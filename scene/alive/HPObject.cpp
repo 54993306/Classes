@@ -89,7 +89,7 @@ void HPObject::updateShow()
 	m_hp->runAction(proto);
 }
 
-bool HPObject::hitEffect(ActObject* target)
+bool HPObject::hitEffect(AliveObject* target)
 {
 	CCNode* Effect = DataCenter::sharedData()->getRoleData()->getActionEffect(target->getModel());
 	if (Effect)
@@ -100,21 +100,9 @@ bool HPObject::hitEffect(ActObject* target)
 	return true;
 }
 
-void HPObject::playerNum(ActObject* target,int num,int type)
+void HPObject::playerNum(AliveObject* target,int num,int type)
 {
-	if (type == nullType)return;
-	if (!num&&type!=typeface)
-	{
-		CCLOG(" [ Tips ] HPObject::playerNum Num = 0!");
-		return	;
-	}
-	int callType = target->getAlive()->getCallType();
-	if ( callType== OnlyOnce || callType == AutoSkill)
-	{
-		this->setVisible(false);
-		return;
-	}
-	showHp(target);
+	showHp(nullptr);
 	float scale = target->getScale();								//得到目标的缩放比例
 	int moveNum = CCRANDOM_0_1()*170;
 	CCScaleTo* sc = CCScaleTo::create(0.15f,1/scale*1.3f);
@@ -202,39 +190,23 @@ void HPObject::playerNum(ActObject* target,int num,int type)
 		CCSequence* runSqu = (CCSequence*)sqe->copy();
 		NumLabel->runAction(runSqu);
 	}
-	ActObject* act = (ActObject*)target;
-	if (act->getEnemy())
+	if (target->getEnemy())
 	{
 		NumLabel->setPosition(ccp(-170,100));
 	}else{
 		NumLabel->setPosition(ccp(-50,100));
 	}
 	target->addChild(NumLabel,1);
-
 	if (!font)return;						//暴击的显示方式，字体旋转一定角度，敌我双方显示位置不同
-	CCFadeIn* fain = CCFadeIn::create(0.2f);
-	CCDelayTime* detime = CCDelayTime::create(0.6f);
-
-	CCSequence* bgsqe = CCSequence::create(fain,detime, CCRemoveSelf::create(), NULL);
-	
-	CCNode* HpNumBg = target->getChildByTag(CritHpBmg_Sp);
-	if (HpNumBg)
+	if (target->getEnemy())
 	{
-		HpNumBg->stopAllActions();
-		CCSequence* runSqu = (CCSequence*)bgsqe->copy();
-		HpNumBg->runAction(runSqu);
+		font->setPosition(ccp(-40,120));
 	}else{
-		if (act->getEnemy())
-		{
-			font->setPosition(ccp(-40,120));
-		}else{
-			font->setPosition(ccp(20,120));
-		}
-		CCSequence* runSqu = (CCSequence*)crit_sqeBg->copy();
-		font->runAction(runSqu);
-		font->setTag(CritHpBmg_Sp);
-		target->addChild(font);
+		font->setPosition(ccp(20,120));
 	}
+	CCSequence* runSqu = (CCSequence*)crit_sqeBg->copy();
+	font->runAction(runSqu);
+	target->addChild(font);
 }
 
 CCProgressTimer* HPObject::getPro()
@@ -253,5 +225,3 @@ void HPObject::hideHp( float dt )
 {
 	this->setVisible(false);
 }
-
-

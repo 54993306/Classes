@@ -29,6 +29,7 @@
 #include "GMessage.h"
 #include "warscene/BattleTools.h"
 #include "warscene/HurtCount.h"
+#include "Battle/BattleMessage.h"
 
 CombatEffect::CombatEffect()
 :m_Scene(nullptr),_armaturePlayerSkill(nullptr),_playerSkillData(nullptr),m_PlayerNum(0)
@@ -117,7 +118,7 @@ void CombatEffect::hurtMonster(float Atk)
 		if (lostNum <= 0)
 			lostNum = 1;
 		alive->setHp(alive->getHp()-lostNum);
-		actObject->getHp()->playerNum(actObject,lostNum,generalType);	//受击武将播放血量变化
+		actObject->playerNum(lostNum,generalType);	//受击武将播放血量变化
 	}
 }
 //公式：	攻击力=近战英雄攻击力总和*0.05+远程英雄攻击力总和*0.04+辅助英雄攻击力总和*0.1+肉盾英雄攻击力总和*0.08		
@@ -183,7 +184,7 @@ void CombatEffect::BattleEffect(BattleResult* Result)
 		CCLOG("[ ERROR ] CombatEffect::BattleEffect EffectInfo NULL %d",efInfo->effectId);
 	}
 	if (Result->getusNum()&&Result->getusType())
-		aliveOb->getHp()->playerNum(aliveOb,Result->getusNum(),Result->getusType());						//攻击武将播放血量变化(吸血类效果有时应该差时而非同步播放)
+		aliveOb->playerNum(Result->getusNum(),Result->getusType());						//攻击武将播放血量变化(吸血类效果有时应该差时而非同步播放)
 	for(vector<unsigned int>::iterator iter = Result->m_HitTargets.begin();iter!=Result->m_HitTargets.end();++iter)
 	{
 		WarAlive* pAlive = Result->m_Alive_s[*iter];
@@ -213,12 +214,8 @@ void CombatEffect::BattleEffect(BattleResult* Result)
 			if (!alive->getEnemy())
 				NOTIFICATION->postNotification(BAR_ATK_HANDLE);			//刷新连击处理
 		}
-		pAliveOb->getHp()->playerNum(pAliveOb,Result->m_LostHp[*iter].hitNum,Result->m_LostHp[*iter].hitType);	//受击武将播放血量变化
-		if (pAlive->getAliveType() == AliveType::WorldBoss)				//同步刷新世界boss学两条
-		{
-			m_Scene->getWarUI()->updateWorldBossBloodBar(pAliveOb->getHp()->getHp());
-			m_Scene->getWarUI()->updateWorldBossDamage(DataCenter::sharedData()->getWar()->getBossHurtCount());
-		}
+		pAliveOb->playerNum(Result->m_LostHp[*iter].hitNum,Result->m_LostHp[*iter].hitType);	
+
 		if (Result->m_Repel[*iter] != pAlive->getGridIndex())
 		{
 			pAlive->setMoveGrid(Result->m_Repel[*iter]);

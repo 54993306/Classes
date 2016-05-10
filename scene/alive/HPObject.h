@@ -2,7 +2,7 @@
 #define _HPOBJECT_H_
 #include "cocos2d.h"
 #include "AppUI.h"
-class ActObject;
+class AliveObject;
 
 USING_NS_CC;
 class HPObject : public CCNode
@@ -16,7 +16,7 @@ public:
 	void setMaxHp(float maxHp);
 	inline int getHp(){return m_hpVal;}
 	inline int getMaxHp(){return m_maxHpVal;}
-	void playerNum(ActObject* target,int num,int type);
+	void playerNum(AliveObject* target,int num,int type);
 	void showHp(CCObject* ob);
 	void hideHp(float dt);
 /***
@@ -27,7 +27,7 @@ public:
  *
  *@brief : 武将可能在其他动作时播放特效，后续可能添加的是特效而不是图片,spine骨骼动画,帧动画等拓展,涉及到动作和资源加载
  */ 
-	bool hitEffect(ActObject* target);
+	bool hitEffect(AliveObject* target);
 	inline float getPercent(){return m_percent;}
 	CCProgressTimer* getPro();
 protected:

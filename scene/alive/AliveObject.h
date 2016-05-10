@@ -35,6 +35,8 @@ public:
 	void AtkBegin_Event();
 	void HpChange_Event();
 	void PlayAnimat_Event(string sData);
+	void initTypeIcon();
+	void playerNum(int num,int type);
 public:
 	CC_SYNTHESIZE(WarAlive*,m_Alive,Alive);				//设置逻辑对象
 	CC_SYNTHESIZE(MoveObj*,m_MoveObj,MoveObj);			//设置移动对象

@@ -276,7 +276,7 @@ void ActObject::SpineActionEvent( int trackIndex,spEvent* Event )
 		}break;
 	case EventType::Mask:
 		{
-			NOTIFICATION->postNotification(SKILL_MASK,m_Alive);
+			NOTIFICATION->postNotification(B_SKILL_MASK,m_Alive);
 		}break;
 	default:
 		break;
@@ -314,7 +314,7 @@ void ActObject::updateFrameEvent( float dt )
 					if(sEventName.compare(EVE_SHAKE)			==0	)
 						NOTIFICATION->postNotification(SHAKE_BYEFFECT,nullptr);
 					if (sEventName.compare(EVE_MASK)			==0 )
-						NOTIFICATION->postNotification(SKILL_MASK,m_Alive);
+						NOTIFICATION->postNotification(B_SKILL_MASK,m_Alive);
 				}
 			}
 		}

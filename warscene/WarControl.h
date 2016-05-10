@@ -19,7 +19,7 @@ public:
 	virtual void onEnter();
 	virtual void onExit();
 public:
-	void initAliveBtn();
+	void initAliveButton();
 	void initTipsEffect(CCObject* ob);
 	void hideEffect(CCNode* node);
 	void AddEvent();
@@ -49,18 +49,37 @@ public:
 	CC_SYNTHESIZE(CCPoint, m_goldIconPos, GoldIconPos);
 	CC_SYNTHESIZE(CCPoint, m_boxIconPos, BoxIconPos);
 	CC_SYNTHESIZE(CCSpriteBatchNode*, m_batchNodeEffect, BatchNodeEffect);
+
 	void update(float dt);
+	void updateBarValue();						  //让costBar的变化缓慢进行,例如释放技能后又60变30的情况
 	void upButtonState(CCObject* ob);
+
 	void flyCostToHeroBtn(CCNode* pNode);
 	void updateTimeCountUI(int iCount);
-	void updateWorldBossUI();
-	void updateWorldBossDamage(int iDamage);
-	void updateWorldBossBloodBar(int iValue);
-	void initArmatureTips();
+	
+	
+	
+	void iniCaptainHurtTips();
 	void frameEvent(CCBone *pBone, const char *str, int a, int b);
 
-	void hideUpUiPart();	//隐藏UI的上面部分
 
+/*******************************************************************************************************************/
+
+	void hideUpUiPart();									//隐藏UI的上面部分
+
+	void iniTestUi();										//初始化一些用于测试的控件按钮
+	
+	void initUIAbove();										//初始化UI上部分
+
+	void initUIEffect();									//初始化添加在UI上的效果
+
+	void updateWorldBossDamage();							//刷新时间boss伤害表现
+
+	void updateWorldBossBloodBar(CCObject* ob);				//刷新世界boss血量条
+
+	void initNormalAbove();									//初始化非世界boss上部分
+
+	void initWorldBossAbove(WarAlive* boss);				//世界boss情况
 protected:
 	WarManager* m_Manage;
 	CLayout*	m_ControLayer;
@@ -123,7 +142,7 @@ enum ControlLayer_Tag
 	CL_TipsEffect2,
 	CL_TipsEffect3,
 	CL_TipsEffect4,
-	GU_openGuide = 250,
+	GU_openGuide = 250,		//引导测试按钮
 	TEST_BattleData,		//重载关卡数据按钮
 	CL_OpenGameEditorBtn =300,
 };

@@ -257,9 +257,9 @@ void BuffManage::ExcuteBuff(BuffInfo*bfinfo, bool handel /*= true*/)
 			NOTIFICATION->postNotification(UPBUFFEFFECT,m_alive);				//每次加减血时显示一次buff的特效
 			if (bfinfo->getDbuf())
 			{			
-				m_alive->getActObject()->getHp()->playerNum(m_alive->getActObject(),num,generalType);
+				m_alive->getActObject()->playerNum(num,generalType);
 			}else{
-				m_alive->getActObject()->getHp()->playerNum(m_alive->getActObject(),num,gainType);
+				m_alive->getActObject()->playerNum(num,gainType);
 			}
 		}break;
 	case ATK:{

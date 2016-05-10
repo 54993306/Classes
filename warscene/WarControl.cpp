@@ -60,7 +60,7 @@ void WarControl::onEnter()
 	NOTIFICATION->addObserver(this,callfuncO_selector(WarControl::AliveBattleDispose),ALIVEBATTLET,nullptr);
 	NOTIFICATION->addObserver(this,callfuncO_selector(WarControl::initTipsEffect),TIPSEFFECT,nullptr);
 	NOTIFICATION->addObserver(this,callfuncO_selector(WarControl::CaptainHit),CAPTAINHIT,nullptr);
-	NOTIFICATION->addObserver(this,callfuncO_selector(WarControl::SkillMask),SKILL_MASK,nullptr);
+	NOTIFICATION->addObserver(this,callfuncO_selector(WarControl::SkillMask),B_SKILL_MASK,nullptr);
 	NOTIFICATION->addObserver(this,callfuncO_selector(WarControl::upButtonState),UPSKILLBUTTON,nullptr);
 }
 
@@ -88,113 +88,108 @@ bool WarControl::init()
 		this->setTouchPriority(WarControlPriority);
 		this->setTouchEnabled(false);
 		this->setOnTouchEndedAfterLongClickListener(this, ccw_afterlongclick_selector(WarControl::onlongClickEnd));		//只对开启了长按监听的控件有效
-
-		CLayout* pLayoutNormal = (CLayout*)m_ControLayer->findWidgetById("layer_up_normal");
-		CLayout* pLayoutBoss = (CLayout*)m_ControLayer->findWidgetById("layer_up_boss");
-		pLayoutNormal->setVisible(true);
-		pLayoutBoss->setVisible(false);
-
-		CButton* bt_return = (CButton*)m_ControLayer->getChildByTag(CL_Menu);
-		bt_return->setOnClickListener(this,ccw_click_selector(WarControl::OnClick));
-		CButton* bt_starWar = (CButton*)m_ControLayer->getChildByTag(CL_StarBtn);
-		bt_starWar->setOnClickListener(this,ccw_click_selector(WarControl::OnClick));
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
-		bt_starWar->setVisible(true);
-#else
-		bt_starWar->setVisible(false);
-#endif
-		CCheckBox* bt_speed = (CCheckBox*)m_ControLayer->getChildByTag(CL_AddSpeedBtn);
-		bt_speed->setOnCheckListener(this,ccw_check_selector(WarControl::CheckBoxCallBack));
-
-		CProgressLabel* GoldNum = CProgressLabel::create();
-		CLabel* goldNum_ = (CLabel*)pLayoutNormal->getChildByTag(CL_GoldNum);
-		goldNum_->setString("0");
-		GoldNum->setLabel(goldNum_);
-		GoldNum->setTag(CL_GoldNumPro);
-		m_ControLayer->addChild(GoldNum);
-
-		CProgressLabel* BoxNum = CProgressLabel::create();
-		CLabel* boxNum_ = (CLabel*)pLayoutNormal->getChildByTag(CL_BoxNum);
-		boxNum_->setString("0");
-		BoxNum->setLabel(boxNum_);
-		BoxNum->setTag(CL_BoxNumPro);
-		m_ControLayer->addChild(BoxNum);
 		m_Manage = DataCenter::sharedData()->getWar();
 		this->addChild(m_ControLayer);
-		initAliveBtn();
 
-		for (int i=0;i<4;i++)
-		{
-			CCPoint p = DataCenter::sharedData()->getMap()->getCurrWarMap()->getPoint(i);
-			EffectObject* ef = EffectObject::create("10030",EffectType::Repeat);
-			ef->setTag(CL_TipsEffect1+i);
-			ef->setPosition(ccp(100,p.y));
-			ef->setVisible(false);
-			m_ControLayer->addChild(ef);
-		}
-		initArmatureTips();
+		initUIAbove();									//初始化界面上部分
 
-		m_LayerColor = CCLayerColor::create();
-		m_LayerColor->setContentSize(CCDirector::sharedDirector()->getWinSize()*2);
-		m_LayerColor->setAnchorPoint(ccp(0,0));
-		m_LayerColor->setZOrder(1);
-		m_ControLayer->addChild(m_LayerColor);
+		initAliveButton();								//初始化武将按钮
 
-		CButton* open = CButton::create("public/btn_tihuanwujiang_01.png","public/btn_tihuanwujiang_02.png");
-		open->setPosition(CCPoint(200, 100));
-		open->setTag(GU_openGuide);
-		open->setOnClickListener(this,ccw_click_selector(WarControl::OnClick));
-		m_ControLayer->addChild(open);
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
-		open->setVisible(false);
-#else
-		open->setVisible(false);
-#endif
-		//初始化金币图标和盒子图标的世界坐标位置
-		CCSprite* pGold = ((CCSprite*)pLayoutNormal->findWidgetById("gold"));
-		m_goldIconPos = pGold->getPosition()+ccp(pGold->getContentSize().width*0.5f, pGold->getContentSize().height*0.5f);
-		m_goldIconPos = pGold->getParent()->convertToWorldSpace(m_goldIconPos);
-		CCSprite* pBox = ((CCSprite*)pLayoutNormal->findWidgetById("box"));
-		m_boxIconPos = pBox->getPosition();
-		m_boxIconPos = pBox->getParent()->convertToWorldSpace(m_boxIconPos);
+		iniCaptainHurtTips();							//主帅受击提示
 
-		updateWorldBossUI();
-		//掉落效果层
-		m_batchNodeEffect = CCSpriteBatchNode::create("common/icon_11.png");
-		this->addChild(m_batchNodeEffect);
+		initUIEffect();									//添加在界面上的特效
+
+		iniTestUi();
+
 		scheduleUpdate();
 		return true;
 	}
 	return false;
 }
-//是否有世界BOSS
-void WarControl::updateWorldBossUI()
+//添加在界面上的特效
+void WarControl::initUIEffect()
+{
+	for (int i=0;i<4;i++)
+	{
+		CCPoint p = DataCenter::sharedData()->getMap()->getCurrWarMap()->getPoint(i);
+		EffectObject* ef = EffectObject::create("10030",EffectType::Repeat);
+		ef->setTag(CL_TipsEffect1+i);
+		ef->setPosition(ccp(100,p.y));
+		ef->setVisible(false);
+		m_ControLayer->addChild(ef);
+	}
+	m_LayerColor = CCLayerColor::create();															//技能触发的全屏颜色
+	m_LayerColor->setContentSize(CCDirector::sharedDirector()->getWinSize()*2);
+	m_LayerColor->setAnchorPoint(ccp(0,0));
+	m_LayerColor->setZOrder(1);
+	m_ControLayer->addChild(m_LayerColor);
+	m_batchNodeEffect = CCSpriteBatchNode::create("common/icon_11.png");							//金币掉落
+	m_ControLayer->addChild(m_batchNodeEffect);
+}
+//初始化界面上部分
+void WarControl::initUIAbove()
 {
 	WarAlive* boss = m_Manage->getAliveByType(AliveType::WorldBoss);
-	if (!boss)
+	if (boss)
+	{
+		m_ControLayer->findWidgetById("layer_up_boss")->setVisible(true);
+		m_ControLayer->findWidgetById("layer_up_normal")->setVisible(false);
+		updateTimeCountUI(180);																			//时间
+		initWorldBossAbove(boss);
+	}else{
+		m_ControLayer->findWidgetById("layer_up_boss")->setVisible(false);
+		m_ControLayer->findWidgetById("layer_up_normal")->setVisible(true);
+		initNormalAbove();
 		return;
-	m_ControLayer->findWidgetById("layer_up_boss")->setVisible(true);
-	m_ControLayer->findWidgetById("layer_up_normal")->setVisible(false);
-	//时间
-	updateTimeCountUI(180);
-	//伤害
-	CLabel* pDamageText = (CLabel*)m_ControLayer->findWidgetById("attack_index");
+	}
+}
+
+void WarControl::initNormalAbove()
+{
+	CButton* bt_return = (CButton*)m_ControLayer->getChildByTag(CL_Menu);								//返回按钮
+	bt_return->setOnClickListener(this,ccw_click_selector(WarControl::OnClick));		
+
+	CCheckBox* bt_speed = (CCheckBox*)m_ControLayer->getChildByTag(CL_AddSpeedBtn);						//加速按钮
+	bt_speed->setOnCheckListener(this,ccw_check_selector(WarControl::CheckBoxCallBack));
+
+	CLayout* pLayoutNormal = (CLayout*)m_ControLayer->findWidgetById("layer_up_normal");
+	CProgressLabel* GoldNum = CProgressLabel::create();
+	CLabel* goldNum_ = (CLabel*)pLayoutNormal->getChildByTag(CL_GoldNum);
+	goldNum_->setString("0");
+	GoldNum->setLabel(goldNum_);
+	GoldNum->setTag(CL_GoldNumPro);
+	m_ControLayer->addChild(GoldNum);
+
+	CProgressLabel* BoxNum = CProgressLabel::create();
+	CLabel* boxNum_ = (CLabel*)pLayoutNormal->getChildByTag(CL_BoxNum);
+	boxNum_->setString("0");
+	BoxNum->setLabel(boxNum_);
+	BoxNum->setTag(CL_BoxNumPro);
+	m_ControLayer->addChild(BoxNum);
+
+	CCSprite* pGold = ((CCSprite*)pLayoutNormal->findWidgetById("gold"));								//初始化金币图标和盒子图标的世界坐标位置
+	m_goldIconPos = pGold->getPosition()+ccp(pGold->getContentSize().width*0.5f, pGold->getContentSize().height*0.5f);
+	m_goldIconPos = pGold->getParent()->convertToWorldSpace(m_goldIconPos);
+	CCSprite* pBox = ((CCSprite*)pLayoutNormal->findWidgetById("box"));
+	m_boxIconPos = pBox->getPosition();
+	m_boxIconPos = pBox->getParent()->convertToWorldSpace(m_boxIconPos);
+}
+
+//初始化世界bossUI
+void WarControl::initWorldBossAbove(WarAlive* boss)
+{											
+	CLabel* pDamageText = (CLabel*)m_ControLayer->findWidgetById("attack_index");					//伤害
 	m_pAllDamage = CCLabelAtlas::create("0", "worldBoss/no_07.png", 17, 28, 48);
 	m_pAllDamage->setAnchorPoint(ccp(1.0f, 0.5f));
 	m_pAllDamage->setPosition(pDamageText->getPosition() + ccp(-36, 15));
 	pDamageText->getParent()->addChild(m_pAllDamage, pDamageText->getZOrder());
+	NOTIFICATION->addObserver(this,callfuncO_selector(WarControl::updateWorldBossBloodBar),B_WorldBoss_HurtUpdate,nullptr);
 
-	//屏蔽加速和暂停
-	CCheckBox* bt_speed = (CCheckBox*)m_ControLayer->getChildByTag(CL_AddSpeedBtn);
+	CCheckBox* bt_speed = (CCheckBox*)m_ControLayer->getChildByTag(CL_AddSpeedBtn);					//屏蔽加速和暂停
 	bt_speed->setEnabled(false);
 	bt_speed->setVisible(false);
-	//CButton* pBtPause = (CButton*)m_ControLayer->getChildByTag(CL_Menu);
-	//pBtPause->setEnabled(false);
-	//pBtPause->setVisible(false);
 
-
-	//BOSS头像
-	CImageView* pHead = (CImageView*)m_ControLayer->findWidgetById("boss_head");
+	CImageView* pHead = (CImageView*)m_ControLayer->findWidgetById("boss_head");					//BOSS头像
 	CCString* pStr = CCString::createWithFormat("headImg/%d.png", boss->getModel());
 	std::string strFullPath = CCFileUtils::sharedFileUtils()->fullPathForFilename(pStr->getCString());
 	if(CCFileUtils::sharedFileUtils()->isFileExist(strFullPath))
@@ -202,46 +197,41 @@ void WarControl::updateWorldBossUI()
 
 	m_pBossBar1 = (CProgressBar*)m_ControLayer->findWidgetById("bar1");
 	m_pBossBar2 = (CProgressBar*)m_ControLayer->findWidgetById("bar2");
-	updateWorldBossBloodBar(boss->getHp());
+	updateWorldBossBloodBar(CCInteger::create(boss->getHp()));
 
-	//BUFF层次
-	CLabel* pBuffRank = (CLabel*)m_ControLayer->findWidgetById("boss_fire_level");
+	CLabel* pBuffRank = (CLabel*)m_ControLayer->findWidgetById("boss_fire_level");					//BUFF层次
 	pBuffRank->setString(ToString(DataCenter::sharedData()->getWar()->getWorldBossRank()));
 }
 
-void WarControl::updateWorldBossDamage( int iDamage )
+void WarControl::updateWorldBossDamage()
 {
-	if (!m_pAllDamage || !iDamage)
-		return;
-	m_pAllDamage->runAction(CCRollLabelAction::create(0.3f, atoi(m_pAllDamage->getString()), iDamage, m_pAllDamage));
+	WarAlive* boss = m_Manage->getAliveByType(AliveType::WorldBoss);
+	int num = DataCenter::sharedData()->getWar()->getBossHurtCount();
+	m_pAllDamage->runAction(CCRollLabelAction::create(0.3f, atoi(m_pAllDamage->getString()), num, m_pAllDamage));
 	m_pAllDamage->runAction(CCSequence::createWithTwoActions(CCScaleTo::create(0.1f, 1.5f), CCScaleTo::create(0.05f, 1.0f)));
 }
-
-void WarControl::updateWorldBossBloodBar( int iValue )
+//世界boss两个bar叠加在一起构成世界boss血量条
+void WarControl::updateWorldBossBloodBar( CCObject* ob )
 {
-	if (!m_pBossBar1)
-		return;
-
-	//保证大于等于0
-	iValue = iValue<0?0:iValue;
-
-	//一管血10000
-	int iOneBarMax = 10000;
-	//剩余多少
-	int iRemain = iValue%iOneBarMax;
-	//多少整管
-	int iBarCount = iValue/iOneBarMax;
-	//底管血条颜色
-	int iLowBarIndex = iBarCount%4;
-	//上层管血条颜色
-	int iUpBarIndex = (iLowBarIndex+1)%4;
+	updateWorldBossDamage();
+	
+	int iValue = ((CCInteger*)ob)->getValue();					
+	iValue = iValue<0?0:iValue;									//保证大于等于0
+	
+	int iOneBarMax = 10000;										//一管血10000
+	
+	int iRemain = iValue%iOneBarMax;							//剩余多少
+	
+	int iBarCount = iValue/iOneBarMax;							//多少整管
+	
+	int iLowBarIndex = iBarCount%4;								//底管血条颜色
+	
+	int iUpBarIndex = (iLowBarIndex+1)%4;						//上层管血条颜色
 
 	if(iBarCount==0)
 	{
 		m_pBossBar1->setVisible(false);
-	}
-	else
-	{
+	}else{
 		m_pBossBar1->setProgressImage(CCString::createWithFormat("warScene/boss_bar_%d.png", iLowBarIndex)->getCString());
 		m_pBossBar1->setMaxValue(iOneBarMax);
 		m_pBossBar1->setValue(iOneBarMax);
@@ -254,17 +244,14 @@ void WarControl::updateWorldBossBloodBar( int iValue )
 		float fTime = 0.015f*100*(iOneBarMax-iRemain)/iOneBarMax;
 		m_pBossBar2->setValue(iOneBarMax);
 		m_pBossBar2->startProgress(iRemain, fTime);
-	}
-	else
-	{
+	}else{
 		float fTime = 0.015f*100*(m_pBossBar2->getValue()-iRemain)/iOneBarMax;
 		m_pBossBar2->startProgress(iRemain, fTime);
 	}
-
 }
 
 //初始化UI按钮信息
-void WarControl::initAliveBtn()
+void WarControl::initAliveButton()
 {
 	CCArray* arr = m_Manage->getHeros(true);
 	CCObject* obj = nullptr;
@@ -401,17 +388,11 @@ void WarControl::initAliveBtn()
 
 	//旋转3球
 	CCSprite* pCircle = (CCSprite*)m_ControLayer->getChildByTag(CL_CostEffect);
-	//pCircle->runAction(CCRepeatForever::create(CCRotateBy::create(10,360)));
 	pCircle->setOpacity(0);
 	for(unsigned int i=0; i<3; i++)
 	{
 		CCSprite* pCircle1 = (CCSprite*)m_ControLayer->findWidgetById(CCString::createWithFormat("circle_%d", i)->getCString());
-		//pCircle1->setPosition(pCircle->convertToNodeSpace(m_ui->convertToWorldSpace(pCircle1->getPosition())));
-		//pCircle1->retain();
 		pCircle1->removeFromParentAndCleanup(true);
-		//pCircle->addChild(pCircle1);
-		//pCircle1->runAction(CCRepeatForever::create(CCRotateBy::create(10,-360)));
-		//pCircle1->release();
 	}
 	CCSpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile("skill/9051.plist");//将plist文件加载进入缓存
 	AnimationManager::sharedAction()->ParseAnimation("9051");
@@ -910,7 +891,6 @@ void WarControl::SkillMask( CCObject* ob )
 	}
 	m_LayerColor->stopAllActions();
 	m_LayerColor->setVisible(true);
-	//m_CaptainTips->setOpacity(100);
 	m_LayerColor->runAction(CCSequence::create(CCFadeOut::create(0.07f),CCHide::create(),NULL));
 }
 //cost变化数字
@@ -985,21 +965,22 @@ void WarControl::showFlyCostToBarCallBack( CCNode* pSender )
 	m_ControLayer->addChild(pLz);
 	PlayEffectSound(SFX_423);
 }
-
+//在update里面不宜直接写逻辑
 void WarControl::update( float dt )
 {
-	int iNowCost = m_pCostBar->getValue();
+	updateBarValue();									//缓慢的刷新bar的显示
+}
 
+void WarControl::updateBarValue()
+{
+	int iNowCost = m_pCostBar->getValue();
 	if(m_iAimCost == iNowCost)
 	{
 		return;
-	}
-	else
-	{
+	}else{
 		int iCurrentCost = m_iAimCost>iNowCost?++iNowCost:--iNowCost;
 		m_pCostBar->setValue(iCurrentCost);
 	}
-
 }
 
 void WarControl::flyCostToHeroBtn( CCNode* pNode )
@@ -1036,7 +1017,7 @@ void WarControl::updateTimeCountUI( int iCount )
 	pLabel->setString(pStr->getCString());
 }
 
-void WarControl::initArmatureTips()
+void WarControl::iniCaptainHurtTips()
 {
 	CCAnimationData *animationData = CCArmatureDataManager::sharedArmatureDataManager()->getAnimationData("attack");
 	if (animationData)
@@ -1091,4 +1072,26 @@ void WarControl::hideUpUiPart()
 	m_ControLayer->findWidgetById("layer_up_normal")->setVisible(false);
 	m_ControLayer->getChildByTag(CL_Menu)->setVisible(false);
 	m_ControLayer->getChildByTag(CL_AddSpeedBtn)->setVisible(false);
+}
+
+void WarControl::iniTestUi()
+{
+	CButton* bt_starWar = (CButton*)m_ControLayer->getChildByTag(CL_StarBtn);
+	bt_starWar->setOnClickListener(this,ccw_click_selector(WarControl::OnClick));
+#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+	bt_starWar->setVisible(true);
+#else
+	bt_starWar->setVisible(false);
+#endif
+
+	CButton* open = CButton::create("public/btn_tihuanwujiang_01.png","public/btn_tihuanwujiang_02.png");
+	open->setPosition(CCPoint(200, 100));
+	open->setTag(GU_openGuide);
+	open->setOnClickListener(this,ccw_click_selector(WarControl::OnClick));
+	m_ControLayer->addChild(open);
+#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+	open->setVisible(false);
+#else
+	open->setVisible(false);
+#endif
 }

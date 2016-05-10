@@ -834,7 +834,6 @@ void CombatLogic::ActRemove( CCObject* ob )
 				m_UILayer->hideUpUiPart();			//隐藏control UI的上部分
 				m_StoryLayer->CreateStory(CCInteger::create((int)StoryType::OverStory));			//我方胜利(播放最后一个剧情)
 			}
-				
 		}
 	}else{
 		if (!alive->getCaptain())

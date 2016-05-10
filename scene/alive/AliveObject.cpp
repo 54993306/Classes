@@ -19,6 +19,7 @@
 #include "warscene/CHeroSoundData.h"
 #include "model/BuffManage.h"
 
+#include "Battle/BattleMessage.h"
 AliveObject::AliveObject()
 	:m_Body(nullptr),m_Hp(nullptr),m_Name(""),m_ActionKey(""),m_MoveState(0)
 	,m_NameLabel(nullptr),m_Armature(nullptr),m_DropItem(0),m_offs(CCPointZero),m_Speed(CCPointZero)
@@ -90,15 +91,19 @@ void AliveObject::setHp(HPObject* hp)
 	m_Hp->setScale(1/m_Alive->getZoom());
 	m_Hp->setVisible(false);
 	m_Hp->setPosition(ccp(0,-5));
+	m_Armature->addChild(m_Hp, 100);
+	initTypeIcon();
+}
+HPObject* AliveObject::getHp() { return m_Hp; }
 
+void AliveObject::initTypeIcon()
+{
 	char str[60]={0};
 	const HeroInfoData *c_data = DataCenter::sharedData()->getHeroInfo()->getCfg(m_Alive->role->thumb);
 	if(c_data)
 	{
 		sprintf(str,"common/type_%d_%d.png", m_Alive->role->roletype, c_data->iType2);
-	}
-	else
-	{
+	}else{
 		sprintf(str,"common/type_1_1.png");
 	}
 	CCSprite* sp = CCSprite::create(str);
@@ -110,9 +115,7 @@ void AliveObject::setHp(HPObject* hp)
 	sp->setScale(0.5f);
 	sp->setPosition(ccp(-m_Hp->getContentSize().width/2,0));			//在body处设置了翻转了
 	m_Hp->addChild(sp);
-	m_Armature->addChild(m_Hp, 100);
 }
-HPObject* AliveObject::getHp() { return m_Hp; }
 
 void AliveObject::setNickName(string nickName)//设置武将名字
 {
@@ -277,4 +280,17 @@ void AliveObject::PlayAnimat_Event(string sData)
 	pAnimat->setZOrder(m_Armature->getZOrder()+iOffZorder);
 	m_Armature->getParent()->addChild(pAnimat);
 	pAnimat->setShaderEffect(m_Armature->getShaderProgram());
+}
+
+void AliveObject::playerNum( int num,int type )
+{
+	if (type == nullType)return;
+	if (!num&&type!=typeface)
+	{
+		CCLOG(" [ Tips ] AliveObject::playerNum Num = 0!");
+		return	;
+	}
+	m_Hp->playerNum(this,num,type);
+	if (m_Alive->getAliveType() == AliveType::WorldBoss)														//boss的情况处理应该在血量条的内部,自己进行。
+		NOTIFICATION->postNotification(B_WorldBoss_HurtUpdate,CCInteger::create(m_Hp->getHp()));	
 }
