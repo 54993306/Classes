@@ -1,0 +1,43 @@
+#ifndef __BATTLERESULT__
+#define __BATTLERESULT__
+
+#include "AppUI.h"
+#include "model/BattleData.h"
+/************************************************************************/
+//                                                                      
+//
+//						武将攻击结果,存储武将当前攻击的状态信息
+//						之前是用于逻辑层和显示层之间进行数据传递使用
+//						//  [9/3/2015 LinXianCheng]
+//
+/************************************************************************/
+//每一个掉血数据，参数为掉血类型和掉血数值
+struct STR_LostHp
+{
+	STR_LostHp();
+	int hitType;
+	int hitNum;			//计算可以为浮点,最后转化为整型伤害
+	int anger;
+};
+class WarAlive;
+class ActObject;
+class BattleResult : public CCObject
+{
+public:
+	BattleResult();
+	virtual ~BattleResult();
+	virtual bool init(){return true;}
+	CREATE_FUNC(BattleResult);			
+	vector<unsigned int> m_HitTargets;								//受击武将ID
+	map<unsigned int,WarAlive*> m_Alive_s;							//存储受击数组的武将信息
+	map<unsigned int,STR_LostHp> m_LostHp;
+	map<unsigned int,int> m_CurrHp;									//原先用于做血量条变化,现用于做
+	map<unsigned int,int> m_Repel;									//记录击退格子
+	map<unsigned int,unsigned int> m_AddBuf;
+	map<unsigned int,unsigned int> m_DelBuf;
+	CC_SYNTHESIZE(WarAlive*,m_alive,Alive);
+	CC_SYNTHESIZE(int,m_usType,usType);
+	CC_SYNTHESIZE(int,m_usNum,usNum);
+protected:
+};
+#endif

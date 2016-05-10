@@ -1,0 +1,17 @@
+#pragma once
+
+#define VERSION	"VERSION"
+#define USER_NAME "userName"
+#define PASSWORD "password"
+#define BG_MUSIC "bg_music"
+#define EFF_MUSIC "eff_music"
+#define PACKAGE_DOWNLOAD_OPEN "PACKAGE_DOWNLOAD_OPEN"
+#define PACKAGE_DOWNLOAD_INDEX "PACKAGE_DOWNLOAD_INDEX"
+
+#define TELEPHONE "TELEPHONE"
+#define DEVICE_ID "DEVICE_ID"
+
+#define SERVER_FOR_GAME "SERVER_FOR_GAME"
+#define SERVER_FOR_UPDATE "SERVER_FOR_UPDATE"
+
+#define ACCESS_UI_OPEN "ACCESS_UI_OPEN"
