@@ -19,7 +19,7 @@ public:
 	virtual void onEnter();
 	virtual void onExit();
 public:
-	void initAliveButton();
+	void initAliveButtons();
 	void initTipsEffect(CCObject* ob);
 	void hideEffect(CCNode* node);
 	void AddEvent();
@@ -29,18 +29,17 @@ public:
 	void UpdateBtn(CCObject* ob);						
 	void ChangeBoxGoldNum(CCObject* ob);			//箱子金币
 	CCNode* getboxGold(bool box,bool label);			
-	bool LongClick(CCObject* pSender, CCTouch* pTouch);
-	void onlongClickEnd(CCObject* pSender, CCTouch* pTouch, float fDuration);
-	bool judgeSceneTrap();							//判断场景效果启动条件		
+	bool AliveButtonLongClick(CCObject* pSender, CCTouch* pTouch);
+	void onlongClickEnd(CCObject* pSender, CCTouch* pTouch, float fDuration);	
 	CLayout* getLaout();
 	void upContinuousState(float dt);				//
 	void upContinuousNum(CCObject* ob);				//
-	void AliveProCallBack(CCObject* ob);
+	void AliveBarFullCallBack(CCObject* ob);
 	void AliveBattleDispose(CCObject* ob);
 	void CallAliveBattle(WarAlive*alive);
-	void upAliveButtonState(int cost);
-	CWidgetTouchModel AtkButtonClick(CCObject* ob,CCTouch* pTouch);
-	void AtkBtnClick(CCObject* ob);
+	
+	CWidgetTouchModel AliveButtonClickBegin(CCObject* ob,CCTouch* pTouch);
+	void AliveButtonClick(CCObject* ob);
 	void CaptainHit(CCObject* ob);
 	void SkillMask(CCObject* ob);
 	void showCostAddOrReduceEffect(int iCostChange);
@@ -50,36 +49,46 @@ public:
 	CC_SYNTHESIZE(CCPoint, m_boxIconPos, BoxIconPos);
 	CC_SYNTHESIZE(CCSpriteBatchNode*, m_batchNodeEffect, BatchNodeEffect);
 
-	void update(float dt);
-	void updateBarValue();						  //让costBar的变化缓慢进行,例如释放技能后又60变30的情况
+	
 	void upButtonState(CCObject* ob);
 
 	void flyCostToHeroBtn(CCNode* pNode);
 	void updateTimeCountUI(int iCount);
 	
-	
-	
 	void iniCaptainHurtTips();
 	void frameEvent(CCBone *pBone, const char *str, int a, int b);
 
-
 /*******************************************************************************************************************/
+	CCNode* getMoveLayout(int index);							//得到武将移动的UI部分
 
-	void hideUpUiPart();									//隐藏UI的上面部分
+	void hideUpUiPart();										//隐藏UI的上面部分
 
-	void iniTestUi();										//初始化一些用于测试的控件按钮
+	void iniTestUi();											//初始化一些用于测试的控件按钮
 	
-	void initUIAbove();										//初始化UI上部分
+	void initUIAbove();											//初始化UI上部分
 
-	void initUIEffect();									//初始化添加在UI上的效果
+	void initUIEffect();										//初始化添加在UI上的效果
 
-	void updateWorldBossDamage();							//刷新时间boss伤害表现
+	void updateWorldBossDamage();								//刷新时间boss伤害表现
 
-	void updateWorldBossBloodBar(CCObject* ob);				//刷新世界boss血量条
+	void updateWorldBossBloodBar(CCObject* ob);					//刷新世界boss血量条
 
-	void initNormalAbove();									//初始化非世界boss上部分
+	void initNormalAbove();										//初始化非世界boss上部分
 
-	void initWorldBossAbove(WarAlive* boss);				//世界boss情况
+	void initWorldBossAbove(WarAlive* boss);					//世界boss情况
+
+	void initCostBar();											//初始化costbar
+
+	void initAliveButton(CCNode* Layout,WarAlive* alive);		//初始化单个武将按钮
+
+	void initAliveButtonBar(CCNode* Layout,int model);			//初始化武将进度条
+
+	void initButtonBackImage(CButton* button,int index );		//根据召唤数目初始化按钮图
+
+	void updateUiLayerCostNumber(int cost);						//刷新显示层上Cost值
+
+	void updateAliveButtonEffect();								//刷新武将按钮特效
+
 protected:
 	WarManager* m_Manage;
 	CLayout*	m_ControLayer;

@@ -230,7 +230,7 @@ void CombatLogic::update(float delta)
 	TaskArray();
 	m_bufExp->ResetInterval(delta);
 	RunLogic(delta);
-	m_UILayer->upAliveButtonState(m_CurrCost);
+	m_UILayer->updateUiLayerCostNumber(m_CurrCost);
 	m_UILayer->showCostAddOrReduceEffect(m_fCurrentCostAdd);
 	m_fCurrentCostAdd = 0;
 }

@@ -122,7 +122,7 @@ void WarManager::addAlive(WarAlive* alive)
 	if( tpAlive == alive ) return;
 	if( tpAlive )
 	{
-		CCLOG("WarManager has exists Alive:%d",alive->getAliveID());
+		CCLOG("[ **ERROR ]WarManager::addAlive has exists AliveModel:%d",alive->getModel());
 		return;
 	}
 	alive->retain();
@@ -554,7 +554,7 @@ WarAlive* WarManager::getCallAlive(WarAlive* Father,CSkill* skill)
 			child->setEnemy(Father->getEnemy());
 			if (child->getEnemy())
 			{
-				child->setAliveID(CallNum+C_CallMonst);
+				child->setAliveID(m_members.size()+C_CallMonst);
 				if (child->role->MstType == MST_HIDE)
 					child->setcloaking(true);
 				child->setDelaytime(i->delay);
@@ -573,7 +573,7 @@ WarAlive* WarManager::getCallAlive(WarAlive* Father,CSkill* skill)
 				child->moves.push_back(i->move4);
 				child->moves.push_back(i->move5);
 			}else{
-				child->setAliveID(CallNum+C_CallHero);
+				child->setAliveID(m_members.size()+C_CallHero);
 				child->setGridIndex(INVALID_GRID);
 			}
 			initCallAlive(child,Father);
