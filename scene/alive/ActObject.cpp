@@ -400,6 +400,22 @@ void ActObject::MoveUpdate( float dt )
 	}
 }
 
+bool ActObject::firstBattle( CCPoint& p )
+{
+	if (!m_Alive->getBattle()&&!m_Alive->getEnemy())								//第一次召唤武将处理(未上阵的武将都瞬移)
+	{
+		m_MoveState = 0;
+		m_Alive->setAliveStat(INVINCIBLE);
+		this->TurnStateTo(Start_Index);
+		NOTIFICATION->postNotification(ALIVEBATTLET,m_Alive);//武将上阵
+		m_Alive->setGridIndex(m_Alive->getMoveGrid());
+		this->setSpeed(CCPointZero);
+		this->setPosition(p);
+		return true;
+	}
+	return false;
+}
+
 void ActObject::setMoveState(int var /*= Walk_Index*/)
 {
 	m_MoveState = var;
@@ -411,58 +427,56 @@ void ActObject::setMoveState(int var /*= Walk_Index*/)
 		m_MoveState = 0;
 		return;
 	}
-	//定身状态
 	if (this->getCurrActionCode() != var)
 		this->TurnStateTo(m_MoveState);
+	roleMoveSpeed();
+}
+
+void ActObject::roleMoveSpeed()
+{
 	int MoveGrid = m_Alive->getMoveGrid();											//格子相等的时候可能存在格子大小的误差，应以点的位置来进行判断
-	int us_grid = m_Alive->getGridIndex();
 	if (MoveGrid == INVALID_GRID)return;
 	CCPoint p = m_MapData->getPoint(MoveGrid) + getoffs();							//目标点
-	CCPoint us_p = getPosition();													//武将当前坐标
-	if (!m_Alive->getBattle()&&!m_Alive->getEnemy())								//第一次召唤武将处理(未上阵的武将都瞬移)
-	{
-		m_MoveState = 0;
-		m_Alive->setAliveStat(INVINCIBLE);
-		this->TurnStateTo(Start_Index);
-		NOTIFICATION->postNotification(ALIVEBATTLET,m_Alive);//武将上阵
-		m_Alive->setGridIndex(MoveGrid);
-		this->setSpeed(CCPointZero);
-		this->setPosition(p);
+	if (firstBattle(p))
 		return ;
-	}
 	if (m_Alive->role->row==1&&m_Alive->role->col==1&&m_Enemy)
 		p = CCPoint(p.x+CCRANDOM_0_1()*15+5,p.y);									//防止武将叠在一起
+	int us_grid = m_Alive->getGridIndex();
 	int row = abs((MoveGrid % C_GRID_ROW) - (us_grid % C_GRID_ROW));
 	int col = abs((MoveGrid / C_GRID_ROW) - (us_grid / C_GRID_ROW));
-	float actionTime = max(row,col) * m_Alive->getMSpeed();							//一格多少时间
+	float actionTime = max(row,col) * m_Alive->getMoveSpeed();						//一格多少时间
 	if (m_MoveState == Hit_Index||!actionTime)	//被击退的情况
 	{
 		actionTime = 0.2f;	
 		if (m_MoveState == Hit_Index&&this->getCurrActionCode() != Hit_Index)
 			m_Alive->setGridIndex(MoveGrid);										//动作没有切换成功，瞬间更新受击武将位置(攻击状态无法切换受击动作,无法更新武将位置了)
 	}
-	this->setSpeed((p - us_p)/actionTime);
-	if (this->getCurrActionCode() == Walk_Index)										
-	{	
-		if ((m_Enemy&&us_p.x > p.x) || (!m_Enemy&&us_p.x < p.x))//移动翻转问题
+	CCPoint cp = getPosition();														//武将当前坐标
+	this->setSpeed((p - cp)/actionTime);
+	walkDirection(p,cp);
+}
+
+void ActObject::walkDirection( CCPoint& p,CCPoint& cp )
+{
+	if (this->getCurrActionCode() != Walk_Index)		
+		return ;	
+	if ((m_Enemy&&cp.x > p.x) || (!m_Enemy&&cp.x < p.x))//移动翻转问题
+	{
+		if (m_Enemy)									//改变武将方向
 		{
-			if (m_Enemy)									//改变武将方向
-			{
-				this->setDirection(Ditection_Left);
-			}else{
-				this->setDirection(Ditection_Right);
-			}
+			this->setDirection(Ditection_Left);
 		}else{
-			if (m_Enemy)									//改变武将方向
-			{
-				this->setDirection(Ditection_Right);
-			}else{
-				this->setDirection(Ditection_Left);
-			}
+			this->setDirection(Ditection_Right);
+		}
+	}else{
+		if (m_Enemy)									//改变武将方向
+		{
+			this->setDirection(Ditection_Right);
+		}else{
+			this->setDirection(Ditection_Left);
 		}
 	}
 }
-
 MoveObj::MoveObj():m_grid(0),m_Actobject(nullptr),m_Alive(nullptr){}
 
 bool MoveObj::init()

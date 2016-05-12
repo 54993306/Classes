@@ -1,9 +1,24 @@
 ﻿#ifndef _ALIVEOBJECT_H_
 #define _ALIVEOBJECT_H_
+
+/************************************************************* 
+ *
+ *
+ *		Data : 2016.5.12
+ *	
+ *		Name : 
+ *
+ *		Author : Lin_Xiancheng
+ *
+ *		Description : 用于做武将显示对象处理的地方,和数据对象waralive构成一个完整的ActObject
+ *
+ *
+ *************************************************************/
 #include "ActionDef.h"
 #include "AppUI.h"
 #include <string>
 #include <spine/spine-cocos2dx.h>
+
 class HPObject;
 class EffectObject;
 class WarAlive;

@@ -394,7 +394,7 @@ bool CombatLogic::monsterFlee( WarAlive* alive )
 		{
 			alive->setMoveGrid(4);
 			alive->getActObject()->setMoveState(Walk_Index);
-			alive->setMSpeed(0.5f);
+			alive->setMoveSpeed(0.5f);
 			alive->setDef(1000000);
 		}
 		if (alive->getGridIndex()<= C_BEGINGRID-C_GRID_ROW*4)

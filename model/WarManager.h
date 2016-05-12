@@ -46,6 +46,8 @@ public:
 	WarAlive* getAliveByGrid(int grid);
 	WarAlive* getCallAlive(WarAlive* pAlive,CSkill* skill);
 	WarAlive* getAliveByType(AliveType type,bool Monster = true);
+	WarAlive* getAbsentCallAlive(WarAlive* fatherAlive);
+	bool captainCallNumberJudge(WarAlive* alive);
 	void BattleDataClear();
 	void initData();
 	bool checkMonstOver();

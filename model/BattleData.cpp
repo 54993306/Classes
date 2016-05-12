@@ -226,7 +226,7 @@ void CMonster::readData(const protos::common::Monster &monster)
 	this->atkInterval = monster.atkinterval();
 	this->mCritTime = CCRANDOM_0_1()*(monster.maxround()- monster.minround()) +  monster.minround();
 	this->MoveSpeed = monster.movespeed();
-	this->isCall = monster.iscall();
+	this->isCall = monster.iscall();				//召唤类的武将都放在怪物列表中传输过来
 	this->CallID = monster.monsterid();
 	this->MstType = monster.buff();
 	this->batch = monster.batch();

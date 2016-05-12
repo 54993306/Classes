@@ -152,7 +152,7 @@ void CallAliveByFixRange( WarAlive*father , WarAlive*child )
 	}
 }
 
-CEffect* getCallSkillEffect( CSkill* skill )
+CEffect* getSummonEffect( CSkill* skill )
 {
 	if (skill->skillType == CallAtk)
 		if (skill->EffectList.size())

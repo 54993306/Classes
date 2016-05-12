@@ -60,13 +60,13 @@ struct CEffect
 	int	damage;				//伤害百分比
 	int	hurt;				//真实伤害
 	int	pTarget;			//效果影响的对象(1:友方  2:敌方  3:敌我双方)
-	int	batter;				//连击数
+	int	batter;				//连击数(怪物配置一次召唤多少怪物时使用)
 	int	repel;				//受击移动距离(受击对象移动距离，分敌我双方)
 	int	erange;				//伤害浮动值(百分比)
 	int	mode;				//攻击范围(1 直线群体...27 随机固定武将区域)
 	int	distance;			//攻击距离 间隔多少行
 	int	range;				//技能范围
-	int pro_Type;			//属性影响类型
+	int pro_Type;			//属性影响类型(召唤数量限制)
 	int pro_Rate;			//属性影响比率(加血吸血使用)
 	string name;			//效果名称
 	int	element;			//元素类型影响(1:冰 2:火 3:雷)
@@ -85,7 +85,7 @@ struct CSkill
 	unsigned int cost;			//释放技能所需的cost
 	int		star;				//技能开放星级
 	int		pTarget;			//队长技种族限制(召唤类技能对应召唤类武将id,CallID)
-	int		pro_type;			//限制类型(召唤数量限制)
+	int		pro_type;			//限制类型
 	int		pro_rate;			//限制百分比	
 	int		coldDown;			//技能cd
 	string	name;				//技能名称

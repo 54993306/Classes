@@ -100,6 +100,8 @@ protected:
 	string m_Name;
 };
 
+//重构方向，这个类还是一样作为数据存储的存在，跟显示对象aliveObject组合构成一个完整的武将。Actobject(包含武将独立逻辑和公用逻辑的地方)
+//太多地方引用了导致整个类都不敢修改，实际上应该以接口的方式来处理的。接口修改少，但是继承接口的实现就难说了
 /******************* 战场武将数据 ********************/
 
 class WarAlive:public AliveBase					//定义数据的顺序结构是为了方便查看数据
@@ -134,7 +136,7 @@ public:
 	CC_PROPERTY(int,m_MoveGrid,MoveGrid);				//移动目标格子
 	CC_SYNTHESIZE(bool,m_TouchState,TouchState);		//武将当前为移动状态下
 	CC_PROPERTY(int,m_TouchGrid,TouchGrid);				//移动状态下当前位置
-	CC_SYNTHESIZE(float,m_MSpeed,MSpeed);				//移动速度(格/S)
+	CC_SYNTHESIZE(float,m_MoveSpeed,MoveSpeed);				//移动速度(格/S)
 	CC_SYNTHESIZE(int,m_UILayout,UiLayout);				//对应的UI控制面板ID
 	CC_PROPERTY(float,m_Delaytime,Delaytime);			//武将出现延迟时间
 	CC_PROPERTY(float,m_AtkDelay,AtkDelay);				//武将攻击延迟时间
@@ -163,6 +165,7 @@ public:
 	CC_SYNTHESIZE(bool,m_Battle,Battle);				//上阵状态
 	CC_SYNTHESIZE(int,m_SortieNum,SortieNum);			//当前回造成伤害次数
 	CC_SYNTHESIZE(int,m_FatherID,FatherID);				//被召唤武将存储父武将ID
+	CC_SYNTHESIZE(int,m_CallAliveNum,callAliveNum);		//record can call alive number use int alive is captain
 	CC_SYNTHESIZE(bool,m_Captain,Captain);				//是否为队长
 	CC_SYNTHESIZE(bool,m_CritEffect,CritEffect);		//必杀技播放过特效
 	CC_SYNTHESIZE(bool,m_ExecuteCap,ExecuteCap);		//队长技执行标记
@@ -174,6 +177,7 @@ public:
 	CC_SYNTHESIZE(float,m_Zoom,Zoom);					//缩放比
 	CC_SYNTHESIZE(int,m_TerType,TerType);				//地形影响属性类型
 	CC_SYNTHESIZE(int,m_TerTypeNum,TerTypeNum);			//地形影响属性数值
+	bool canSummonAlive();								//是否可以召唤武将
 };
 
 class CityAlive:public AliveBase

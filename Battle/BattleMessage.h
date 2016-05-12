@@ -19,6 +19,7 @@
 
 const char B_SKILL_MASK[]					=	"B_SKILL_MASK";									//技能遮罩颜色
 const char B_WorldBoss_HurtUpdate[]			=	"B_WroldBoss_HurtUpdate";						//刷新时间boss伤害值
+const char B_ChangeMoveState[]				=	"B_ChangeMoveState";
 
 
 

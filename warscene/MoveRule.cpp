@@ -6,11 +6,21 @@
 #include "model/WarManager.h"
 #include "model/MapManager.h"
 #include "scene/alive/AliveDefine.h"
-MoveRule::MoveRule(){}
+#include "Battle/BattleMessage.h"
+MoveRule::MoveRule():m_testState(false){}
 
-MoveRule::~MoveRule(){}
+MoveRule::~MoveRule(){NOTIFICATION->removeAllObservers(this);}
 
-bool MoveRule::init(){return true;}
+bool MoveRule::init()
+{
+	NOTIFICATION->addObserver(this,callfuncO_selector(MoveRule::changeTestState),B_ChangeMoveState,nullptr);
+	return true;
+}
+
+void MoveRule::changeTestState( CCObject* ob )
+{
+	m_testState = !m_testState;
+}
 
 bool MoveRule::MonstMoveExcute(WarAlive* monster)
 {
@@ -29,7 +39,8 @@ bool MoveRule::MonstMoveExcute(WarAlive* monster)
 int MoveRule::MonstMoveAreaDispose(WarAlive* alive)
 {
 #if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
-	return INVALID_GRID;
+	if (m_testState)
+		return INVALID_GRID;
 #endif
 	//怪物的移动处理是，哪个最先返回值不是INVALID_GRID就以哪个为标准，后面的不做处理了
 	if (alive->getAliveType() == AliveType::WorldBoss)

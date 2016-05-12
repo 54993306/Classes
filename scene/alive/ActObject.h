@@ -1,5 +1,19 @@
 ﻿#ifndef _ACTOBJECT_H_
 #define _ACTOBJECT_H_
+
+/************************************************************* 
+ *
+ *
+ *		Data : 2016.5.12
+ *	
+ *		Name : 
+ *
+ *		Author : Lin_Xiancheng
+ *
+ *		Description : 在战场上的一个完整的武将，由数据对象waralive和现实对象aliveobject构成(大的方向)
+ *
+ *
+ *************************************************************/
 #include "AliveObject.h"
 #include "scene/state/StateDefine.h"
 
@@ -49,6 +63,10 @@ public:
 	void MoveUpdate(float dt);
 	void TurnToStand(float dt);
 	CC_SYNTHESIZE(bool,m_Reset,Reset);						//武将是否置空过(引导重置用)
+
+	bool firstBattle(CCPoint& p);
+	void walkDirection(CCPoint& p,CCPoint& cp);
+	void roleMoveSpeed();
 private:
 	WarMapData* m_MapData;
 	int m_lastFrame;

@@ -47,7 +47,7 @@ WarAlive::WarAlive()
 	,m_Crit(0)						//暴击
 	,m_Zoom(0)						//缩放比
 	,m_Renew(0)						//回复
-	,m_EfGroup(1)				//默认执行效果组0
+	,m_EfGroup(1)					//默认执行效果组0
 	,m_EffectIndex(0)				//记录当前处理效果
 	,m_Negate(false)				//标记是否反向
 	,m_ExecuteCap(false)			//执行队长技标记
@@ -63,7 +63,7 @@ WarAlive::WarAlive()
 	,m_TimePercent(1)				//增减攻速百分比
 	,m_SpecialAtk(false)			//特殊攻击
 	,m_Battle(false)				//默认为不上阵状态
-	,m_MSpeed(0)					//移动速度
+	,m_MoveSpeed(0)					//移动速度
 	,m_CritTime(0)					//释放必杀技时间
 	,m_NorAtk(true)					//普通攻击
 	,m_FatherID(0)					//被召唤的武将才有此信息
@@ -80,6 +80,7 @@ WarAlive::WarAlive()
 	,m_AliveState(COMMONSTATE)		//武将状态
 	,m_AliveType(AliveType::Common)	//角色品质等级
 	,m_DieState(false)
+	,m_CallAliveNum(0)				//record can claa alive number
 {
 	setBuffManage(nullptr);
 }
@@ -257,7 +258,7 @@ void WarAlive::ResetAttackState()
 {
 	if (!m_IsEnemy && m_CritSkill)
 	{
-		NOTIFICATION->postNotification(UPSKILLBUTTON,this);
+		//NOTIFICATION->postNotification(UPSKILLBUTTON,this);
 		setNorAtk(true);
 	}else{
 		setNorAtk(false);
@@ -284,6 +285,17 @@ void WarAlive::ExcuteNextEffect()
 			alive->getActObject()->AliveDie();
 	}
 	HittingAlive.clear();
+}
+
+bool WarAlive::canSummonAlive()
+{
+	if (role->skill3.skillType ==CallAtk)
+	{
+		if (m_Captain && m_CallAliveNum < 1)
+			return false;
+		return true;
+	}
+	return false;
 }
 
 void UserData::read(const protos::common::Role& role)

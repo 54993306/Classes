@@ -236,6 +236,9 @@ void WarManager::initAlive(WarAlive* alive)
 		{
 			alive->setCaptain(true);
 			alive->setGridIndex(C_CAPTAINSTAND);
+			CEffect* effect = getSummonEffect(&alive->role->skill3);
+			if (effect)
+				alive->setcallAliveNum(effect->pro_Type);
 		}else{
 			alive->setGridIndex(INVALID_GRID);
 		}
@@ -247,7 +250,7 @@ void WarManager::initAlive(WarAlive* alive)
 	alive->setModel(alive->role->thumb);
 	alive->setCallType(alive->role->CallType);
 	alive->setAtkInterval(alive->role->atkInterval);
-	alive->setMSpeed(alive->role->MoveSpeed);
+	alive->setMoveSpeed(alive->role->MoveSpeed);
 	if (alive->getAliveType() == AliveType::WorldBoss)
 	{
 		alive->setMaxHp(alive->role->maxhp);
@@ -501,94 +504,88 @@ StoryData* WarManager::getStoryData(){
 //先判断是否已经存在我方的召唤武将且未上阵的
 //判断召唤数量是否达到上限
 //获取我方将要召唤武将信息
+
+
+WarAlive* WarManager::getAbsentCallAlive( WarAlive* fatherAlive )
+{
+	Members::iterator iter = m_members.begin();
+	for(; iter != m_members.end();++iter)			//判断是否有已创建但未上阵的召唤武将
+	{
+		WarAlive* alive = iter->second;
+		if (alive->getHp()<=0 || alive->getEnemy() != fatherAlive->getEnemy())
+			continue;
+		if (alive->role->isCall && 
+			!alive->getBattle() && 
+			alive->getFatherID()==fatherAlive->getAliveID())
+			return alive;
+	}
+	return nullptr;
+}
+
+bool WarManager::captainCallNumberJudge( WarAlive* alive )
+{
+	if (alive->getCaptain() )
+	{
+		if (alive->getcallAliveNum()<1)
+		{
+			return true;
+		}else{
+			alive->setcallAliveNum(alive->getcallAliveNum() - 1);
+		}
+	}
+	return false;
+}
+
 WarAlive* WarManager::getCallAlive(WarAlive* Father,CSkill* skill)
 {
-	for(Members::iterator iter = m_members.begin(); iter != m_members.end();++iter)			//判断是否有已创建但未上阵的召唤武将
-	{
-		WarAlive* alive = iter->second;
-		if (alive->getEnemy()== Father->getEnemy()&&alive->getHp() > 0)
-		{
-			if (alive->role->isCall && 
-				!alive->getBattle() && 
-				alive->getFatherID()==Father->getAliveID())
-				return alive;
-		}
-	}
-	int CallNum = 0;			//总召唤出来的数量
-	for (Members::iterator iter = m_members.begin(); iter != m_members.end();++iter)
-	{
-		WarAlive* alive = iter->second;
-		if (alive->getEnemy()== Father->getEnemy())
-		{
-			if (alive->role->isCall && 
-				alive->getBattle())
-			{
-				if (Father->getCaptain())
-				{
-					if (alive->getFatherID()==Father->getAliveID())									//我方队长召唤技召唤武将有限制
-						CallNum++;
-				}else{
-					CallNum++;
-				}
-			}	
-		}
-	}
-
-	CEffect* effect = getCallSkillEffect(skill);
+	WarAlive* alive = getAbsentCallAlive(Father);					
+	if (alive)
+		return alive;
+	if (captainCallNumberJudge(Father))
+		return nullptr;
+	CEffect* effect = getSummonEffect(skill);
 	if (!effect)
 	{
 		CCLOG("[ *ERROR ] WarManager::getCallAlive Skill Effect NULL");
 		return nullptr;
 	}
-	if (CallNum >= effect->pro_Type&&Father->getCaptain())											//判断召唤数量是否达到上限
-		return nullptr;
-	bool CanNotFindpTarget = true;
 	for (auto i:m_CallRole)
 	{
-		if (i->CallID == effect->pTarget)
+		if (i->CallID != effect->pTarget)
+			continue;
+		WarAlive* child = WarAlive::create();
+		child->role = i;
+		child->setCallType(i->CallType);
+		child->setEnemy(Father->getEnemy());
+		if (child->getEnemy())
 		{
-			CanNotFindpTarget = false;
-			WarAlive* child = WarAlive::create();
-			child->role = i;
-			child->setCallType(i->CallType);
-			child->setEnemy(Father->getEnemy());
-			if (child->getEnemy())
+			child->setAliveID(m_members.size()+C_CallMonst);
+			if (child->role->MstType == MST_HIDE)
+				child->setcloaking(true);
+			child->setDelaytime(i->delay);
+			if (i->grid)
 			{
-				child->setAliveID(m_members.size()+C_CallMonst);
-				if (child->role->MstType == MST_HIDE)
-					child->setcloaking(true);
-				child->setDelaytime(i->delay);
-				if (i->grid)
-				{
-					CallAliveByFixRange(Father,child);
-				}else{
-					int ran = CCRANDOM_0_1()*(Father->grids.size()-1);
-					int grid = MoveRule::create()->getCurrRandomGrid(Father->grids.at(ran));	//得到当前武将格子的附近范围格子
-					child->setGridIndex(grid);
-				}
-				child->setMstType(child->role->MstType);
-				child->moves.push_back(i->move1);
-				child->moves.push_back(i->move2);
-				child->moves.push_back(i->move3);
-				child->moves.push_back(i->move4);
-				child->moves.push_back(i->move5);
+				CallAliveByFixRange(Father,child);
 			}else{
-				child->setAliveID(m_members.size()+C_CallHero);
-				child->setGridIndex(INVALID_GRID);
+				int ran = CCRANDOM_0_1()*(Father->grids.size()-1);
+				int grid = MoveRule::create()->getCurrRandomGrid(Father->grids.at(ran));	//得到当前武将格子的附近范围格子
+				child->setGridIndex(grid);
 			}
-			initCallAlive(child,Father);
-			if (Father->getCaptain())
-			{
-				CallNum++;
-				if (CallNum >= effect->pro_Type)										//判断召唤数量是否达到上限
-					Father->setFatherID(Father->getAliveID());	
-			}
-			child->setFatherID(Father->getAliveID());
-			return child;
+			child->setMstType(child->role->MstType);
+			child->moves.push_back(i->move1);
+			child->moves.push_back(i->move2);
+			child->moves.push_back(i->move3);
+			child->moves.push_back(i->move4);
+			child->moves.push_back(i->move5);
+		}else{
+			child->setAliveID(m_members.size()+C_CallHero);
+			child->setGridIndex(INVALID_GRID);
 		}
+		initCallAlive(child,Father);
+		child->setFatherID(Father->getAliveID());
+		return child;
 	}
-	if (CanNotFindpTarget)
-		CCLOG("[ *ERROR ]WarManager::getCallAlive  CallID != skill->pTarget =%d ",effect->pTarget);
+	CCLOG("[ *ERROR ]WarManager::getCallAlive  CallID != skill->pTarget =%d ",effect->pTarget);
 	return nullptr;
 }
 //pAlive为释放技能的武将,召唤出来的武将继承释放技能对象的百分比属性
@@ -600,7 +597,7 @@ void WarManager::initCallAlive(WarAlive* alive,WarAlive*pAlive)
 	if (pAlive->getAliveType() == AliveType::WorldBoss)
 	{
 		alive->setAtkInterval(alive->role->atkInterval);
-		alive->setMSpeed(alive->role->MoveSpeed);
+		alive->setMoveSpeed(alive->role->MoveSpeed);
 		alive->setMaxHp(alive->role->hp);
 		alive->setHp(alive->role->hp);					//第一次进来是满血状态
 		alive->setAddCost(alive->role->addCost);
@@ -612,7 +609,7 @@ void WarManager::initCallAlive(WarAlive* alive,WarAlive*pAlive)
 		alive->setDoge(alive->role->dodge);				//数值型是召唤它武将的百分比
 	}else{
 		alive->setAtkInterval((alive->role->atkInterval*0.01f)*pAlive->role->atkInterval);
-		alive->setMSpeed((alive->role->MoveSpeed*0.01f)*pAlive->role->MoveSpeed);
+		alive->setMoveSpeed((alive->role->MoveSpeed*0.01f)*pAlive->role->MoveSpeed);
 		alive->setMaxHp((alive->role->hp*0.01f)*pAlive->role->hp);
 		alive->setHp((alive->role->hp*0.01f)*pAlive->role->hp);							//第一次进来是满血状态		
 		alive->setAddCost((alive->role->addCost*0.01f)*pAlive->role->addCost);

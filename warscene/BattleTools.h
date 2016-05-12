@@ -29,7 +29,7 @@ int getHeroNewCol(int originCol ,int aimCol ,int aim_col);
 int getMonsterNewCol(int originCol ,int aimCol ,int aim_col);
 void CallAliveByFixRange( WarAlive*father , WarAlive*child );
 
-CEffect* getCallSkillEffect(CSkill* skill);
+CEffect* getSummonEffect(CSkill* skill);
 
 void RemoveVectorRepeat(vector<int>& Vec);
 

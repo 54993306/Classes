@@ -525,36 +525,36 @@ void BuffManage::bufMSpeedHandle( BuffInfo* bfinfo,bool handel )
 {
 	if (bfinfo->getChangeNum())//影响武将移动速度数值    
 	{
-		CCLOG("aliveID = %d,before MSpeed = %f",m_alive->getAliveID(),m_alive->getMSpeed());
+		CCLOG("aliveID = %d,before MSpeed = %f",m_alive->getAliveID(),m_alive->getMoveSpeed());
 		if (bfinfo->getDbuf() == handel)
 		{
-			m_alive->setMSpeed(m_alive->getMSpeed() + bfinfo->getChangeNum());
+			m_alive->setMoveSpeed(m_alive->getMoveSpeed() + bfinfo->getChangeNum());
 		}else{
-			float speed = m_alive->getMSpeed() - bfinfo->getChangeNum();
+			float speed = m_alive->getMoveSpeed() - bfinfo->getChangeNum();
 			if (speed <= 0.2f)
 				speed = 0.2f;				//武将移动最快速度极限值处理
-			m_alive->setMSpeed(speed);
+			m_alive->setMoveSpeed(speed);
 		}
-		CCLOG("bufType MSpeed= %d,changeNum = %d,alive MSpeed=%f",MOVESPEED,bfinfo->getChangeNum(),m_alive->getMSpeed());
+		CCLOG("bufType MSpeed= %d,changeNum = %d,alive MSpeed=%f",MOVESPEED,bfinfo->getChangeNum(),m_alive->getMoveSpeed());
 	}
 	if (bfinfo->getPrecent())//影响武将移动速度百分比
 	{
-		CCLOG("aliveID = %d,before MSpeed = %f",m_alive->getAliveID(),m_alive->getMSpeed());
+		CCLOG("aliveID = %d,before MSpeed = %f",m_alive->getAliveID(),m_alive->getMoveSpeed());
 		float speed =m_alive->role->MoveSpeed;					//s/格
 		float num = bfinfo->getPrecent() * 0.01f;
 		if (bfinfo->getDbuf() == handel)
 		{
-			float cSpeed = speed/(speed/m_alive->getMSpeed()-num);
+			float cSpeed = speed/(speed/m_alive->getMoveSpeed()-num);
 			if (cSpeed < 0.2f)
 				cSpeed = 0.2f;
-			m_alive->setMSpeed(cSpeed);
+			m_alive->setMoveSpeed(cSpeed);
 		}else{
-			float cSpeed = speed/(speed/m_alive->getMSpeed()+num);
+			float cSpeed = speed/(speed/m_alive->getMoveSpeed()+num);
 			if (cSpeed < 0.2f)
 				cSpeed = 0.2f;
-			m_alive->setMSpeed(cSpeed);
+			m_alive->setMoveSpeed(cSpeed);
 		}
-		CCLOG("bufType MSpeed= %d,changePe = %d,alive MSpeed=%d",MOVESPEED,bfinfo->getPrecent(),m_alive->getMSpeed());
+		CCLOG("bufType MSpeed= %d,changePe = %d,alive MSpeed=%d",MOVESPEED,bfinfo->getPrecent(),m_alive->getMoveSpeed());
 	}
 	if (!handel)CCLOG("//------------------------Remove----------------------------");
 	CCLOG("Id = %d,Type= %d,changeNum= %d,changePe= %d",

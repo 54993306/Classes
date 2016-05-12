@@ -21,12 +21,9 @@ public:
 public:
 	void initAliveButtons();
 	void initTipsEffect(CCObject* ob);
-	void hideEffect(CCNode* node);
 	void AddEvent();
 	void RemoveEvent();
-	void OnClick(CCObject* ob);						//按钮类
-	void CheckBoxCallBack(CCObject* ob,bool check);
-	void UpdateBtn(CCObject* ob);						
+	void OnClick(CCObject* ob);						//按钮类					
 	void ChangeBoxGoldNum(CCObject* ob);			//箱子金币
 	CCNode* getboxGold(bool box,bool label);			
 	bool AliveButtonLongClick(CCObject* pSender, CCTouch* pTouch);
@@ -38,7 +35,7 @@ public:
 	void AliveBattleDispose(CCObject* ob);
 	void CallAliveBattle(WarAlive*alive);
 	
-	CWidgetTouchModel AliveButtonClickBegin(CCObject* ob,CCTouch* pTouch);
+	CWidgetTouchModel AliveButtonBeginClick(CCObject* ob,CCTouch* pTouch);
 	void AliveButtonClick(CCObject* ob);
 	void CaptainHit(CCObject* ob);
 	void SkillMask(CCObject* ob);
@@ -59,36 +56,39 @@ public:
 	void frameEvent(CCBone *pBone, const char *str, int a, int b);
 
 /*******************************************************************************************************************/
-	CCNode* getMoveLayout(int index);							//得到武将移动的UI部分
+	CCNode* getMoveLayout(int index);							//get role button move part
 
-	void hideUpUiPart();										//隐藏UI的上面部分
+	void hideUpUiPart();										//hide ui panel above part
 
-	void iniTestUi();											//初始化一些用于测试的控件按钮
+	void iniTestUi();											//init use to test button
 	
-	void initUIAbove();											//初始化UI上部分
+	void initUIAbove();											//init ui panel above part
 
-	void initUIEffect();										//初始化添加在UI上的效果
+	void initUIEffect();										//init add ui panel effect
 
-	void updateWorldBossDamage();								//刷新时间boss伤害表现
+	void updateWorldBossDamage();								//update word boss hurt number
 
-	void updateWorldBossBloodBar(CCObject* ob);					//刷新世界boss血量条
+	void updateWorldBossBloodBar(CCObject* ob);					//update word boss blood bar
 
-	void initNormalAbove();										//初始化非世界boss上部分
+	void initNormalAbove();										//init normal panel above part
 
-	void initWorldBossAbove(WarAlive* boss);					//世界boss情况
+	void initWorldBossAbove(WarAlive* boss);					//have word init panel above part
 
-	void initCostBar();											//初始化costbar
+	void initCostBar();											//init cost bar
 
-	void initAliveButton(CCNode* Layout,WarAlive* alive);		//初始化单个武将按钮
+	void initAliveButton(CCNode* Layout,WarAlive* alive);		//init single role button
 
-	void initAliveButtonBar(CCNode* Layout,int model);			//初始化武将进度条
+	void initAliveButtonBar(CCNode* Layout,int model);			//init role bar
 
-	void initButtonBackImage(CButton* button,int index );		//根据召唤数目初始化按钮图
+	void initButtonBackImage(CButton* button,int index );		//reason call number init button back image
 
 	void updateUiLayerCostNumber(int cost);						//刷新显示层上Cost值
 
 	void updateAliveButtonEffect();								//刷新武将按钮特效
 
+	bool guideStateButtonEffect(CCNode* layout);				//按钮特效新手引导下时处理
+
+	void AliveBattlefield(WarAlive* alive);						//role log in battlefield or leave
 protected:
 	WarManager* m_Manage;
 	CLayout*	m_ControLayer;
@@ -153,6 +153,7 @@ enum ControlLayer_Tag
 	CL_TipsEffect4,
 	GU_openGuide = 250,		//引导测试按钮
 	TEST_BattleData,		//重载关卡数据按钮
+	TEST_MoveState,
 	CL_OpenGameEditorBtn =300,
 };
 #endif
