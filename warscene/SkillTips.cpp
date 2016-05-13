@@ -4,6 +4,7 @@
 #include "model/DataDefine.h"
 #include "model/DataCenter.h"
 #include "GMessage.h"
+#include "Battle/BattleMessage.h"
 
 SkillTips::SkillTips()
 	:m_ui(nullptr)
@@ -15,7 +16,7 @@ SkillTips::~SkillTips()
 void SkillTips::onEnter()
 {
 	BaseLayer::onEnter();
-	NOTIFICATION->addObserver(this,callfuncO_selector(SkillTips::removeTips),Remove_SkillTips,nullptr);
+	NOTIFICATION->addObserver(this,callfuncO_selector(SkillTips::removeTips),B_RemoveSkillTipsLayer,nullptr);
 }
 
 void SkillTips::onExit()

@@ -8,6 +8,8 @@
 #include "warscene/WarControl.h"
 #include "scene/layer/WarAliveLayer.h"
 #include "common/CGameSound.h"
+#include "Battle/BattleMessage.h"
+
 DropItem::DropItem()
 	:m_ui(nullptr)
 	,m_alive(nullptr)
@@ -118,5 +120,5 @@ void DropItem::changeGoldNum(CCObject*ob)
 	}else{
 		PlayEffectSound(SFX_404);
 	}
-	CCNotificationCenter::sharedNotificationCenter()->postNotification(Drop_Item_NumDispose,ob);
+	CCNotificationCenter::sharedNotificationCenter()->postNotification(B_DropItem,ob);
 }

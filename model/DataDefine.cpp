@@ -258,7 +258,6 @@ void WarAlive::ResetAttackState()
 {
 	if (!m_IsEnemy && m_CritSkill)
 	{
-		//NOTIFICATION->postNotification(UPSKILLBUTTON,this);
 		setNorAtk(true);
 	}else{
 		setNorAtk(false);

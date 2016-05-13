@@ -21,7 +21,6 @@
 #include "common/CommonFunction.h"	
 #include "warscene/ComBatLogic.h"
 #include "scene/AnimationManager.h"
-#include "scene/layer/PauseLayer.h"
 #include "scene/alive/AliveDefine.h"
 #include "scene/layer/WarAliveLayer.h"
 #include "netcontrol/CPlayerControl.h"
@@ -55,13 +54,12 @@ WarControl::~WarControl()
 void WarControl::onEnter()
 {
 	CCNode::onEnter();
-	NOTIFICATION->addObserver(this,callfuncO_selector(WarControl::ChangeBoxGoldNum),Drop_Item_NumDispose,nullptr);
-	NOTIFICATION->addObserver(this,callfuncO_selector(WarControl::upContinuousNum),BAR_ATK_HANDLE,nullptr);
-	NOTIFICATION->addObserver(this,callfuncO_selector(WarControl::AliveBattleDispose),ALIVEBATTLET,nullptr);
-	NOTIFICATION->addObserver(this,callfuncO_selector(WarControl::initTipsEffect),TIPSEFFECT,nullptr);
-	NOTIFICATION->addObserver(this,callfuncO_selector(WarControl::CaptainHit),CAPTAINHIT,nullptr);
+	NOTIFICATION->addObserver(this,callfuncO_selector(WarControl::ChangeBoxGoldNum),B_DropItem,nullptr);
+	NOTIFICATION->addObserver(this,callfuncO_selector(WarControl::upContinuousNumber),B_ContinuousNumber,nullptr);
+	NOTIFICATION->addObserver(this,callfuncO_selector(WarControl::AliveBattleDispose),B_RolrLogInBattlefield,nullptr);
+	NOTIFICATION->addObserver(this,callfuncO_selector(WarControl::showMonsterTips),B_MonsterTips,nullptr);
+	NOTIFICATION->addObserver(this,callfuncO_selector(WarControl::CaptainHit),B_CaptainHurt,nullptr);
 	NOTIFICATION->addObserver(this,callfuncO_selector(WarControl::SkillMask),B_SKILL_MASK,nullptr);
-	NOTIFICATION->addObserver(this,callfuncO_selector(WarControl::upButtonState),UPSKILLBUTTON,nullptr);
 }
 
 void WarControl::onExit()
@@ -147,7 +145,7 @@ void WarControl::iniTestUi()
 	MoveTest->setVisible(false);
 #endif
 }
-
+//创建一些其他的对象用于管理相应的效果，把主控制节点传过去，再根据ID进行相应的获取就可以了
 bool WarControl::init()
 {
 	if (!BaseLayer::init())
@@ -466,9 +464,7 @@ void WarControl::initAliveButtons()
 			CLabel* NeedCost = (CLabel*)BtnLay->getChildByTag(CL_NeedCost);
 			CSkill skill = alive->role->skill3;
 			NeedCost->setString(ToString(skill.cost));									//初始化值为技能消耗cost
-			MoveLaout = (CLayout*)BtnLay->getChildByTag(CL_HeroNode);	
-			if (skill.skillType == CallAtk||!skill.skillId)
-				MoveLaout->setPosition(ccpAdd(MoveLaout->getPosition(),ccp(0,-30)));
+			MoveLaout = (CLayout*)BtnLay->getChildByTag(CL_HeroNode);
 		}else{
 			alive->setUiLayout(CL_BtnLayout2+index);
 			CLayout* BtnLay = (CLayout*)m_ControLayer->getChildByTag(CL_BtnLayout2+index);
@@ -483,8 +479,21 @@ void WarControl::initAliveButtons()
 		initAliveButtonBar(MoveLaout,alive->getModel());
 	}
 }
+//cost变化数字
+void WarControl::updateCostSpeed( int iCostChange )
+{
+	m_pCostChange->setString(CCString::createWithFormat("%d", abs(iCostChange))->getCString());
+	if(m_pCostChange->getColor().g == 0)
+	{
+		m_pCostChange->stopAllActions();
+		m_pCostChange->setColor(ccc3(255, 255, 255));
+
+		m_pCostBar->setOpacity(255);
+		m_pCostBar->stopAllActions();
+	}
+}
 //必须实时更新，当cost足够时，会刷新显示特效	
-void WarControl::updateUiLayerCostNumber(int cost)
+void WarControl::updateCostNumber(int cost)
 {
 	m_iAimCost = cost;
 	updateAliveButtonEffect();														//update button effect state									
@@ -551,7 +560,7 @@ void WarControl::updateAliveButtonEffect()
 	}
 }
 //call role log in battlefield
-void WarControl::CallAliveBattle(WarAlive*alive)
+void WarControl::CallAliveEntranceBattle(WarAlive*alive)
 {
 	WarAlive* pAlive = m_Manage->getAlive(alive->getFatherID());
 	CCNode* MoveLaout = getMoveLayout(pAlive->getUiLayout()-CL_BtnLayout1);
@@ -561,8 +570,8 @@ void WarControl::CallAliveBattle(WarAlive*alive)
 	CProgressBar* CdBar = (CProgressBar*)MoveLaout->getChildByTag(CL_HeroPro);
 	btn->setEnabled(false);
 	int cost = pAlive->role->skill3.cost;
-	NOTIFICATION->postNotification(CHANGECOST,CCFloat::create(-cost));			//this in a call alive real log in battlefield
-	if (pAlive->canSummonAlive())												//is call full
+	NOTIFICATION->postNotification(B_ChangeCostNumber,CCFloat::create(-cost));			//this in a call alive real log in battlefield
+	if (pAlive->canSummonAlive())														//is call full
 		CdBar->startProgressFromTo(0,100,pAlive->role->skill3.coldDown);
 }
 //role log in battlefield or leave
@@ -582,7 +591,7 @@ void WarControl::AliveBattlefield( WarAlive* alive )
 		MoveLaout->runAction(CCMoveBy::create(0.2f,ccp(0,30)));					//武将上阵
 		CdBar->startProgressFromTo(0,100,skill.coldDown);						//技能CD
 		NeedCost->setString(ToString(skill.cost));								//初始化值为上阵消耗cost
-		NOTIFICATION->postNotification(CHANGECOST,CCFloat::create(-alive->role->useCost));
+		NOTIFICATION->postNotification(B_ChangeCostNumber,CCFloat::create(-alive->role->useCost));
 	}
 	CButton* btn = (CButton*)MoveLaout->getChildByTag(CL_Btn);
 	btn->setEnabled(false);
@@ -593,7 +602,7 @@ void WarControl::AliveBattleDispose(CCObject* ob)
 	WarAlive* alive = (WarAlive*)ob;
 	if (alive->role->isCall)
 	{
-		CallAliveBattle(alive);
+		CallAliveEntranceBattle(alive);
 	}else{
 		AliveBattlefield(alive);
 	}
@@ -626,11 +635,11 @@ CWidgetTouchModel WarControl::AliveButtonBeginClick(CCObject* ob,CCTouch* pTouch
 		if (cost < alive->role->useCost)
 			return eWidgetTouchTransient;
 		NOTIFICATION->postNotification(ALIVEBATTLETOUCH,alive);
-		initTipsEffect(CCBool::create(1));
+		showMonsterTips(nullptr);
 		return eWidgetTouchNone;	
 	}
 }
-//判断武将状态决定是否要处理这个消息。和消息是否要往下传递,可以在touchEnd处理技能触发。
+//role skill button dispose
 void WarControl::AliveButtonClick( CCObject* ob )
 {
 	CButton* btn = (CButton*)ob;	
@@ -641,73 +650,45 @@ void WarControl::AliveButtonClick( CCObject* ob )
 		||!alive->getBattle() )
 		return;
 	CCNode* MoveLaout = getMoveLayout(alive->getUiLayout()-CL_BtnLayout1);
+	btn->setEnabled(false);
 	if (guideStateButtonEffect(MoveLaout))
 		return;
 	alive->getActObject()->TurnStateTo(Stand_Index);
 	alive->ResetAttackState();																	//点击了必杀技按钮，但是武将并没有进入必杀技状态的情况,强制切换至必杀技状态
 	alive->setCriAtk(true);
-	NOTIFICATION->postNotification(RECORDBATTERNUM);
 	CProgressBar* CdBar = (CProgressBar*)MoveLaout->getChildByTag(CL_HeroPro);
 	CdBar->setValue(0);
-	btn->setEnabled(false);
-	NOTIFICATION->postNotification(CHANGECOST,CCFloat::create(-skill.cost));
+	NOTIFICATION->postNotification(B_RecordContinuousSkill);
+	NOTIFICATION->postNotification(B_ChangeCostNumber,CCInteger::create(-skill.cost));
 	if (alive->getCaptain())
-		upButtonState(ob);
+		ResetButtonState(alive);
 	else
 		alive->getActObject()->setUpdateState(false);
 }
 
-void WarControl::upButtonState( CCObject* ob )
+void WarControl::ResetButtonState( CCObject* ob )
 {
-	for (int i=0; i<5 ; i++)
-	{
-		CCNode* MoveLaout = getMoveLayout(i);
-		CProgressBar* CdBar = (CProgressBar*)MoveLaout->getChildByTag(CL_HeroPro);
-		CButton* btn = (CButton*)MoveLaout->getChildByTag(CL_Btn);
-		WarAlive* alive = (WarAlive*)btn->getUserObject();
-		if (ob != alive)
-			continue;
-		CSkill skill = alive->role->skill3;
-		CEffect* effect = getSummonEffect(&skill);
-		if (effect&&effect->pro_Type)
-		{
-			++alive->role->skill3.pro_rate;
-			initButtonBackImage(btn,effect->pro_Type-alive->role->skill3.pro_rate);
-			if (alive->role->skill3.pro_rate >= effect->pro_Type)
-				return;
-		}
-		CdBar->startProgressFromTo(0,100,skill.coldDown);										//技能CD
-	}
+	WarAlive* alive = (WarAlive*)ob;
+	CCNode* MoveLaout = getMoveLayout(alive->getUiLayout() - CL_BtnLayout1);
+	CProgressBar* CdBar = (CProgressBar*)MoveLaout->getChildByTag(CL_HeroPro);
+	CdBar->startProgressFromTo(0,100,alive->role->skill3.coldDown);										//技能CD
 }
+
 bool WarControl::AliveButtonLongClick(CCObject* pSender, CCTouch* pTouch)
 {
-	CToggleView* tog = (CToggleView*)pSender;
+	CButton* tog = (CButton*)pSender;
 	WarAlive* alive = (WarAlive*)tog->getUserObject();
-	if (!alive)return false;
 	SkillTips *tips = SkillTips::create(); 
 	tips->setSkillInfo(pSender,alive);//根据武将当前状态判断武将释放的技能从而给出提示信息( CC制不需要技能提示 )
 	LayerManager::instance()->push(tips);
-	NOTIFICATION->postNotification(Draw_BtmSkill_Area,alive);
+	NOTIFICATION->postNotification(B_DrawDynamicSkillArea,alive);
 	return true;
 }
-//长按取消操作
+//长按取消操作,可以使用添加精灵或是做一个类似于连击节点的方法实现，而不用添加层
 void WarControl::onlongClickEnd(CCObject* pSender, CCTouch* pTouch, float fDuration)
 {
-	NOTIFICATION->postNotification(Remove_SkillTips);
-	NOTIFICATION->postNotification(WAR_CANCEL_DRAW_DRAG,nullptr);
-}
-
-CCNode* WarControl::getboxGold(bool box,bool label)
-{
-	if (box)
-	{
-		if (label)return m_ControLayer->getChildByTag(CL_BoxNum);
-		return m_ControLayer->getChildByTag(CL_BoxNumPro);
-	}else{
-		if(label)return m_ControLayer->getChildByTag(CL_BoxNum);
-		return m_ControLayer->getChildByTag(CL_BoxNumPro);
-	}
-	return nullptr;
+	NOTIFICATION->postNotification(B_RemoveSkillTipsLayer);
+	NOTIFICATION->postNotification(B_CancelCostArea,nullptr);
 }
 
 void WarControl::ChangeBoxGoldNum(CCObject* ob)
@@ -725,20 +706,20 @@ void WarControl::ChangeBoxGoldNum(CCObject* ob)
 	}
 }
 
-void WarControl::upContinuousNum(CCObject* ob)
+void WarControl::upContinuousNumber(CCObject* ob)
 {
 	CLayout* Layout = (CLayout*)m_ControLayer->getChildByTag(CL_ContinuousLayou);
 	if (ob)
 	{
 		if (!Layout->isVisible())
 			return;
-		this->unschedule(schedule_selector(WarControl::upContinuousState));
-		this->scheduleOnce(schedule_selector(WarControl::upContinuousState),3.0f);
+		this->unschedule(schedule_selector(WarControl::upContinuousNodeState));
+		this->scheduleOnce(schedule_selector(WarControl::upContinuousNodeState),3.0f);
 	}else{
 		m_ContinuousNum++;
 		if (m_ContinuousNum <= 1)
 			return;
-		this->unschedule(schedule_selector(WarControl::upContinuousState));
+		this->unschedule(schedule_selector(WarControl::upContinuousNodeState));
 		Layout->runAction(CCShake::create(0.4f,3.0f));
 		Layout->setVisible(true);
 		CLabelAtlas* Lab_Num = (CLabelAtlas*)Layout->getChildByTag(CL_ContinuousNum);
@@ -749,45 +730,32 @@ void WarControl::upContinuousNum(CCObject* ob)
 		CCScaleTo* sc2 = CCScaleTo::create(0.05f,1.0f);
 		CCSequence* sqes = CCSequence::create(sc1,sc2,nullptr);
 		Lab_Num->runAction(sqes);
-		this->scheduleOnce(schedule_selector(WarControl::upContinuousState),1.5f);
+		this->scheduleOnce(schedule_selector(WarControl::upContinuousNodeState),1.5f);
 	}
 }
 
-void WarControl::upContinuousState(float dt)
+void WarControl::upContinuousNodeState(float dt)
 {
 	m_ControLayer->getChildByTag(CL_ContinuousLayou)->setVisible(false);
 	m_ContinuousNum = 0;
 }
 //绘制怪物出现行数效果提示
-void WarControl::initTipsEffect(CCObject* ob)
+void WarControl::showMonsterTips(CCObject* ob)
 {
-	CCBool* touch = (CCBool*)ob;
-	CCArray* ArrRow = CCArray::create();
-	CCArray* arr = DataCenter::sharedData()->getWar()->getMonsts(true);
-	CCObject* obj = nullptr;
-	CCARRAY_FOREACH(arr,obj)
+	vector<int>Vec;
+	vector<WarAlive*>*VecAlive = DataCenter::sharedData()->getWar()->getVecMonsters();
+	for (auto alive:*VecAlive)
 	{
-		WarAlive* alive = (WarAlive*)obj;
 		if (alive->getGridIndex() < 52)continue;			//不再预警标记显示范围内
-		if (touch->getValue())								//召唤武将时显示提示
-		{
-			if (alive->getGridIndex() < 64 || alive->getGridIndex() > 91)
-				continue;									//地图内非可视范围显示提示
-		}else{
-			if (alive->getGridIndex() > 75 )continue;		//新一波怪物的提醒
-		}
-		CCInteger* row = CCInteger::create(alive->getGridIndex() % C_GRID_ROW);
-		if (!ArrRow->containsObject(row))
-			ArrRow->addObject(row);
+		Vec.push_back(alive->getGridIndex() % C_GRID_ROW);
 	}
-	CCObject* pobj = nullptr;
-	CCARRAY_FOREACH(ArrRow,pobj)
+	RemoveVectorRepeat(Vec);
+	for (auto i:Vec)
 	{
-		CCInteger* row = (CCInteger*)pobj;
-		EffectObject* ef = (EffectObject*)m_ControLayer->getChildByTag(CL_TipsEffect1 + row->getValue());
+		EffectObject* ef = (EffectObject*)m_ControLayer->getChildByTag(CL_TipsEffect1 + i);
 		ef->setVisible(true);
 		ef->stopAllActions();
-		CCDelayTime* dt = CCDelayTime::create(1.0f);
+		CCDelayTime* dt = CCDelayTime::create(1.5f);
 		ef->runAction(CCSequence::create(dt,CCHide::create(),NULL));
 	}
 }
@@ -810,51 +778,15 @@ void WarControl::SkillMask( CCObject* ob )
 	m_LayerColor->setVisible(true);
 	m_LayerColor->runAction(CCSequence::create(CCFadeOut::create(0.07f),CCHide::create(),NULL));
 }
-//cost变化数字
-void WarControl::showCostAddOrReduceEffect( int iCostChange )
-{
-	m_pCostChange->setString(CCString::createWithFormat("%d", abs(iCostChange))->getCString());
-	if(iCostChange > 0)
-	{
-		if(m_pCostChange->getColor().g == 255)
-		{
-			m_pCostChange->runAction(CCRepeatForever::create(
-				CCSequence::createWithTwoActions(
-				CCScaleTo::create(0.25f, 1.3f),
-				CCScaleTo::create(0.25f, 1.0f)
-				)));
-
-			m_pCostChange->setColor(ccc3(255, 0, 0));
-			m_pCostBar->runAction(CCRepeatForever::create(
-				CCSequence::createWithTwoActions(
-				CCFadeTo::create(0.2f, 80),
-				CCFadeTo::create(0.2f, 240)
-				)));
-			m_pCostBar->setColor(ccc3(230, 50, 50));
-		}
-	}else{
-		if(m_pCostChange->getColor().g == 0)
-		{
-			m_pCostChange->stopAllActions();
-			m_pCostChange->setColor(ccc3(255, 255, 255));
-
-			m_pCostBar->setOpacity(255);
-			m_pCostBar->stopAllActions();
-		}
-	}
-}
 //显示击杀怪物增加cost效果
 void WarControl::showFlyCostToBar( CCPoint pStartPos )
 {
-	pStartPos = m_ControLayer->convertToNodeSpace(pStartPos);
-	
 	float fPosAdd = m_pCostBar->getContentSize().width*(m_pCostBar->getPercentage()-0.5f);
 	if(m_pCostBar->getPercentage()>=0.95f)
-	{
 		fPosAdd = 0;
-	}
 	CCPoint pEndPos = m_pCostBar->getPosition() + ccp(fPosAdd, 0);
 	ccBezierConfig bezier;
+	pStartPos = m_ControLayer->convertToNodeSpace(pStartPos);
 	bezier.controlPoint_1 = ccp(pStartPos.x+(CCRANDOM_0_1()-0.5f)*180, pStartPos.y+(CCRANDOM_0_1()-0.5f)*180);
 	bezier.controlPoint_2 = ccp(pEndPos.x+(CCRANDOM_0_1()-0.5f)*180, pEndPos.y+(CCRANDOM_0_1()-0.5f)*180);
 	bezier.endPosition	= pEndPos;
@@ -872,37 +804,12 @@ void WarControl::showFlyCostToBar( CCPoint pStartPos )
 void WarControl::showFlyCostToBarCallBack( CCNode* pSender )
 {
 	CCPoint pEndPos = pSender->getPosition();
-	//绑定粒子
 	CCParticleSystemQuad* pLz  = CCParticleSystemQuad::create("lz/blue_bomb.plist");
 	pLz->setAutoRemoveOnFinish(true);
 	pLz->setPosition(pEndPos);
 	pLz->resetSystem();
-	m_ControLayer->addChild(pLz);
+	m_ControLayer->addChild(pLz);			//绑定粒子
 	PlayEffectSound(SFX_423);
-}
-
-void WarControl::flyCostToHeroBtn( CCNode* pNode )
-{
-	CCPoint pEndPos = pNode->getPosition();
-
-	float fPosAdd = m_pCostBar->getContentSize().width*(m_pCostBar->getPercentage()-0.5f);
-	if(m_pCostBar->getPercentage()>=0.95f)
-	{
-		fPosAdd = 0;
-	}
-	CCPoint pStartPos = m_pCostBar->getPosition() + ccp(fPosAdd, 0);
-	ccBezierConfig bezier;
-	bezier.controlPoint_1 = ccp(pStartPos.x+CCRANDOM_0_1()*100, pStartPos.y+CCRANDOM_0_1()*100);
-	bezier.controlPoint_2 = ccp(pEndPos.x-CCRANDOM_0_1()*100, pEndPos.y+CCRANDOM_0_1()*100);
-	bezier.endPosition	= pEndPos;
-	CCFiniteTimeAction *beizerMove = CCBezierTo::create(ccpDistance(pStartPos, pEndPos)/1000, bezier);
-	CCCallFuncN *callNext = CCCallFuncN::create(this, callfuncN_selector(WarControl::showFlyCostToBarCallBack));
-
-	//绑定粒子
-	CCParticleSystemQuad* pLz  = CCParticleSystemQuad::create("lz/eff_zz_blue.plist");
-	pLz->setPosition(pStartPos);
-	m_ControLayer->addChild(pLz);
-	pLz->runAction(CCSequence::create(beizerMove,callNext, CCRemoveSelf::create(), nullptr));
 }
 
 void WarControl::updateTimeCountUI( int iCount )
@@ -921,7 +828,6 @@ void WarControl::iniCaptainHurtTips()
 	{
 		m_ArmatureTips = CCArmature::create("attack");
 		m_ArmatureTips->getAnimation()->play("attack",0.01f);
-		m_ArmatureTips->getAnimation()->setFrameEventCallFunc(this, frameEvent_selector(WarControl::frameEvent));
 		CCSize size = CCDirector::sharedDirector()->getWinSize();
 		m_ArmatureTips->setPosition(ccp(size.width/2,size.height/2));
 		m_ArmatureTips->setVisible(false);
@@ -942,24 +848,10 @@ void WarControl::CaptainHit( CCObject* ob )
 		m_ArmatureTips->setOpacity(255);
 		m_ArmatureTips->runAction(CCSequence::create(CCDelayTime::create(0.5f),CCFadeOut::create(0.8f),nullptr));
 	}else{
+		PlayEffectSound("SFX/511.ogg");
 		m_ArmatureTips->setOpacity(255);
 		m_ArmatureTips->setVisible(true);
 		m_ArmatureTips->getAnimation()->play("die",0.01f);
-	}
-}
-
-void WarControl::frameEvent( CCBone *pBone, const char *str, int a, int b )
-{
-	if (m_ArmatureTips->isVisible())
-	{
-		if(strcmp(str, "435"))
-		{
-			//PlayEffectSound("SFX/435.ogg");
-		}
-		else if(strcmp(str, "511"))
-		{
-			//PlayEffectSound("SFX/511.ogg");
-		}
 	}
 }
 
@@ -969,4 +861,20 @@ void WarControl::hideUpUiPart()
 	m_ControLayer->findWidgetById("layer_up_normal")->setVisible(false);
 	m_ControLayer->getChildByTag(CL_Menu)->setVisible(false);
 	m_ControLayer->getChildByTag(CL_AddSpeedBtn)->setVisible(false);
+}
+
+void WarControl::updateBatchNumber( int currbatch )
+{
+	CLayout* m_pNormal = (CLayout*)m_ControLayer->findWidgetById("layer_up_normal");
+	CCNode* node = m_pNormal->getChildByTag(CL_Batch);
+	node->setVisible(false);
+	char path[60] = {0};
+	sprintf(path,"%d/%d",currbatch,m_Manage->getBatch()+1);											
+	CCLabelAtlas* BatchNum = CCLabelAtlas::create(path,"label/number_03.png",27.0f,35,47);
+	BatchNum->setScale(0.6f);
+	BatchNum->setAnchorPoint(ccp(0.5f,0.43f));
+	BatchNum->setPosition(node->getPosition());
+	BatchNum->setTag(CL_Batch);
+	m_pNormal->addChild(BatchNum);
+	node->removeFromParentAndCleanup(true);
 }

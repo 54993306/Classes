@@ -1,7 +1,6 @@
 ﻿#include "CNetClient.h"
 #include "netcontrol/CPlayerControl.h"
 #include "CCTK/scenemanager.h"
-#include "scene/layer/PauseLayer.h"
 #include "common/color.h"
 #include "tools/ShowTexttip.h"
 #include "model/DataCenter.h"

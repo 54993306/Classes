@@ -8,6 +8,7 @@
 #include "common/CGameSound.h"
 #include "common/ShaderDataHelper.h"
 #include "warscene/CHeroSoundData.h"
+#include "Battle/BattleMessage.h"
 HPObject::HPObject()
 	:m_hp(nullptr)
 	,m_bg(nullptr)
@@ -175,8 +176,8 @@ void HPObject::playerNum(AliveObject* target,int num,int type)
 		}
 		if (target->getAlive()->getCaptain())					//主帅掉血提示
 		{
-			NOTIFICATION->postNotification(CAPTAINHIT,target->getAlive());
-			NOTIFICATION->postNotification(SHAKE_BYEFFECT,nullptr);
+			NOTIFICATION->postNotification(B_CaptainHurt,target->getAlive());
+			NOTIFICATION->postNotification(B_Shark,nullptr);
 		}
 	}
 	if (!NumLabel)return;

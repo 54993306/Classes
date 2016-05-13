@@ -13,7 +13,7 @@
 #include "net/CNetClient.h"
 #include "scene/AnimationManager.h"
 #include "scene/alive/AliveDefine.h"
-#include "scene/layer/LayerDefine.h"
+//#include "scene/layer/LayerDefine.h"
 #include "RecruitResult.h"
 #include "common/CheckMoney.h"
 #include "common/MultLanguage.h"

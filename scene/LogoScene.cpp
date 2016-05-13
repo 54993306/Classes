@@ -6,7 +6,6 @@
 #include "tools/StringUtil.h"
 #include "scene/effect/EffectDefine.h"
 #include "common/CommonFunction.h"
-#include "warscene/ComBatDataSaveXML.h"
 #include "warscene/ArmatureEventDataMgr.h"
 #include "warscene/WarAssist.h"
 #include "tools/ShowTexttip.h"

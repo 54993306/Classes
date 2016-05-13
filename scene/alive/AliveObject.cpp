@@ -230,13 +230,13 @@ void AliveObject::HpChange_Event()
 {
 	NOTIFICATION->postNotification(ALIVEATTACK,m_Alive);
 	if (m_PlayerEffect)
-		NOTIFICATION->postNotification(Draw_Skill_Effect,this);
+		NOTIFICATION->postNotification(B_SkilEffectInMap,this);
 }
 //攻击区域必杀技状态才绘制,攻击完毕可以将武将传出去,进行下一个效果的判断或是重置武将信息等
 void AliveObject::AtkEnd_Event()
 {
 	if (!m_UpdateState)return;
-	NOTIFICATION->postNotification(CANCELATTACKAREA,m_Alive);//取消绘制攻击范围(针对性的取消绘制)
+	NOTIFICATION->postNotification(B_CancelDrawAttackArea,m_Alive);//取消绘制攻击范围(针对性的取消绘制)
 	if (m_Alive->AtkAlive.size())
 	{
 		if (DataCenter::sharedData()->getWar()->NextEffect(m_Alive))

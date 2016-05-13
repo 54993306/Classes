@@ -42,7 +42,7 @@ void ActObject::setActionKey(string ActionKey)//设置人物对应动作(动作�
 
 	if (ActionKey == Walk_Action)			//我方突然中断整个战斗流程的情况(玩家操纵拖动武将)
 	{
-		NOTIFICATION->postNotification(CANCELATTACKAREA,m_Alive);//取消绘制攻击范围(针对性的取消绘制)
+		NOTIFICATION->postNotification(B_CancelDrawAttackArea,m_Alive);//取消绘制攻击范围(针对性的取消绘制)
 		if (m_Alive->getNorAtk()&&!m_Alive->getSpeAtk()&&!m_Alive->getCriAtk())
 		{
 			m_Alive->ResetAttackState();
@@ -272,7 +272,7 @@ void ActObject::SpineActionEvent( int trackIndex,spEvent* Event )
 		}break;
 	case EventType::SharkEvent:
 		{
-			NOTIFICATION->postNotification(SHAKE_BYEFFECT,nullptr);
+			NOTIFICATION->postNotification(B_Shark,nullptr);
 		}break;
 	case EventType::Mask:
 		{
@@ -312,7 +312,7 @@ void ActObject::updateFrameEvent( float dt )
 					if(sEventName.compare(EVE_ANIMAT)			==0 )		PlayAnimat_Event(armatureEvent.extraInfo);			//播放动画
 					if(sEventName.compare(EVE_SOUND)			==0 )		PlaySound_Event(armatureEvent.sound);				//播放声音
 					if(sEventName.compare(EVE_SHAKE)			==0	)
-						NOTIFICATION->postNotification(SHAKE_BYEFFECT,nullptr);
+						NOTIFICATION->postNotification(B_Shark,nullptr);
 					if (sEventName.compare(EVE_MASK)			==0 )
 						NOTIFICATION->postNotification(B_SKILL_MASK,m_Alive);
 				}
@@ -407,7 +407,7 @@ bool ActObject::firstBattle( CCPoint& p )
 		m_MoveState = 0;
 		m_Alive->setAliveStat(INVINCIBLE);
 		this->TurnStateTo(Start_Index);
-		NOTIFICATION->postNotification(ALIVEBATTLET,m_Alive);//武将上阵
+		NOTIFICATION->postNotification(B_RolrLogInBattlefield,m_Alive);//武将上阵
 		m_Alive->setGridIndex(m_Alive->getMoveGrid());
 		this->setSpeed(CCPointZero);
 		this->setPosition(p);

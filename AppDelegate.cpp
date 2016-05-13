@@ -4,7 +4,6 @@
 #include "model/DataCenter.h"
 #include "tools/ToolDefine.h"
 #include "SimpleAudioEngine.h"
-#include "scene/SceneDefine.h"
 #include "protos/protocol.pb.h"
 #include "common/MultLanguage.h"
 #include "protos/auth_protocol.pb.h" 
@@ -18,6 +17,18 @@
 #include "UserDefaultData.h"
 #include "reward/WBossLayer.h"
 #include "ApplicationDefine.h"
+#include "scene/LoadScene.h"
+#include "scene/LoginScene.h"
+#include "scene/LogoScene.h"
+#include "scene/WarScene.h"
+#include "scene/AnimationManager.h"
+#include "scene/SelectHeroScene.h"
+#include "scene/CityScene.h"
+#include "mainCity/mainScene.h"
+#include "bag/BagScene.h"
+#include "scene/layer/WaitLayer.h"
+#include "scene/layer/GameTip.h"
+#include "scene/loadWar.h"
 
 USING_NS_CC;
 using namespace CocosDenshion;

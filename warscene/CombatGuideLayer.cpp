@@ -16,6 +16,7 @@
 #include <string>
 #include "common/CommonFunction.h"
 #include "Battle/LoadSpineData.h"
+#include "Battle/BattleMessage.h"
 CombatGuideLayer::CombatGuideLayer()
 	:m_TouchIntercept(nullptr),m_Clipping(nullptr),m_TextRect(nullptr)
 	,m_Step(nullptr),m_root(nullptr),m_mapData(nullptr)
@@ -386,7 +387,7 @@ void CombatGuideLayer::ImageArray(CombatGuideStep* step)
 		if (imagedata.isSpine)
 		{
 			if (imagedata.SendMsg)
-				NOTIFICATION->postNotification(COST_AREA,CCInteger::create(imagedata.SendMsg));
+				NOTIFICATION->postNotification(B_CostArea,CCInteger::create(imagedata.SendMsg));
 			char bg_path[60] = {0};
 			sprintf(bg_path,"888%d",imagedata.spineID);
 			spSkeletonData* data = nullptr;
@@ -422,7 +423,7 @@ void CombatGuideLayer::initguideImage( ImageData& data )
 	pSprite->setFlipY(data.bFlipY);
 	pSprite->setRotation(data.iRotation);
 	if (data.SendMsg)
-		NOTIFICATION->postNotification(COST_AREA,CCInteger::create(data.SendMsg));
+		NOTIFICATION->postNotification(B_CostArea,CCInteger::create(data.SendMsg));
 	m_root->addChild(pSprite, data.iZorder);
 	if(data.iDir == 1)
 	{
@@ -534,8 +535,8 @@ void CombatGuideLayer::ImageTextGuide(CombatGuideStep* step)
 	}
 	if (step->getAddCost())
 	{
-		NOTIFICATION->postNotification(CHANGECOST,CCFloat::create(-10000));//置空处理
-		NOTIFICATION->postNotification(CHANGECOST,CCFloat::create(step->getAddCost()));
+		NOTIFICATION->postNotification(B_ChangeCostNumber,CCFloat::create(-10000));//置空处理
+		NOTIFICATION->postNotification(B_ChangeCostNumber,CCFloat::create(step->getAddCost()));
 	}
 }
 

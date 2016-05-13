@@ -19,6 +19,7 @@
 #include "common/CommonFunction.h"
 #include "warscene/EffectData.h"
 #include "tools/CCShake.h"
+#include "Battle/BattleMessage.h"
 WarScene::WarScene()
 	:m_MapLayer(nullptr),m_AliveLayer(nullptr),m_StoryLayer(nullptr)
 	,m_MoveLayer(nullptr),m_UILayer(nullptr),_dropItem(nullptr)
@@ -35,7 +36,7 @@ void WarScene::onEnter()
 	DataCenter::sharedData()->getUser()->setoldLevel();									//设置开始战斗前等级
 	m_Loginc->initMember();
 	LayerMoveEnd(CCInteger::create((int)StoryType::beginStory));						//这个方法不应该放在这里的发条消息也能解决的问题
-	NOTIFICATION->addObserver(this,callfuncO_selector(WarScene::ShakeLayer),SHAKE_BYEFFECT,nullptr);
+	NOTIFICATION->addObserver(this,callfuncO_selector(WarScene::ShakeLayer),B_Shark,nullptr);
 }
 
 void WarScene::onEnterTransitionDidFinish()

@@ -75,7 +75,7 @@ void CombatEffect::SpineActionEvent( int trackIndex, spEvent* pEvent )
 		}break;
 	case EventType::SharkEvent:
 		{
-			NOTIFICATION->postNotification(SHAKE_BYEFFECT,nullptr);
+			NOTIFICATION->postNotification(B_Shark,nullptr);
 		}break;
 	case EventType::Die:
 		{
@@ -207,12 +207,12 @@ void CombatEffect::BattleEffect(BattleResult* Result)
 		FloorEffect->setShaderEffect(aliveOb->getArmature()->getShaderProgram());
 
 		if (effectinfo->getisShake())															//震屏处理
-			NOTIFICATION->postNotification(SHAKE_BYEFFECT,nullptr);
+			NOTIFICATION->postNotification(B_Shark,nullptr);
 		if (Result->m_LostHp[*iter].hitNum < 0)													//播放受击动作
 		{
 			pAliveOb->TurnStateTo(Hit_Index); 
 			if (!alive->getEnemy())
-				NOTIFICATION->postNotification(BAR_ATK_HANDLE);			//刷新连击处理
+				NOTIFICATION->postNotification(B_ContinuousNumber);			//刷新连击处理
 		}
 		pAliveOb->playerNum(Result->m_LostHp[*iter].hitNum,Result->m_LostHp[*iter].hitType);	
 
@@ -239,7 +239,7 @@ void CombatEffect::AttackNull(BattleResult* Result)
 	{
 		aliveOb->setEffectMusic(effectinfo->getfoeMusicId());
 		if (effectinfo->getisblack())															//震屏处理
-			NOTIFICATION->postNotification(SHAKE_BYEFFECT,nullptr);
+			NOTIFICATION->postNotification(B_Shark,nullptr);
 	}
 	aliveOb->setPlayerEffect(effectinfo->getfoeEft());
 }
@@ -257,7 +257,7 @@ void CombatEffect::PlayerSkill(WarAlive* alive)
 	float time = crit_eff->getTotalTime();
 	PlayEffectSound(SFX_503);
 
-	NOTIFICATION->postNotification(BAR_ATK_HANDLE,alive);			//刷新连击处理
+	NOTIFICATION->postNotification(B_ContinuousNumber,alive);			//刷新连击处理
 	int offs_x = 200;												//武将距离屏幕边缘的距离
 	CCNode* MoveLayer = m_Scene->getMoveLayer();
 	CCPoint p = MoveLayer->getPosition();

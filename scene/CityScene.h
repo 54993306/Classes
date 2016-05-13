@@ -2,7 +2,7 @@
 #define _CITY_SCENE_H_
 #include "AppUI.h"
 #include "alive/AliveDefine.h"
-#include "layer/LayerDefine.h"
+//#include "layer/LayerDefine.h"
 #include<map>
 using namespace std;
 class CityScene : public CScene,public CCTargetedTouchDelegate 

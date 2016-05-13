@@ -1,5 +1,18 @@
 ﻿#ifndef _WARCONTROL_
 #define _WARCONTROL_
+/************************************************************* 
+ *
+ *
+ *		Data : 2016.5.13
+ *	
+ *		Name : 
+ *
+ *		Author : Lin_Xiancheng
+ *
+ *		Description : 可分为几个部分进行处理，按钮的特效，其他连击效果的显示，UI上半部分的处理可拆分为多个类，将tag的定义抽出到共用的位置进行处理，创建一个ui的文件夹管理相关的类
+ *
+ *
+ *************************************************************/
 #include "AppUI.h"
 #include "Global.h"
 #include "scene/layer/LayerManager.h"
@@ -18,42 +31,36 @@ public:
 	CREATE_FUNC(WarControl);
 	virtual void onEnter();
 	virtual void onExit();
-public:
-	void initAliveButtons();
-	void initTipsEffect(CCObject* ob);
+public:												//
 	void AddEvent();
 	void RemoveEvent();
+	CLayout* getLaout();
+	void initAliveButtons();
+	void showMonsterTips(CCObject* ob);
+	
 	void OnClick(CCObject* ob);						//按钮类					
 	void ChangeBoxGoldNum(CCObject* ob);			//箱子金币
-	CCNode* getboxGold(bool box,bool label);			
 	bool AliveButtonLongClick(CCObject* pSender, CCTouch* pTouch);
 	void onlongClickEnd(CCObject* pSender, CCTouch* pTouch, float fDuration);	
-	CLayout* getLaout();
-	void upContinuousState(float dt);				//
-	void upContinuousNum(CCObject* ob);				//
+	
+	void upContinuousNodeState(float dt);				//
+	void upContinuousNumber(CCObject* ob);				//
 	void AliveBarFullCallBack(CCObject* ob);
 	void AliveBattleDispose(CCObject* ob);
-	void CallAliveBattle(WarAlive*alive);
+	void CallAliveEntranceBattle(WarAlive*alive);
 	
 	CWidgetTouchModel AliveButtonBeginClick(CCObject* ob,CCTouch* pTouch);
 	void AliveButtonClick(CCObject* ob);
 	void CaptainHit(CCObject* ob);
 	void SkillMask(CCObject* ob);
-	void showCostAddOrReduceEffect(int iCostChange);
+	
 	void showFlyCostToBar(CCPoint pStartPos);
 	void showFlyCostToBarCallBack(CCNode* pSender);
-	CC_SYNTHESIZE(CCPoint, m_goldIconPos, GoldIconPos);
-	CC_SYNTHESIZE(CCPoint, m_boxIconPos, BoxIconPos);
-	CC_SYNTHESIZE(CCSpriteBatchNode*, m_batchNodeEffect, BatchNodeEffect);
-
 	
-	void upButtonState(CCObject* ob);
-
-	void flyCostToHeroBtn(CCNode* pNode);
+	void ResetButtonState(CCObject* ob);
 	void updateTimeCountUI(int iCount);
 	
 	void iniCaptainHurtTips();
-	void frameEvent(CCBone *pBone, const char *str, int a, int b);
 
 /*******************************************************************************************************************/
 	CCNode* getMoveLayout(int index);							//get role button move part
@@ -82,13 +89,21 @@ public:
 
 	void initButtonBackImage(CButton* button,int index );		//reason call number init button back image
 
-	void updateUiLayerCostNumber(int cost);						//刷新显示层上Cost值
+	void updateCostNumber(int cost);							//update cost number
 
-	void updateAliveButtonEffect();								//刷新武将按钮特效
+	void updateCostSpeed(int iCostChange);						//update cost speed
 
-	bool guideStateButtonEffect(CCNode* layout);				//按钮特效新手引导下时处理
+	void updateAliveButtonEffect();								//update role button effect
+
+	bool guideStateButtonEffect(CCNode* layout);				//guide state button dispose
 
 	void AliveBattlefield(WarAlive* alive);						//role log in battlefield or leave
+
+	void updateBatchNumber(int currbatch);						//update batch number
+
+	CC_SYNTHESIZE(CCPoint, m_goldIconPos, GoldIconPos);
+	CC_SYNTHESIZE(CCPoint, m_boxIconPos, BoxIconPos);
+	CC_SYNTHESIZE(CCSpriteBatchNode*, m_batchNodeEffect, BatchNodeEffect);
 protected:
 	WarManager* m_Manage;
 	CLayout*	m_ControLayer;

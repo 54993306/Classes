@@ -18,7 +18,7 @@
 #include "warscene/MapEffect.h"
 #include "warscene/ParseFileData.h"
 #include "tools/ShowTexttip.h"
-
+#include "Battle/BattleMessage.h"
 #define AddMoveImg		"lv.png"
 #define CutMoveImg		"huang.png"
 #define AtksImg			"hong.png"
@@ -76,15 +76,15 @@ bool WarMapLayer::init()
 
 void WarMapLayer::addEvent()
 {
-	NOTIFICATION->addObserver(this,callfuncO_selector(WarMapLayer::touchAreaCancel),WAR_CANCEL_DRAW_DRAG,nullptr);
-	NOTIFICATION->addObserver(this,callfuncO_selector(WarMapLayer::DrawMoveAtkArea),MOVE_ATK_AREA,nullptr);
-	NOTIFICATION->addObserver(this,callfuncO_selector(WarMapLayer::DrawAtkEffect),Draw_Skill_Effect,nullptr);
-	NOTIFICATION->addObserver(this,callfuncO_selector(WarMapLayer::CombatArea),Draw_SKILL_Area,nullptr);
-	NOTIFICATION->addObserver(this,callfuncO_selector(WarMapLayer::CancelCombatArea),CANCELATTACKAREA,nullptr);
-	NOTIFICATION->addObserver(this,callfuncO_selector(WarMapLayer::SkillBtnDrawSkillArea),Draw_BtmSkill_Area,nullptr);
-	NOTIFICATION->addObserver(this,callfuncO_selector(WarMapLayer::MapShake),SHAKE_BYEFFECT,nullptr);
-	NOTIFICATION->addObserver(this,callfuncO_selector(WarMapLayer::CaptainHit),CAPTAINHIT,nullptr);
-	NOTIFICATION->addObserver(this,callfuncO_selector(WarMapLayer::CostAreaTips),COST_AREA,nullptr);
+	NOTIFICATION->addObserver(this,callfuncO_selector(WarMapLayer::touchAreaCancel),B_CancelCostArea,nullptr);
+	NOTIFICATION->addObserver(this,callfuncO_selector(WarMapLayer::DrawMoveAtkArea),B_RoleAttackCostArea,nullptr);
+	NOTIFICATION->addObserver(this,callfuncO_selector(WarMapLayer::DrawAtkEffect),B_SkilEffectInMap,nullptr);
+	NOTIFICATION->addObserver(this,callfuncO_selector(WarMapLayer::CombatArea),B_DrawSkillArea,nullptr);
+	NOTIFICATION->addObserver(this,callfuncO_selector(WarMapLayer::CancelCombatArea),B_CancelDrawAttackArea,nullptr);
+	NOTIFICATION->addObserver(this,callfuncO_selector(WarMapLayer::SkillBtnDrawSkillArea),B_DrawDynamicSkillArea,nullptr);
+	NOTIFICATION->addObserver(this,callfuncO_selector(WarMapLayer::MapShake),B_Shark,nullptr);
+	NOTIFICATION->addObserver(this,callfuncO_selector(WarMapLayer::CaptainHit),B_CaptainHurt,nullptr);
+	NOTIFICATION->addObserver(this,callfuncO_selector(WarMapLayer::CostAreaTips),B_CostArea,nullptr);
 }
 void WarMapLayer::removeEvent() { NOTIFICATION->removeAllObservers(this); }
 
@@ -160,7 +160,7 @@ void WarMapLayer::DrawAtkArea(WarAlive* alive)
 {
 	vector<int>VecGrid;
 	alive->setTouchState(true);
-	if (alive->role->alert)
+	if (alive->role->alert && !alive->getCriAtk())
 	{
 		VecGrid = m_SkillRange->getAliveGuard(alive);
 	}else{

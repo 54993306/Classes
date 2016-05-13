@@ -6,6 +6,7 @@
 #include "model/WarManager.h"
 #include "common/CGameSound.h"
 #include "GMessage.h"
+#include "Battle/BattleMessage.h"
 
 EffectObject::EffectObject()
 	:m_effect(nullptr),m_TotalTime(0),m_Playtime(0),m_Type(EffectType::once),m_Music(0)
@@ -187,7 +188,7 @@ void EffectObject::setShaderEffect( CCGLProgram* pGl )
 
 void EffectObject::ShakeMessage()
 {
-	NOTIFICATION->postNotification(SHAKE_BYEFFECT,nullptr);
+	NOTIFICATION->postNotification(B_Shark,nullptr);
 }
 
 void EffectObject::PlayerMusic()

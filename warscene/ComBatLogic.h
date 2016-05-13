@@ -74,9 +74,7 @@ public:
 	void HeroExcuteAI(WarAlive* alive);
 	bool AttackJudge(WarAlive* alive);
 	void AliveCritEnd(WarAlive* alive);
-	//bool getHitAlive(WarAlive* alive);
 	bool StateDispose(WarAlive* alive,float dt);
-	void ContinueStage(int type, google::protobuf::Message *msg);
 	void OnBattleFinish(int type, google::protobuf::Message *msg);
 	bool IsAutoMoveType(WarAlive*alive);
 	void startCountDown(int iTime);		//开始倒计时
@@ -84,7 +82,6 @@ public:
 	CC_SYNTHESIZE(CCArray*,m_task,TaskArray);
 	CC_SYNTHESIZE(float,m_MaxCost,MaxCost);
 	CC_SYNTHESIZE(bool,m_Run,RunLogic);
-	CC_SYNTHESIZE(bool,m_CostChange,CostChange);
 	CC_PROPERTY(float,m_CurrCost,CurrCost);
 	CC_SYNTHESIZE(int, m_iGameTimeCount, GameTimeCount);		//倒计时时间
 	CC_SYNTHESIZE(bool, m_bCountDown, CountDown);				//倒计时开启

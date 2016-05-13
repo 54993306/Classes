@@ -452,14 +452,9 @@ void LoadWar::LoadBeingAnimation()
 	string data ((const char*)buff,size);
 	rapidjson::Document doc;
 	doc.Parse<0>(data.c_str());
-	if ( doc.HasParseError())
+	if ( doc.HasParseError()||!doc.IsObject() || !doc.HasMember("OPEN"))
 	{
 		CCLOG("[ *ERROR ] LoginScene::LoadAnimationCallBack %s",doc.GetParseError());
-		return;
-	}
-	if ( !doc.IsObject() || !doc.HasMember("OPEN") )
-	{
-		CCLOG("[ *ERROR ] LoginScene::LoadAnimationCallBack Create Json Project Fail");
 		return;
 	}
 	rapidjson::Value& VecPath = doc["OPEN"];		//得到键对应的数组信息
@@ -555,8 +550,6 @@ void LoadWar::ProgressEnd()
 	{
 		if ( !m_LoadSpine->getLoadSucceed())
 			return;
-		CCLOG("m_LoadSpine->getLoadSucceed");
-
 		for (int i=0; i<m_resVec.size();++i)
 		{
 			LoadResourceInfo &res = m_resVec.at(i);

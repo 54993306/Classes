@@ -25,7 +25,7 @@
 #include "common/CGameSound.h"
 #include "Resources.h"
 #include "warscene/CHeroSoundData.h"
-
+#include "Battle/BattleMessage.h"
 WarAliveLayer::WarAliveLayer()
 	:m_TouchAlive(nullptr),m_grid(0),m_AliveNode(0)
 	,m_moveTarget(nullptr),m_TouchAliveBtn(false),m_Manage(nullptr)
@@ -195,7 +195,7 @@ void WarAliveLayer::onEnter()
 {
 	BaseLayer::onEnter();
 	this->scheduleUpdate();
-	NOTIFICATION->addObserver(this,callfuncO_selector(WarAliveLayer::LayerShake),SHAKE_BYEFFECT,nullptr);
+	NOTIFICATION->addObserver(this,callfuncO_selector(WarAliveLayer::LayerShake),B_Shark,nullptr);
 	NOTIFICATION->addObserver(this,callfuncO_selector(WarAliveLayer::AliveBattle),ALIVEBATTLETOUCH,nullptr);
 }
 void WarAliveLayer::onExit()
@@ -244,7 +244,7 @@ void WarAliveLayer::TouchAlive(WarAlive* alive)
 	ActObject* act = alive->getActObject();										//指针复制，复制被触摸武将
 	if (!act)return;
 	alive->setTouchGrid(alive->getGridIndex());
-	NOTIFICATION->postNotification(MOVE_ATK_AREA, alive);
+	NOTIFICATION->postNotification(B_RoleAttackCostArea, alive);
 	m_TouchAlive = alive;
 	if ( !alive->getEnemy()&&alive->getBattle())								//上阵武将才做透明处理
 	{
@@ -328,7 +328,7 @@ void WarAliveLayer::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)
 	{
 		m_grid = grid;
 		m_TouchAlive->setTouchGrid(m_grid);
-		NOTIFICATION->postNotification(MOVE_ATK_AREA,m_TouchAlive);
+		NOTIFICATION->postNotification(B_RoleAttackCostArea,m_TouchAlive);
 	}
 }
 
@@ -351,13 +351,13 @@ void WarAliveLayer::ccTouchCancelled(CCTouch *pTouch, CCEvent *pEvent)
 		setEnableRecursiveCascading(act->getArmature(),true,ccc3(255,255,255),255);
 	}
 	m_moveTarget->setVisible(false);
-	NOTIFICATION->postNotification(WAR_CANCEL_DRAW_DRAG,nullptr);
+	NOTIFICATION->postNotification(B_CancelCostArea,nullptr);
 }
 
 void WarAliveLayer::ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent)
 {
 	m_moveTarget->setVisible(false);
-	NOTIFICATION->postNotification(WAR_CANCEL_DRAW_DRAG,nullptr);
+	NOTIFICATION->postNotification(B_CancelCostArea,nullptr);
 	CCPoint p = convertToNodeSpace(pTouch->getLocation())+m_TouchOffs-m_moveTarget->getoffs();		//触摸点传递下来
 	int grid = m_map->getGridIndex(p);																//判断触摸点是否在格子上
 	if(!m_TouchAlive->getEnemy())

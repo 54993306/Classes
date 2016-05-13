@@ -38,9 +38,8 @@
 #include "warscene/WarWinLayer.h"
 #include "common/CGameSound.h"
 #include "common/ShaderDataHelper.h"
-#include "warscene/WarRelive.h"
 #include "warscene/WorldBossEndLayer.h"
-
+#include "Battle/BattleMessage.h"
 #include "update/CDownloadPackage.h"
 #include "jni/CJniHelper.h"
 
@@ -48,7 +47,7 @@ CombatLogic::CombatLogic()
 	:m_time(0),m_Assist(nullptr),m_task(nullptr),m_CombatEffect(nullptr),m_bufExp(nullptr),m_terExp(nullptr),m_SkillRange(nullptr)
 	,m_BatchNum(0),m_send(1),m_CurrBatchNum(0),m_FiratBatch(true),m_Scene(nullptr),m_UILayer(nullptr)
 	,m_MapLayer(nullptr),m_AliveLayer(nullptr),m_TerrainLayer(nullptr),m_StoryLayer(nullptr)
-	,m_GuideLayer(nullptr),m_Run(false),m_HurtCount(nullptr),m_MoveRule(nullptr),m_Manage(nullptr),m_MaxCost(0),m_CostChange(true)
+	,m_GuideLayer(nullptr),m_Run(false),m_HurtCount(nullptr),m_MoveRule(nullptr),m_Manage(nullptr),m_MaxCost(0)
 	,m_CurrCost(0),m_speed(1),m_FrameTime(0),m_Alive(nullptr),m_bFinish(false),m_bGameOver(false),m_fCurrentCostAdd(0),
 	m_iGameTimeCount(0), m_bCountDown(false),m_Record(true),m_RecordNum(0),m_PlayerNum(0)
 {}
@@ -123,9 +122,6 @@ bool CombatLogic::init()
 		if (alive->getCaptain())
 			m_CurrCost += alive->getInitCost();
 	}
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
-	//m_CurrCost = m_MaxCost;
-#endif
 	return true;
 }
 
@@ -166,8 +162,7 @@ void CombatLogic::initMember()
 	NOTIFICATION->addObserver(this,callfuncO_selector(CombatLogic::AliveDieDispose),ALIVEDIE,nullptr);
 	NOTIFICATION->addObserver(this,callfuncO_selector(CombatLogic::CBackLayer),SHOW_PLAN_PANEL,nullptr);
 	NOTIFICATION->addObserver(this,callfuncO_selector(CombatLogic::ChangeCost),CHANGECOST,nullptr);
-	NOTIFICATION->addObserver(this,callfuncO_selector(CombatLogic::BatterRecord),RECORDBATTERNUM,nullptr);
-	CNetClient::getShareInstance()->registerMsgHandler(HeroInfoMsg,this,CMsgHandler_selector(CombatLogic::ContinueStage));
+	NOTIFICATION->addObserver(this,callfuncO_selector(CombatLogic::BatterRecord),B_RecordContinuousSkill,nullptr);
 	CNetClient::getShareInstance()->registerMsgHandler(ExitStage,this,CMsgHandler_selector(CombatLogic::OnBattleFinish));
 	CNetClient::getShareInstance()->registerMsgHandler(BossFinishReqMsg,this,CMsgHandler_selector(CombatLogic::OnBattleFinish));
 	
@@ -178,19 +173,7 @@ void CombatLogic::initMember()
 		m_MapLayer->getBackgroundManage()->initWithStage(m_Manage->getStageID());
 	}
 	m_BatchNum = m_Manage->getBatch();
-	CLayout* m_ControLayer = m_UILayer->getLaout();
-	CLayout* m_pNormal = (CLayout*)m_ControLayer->findWidgetById("layer_up_normal");
-	CCNode* node = m_pNormal->getChildByTag(CL_Batch);
-	node->setVisible(false);
-	char path[60] = {0};
-	sprintf(path,"%d/%d",m_send,m_BatchNum+1);
-	CCLabelAtlas* BatchNum = CCLabelAtlas::create(path,"label/number_03.png",27.0f,35,47);
-	BatchNum->setScale(0.6f);
-	BatchNum->setAnchorPoint(ccp(0.5f,0.43f));
-	BatchNum->setPosition(node->getPosition());
-	BatchNum->setTag(CL_Batch);
-	m_pNormal->addChild(BatchNum);
-	node->removeFromParentAndCleanup(true);
+	m_UILayer->updateBatchNumber(m_send);
 }
 //测试用
 void CombatLogic::RoundStart(CCObject* ob)
@@ -230,8 +213,8 @@ void CombatLogic::update(float delta)
 	TaskArray();
 	m_bufExp->ResetInterval(delta);
 	RunLogic(delta);
-	m_UILayer->updateUiLayerCostNumber(m_CurrCost);
-	m_UILayer->showCostAddOrReduceEffect(m_fCurrentCostAdd);
+	m_UILayer->updateCostNumber(m_CurrCost);
+	m_UILayer->updateCostSpeed(m_fCurrentCostAdd);
 	m_fCurrentCostAdd = 0;
 }
 
@@ -247,7 +230,7 @@ void CombatLogic::showRound()
 		m_FiratBatch = false;
 		CCLabelAtlas* labAt = CCLabelAtlas::create(ToString(m_CurrBatchNum+1),"label/47_44.png",47,44,'0');
 		ShowTexttip(labAt,RGB_GREEN,ROUNDNUM,CCPointZero,0,0,0,200);
-		NOTIFICATION->postNotification(TIPSEFFECT,CCBool::create(false));
+		NOTIFICATION->postNotification(B_MonsterTips);
 	}
 }
 
@@ -275,23 +258,19 @@ void CombatLogic::TaskArray()
 
 void CombatLogic::RunLogic(float delta)
 {
-	if (m_Run)
+	if (!m_Run || DataCenter::sharedData()->getCombatGuideMg()->IsGuide())
+		return;
+	m_Manage->updateAlive();				//更新武将信息
+	ExcuteAI(delta);
+	if (m_CurrCost < m_MaxCost && !m_Alive)	//放必杀技时cost不发生改变
 	{
-		m_Manage->updateAlive();				//更新武将信息
-		if (!DataCenter::sharedData()->getCombatGuideMg()->IsGuide())
-		{
-			if (m_CurrCost < m_MaxCost && m_CostChange && !m_Alive)	//放必杀技时cost不发生改变
-			{
 #if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
-				m_CurrCost += delta * 100;				//系统一直增加cost
-				m_fCurrentCostAdd += 1;
+		m_CurrCost += delta * 100;				//系统一直增加cost
+		m_fCurrentCostAdd += 1;
 #else
-				m_CurrCost += delta;
-				m_fCurrentCostAdd += delta;
+		m_CurrCost += delta;
+		m_fCurrentCostAdd += delta;
 #endif	
-			}
-			ExcuteAI(delta);
-		}
 	}
 }
 //每一帧都判断每个武将的信息                    BUFF应该是每一帧都自动处理的
@@ -574,12 +553,12 @@ void CombatLogic::CritAtkEnd(CCObject* ob)
 		act->setFront(false);
 		act->getHp()->setUserObject(nullptr);
 	}
+	m_UILayer->ResetButtonState(m_Alive);
 	m_UILayer->AddEvent();
 	m_AliveLayer->addEvent();
 	m_AliveLayer->getLayerColor()->setVisible(false);
 	LGResume(m_AliveLayer);
 	m_Alive = nullptr;
-
 	m_Record = false;
 	m_PlayerNum++;
 	m_CombatEffect->setPlayerNum(m_PlayerNum);
@@ -764,33 +743,19 @@ void CombatLogic::NextBatch( float dt )
 		if(alive->getAliveID() >= C_BatchMonst+m_CurrBatchNum*100)
 			m_AliveLayer->createAlive(alive,SceneTrap);
 	}
-	char path[60] = {0};
-	sprintf(path,"%d/%d",m_CurrBatchNum+1,m_BatchNum+1);
-	CLayout* m_pNormal = (CLayout*)m_UILayer->findWidgetById("layer_up_normal");
-	CCLabelAtlas* BatchNum = (CCLabelAtlas*)m_pNormal->getChildByTag(CL_Batch);
-	BatchNum->setString(path);
-	if (m_CurrBatchNum < m_BatchNum/*&&DataCenter::sharedData()->getWar()->getStageID()*/)
+	m_UILayer->updateBatchNumber(m_CurrBatchNum+1);
+	if (m_CurrBatchNum < m_BatchNum)
 	{
 		CCLabelAtlas* labAt = CCLabelAtlas::create(ToString(m_CurrBatchNum+1),"label/47_44.png",47,44,'0');
 		ShowTexttip(labAt,RGB_GREEN,ROUNDNUM,CCPointZero,0,0,0,200);
-		NOTIFICATION->postNotification(TIPSEFFECT,CCBool::create(false));
+		NOTIFICATION->postNotification(TIPSEFFECT);
 	}
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
 	if (DataCenter::sharedData()->getWar()->getStageID() == 0)							//引导开启的情况
 	{
 		char path[60] = {0};
 		sprintf(path,"%d_%d",0,m_CurrBatchNum+1);										//覆盖高亮区域的图片
 		DataCenter::sharedData()->getCombatGuideMg()->setGuide(path);
 	}
-#else
-	if (DataCenter::sharedData()->getWar()->getStageID() == 0)							//引导开启的情况
-	{
-		char path[60] = {0};
-		sprintf(path,"%d_%d",0,m_CurrBatchNum+1);										//覆盖高亮区域的图片
-		DataCenter::sharedData()->getCombatGuideMg()->setGuide(path);
-	}
-#endif
-	//m_MapLayer->getBackgroundManage()->initWithStageBatch(m_Manage->getStageID(),m_send);	//一场战斗一个地图		
 	if (m_Manage->getAliveByType(AliveType::Boss))
 	{
 		WarAlive* boss = m_Manage->getAliveByType(AliveType::Boss);
@@ -828,12 +793,9 @@ void CombatLogic::ActRemove( CCObject* ob )
 				if (act->getCurrActionCode() != Die_Index)
 					act->AliveDie();
 			}
+			m_UILayer->hideUpUiPart();			//隐藏control UI的上部分
 			CCDirector::sharedDirector()->getScheduler()->setTimeScale(1);
-			if (DataCenter::sharedData()->getWar()->getAliveByGrid(C_CAPTAINGRID))
-			{
-				m_UILayer->hideUpUiPart();			//隐藏control UI的上部分
-				m_StoryLayer->CreateStory(CCInteger::create((int)StoryType::OverStory));			//我方胜利(播放最后一个剧情)
-			}
+			m_StoryLayer->CreateStory(CCInteger::create((int)StoryType::OverStory));
 		}
 	}else{
 		if (!alive->getCaptain())
@@ -1062,14 +1024,6 @@ void CombatLogic::CostCount(WarAlive* alive,float dt)
 //显示返回层
 void CombatLogic::CBackLayer(CCObject* ob)
 {
-	if(dynamic_cast<WarRelive*>(CCDirector::sharedDirector()->getRunningScene()->getChildByTag(WAR_RELIVE_TAG)))
-		return;
-	////如果是在打世界BOSS，屏蔽返回键
-	//if(m_Manage->getWorldBoss())
-	//{
-	//	return;
-	//}
-
 	if(m_bGameOver)
 	{
 		m_Scene->removeChildByTag(backLayer_tag);
@@ -1092,11 +1046,6 @@ void CombatLogic::CBackLayer(CCObject* ob)
 		onPause();
 		blayer->show();
 	}
-}
-
-void CombatLogic::ContinueStage( int type, google::protobuf::Message *msg )
-{
-	int i =0;
 }
 
 void CombatLogic::OnBattleFinish( int type, google::protobuf::Message *msg )

@@ -3,7 +3,6 @@
 
 #include "Resources.h"
 static const char* DEFAULT_FONT = "Arial";
-static const char* VERSION = "1.0.3";
 
 #define PUBLIC_ROOT(__URL__) ("public/" __URL__ )
 #define CSV_ROOT(__URL__) ("csv/" __URL__)
