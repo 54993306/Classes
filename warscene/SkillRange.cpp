@@ -173,7 +173,7 @@ CCDictionary* SkillRange::PlaySkillInfo( WarAlive* alive )
 	default:
 		break;
 	}
-	return nullptr;
+	return pDic;
 }
 
 //返回攻击区域受击武将信息

@@ -125,11 +125,9 @@ bool CombatLogic::init()
 	return true;
 }
 
-void CombatLogic::ChangeCost( CCObject* ob ) { setCurrCost(((CCFloat*)ob)->getValue()); }
-
-void CombatLogic::setCurrCost(float var)
-{
-	m_CurrCost += var;
+void CombatLogic::ChangeCost( CCObject* ob ) 
+{ 
+	m_CurrCost += ((CCFloat*)ob)->getValue();
 	if (m_CurrCost <=0 )
 	{
 		CCLOG("[ *Tips ] CombatLoginc::setCurrCost <= 0");
@@ -138,7 +136,6 @@ void CombatLogic::setCurrCost(float var)
 	if (m_CurrCost >= m_MaxCost)
 		m_CurrCost = m_MaxCost;
 }
-float CombatLogic::getCurrCost(){return m_CurrCost;}
 
 void CombatLogic::initMember() 
 { 
@@ -152,6 +149,7 @@ void CombatLogic::initMember()
 	m_AliveLayer = m_Scene->getWarAliveLayer();
 	m_TerrainLayer = m_Scene->getTerrainLayer();
 	m_GuideLayer = m_Scene->getCombatGuideLayer();
+	m_BatchNum = m_Manage->getBatch();
 
 	NOTIFICATION->addObserver(this,callfuncO_selector(CombatLogic::StoryEndEvent),WAR_STORY_OVER,nullptr);
 	NOTIFICATION->addObserver(this,callfuncO_selector(CombatLogic::RoundStart),WAR_ROUND_START,nullptr);
@@ -172,7 +170,6 @@ void CombatLogic::initMember()
 		m_MapLayer->getBackgroundManage()->setMap(m_MapLayer);
 		m_MapLayer->getBackgroundManage()->initWithStage(m_Manage->getStageID());
 	}
-	m_BatchNum = m_Manage->getBatch();
 	m_UILayer->updateBatchNumber(m_send);
 }
 //测试用
@@ -222,11 +219,7 @@ void CombatLogic::showRound()
 {
 	if (m_time >= 0.8f && m_FiratBatch && !DataCenter::sharedData()->getCombatGuideMg()->IsGuide())
 	{
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
-		m_Run = true;
-#else
-		m_Run = true;
-#endif		
+		m_Run = true;	
 		m_FiratBatch = false;
 		CCLabelAtlas* labAt = CCLabelAtlas::create(ToString(m_CurrBatchNum+1),"label/47_44.png",47,44,'0');
 		ShowTexttip(labAt,RGB_GREEN,ROUNDNUM,CCPointZero,0,0,0,200);
@@ -287,6 +280,7 @@ void CombatLogic::ExcuteAI(float delta)
 			continue;										
 		if (!AttackJudge(alive))
 			continue;
+		//CCLOG("test alive id=%d",alive->getAliveID());
 		if (alive->getEnemy())
 		{
 			MonsterExcuteAI(alive,delta);
@@ -294,57 +288,46 @@ void CombatLogic::ExcuteAI(float delta)
 			HeroExcuteAI(alive);			
 		}
 	}
+	//int i=0;
 }
-
+//@@
 void CombatLogic::HeroExcuteAI( WarAlive* alive )
 {
 	int ActionCode = alive->getActObject()->getCurrActionCode();
 	CCDictionary* AttackInfo = m_SkillRange->PlaySkillInfo(alive);		//生命周期只有一帧
-	if (!AttackInfo)return;
 	CCArray* Alives = (CCArray*)AttackInfo->objectForKey(Hit_Alive);		//受击目标	
-	if (Alives->count())
+	if (Alives->count()||alive->getCriAtk())
 	{
 		if (ActionCode == Walk_Index)
 		{
 			alive->getActObject()->setMoveState(0);
 			alive->getActObject()->TurnStateTo(Stand_Index);
 			alive->setAIState(false);
-			return;
-		}else{
-			AliveExcuteAI(alive,AttackInfo);
 		}
-	}else{
-		if (m_Manage->getSkill(alive)->skillType == CallAtk)
-		{
-			AliveExcuteAI(alive,AttackInfo);
-		}else if (alive->getCriAtk())
-		{
-			AliveExcuteAI(alive,AttackInfo);
-		}else{				
-			if (alive->getSpeAtk())
-				alive->setSpeAtk(false);
-			if (IsAutoMoveType(alive) || ActionCode == Walk_Index)//自动移动类,或已经开始执行AI状态
-				return;
-			if (!alive->getCaptain()&&alive->getGridIndex()!=alive->getMoveObj()->getgrid())//武将当前是否在固定位置,如果不在则移动回固定位置(执行AI完毕状态)
-			{			
-				alive->setAIState(false);
-				alive->setMoveGrid(alive->getMoveObj()->getgrid());							//武将有一个回到初始位置的方法
+		AliveExcuteAI(alive,AttackInfo);
+	}else{		
+		//@@这些逻辑，应该都封装在武将的内部，单个武将去单独处理自身的情况
+		if (IsAutoMoveType(alive) || ActionCode == Walk_Index)//自动移动类,或已经开始执行AI状态
+			return;
+		if (!alive->getCaptain()&&alive->getGridIndex()!=alive->getMoveObj()->getgrid())//武将当前是否在固定位置,如果不在则移动回固定位置(执行AI完毕状态)
+		{			
+			alive->setAIState(false);
+			alive->setMoveGrid(alive->getMoveObj()->getgrid());							//@@武将有一个回到初始位置的方法
+			alive->getActObject()->setMoveState(Walk_Index);
+		}else{
+			int grid = m_SkillRange->GuardMoveArea(alive);								//@@有警戒区域的武将处理
+			alive->setAIState(true);
+			if(grid)
+			{
+				alive->setMoveGrid(grid);
 				alive->getActObject()->setMoveState(Walk_Index);
 			}else{
-				int grid = m_SkillRange->GuardMoveArea(alive);
-				alive->setAIState(true);
-				if(grid)
-				{
-					alive->setMoveGrid(grid);
-					alive->getActObject()->setMoveState(Walk_Index);
-				}else{
-					alive->setAIState(false);
-				}	
-			}
+				alive->setAIState(false);
+			}	
 		}
 	}
 }
-
+//@@自动移动的我方武将无受击目标情况处理
 bool CombatLogic::IsAutoMoveType( WarAlive*alive )
 {
 	if (alive->getCallType() != AutoMoveType)
@@ -356,12 +339,12 @@ bool CombatLogic::IsAutoMoveType( WarAlive*alive )
 		alive->getActObject()->AliveDie();							//超出预定范围执行死亡操作
 		return true;
 	}			
-	alive->setMoveGrid(alive->getGridIndex()-C_GRID_ROW);
+	alive->setMoveGrid(alive->getGridIndex()-C_GRID_ROW);			//这里的移动范围是写死了的
 	alive->getActObject()->setMoveState(Walk_Index);
 	return true;
 }
 
-//骸兽逃跑处理
+//@@骸兽逃跑处理
 bool CombatLogic::monsterFlee( WarAlive* alive )
 {
 	if (DataCenter::sharedData()->getWar()->getStageID())				//当前是为新手引导关卡,可以抽象出一个方法用于判断是否为新手关卡
@@ -386,13 +369,13 @@ bool CombatLogic::monsterFlee( WarAlive* alive )
 	}
 	return false;
 }
-
+//@@
 void CombatLogic::MonsterExcuteAI( WarAlive* alive,float dt )
 {
 	if (monsterFlee(alive))											//骸兽逃跑处理,将AI执行的都放在这个地方后面好整理
 		return;
 	int ActionCode = alive->getActObject()->getCurrActionCode();
-	if (alive->getGridIndex()<C_BEGINGRID)
+	if (alive->getGridIndex()<C_BEGINGRID)							//@@
 	{
 		if (!alive->getActObject()->getMoveState() 
 			&& m_MoveRule->MonstMoveExcute(alive))
@@ -400,12 +383,6 @@ void CombatLogic::MonsterExcuteAI( WarAlive* alive,float dt )
 		return ;
 	}
 	CCDictionary* AttackInfo = m_SkillRange->PlaySkillInfo(alive);				//生命周期只有一帧
-	if (!AttackInfo)
-	{
-		if (!alive->getActObject()->getMoveState() && m_MoveRule->MonstMoveExcute(alive) )
-			alive->getActObject()->setMoveState(Walk_Index);
-		return ;
-	}
 	CCArray* Alives = (CCArray*)AttackInfo->objectForKey(Hit_Alive);		//受击目标
 	if (Alives->count())
 	{
@@ -413,7 +390,6 @@ void CombatLogic::MonsterExcuteAI( WarAlive* alive,float dt )
 		{
 			alive->getActObject()->setMoveState(0);
 			alive->getActObject()->TurnStateTo(Stand_Index);
-			return ;
 		}
 		AliveExcuteAI(alive,AttackInfo);
 	}else{
@@ -423,8 +399,6 @@ void CombatLogic::MonsterExcuteAI( WarAlive* alive,float dt )
 			alive->getActObject()->TurnStateTo(Stand_Index);
 			AliveExcuteAI(alive,AttackInfo); 
 		}else{
-			if (alive->getSpeAtk())
-				alive->setSpeAtk(false);
 			if (alive->getCriAtk())
 				alive->setCriAtk(false);			
 			if (!alive->getActObject()->getMoveState() && m_MoveRule->MonstMoveExcute(alive) )
@@ -432,7 +406,7 @@ void CombatLogic::MonsterExcuteAI( WarAlive* alive,float dt )
 		}
 	}
 }
-
+//@@
 void CombatLogic::AliveExcuteAI(WarAlive* alive,CCDictionary*pDic)
 {
 	CCArray* Alives = (CCArray*)pDic->objectForKey(Hit_Alive);

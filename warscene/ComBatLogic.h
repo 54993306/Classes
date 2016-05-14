@@ -78,11 +78,11 @@ public:
 	void OnBattleFinish(int type, google::protobuf::Message *msg);
 	bool IsAutoMoveType(WarAlive*alive);
 	void startCountDown(int iTime);		//开始倒计时
+	int getCurrCost(){return m_CurrCost;}
 	CC_SYNTHESIZE(WarAssist*,m_Assist,WarAssist);
 	CC_SYNTHESIZE(CCArray*,m_task,TaskArray);
 	CC_SYNTHESIZE(float,m_MaxCost,MaxCost);
 	CC_SYNTHESIZE(bool,m_Run,RunLogic);
-	CC_PROPERTY(float,m_CurrCost,CurrCost);
 	CC_SYNTHESIZE(int, m_iGameTimeCount, GameTimeCount);		//倒计时时间
 	CC_SYNTHESIZE(bool, m_bCountDown, CountDown);				//倒计时开启
 
@@ -97,7 +97,8 @@ public:
 	void downloadPackageEnd(bool bAnswer);
 protected:
 	void onClickDownloadPackage(CCObject* pSender);
-private:			
+private:	
+	int m_CurrCost;
 	float m_FrameTime;				//累计时间
 	int m_send;						//记录以请求的消息批次
 	int	m_CurrBatchNum;				//记录当前战斗批次
