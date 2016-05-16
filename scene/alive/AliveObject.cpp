@@ -23,7 +23,7 @@
 AliveObject::AliveObject()
 	:m_Body(nullptr),m_Hp(nullptr),m_Name(""),m_ActionKey(""),m_MoveState(0)
 	,m_NameLabel(nullptr),m_Armature(nullptr),m_DropItem(0),m_offs(CCPointZero),m_Speed(CCPointZero)
-	,m_Enemy(false),m_EffectMusic(0),m_Front(false),m_DieState(false),m_IsSpine(false)
+	,m_Enemy(false),m_EffectMusic(0),m_DieState(false),m_IsSpine(false)
 	,m_Direction(0),m_ID(0),m_Model(0),m_Alive(nullptr),m_MoveObj(nullptr)
 	,m_AtkEffect(0),m_PlayerEffect(0),m_UpdateState(true),m_Skeleton(nullptr)
 {}

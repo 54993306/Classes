@@ -101,7 +101,7 @@ void WarAliveLayer::createAlive(WarAlive* alive,int createType)
 	aliveOb->setModel(alive->getModel());
 	aliveOb->setHp(nullptr); 
 	aliveOb->getBody()->setScale(alive->getZoom());
-	if (alive->getcloaking())											//潜行怪物处理
+	if (alive->getCloaking())											//潜行怪物处理
 		((CCArmature*)aliveOb->getArmature())->setOpacity(125);
 	AliveObEffect(aliveOb,createType);
 	AddActToGrid(aliveOb,alive->getGridIndex());
@@ -216,8 +216,6 @@ void WarAliveLayer::update(float delta)
 		ActObject* act = dynamic_cast<ActObject*>(object);
 		if(!act || object == m_moveTarget) continue;
 		int zorder = -act->getPositionY();
-		if (act->getFront())							//引导状态处理
-			zorder = 101;
 		if(act->getParent()) 
 			act->getParent()->reorderChild(act,zorder);	//z排序
 		act->updatePosition(delta);
@@ -405,7 +403,6 @@ void WarAliveLayer::AddAliveToGrid( WarAlive* alive,int grid )
 		{
 			if (grid != step->getFinishgrid())
 				return;								//固定格子才算完成(在移动区域内即算完成)
-			act->setFront(false);
 			DataCenter::sharedData()->getCombatGuideMg()->NextStep();
 		}
 	}
@@ -563,10 +560,9 @@ CCArray* WarAliveLayer::getAlivesOb(int AliveType /*=AliveType_All*/)
 	}
 	return arrAlive;
 }
-
+//0.4s震13次为基准,反馈过来的数据是它的倍数
 void WarAliveLayer::LayerShake(CCObject* ob)
 {
-	//0.4s震13次为基准,反馈过来的数据是它的倍数
 	//return;
 	if (ob)
 	{
@@ -577,5 +573,16 @@ void WarAliveLayer::LayerShake(CCObject* ob)
 		m_AliveNode->setPosition(ccp(0,0));
 		CCPoint p = m_AliveNode->getPosition();
 		m_AliveNode->runAction(CCSequence::create(CCShake::create(0.4f,13.0f),CCPlace::create(p),NULL));
+	}
+}
+
+void WarAliveLayer::clearAlivesPauseMark()
+{
+	CCArray* arr = getAlivesOb();
+	CCObject* obj = nullptr;
+	CCARRAY_FOREACH(arr,obj)
+	{
+		ActObject* act = (ActObject*)obj;
+		act->setUserObject(nullptr);
 	}
 }

@@ -65,7 +65,6 @@ public:
 	CC_SYNTHESIZE(int,m_AtkEffect,AtkEffect);			//攻击特效id
 	CC_SYNTHESIZE(int,m_PlayerEffect,PlayerEffect);		//播放空效果
 	CC_SYNTHESIZE(int,m_EffectMusic,EffectMusic);		//空效果音效
-	CC_SYNTHESIZE(bool,m_Front,Front);					//让武将单独高亮
 	CC_SYNTHESIZE(bool,m_UpdateState,UpdateState);		//是否在攻击结束刷新武将状态
 	CC_PROPERTY(string,m_Name,NickName);				//设置武将显示名称
 	CC_PROPERTY(CCSprite*,m_Body,Body);					//显示搭载

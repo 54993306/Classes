@@ -49,34 +49,31 @@ public:
 	virtual void onExit();
 	virtual bool init();
 	virtual void update(float delta);
-	void updateOneSecond(float dt);
 	CREATE_FUNC(CombatLogic);
-	void TaskArray();
-	void showRound();
-	void RunLogic(float delt);
+
+	void updateOneSecond(float dt);
 	void initMember();
-	void ExcuteAI(float dt);
+	
 	void AliveDieDispose(CCObject* ob);
 	void ActRemove(CCObject* ob);
 	void NextBatch(float dt);
 	void CBackLayer(CCObject* ob);
 	void CombatResult(CCObject* ob);
-	void RoundStart(CCObject* ob);
-	void CritAtkEnd(CCObject* ob);
-	void ChangeSpeed(CCObject* ob);
+	
+	
+	
 	void StoryEndEvent(CCObject* ob);
-	void BatterRecord(CCObject* ob);
-	void AtkLogic(CCObject* ob);
-	void ChangeCost(CCObject* ob);
+	
+	
+	
 	void CostCount(WarAlive* alive,float dt);
-	void AliveExcuteAI(WarAlive* alive,CCDictionary*pDic);	
-	void MonsterExcuteAI(WarAlive* alive,float dt); 
-	void HeroExcuteAI(WarAlive* alive);
-	bool AttackJudge(WarAlive* alive);
-	void AliveCritEnd(WarAlive* alive);
+	
+
+	
+	
 	bool StateDispose(WarAlive* alive,float dt);
 	void OnBattleFinish(int type, google::protobuf::Message *msg);
-	bool IsAutoMoveType(WarAlive*alive);
+	
 	void startCountDown(int iTime);		//开始倒计时
 	int getCurrCost(){return m_CurrCost;}
 	CC_SYNTHESIZE(WarAssist*,m_Assist,WarAssist);
@@ -89,27 +86,55 @@ public:
 	float getTime() { return m_time; }
 	void scheduleForRequestFinish();
 	void scheduleForRequesBossFinish();
-	bool monsterFlee(WarAlive* alive);
+	
 	void onPause();
 	void onResume();
 	void reliveSuccess();
 
 	void downloadPackageEnd(bool bAnswer);
 	/*****************************************************************************/
+	void ChangeCost(CCObject* ob);
+	void ChangeSpeed(CCObject* ob);
+	void RoundStart(CCObject* ob);
+	void TaskArray();
+	void showRound();
+	void RunLogic(float delt);
+	void ExcuteAI(float dt);
+	bool IsAutoMoveType(WarAlive*alive);
+	bool monsterFlee(WarAlive* alive);
+	void MonsterExcuteAI(WarAlive* alive,float dt); 
+	void HeroExcuteAI(WarAlive* alive);
+	void AliveExcuteAI(WarAlive* alive,CCDictionary*pDic);	
+	void BatterRecord(CCObject* ob);
+	void AliveCritEnd(WarAlive* alive);
+	void CritAtkEnd(CCObject* ob);
 	bool critJudge(WarAlive* alive);
 	void excuteCritEffect(WarAlive* alive,CCDictionary*pDic);
 	void monsterCritEffect(WarAlive* alive,CCArray* arr);
 	void heroCritEffect(WarAlive* alive,CCArray* arr);
 	void attackEffect(WarAlive*alive);
 	void attackDirection(WarAlive*alive);
-
+	void critComboEffect();
+	void attackEnd(WarAlive* alive);
+	void doLostHp(CCObject* ob);
+	bool walkState(WarAlive* alive);
+	bool AttackJudge(WarAlive* alive);
+	bool delayEntrance(WarAlive* alive,float dt);
+	bool autoSkillAlive(WarAlive* alive);
+	void attackTime(WarAlive* alive,float dt);
+	bool aliveAttackState(WarAlive* alive);
+	void displayBatchTips();
+	void displayRoundTips();
+	void displayGuide();
+	void heroRemove(WarAlive* alive);
+	void monsterRemove(WarAlive* alive);
 protected:
 	void onClickDownloadPackage(CCObject* pSender);
 private:	
 	int m_CurrCost;
 	float m_FrameTime;				//累计时间
 	int m_send;						//记录以请求的消息批次
-	int	m_CurrBatchNum;				//记录当前战斗批次
+	int	m_CurrBatchNum;				//记录当前战斗批次					这个参数+1的地方太多了，需要修改一下初始值
 	float m_time;
 	float m_speed;					//速度变化参数
 	int m_BatchNum;					//当前关卡批次

@@ -107,7 +107,7 @@ CCArray* SkillRange::UnderAttackAlive(WarAlive* self,CCArray* Area)
 		if (effect->mode == frontAreaVia&&Alives->count())
 		{
 			WarAlive* alive = (WarAlive*)Alives->objectAtIndex(0);
-			if (!alive->getcloaking())									//潜行类怪物处理
+			if (!alive->getCloaking())									//潜行类怪物处理
 				break;
 			else
 				Alives->removeAllObjects();
@@ -141,7 +141,7 @@ CCArray* SkillRange::UnderAttackAlive(WarAlive* self,CCArray* Area)
 		CCARRAY_FOREACH(Alives,pObj)
 		{
 			WarAlive* alive = (WarAlive*)pObj;
-			if (!alive->getcloaking())									//攻击范围内存在非潜行类怪物
+			if (!alive->getCloaking())									//攻击范围内存在非潜行类怪物
 				return Alives;
 		}
 		Alives->removeAllObjects();

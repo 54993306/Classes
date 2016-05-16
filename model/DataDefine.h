@@ -165,18 +165,19 @@ public:
 	CC_SYNTHESIZE(bool,m_Battle,Battle);				//上阵状态
 	CC_SYNTHESIZE(int,m_SortieNum,SortieNum);			//当前回造成伤害次数
 	CC_SYNTHESIZE(int,m_FatherID,FatherID);				//被召唤武将存储父武将ID
-	CC_SYNTHESIZE(int,m_CallAliveNum,callAliveNum);		//record can call alive number use int alive is captain
+	CC_SYNTHESIZE(int,m_CallAliveNum,CallAliveNum);		//record can call alive number use int alive is captain
 	CC_SYNTHESIZE(bool,m_Captain,Captain);				//是否为队长
 	CC_SYNTHESIZE(bool,m_CritEffect,CritEffect);		//必杀技播放过特效
 	CC_SYNTHESIZE(bool,m_ExecuteCap,ExecuteCap);		//队长技执行标记
 	CC_SYNTHESIZE(bool,m_Negate,Negate);				//标记是否转向攻击
 	CC_SYNTHESIZE(bool,m_Move,Move);					//是否可以移动
-	CC_SYNTHESIZE(bool,m_cloaking,cloaking);			//隐身状态
+	CC_SYNTHESIZE(bool,m_cloaking,Cloaking);			//隐身状态
 	CC_SYNTHESIZE(int,m_Hrt,Hrt);						//伤害减免效果(正加深,负减少)
 	CC_SYNTHESIZE(int,m_HrtPe,Hrtpe);					//伤害百分比(正加深,负减少)
 	CC_SYNTHESIZE(float,m_Zoom,Zoom);					//缩放比
 	CC_SYNTHESIZE(int,m_TerType,TerType);				//地形影响属性类型
 	CC_SYNTHESIZE(int,m_TerTypeNum,TerTypeNum);			//地形影响属性数值
+	CC_SYNTHESIZE(bool,m_LastAlive,LastAlive);			//隐身状态
 	bool canSummonAlive();								//是否可以召唤武将
 };
 

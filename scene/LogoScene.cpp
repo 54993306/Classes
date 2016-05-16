@@ -74,13 +74,14 @@ void LogoScene::onEnter()
 	//skeletonNode->retain();
 
 #if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
-    //testRests();
+    testRests();
+	m_XmlLayer->getChildByTag(3)->setVisible(false);
 	//CountMethod();
 	//this->scheduleOnce(schedule_selector(LogoScene::start), 0.1f);
 
-	SpineboyExample* TestSpineLayer = SpineboyExample::create();
-	TestSpineLayer->InitLayer((CLayout*)m_XmlLayer->getChildByTag(3));
-	m_XmlLayer->addChild(TestSpineLayer);
+	//SpineboyExample* TestSpineLayer = SpineboyExample::create();
+	//TestSpineLayer->InitLayer((CLayout*)m_XmlLayer->getChildByTag(3));
+	//m_XmlLayer->addChild(TestSpineLayer);
 
 #else
 	this->setVisible(false);
@@ -442,8 +443,8 @@ void LogoScene::TestAction()
 	CButton* Next = CButton::create();
 	Next->setEnabled(true);
 	Next->setTag(NextAction);
-	Next->setNormalImage("warScene/Normal2.png");
-	Next->setSelectedImage("warScene/Select2.png");
+	Next->setNormalImage("common/button_04_on.png");
+	Next->setSelectedImage("common/button_04_off.png");
 	Next->setOnClickListener(this,ccw_click_selector(LogoScene::onClick));
 	Next->setPosition(ccp(m_LogoSize.width-320,m_LogoSize.height-300));
 	m_XmlLayer->addChild(Next);
@@ -451,8 +452,8 @@ void LogoScene::TestAction()
 	CButton* Up = CButton::create();
 	Up->setEnabled(true);
 	Up->setTag(UpAction);
-	Up->setNormalImage("warScene/Normal.png");
-	Up->setSelectedImage("warScene/Select.png");
+	Up->setNormalImage("common/button_04_on.png");
+	Up->setSelectedImage("common/button_04_off.png");
 	Up->setOnClickListener(this,ccw_click_selector(LogoScene::onClick));
 	Up->setPosition(ccp(m_LogoSize.width-340-Up->getContentSize().width,m_LogoSize.height-300));
 	m_XmlLayer->addChild(Up);
@@ -460,8 +461,8 @@ void LogoScene::TestAction()
 	CButton* curr = CButton::create();
 	curr->setEnabled(true);
 	curr->setTag(RepeatCurrAction);
-	curr->setNormalImage("common/type_1.png");
-	curr->setSelectedImage("common/type_2.png");
+	curr->setNormalImage("common/button_04_on.png");
+	curr->setSelectedImage("common/button_04_off.png");
 	curr->setOnClickListener(this,ccw_click_selector(LogoScene::onClick));
 	curr->setPosition(ccp(m_LogoSize.width-340-Up->getContentSize().width,m_LogoSize.height-300-curr->getContentSize().height));
 	m_XmlLayer->addChild(curr);
@@ -470,8 +471,8 @@ void LogoScene::TestAction()
 	ReLoad->setScale(0.6f);
 	ReLoad->setEnabled(true);
 	ReLoad->setTag(ReLoadData);
-	ReLoad->setNormalImage("common/button_05_off.png");
-	ReLoad->setSelectedImage("common/button_05_on.png");
+	ReLoad->setNormalImage("common/button_04_on.png");
+	ReLoad->setSelectedImage("common/button_04_off.png");
 	ReLoad->setOnClickListener(this,ccw_click_selector(LogoScene::onClick));
 	ReLoad->setPosition(ccp(m_LogoSize.width-440-Up->getContentSize().width,m_LogoSize.height-360+curr->getContentSize().height));
 	m_XmlLayer->addChild(ReLoad);
@@ -525,8 +526,8 @@ void LogoScene::TestModel()
 	CButton* Next = CButton::create();
 	Next->setEnabled(true);
 	Next->setTag(NetModel);
-	Next->setNormalImage("warScene/Normal2.png");
-	Next->setSelectedImage("warScene/Select2.png");
+	Next->setNormalImage("common/button_04_on.png");
+	Next->setSelectedImage("common/button_04_off.png");
 	Next->setOnClickListener(this,ccw_click_selector(LogoScene::onClick));
 	Next->setPosition(ccp(m_LogoSize.width-320,m_LogoSize.height-450));
 	m_XmlLayer->addChild(Next);
@@ -534,8 +535,8 @@ void LogoScene::TestModel()
 	CButton* Up = CButton::create();
 	Up->setEnabled(true);
 	Up->setTag(UpModel);
-	Up->setNormalImage("warScene/Normal.png");
-	Up->setSelectedImage("warScene/Select.png");
+	Up->setNormalImage("common/button_04_on.png");
+	Up->setSelectedImage("common/button_04_off.png");
 	Up->setOnClickListener(this,ccw_click_selector(LogoScene::onClick));
 	Up->setPosition(ccp(m_LogoSize.width-340-Up->getContentSize().width,m_LogoSize.height-450));
 	m_XmlLayer->addChild(Up);

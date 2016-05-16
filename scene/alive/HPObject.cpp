@@ -165,7 +165,7 @@ void HPObject::playerNum(AliveObject* target,int num,int type)
 	}
 	if (type > gainType)										//武将掉血变红
 	{
-		target->getAlive()->setcloaking(false);					//潜行状态取消
+		target->getAlive()->setCloaking(false);					//潜行状态取消
 		NumLabel = CCLabelAtlas::create(str.c_str(),"label/myred.png",31,39,46); 
 		setHp(m_hpVal - HpNum);	
 		if (hitEffect(target))

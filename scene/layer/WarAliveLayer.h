@@ -62,6 +62,8 @@ public:
 	CC_SYNTHESIZE(CCLayerColor*,m_LayerColor,LayerColor);
 	CC_SYNTHESIZE(CCNode*,m_AliveNode,AliveNode);			//挂载武将节点
 	CC_SYNTHESIZE(CCNode*,m_MoveNode,MoveNode);				//挂载移动节点
+	/*************************************************************************/
+	void clearAlivesPauseMark();
 protected:
 	WarAlive*		m_TouchAlive;		//被触摸的武将id
 	ActObject*		m_moveTarget;		//拖拽移动对象

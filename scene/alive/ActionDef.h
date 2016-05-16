@@ -15,11 +15,9 @@ static const char* Die_Action					= "die";				/*死亡			 9*/
 static const char* Start_Action					= "start";				/*入场			 10*/
 
 
-static const char* EVE_CONTINUOUS				= "continuous";			/*连击判断			*/
 static const char* EVE_ATKBEGIN					= "AtkBegin";			/*攻击开始			*/
 static const char* EVE_ATKEND					= "AtkEnd";				/*攻击结束			*/
 static const char* EVE_LOSTHP					= "LostHp";				/*掉血显示			*/ 
-static const char* EVE_REPEAT					= "Repeat";				/*重复标记			*/ 
 static const char* EVE_SHAKE					= "Shake";				/*震屏标记			*/
 static const char* EVE_ANIMAT					= "Animat";				/*播放动画			*/
 static const char* EVE_SOUND					= "Sound";				/*播放声效			*/

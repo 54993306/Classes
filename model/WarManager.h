@@ -41,8 +41,6 @@ public:
 	void addAlive(WarAlive* alive);
 	WarAlive* getAlive(unsigned int aliveID);
 	CCArray* getAlives(bool isAlive = false);
-	CCArray* getHeros(bool isAlive = false,bool sort = true);
-	CCArray* getMonsts(bool isAlive = false,bool sort = true);
 	WarAlive* getAliveByGrid(int grid);
 	WarAlive* getCallAlive(WarAlive* pAlive,CSkill* skill);
 	WarAlive* getAliveByType(AliveType type,bool Monster = true);
@@ -80,6 +78,12 @@ public:
 	vector<int>* getBossHurtVec(){return &m_VecBossHurt;}
 	vector<int>* getMoveVec(){return &m_CantMoveGrid;}
 	vector<int>* getAddcostVec(){return &m_AddCostGrid;}
+	/*************************************************/
+	void sortArrayByGridIndex(CCArray* arr);
+	CCArray* getHeros(bool isAlive = false,bool sort = true);
+	CCArray* getMonsts(bool isAlive = false,bool sort = true);
+	CCArray* getAlivesByFaction(bool enemy,bool isAlive,bool sort);
+	WarAlive* getNewCallAlive(WarAlive* Father,int CallId);
 public:
 	CC_SYNTHESIZE_READONLY(CritSkillImage*,m_CritImage,CritImage)
 	CC_SYNTHESIZE(int,m_LoadImage,LoadImage);				//用于记录加载图片的id

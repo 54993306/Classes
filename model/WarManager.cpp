@@ -214,7 +214,7 @@ void WarManager::initBatchData( int batch )
 		alive->setEnemy(true);
 		alive->setMstType(alive->role->MstType);
 		if (alive->role->MstType == MST_HIDE)
-			alive->setcloaking(true);
+			alive->setCloaking(true);
 		alive->setDelaytime(-m_battleInit.monsterList.at(i).delay);
 		alive->moves.push_back(m_battleInit.monsterList.at(i).move1);
 		alive->moves.push_back(m_battleInit.monsterList.at(i).move2);
@@ -228,23 +228,23 @@ void WarManager::initBatchData( int batch )
 void WarManager::initAlive(WarAlive* alive)
 {
 	alive->grids.clear();
+	for (int j = 0 ; j<alive->role->buffList.size();j++ )
+		alive->getBuffManage()->AddBuff(alive->role->buffList.at(j));
 	if (alive->getEnemy())
 	{
 		alive->setGridIndex(alive->role->grid);
 	}else{
-		if (alive->role->battle)									//队长进来则为上阵状态
+		if (alive->role->battle)									//队长进来则为上阵状态(服务器用于区分队长的标志)
 		{
 			alive->setCaptain(true);
 			alive->setGridIndex(C_CAPTAINSTAND);
 			CEffect* effect = getSummonEffect(&alive->role->skill3);
 			if (effect)
-				alive->setcallAliveNum(effect->pro_Type);
+				alive->setCallAliveNum(effect->pro_Type);
 		}else{
 			alive->setGridIndex(INVALID_GRID);
 		}
 	}
-	for (int j = 0 ; j<alive->role->buffList.size();j++ )
-		alive->getBuffManage()->AddBuff(alive->role->buffList.at(j));
 	alive->setExecuteCap(false);
 	alive->setDieState(false);
 	alive->setModel(alive->role->thumb);
@@ -281,9 +281,9 @@ void WarManager::initAlive(WarAlive* alive)
 		//alive->setMaxHp(5);
 		//alive->setHp(5);		//第一次进来是满血状态
 	}else{		
-		//alive->setAtk(500000);
-		//alive->setMaxHp(500000);
-		//alive->setHp(500000);		//第一次进来是满血状态
+		alive->setAtk(500000);
+		alive->setMaxHp(500000);
+		alive->setHp(500000);		//第一次进来是满血状态
 	}
 #endif
 }
@@ -367,26 +367,9 @@ CCArray* WarManager::getAlives(bool isAlive /*=false*/)
 	}
 	return arr;
 }
-
-CCArray* WarManager::getHeros(bool isAlive,bool sort/*= true*/)
+//冒泡排序
+void WarManager::sortArrayByGridIndex(CCArray* arr)
 {
-	if(m_members.empty()) return nullptr;
-	CCArray* arr = CCArray::create();
-	for(Members::iterator iter = m_members.begin(); iter != m_members.end();++iter)
-	{
-		if (!iter->second->getEnemy())
-		{
-			if (isAlive)
-			{
-				if (iter->second->getHp()>0)
-					arr->addObject(iter->second);
-			}else{
-				arr->addObject(iter->second);
-			}
-		}
-	}
-	if (!arr->count()||!sort)
-		return arr;
 	for (int i=0;i < arr->count()-1;i++)			//冒泡：判断相邻两个大小关系互换位置
 	{
 		for (int j =0;j<arr->count()-1-i;j++)
@@ -397,38 +380,36 @@ CCArray* WarManager::getHeros(bool isAlive,bool sort/*= true*/)
 				arr->exchangeObjectAtIndex(j,j+1);
 		}
 	}
-	return arr;
+}
+//这两个方法可以合并。。。
+CCArray* WarManager::getHeros(bool isAlive,bool sort/*= true*/)
+{
+	return getAlivesByFaction(false,isAlive,sort);
 }
 
 CCArray* WarManager::getMonsts(bool isAlive,bool sort /*=true*/)
+{
+	return getAlivesByFaction(true,isAlive,sort);
+}
+
+CCArray* WarManager::getAlivesByFaction( bool enemy,bool isAlive,bool sort )
 {
 	if(m_members.empty()) return nullptr;
 	CCArray* arr = CCArray::create();
 	for(Members::iterator iter = m_members.begin(); iter != m_members.end();++iter)
 	{
-		if (iter->second->getEnemy())
+		if (iter->second->getEnemy() != enemy)
+			continue;
+		if (isAlive)
 		{
-			if (isAlive)
-			{
-				if (iter->second->getHp()>0)
-					arr->addObject(iter->second);
-			}else{
+			if (iter->second->getHp()>0)
 				arr->addObject(iter->second);
-			}
+		}else{
+			arr->addObject(iter->second);
 		}
 	}
-	if (!arr->count()||!sort)
-		return arr;
-	for (int i=0;i < arr->count()-1;i++)			//冒泡：判断相邻两个大小关系互换位置
-	{
-		for (int j =0;j<arr->count()-1-i;j++)
-		{
-			int front = ((WarAlive*)arr->objectAtIndex(j))->getGridIndex();
-			int back  = ((WarAlive*)arr->objectAtIndex(j+1))->getGridIndex();
-			if ( front < back)						//从大到小排序,把小的换到后面
-				arr->exchangeObjectAtIndex(j,j+1);
-		}
-	}
+	if (sort)
+		sortArrayByGridIndex(arr);
 	return arr;
 }
 
@@ -505,7 +486,6 @@ StoryData* WarManager::getStoryData(){
 //判断召唤数量是否达到上限
 //获取我方将要召唤武将信息
 
-
 WarAlive* WarManager::getAbsentCallAlive( WarAlive* fatherAlive )
 {
 	Members::iterator iter = m_members.begin();
@@ -526,42 +506,31 @@ bool WarManager::captainCallNumberJudge( WarAlive* alive )
 {
 	if (alive->getCaptain() )
 	{
-		if (alive->getcallAliveNum()<1)
+		if (alive->getCallAliveNum()<1)
 		{
 			return true;
 		}else{
-			alive->setcallAliveNum(alive->getcallAliveNum() - 1);
+			alive->setCallAliveNum(alive->getCallAliveNum() - 1);
 		}
 	}
 	return false;
 }
 
-WarAlive* WarManager::getCallAlive(WarAlive* Father,CSkill* skill)
+WarAlive* WarManager::getNewCallAlive(WarAlive* Father,int CallId)
 {
-	WarAlive* alive = getAbsentCallAlive(Father);					
-	if (alive)
-		return alive;
-	if (captainCallNumberJudge(Father))
-		return nullptr;
-	CEffect* effect = getSummonEffect(skill);
-	if (!effect)
-	{
-		CCLOG("[ *ERROR ] WarManager::getCallAlive Skill Effect NULL");
-		return nullptr;
-	}
 	for (auto i:m_CallRole)
 	{
-		if (i->CallID != effect->pTarget)
+		if (i->CallID != CallId)
 			continue;
 		WarAlive* child = WarAlive::create();
 		child->role = i;
 		child->setCallType(i->CallType);
 		child->setEnemy(Father->getEnemy());
-		if (child->getEnemy())
+		if (Father->getEnemy())
 		{
 			child->setAliveID(m_members.size()+C_CallMonst);
 			if (child->role->MstType == MST_HIDE)
-				child->setcloaking(true);
+				child->setCloaking(true);
 			child->setDelaytime(i->delay);
 			if (i->grid)
 			{
@@ -585,8 +554,24 @@ WarAlive* WarManager::getCallAlive(WarAlive* Father,CSkill* skill)
 		child->setFatherID(Father->getAliveID());
 		return child;
 	}
-	CCLOG("[ *ERROR ]WarManager::getCallAlive  CallID != skill->pTarget =%d ",effect->pTarget);
+	CCLOG("[ *ERROR ]WarManager::getNewCallAlive  CallId =%d ",CallId);
 	return nullptr;
+}
+
+WarAlive* WarManager::getCallAlive(WarAlive* Father,CSkill* skill)
+{
+	WarAlive* alive = getAbsentCallAlive(Father);					
+	if (alive)
+		return alive;
+	if (captainCallNumberJudge(Father))
+		return nullptr;
+	CEffect* effect = getSummonEffect(skill);
+	if (!effect)
+	{
+		CCLOG("[ *ERROR ] WarManager::getCallAlive Skill Effect NULL");
+		return nullptr;
+	}
+	return getNewCallAlive(Father,effect->pTarget);
 }
 //pAlive为释放技能的武将,召唤出来的武将继承释放技能对象的百分比属性
 void WarManager::initCallAlive(WarAlive* alive,WarAlive*pAlive)

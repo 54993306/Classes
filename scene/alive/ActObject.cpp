@@ -221,7 +221,7 @@ void ActObject::ActionEnd( const char* ActionName )
 		||	strcmp(ActionName,Win_Action)==0		)				//胜利动作转站立		
 	{
 		TurnStateTo(Stand_Index);
-		if (m_Alive->getCritEffect())		
+		if (m_Alive->getCritEffect()&&!m_Enemy)		
 			NOTIFICATION->postNotification(SKILLEND,m_Alive);
 		if (	strcmp(ActionName,Attack_Action) == 0					//普攻转站立
 			||	strcmp(ActionName,SpAttack_Action) == 0				//特攻转站立
@@ -295,31 +295,30 @@ void ActObject::updateFrameEvent( float dt )
 		m_ActionKey.compare(Dizzy_Action)==0)
 		return ;
 	int iCurrentFrameIndex = ((CCArmature*)m_Armature)->getAnimation()->getCurrentFrameIndex();
-	if(m_lastFrame!=iCurrentFrameIndex)															//骨骼帧率与游戏帧率不同例如：游戏2帧骨骼才跑了1帧的情况(高效)
-	{	
-		for(unsigned int frameIndex = m_lastFrame+1; frameIndex<=iCurrentFrameIndex; frameIndex++)	//防止偶尔的掉帧情况出现处理
+	if(m_lastFrame ==iCurrentFrameIndex)															//骨骼帧率与游戏帧率不同例如：游戏2帧骨骼才跑了1帧的情况(高效)
+		return;
+	for(unsigned int frameIndex = m_lastFrame+1; frameIndex<=iCurrentFrameIndex; frameIndex++)	//防止偶尔的掉帧情况出现处理
+	{
+		vector<ArmatureEvent*>& frameEvents = m_armatureEventData->getEventVector(m_ActionKey.c_str(), frameIndex);	//获取当前帧的所有事件
+		for(unsigned int i=0; i<frameEvents.size(); i++)
 		{
-			vector<ArmatureEvent*>& frameEvents = m_armatureEventData->getEventVector(m_ActionKey.c_str(), frameIndex);	//获取当前帧的所有事件
-			for(unsigned int i=0; i<frameEvents.size(); i++)
+			const ArmatureEvent& armatureEvent = *(frameEvents.at(i));
+			string sEventName = armatureEvent.name;
+			if(sEventName.size()>0)
 			{
-				const ArmatureEvent& armatureEvent = *(frameEvents.at(i));
-				string sEventName = armatureEvent.name;
-				if(sEventName.size()>0)
-				{
-					sEventName = strRemoveSpace(sEventName);											//去空格
-					if(sEventName.compare(EVE_ATKBEGIN)			==0	)		AtkBegin_Event();			//开始攻击(受击数组受伤)
-					if(sEventName.compare(EVE_LOSTHP)			==0	)		HpChange_Event();			//显示受击方血量处理
-					if(sEventName.compare(EVE_ANIMAT)			==0 )		PlayAnimat_Event(armatureEvent.extraInfo);			//播放动画
-					if(sEventName.compare(EVE_SOUND)			==0 )		PlaySound_Event(armatureEvent.sound);				//播放声音
-					if(sEventName.compare(EVE_SHAKE)			==0	)
-						NOTIFICATION->postNotification(B_Shark,nullptr);
-					if (sEventName.compare(EVE_MASK)			==0 )
-						NOTIFICATION->postNotification(B_SKILL_MASK,m_Alive);
-				}
+				sEventName = strRemoveSpace(sEventName);											//去空格
+				if(sEventName.compare(EVE_ATKBEGIN)			==0	)		AtkBegin_Event();			//开始攻击(受击数组受伤)
+				if(sEventName.compare(EVE_LOSTHP)			==0	)		HpChange_Event();			//显示受击方血量处理
+				if(sEventName.compare(EVE_ANIMAT)			==0 )		PlayAnimat_Event(armatureEvent.extraInfo);			//播放动画
+				if(sEventName.compare(EVE_SOUND)			==0 )		PlaySound_Event(armatureEvent.sound);				//播放声音
+				if(sEventName.compare(EVE_SHAKE)			==0	)
+					NOTIFICATION->postNotification(B_Shark,nullptr);
+				if (sEventName.compare(EVE_MASK)			==0 )
+					NOTIFICATION->postNotification(B_SKILL_MASK,m_Alive);
 			}
 		}
-		m_lastFrame = iCurrentFrameIndex;
 	}
+	m_lastFrame = iCurrentFrameIndex;
 }
 
 void ActObject::removeAct( CCNode* node )

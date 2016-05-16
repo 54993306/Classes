@@ -23,7 +23,6 @@ BattleResult* HurtCount::AttackExcute(WarAlive* alive)
 {
 	BattleResult* Result = BattleResult::create();
 	Result->setAlive(alive);
-	alive->setSortieNum(alive->getSortieNum()+1);							//表示执行了一次攻击逻辑
 	if (alive->getNegate())													//为了做击退处理
 	{
 		vector<WarAlive*>::reverse_iterator iter = alive->AtkAlive.rbegin();//迭代器反向遍历(用下标效率是最高的)
@@ -120,7 +119,7 @@ void HurtCount::addHittingAlive( WarAlive* AtcTarget , WarAlive* HitTarget )
 //对一个武将造成伤害计算
 STR_LostHp HurtCount::lostCount(WarAlive* AtcTarget , WarAlive* HitTarget)
 {
-	HitTarget->setcloaking(false);														//伤害击中取消隐身状态		
+	HitTarget->setCloaking(false);														//伤害击中取消隐身状态		
 	STR_LostHp hp;
 	float race_hurt = raceDispose(AtcTarget,HitTarget);									//属性伤害
 	int crit_pe = critJudge(AtcTarget,HitTarget);										//暴伤修正百分比

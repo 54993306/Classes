@@ -565,7 +565,7 @@ void WarControl::CallAliveEntranceBattle(WarAlive*alive)
 	WarAlive* pAlive = m_Manage->getAlive(alive->getFatherID());
 	CCNode* MoveLaout = getMoveLayout(pAlive->getUiLayout()-CL_BtnLayout1);
 	CButton* btn = (CButton*)MoveLaout->getChildByTag(CL_Btn);
-	initButtonBackImage(btn,pAlive->getcallAliveNum());
+	initButtonBackImage(btn,pAlive->getCallAliveNum());
 
 	CProgressBar* CdBar = (CProgressBar*)MoveLaout->getChildByTag(CL_HeroPro);
 	btn->setEnabled(false);
