@@ -465,12 +465,6 @@ void CombatLogic::attackEffect( WarAlive*alive )
 {
 	ActObject* pActObject = alive->getActObject();
 	CEffect* effect = m_Manage->getEffect(alive);						//开始播放攻击音效攻击特效的时机可以由策划配置
-	if (!effect)
-	{
-		CCLOG("[ ERROR ] CombatLoginc::AliveExcuteAI CEffect NULL AliveID=%d",alive->getAliveID());
-		alive->ResetAttackState();
-		return;
-	}
 	EffectInfo* info = m_Manage->getEffData()->getEffectInfo(effect->effectId);
 	if (!info)
 	{
