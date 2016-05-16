@@ -945,7 +945,7 @@ void SkillRange::getAtkGrid(AreaCountInfo& CountInfo,vector<int>&VecAtkGrid)
 		{
 			if (!CountInfo.alive->AtkArea.size())
 				FixGrid(CountInfo);
-			VecAtkGrid = CountInfo.alive->AtkArea;		//为什么这里还需要复制传出去？
+			VecAtkGrid = CountInfo.alive->AtkArea;
 		}
 	case anyFixGridArea:	//随机格子区域				111
 		{
@@ -957,7 +957,7 @@ void SkillRange::getAtkGrid(AreaCountInfo& CountInfo,vector<int>&VecAtkGrid)
 		{
 			if (!CountInfo.alive->AliveS.size())
 				FixAlive(CountInfo);
-			if (CountInfo.alive->AliveS.size())			//仍然是把存储固定武将的格子取出来传了出去，为什么？
+			if (CountInfo.alive->AliveS.size())
 			{
 				for (int i=0;i<CountInfo.alive->AliveS.size();i++)
 					VecAtkGrid.push_back(CountInfo.alive->AliveS.at(i)->getGridIndex());
