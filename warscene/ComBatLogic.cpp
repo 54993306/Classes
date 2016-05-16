@@ -406,53 +406,64 @@ void CombatLogic::MonsterExcuteAI( WarAlive* alive,float dt )
 		}
 	}
 }
-//@@
-void CombatLogic::AliveExcuteAI(WarAlive* alive,CCDictionary*pDic)
+bool CombatLogic::critJudge( WarAlive* alive )
 {
-	CCArray* Alives = (CCArray*)pDic->objectForKey(Hit_Alive);
-	ActObject* pActObject = alive->getActObject();
 	if (!alive->getCaptain()&&
 		alive->getCriAtk()&&
 		!alive->getCritEffect()&&
 		alive->getCallType() != AutoSkill)
 	{
 		alive->setCritEffect(true);
-		if (alive->getEnemy())
-		{
-			alive->getActObject()->TurnStateTo(Stand_Index);		
-			CCArray* Grids  = (CCArray*)pDic->objectForKey(Atk_Area);
-			m_MapLayer->DrawWarningEffect(Grids);						//格子预警
-			m_CombatEffect->PlayerSkill(alive);
-			return;
-		}
-		m_AliveLayer->removeEvent();
-		m_Run = false;
-		m_Alive = alive;
-		pActObject->setUserObject(CCBool::create(true));
-		pActObject->setZOrder(1000);
-		CCObject* obj = nullptr;
-		CCArray* actArr = CCArray::create();
-		CCARRAY_FOREACH(Alives,obj)
-		{
-			WarAlive* pAlive = (WarAlive*)obj;
-			pAlive->getActObject()->setUserObject(CCBool::create(true));
-			pAlive->getActObject()->setZOrder(1000);
-			pAlive->getActObject()->pauseSchedulerAndActions();
-			actArr->addObject(pAlive->getActObject());
-		}
-		m_Assist->ActStandExcute(actArr);										//受击目标站立处理
-		m_AliveLayer->getLayerColor()->setVisible(true);
-		LGPause(m_AliveLayer);													//暂停刷新位置和zorder的值
-		m_CombatEffect->PlayerSkill(alive);
-		return;
+		return true;
 	}
+	return false;
+}
+
+void CombatLogic::monsterCritEffect( WarAlive* alive ,CCArray* arr)
+{
+	alive->getActObject()->TurnStateTo(Stand_Index);		
+	m_MapLayer->DrawWarningEffect(arr);						//格子预警
+	m_CombatEffect->PlayerSkill(alive);
+}
+
+void CombatLogic::heroCritEffect( WarAlive* alive ,CCArray* arr)
+{
+	ActObject* pActObject = alive->getActObject();
+	m_AliveLayer->removeEvent();
+	m_Run = false;
+	m_Alive = alive;
+	pActObject->setUserObject(CCBool::create(true));
+	pActObject->setZOrder(1000);
 	CCObject* obj = nullptr;
-	CCARRAY_FOREACH(Alives,obj)
+	CCArray* actArr = CCArray::create();
+	CCARRAY_FOREACH(arr,obj)
 	{
 		WarAlive* pAlive = (WarAlive*)obj;
-		if (pAlive->getHp()<=0)continue;
+		pAlive->getActObject()->setUserObject(CCBool::create(true));
+		pAlive->getActObject()->setZOrder(1000);
+		pAlive->getActObject()->pauseSchedulerAndActions();
+		actArr->addObject(pAlive->getActObject());
 		alive->AtkAlive.push_back(pAlive);
 	}
+	m_Assist->ActStandExcute(actArr);										//受击目标站立处理
+	m_AliveLayer->getLayerColor()->setVisible(true);
+	LGPause(m_AliveLayer);													//暂停刷新位置和zorder的值
+	m_CombatEffect->PlayerSkill(alive);
+}
+
+void CombatLogic::excuteCritEffect( WarAlive* alive ,CCDictionary*pDic)
+{
+	if (alive->getEnemy())
+	{
+		monsterCritEffect(alive,(CCArray*)pDic->objectForKey(Atk_Area));
+	}else{
+		heroCritEffect(alive,(CCArray*)pDic->objectForKey(Hit_Alive));
+	}
+}
+
+void CombatLogic::attackEffect( WarAlive*alive )
+{
+	ActObject* pActObject = alive->getActObject();
 	CEffect* effect = m_Manage->getEffect(alive);						//开始播放攻击音效攻击特效的时机可以由策划配置
 	if (!effect)
 	{
@@ -467,16 +478,40 @@ void CombatLogic::AliveExcuteAI(WarAlive* alive,CCDictionary*pDic)
 		info = m_Manage->getEffData()->getEffectInfo(10000021);
 	}
 	pActObject->setAtkEffect(info->getusEft());
+	pActObject->TurnStateTo(info->getActionID());
+}
+
+void CombatLogic::attackDirection( WarAlive*alive )
+{
+	ActObject* pActObject = alive->getActObject();
 	if (!alive->getCaptain()&& alive->getNegate())									//反向攻击处理
 	{
-		if (pActObject->getEnemy())
+		if (alive->getEnemy())
 		{
 			pActObject->setDirection(Ditection_Left);
 		}else{
 			pActObject->setDirection(Ditection_Right);
 		}
 	}
-	pActObject->TurnStateTo(info->getActionID());
+}
+//@@
+void CombatLogic::AliveExcuteAI(WarAlive* alive,CCDictionary*pDic)
+{
+	CCArray* Alives = (CCArray*)pDic->objectForKey(Hit_Alive);
+	if (critJudge(alive))
+	{
+		excuteCritEffect(alive,pDic);
+		return;
+	}
+	attackDirection(alive);
+	attackEffect(alive);
+	CCObject* obj = nullptr;
+	CCARRAY_FOREACH(Alives,obj)
+	{
+		WarAlive* pAlive = (WarAlive*)obj;
+		if (pAlive->getHp()<=0)continue;
+		alive->AtkAlive.push_back(pAlive);
+	}
 }
 void CombatLogic::BatterRecord( CCObject* ob )
 {

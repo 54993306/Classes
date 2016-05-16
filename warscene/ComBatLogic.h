@@ -95,6 +95,14 @@ public:
 	void reliveSuccess();
 
 	void downloadPackageEnd(bool bAnswer);
+	/*****************************************************************************/
+	bool critJudge(WarAlive* alive);
+	void excuteCritEffect(WarAlive* alive,CCDictionary*pDic);
+	void monsterCritEffect(WarAlive* alive,CCArray* arr);
+	void heroCritEffect(WarAlive* alive,CCArray* arr);
+	void attackEffect(WarAlive*alive);
+	void attackDirection(WarAlive*alive);
+
 protected:
 	void onClickDownloadPackage(CCObject* pSender);
 private:	

@@ -156,8 +156,7 @@ CCDictionary* SkillRange::PlaySkillInfo( WarAlive* alive )
 	CCArray* Alives = CCArray::create();
 	pDic->setObject(Alives,Hit_Alive);
 	pDic->setObject(Area,Atk_Area);
-	if (alive->getGridIndex()<C_BEGINGRID||
-		alive->getAliveStat() == UNATK	||
+	if (alive->getAliveStat() == UNATK	||
 		alive->getAliveStat() == INVINCIBLE)					//超出边界的武将不再进行技能处理
 		return pDic;
 	switch (m_Manage->getSkill(alive)->skillType)
@@ -170,8 +169,7 @@ CCDictionary* SkillRange::PlaySkillInfo( WarAlive* alive )
 		return pDic;										//无受击目标类型技能
 	case CapAtk:
 		break;
-	default:
-		break;
+	default:{CCLOG("[ *ERROR ] SkillRange::PlaySkillInfo Skill Type UnKnow");}break;
 	}
 	return pDic;
 }
