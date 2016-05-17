@@ -9,6 +9,7 @@
 //							做引导显示处理
 //
 //************************************************************************/
+class WarAlive;
 class WarScene;
 class WarMapData;
 class WarMapLayer;
@@ -54,7 +55,7 @@ public:
 	void describe(CombatGuideStep* step);
 	void captainMark(CombatGuideStep* step);
 	void resetAlive(CombatGuideStep* step);
-	void creaAliveByVector(vector<CCObject*>VecAlive,CombatGuideStep* step);
+	void creaAliveByVector(vector<WarAlive*>VecAlive,CombatGuideStep* step);
 private:
 	CCNode* m_root;
 	WarScene* m_Scene;
