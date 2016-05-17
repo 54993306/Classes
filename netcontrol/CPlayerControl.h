@@ -40,7 +40,7 @@ public:
 	void sendSkillList(int heroId);//请求英雄所有可用技能列表
 	void sendChangeSkill(int type, int skillId,int heroId);//请求更换技能
 	void sendChangeHero(int nionId, int pos, int heroId); //设置出战英雄
-	void sendBattleFinish(int reason, bool res,int roundNum,int aliveNum);
+	void sendBattleFinish(int reason, bool res,int roundNum);
 	void sendWorldBossFinish(int hurt,int checkNum,vector<int>&vec);
 
 	void sendChangeArmor(int heroId, int pos,int armorId);//请求更换装备;

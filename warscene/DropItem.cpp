@@ -30,7 +30,7 @@ bool DropItem::init()
 
 void DropItem::AddEvent()
 {
-	NOTIFICATION->addObserver(this,callfuncO_selector(DropItem::ItemDropDispose),Msg_DropItem,nullptr);
+	NOTIFICATION->addObserver(this,callfuncO_selector(DropItem::ItemDropDispose),B_DrpItem,nullptr);
 }
 
 void DropItem::RemoveEnent()

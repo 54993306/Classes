@@ -456,8 +456,7 @@ bool WarManager::checkMonstOver()
 {
 	for(Members::iterator iter = m_members.begin(); iter != m_members.end();++iter)
 	{
-		if(iter->second->getEnemy() && iter->second->getHp()>0&&
-			iter->second->getBattle() && iter->second->getActObject()&&!iter->second->getDieState())
+		if(iter->second->getEnemy() &&!iter->second->getDieState())
 			return false;
 	}
 	return true;

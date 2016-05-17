@@ -9,6 +9,7 @@
 #include "tools/CCShake.h"
 #include "common/CGameSound.h"
 #include "warscene/EffectData.h"
+#include "Battle/BattleMessage.h"
 #include <spine/spine-cocos2dx.h>
 using namespace spine;
 StoryLayer::StoryLayer()
@@ -37,7 +38,7 @@ bool StoryLayer::init()
 	this->setTouchPriority(StoryPriority);
 	this->setIsShowBlack(false);
 	this->addChild(m_ui);
-	NOTIFICATION->addObserver(this,callfuncO_selector(StoryLayer::CreateStory),LAYERMOVEEND,nullptr);
+	NOTIFICATION->addObserver(this,callfuncO_selector(StoryLayer::CreateStory),B_LayerMoveEnd,nullptr);
 #if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
 	this->setTouchEnabled(false);
 	m_isStory = false;
@@ -65,8 +66,10 @@ bool StoryLayer::LoadFile(int storytype, StoryData* pStoryData)
 	}
 	if(!pStoryData)
 	{
+#if CC_TARGET_PLATFORM != CC_PLATFORM_WIN32
 		if (DataCenter::sharedData()->getWar()->getTollgete()->star>=1)		//第一次打关卡才出现关卡剧情
 			return false;
+#endif	
 		pStoryData = DataCenter::sharedData()->getWar()->getStoryData();
 	}
 		
@@ -407,7 +410,7 @@ void StoryLayer::PostEnd(CCObject* ob)
 	m_VecStep.clear();
 	m_StoryStep = nullptr;
 	this->setTouchEnabled(false);
-	NOTIFICATION->postNotification(WAR_STORY_OVER,nullptr);
+	NOTIFICATION->postNotification(B_StoryOver,nullptr);
 }
 
 void StoryLayer::updateForTouch( float dt ){	m_bOpenTouch = true; }

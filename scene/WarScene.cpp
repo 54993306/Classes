@@ -195,7 +195,7 @@ CCArray* WarScene::getTaskArray()
 void WarScene::LayerMoveEnd(CCObject* ob)
 {
 #if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
-	CCNotificationCenter::sharedNotificationCenter()->postNotification(LAYERMOVEEND,ob);
+	CCNotificationCenter::sharedNotificationCenter()->postNotification(B_LayerMoveEnd,ob);
 	//if (DataCenter::sharedData()->getWar()->getStageID())
 	//{
 	//	CCNotificationCenter::sharedNotificationCenter()->postNotification(LAYERMOVEEND,ob);
@@ -208,12 +208,12 @@ void WarScene::LayerMoveEnd(CCObject* ob)
 #else
 	if (DataCenter::sharedData()->getWar()->getStageID())
 	{
-		CCNotificationCenter::sharedNotificationCenter()->postNotification(LAYERMOVEEND,ob);
+		CCNotificationCenter::sharedNotificationCenter()->postNotification(B_LayerMoveEnd,ob);
 	}else{
 		if (((CCInteger*)ob)->getValue() == (int)StoryType::beginStory)
-			CCNotificationCenter::sharedNotificationCenter()->postNotification(PLAYERBEGINANIMATION);
+			CCNotificationCenter::sharedNotificationCenter()->postNotification(B_PlayBeginAnimation);
 		else
-			CCNotificationCenter::sharedNotificationCenter()->postNotification(LAYERMOVEEND,ob);
+			CCNotificationCenter::sharedNotificationCenter()->postNotification(B_LayerMoveEnd,ob);
 	}
 #endif
 }

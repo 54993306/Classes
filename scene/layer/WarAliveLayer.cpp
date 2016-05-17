@@ -196,7 +196,7 @@ void WarAliveLayer::onEnter()
 	BaseLayer::onEnter();
 	this->scheduleUpdate();
 	NOTIFICATION->addObserver(this,callfuncO_selector(WarAliveLayer::LayerShake),B_Shark,nullptr);
-	NOTIFICATION->addObserver(this,callfuncO_selector(WarAliveLayer::AliveBattle),ALIVEBATTLETOUCH,nullptr);
+	NOTIFICATION->addObserver(this,callfuncO_selector(WarAliveLayer::AliveBattle),B_EntranceBattle,nullptr);
 }
 void WarAliveLayer::onExit()
 {
@@ -287,14 +287,6 @@ bool WarAliveLayer::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
 	}
 	CCPoint p = this->convertToNodeSpace(pTouch->getLocation());
 	int grid = m_map->getGridIndex(p);
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
-	//WarAlive* alive = DataCenter::sharedData()->getWar()->getAliveByGrid(grid);
-	//if (alive)
-	//{
-	//	TouchAlive(alive);
-	//	return true;
-	//}
-#endif
 	vector<WarAlive*>* Vec = m_Manage->getVecHeros();
 	for (auto i : *Vec)
 	{
@@ -371,6 +363,22 @@ void WarAliveLayer::ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent)
 	AddAliveToGrid(m_TouchAlive,grid);
 }
 
+bool WarAliveLayer::moveGuide( int grid,bool nextStep )
+{
+	if (DataCenter::sharedData()->getCombatGuideMg()->IsGuide())					//引导判断
+	{
+		CombatGuideStep* step = DataCenter::sharedData()->getCombatGuideMg()->getCurrStep();
+		if (step->getType()==AliveMove_Type || step->getType() == CallAalive_Type)
+		{
+			if (grid != step->getFinishgrid())
+				return true;								//固定格子才算完成(在移动区域内即算完成)
+			if (nextStep)
+				DataCenter::sharedData()->getCombatGuideMg()->NextStep();
+		}
+	}
+	return false;
+}
+
 void WarAliveLayer::AddAliveToGrid( WarAlive* alive,int grid )
 {
 	if (!alive->getMove())
@@ -383,29 +391,14 @@ void WarAliveLayer::AddAliveToGrid( WarAlive* alive,int grid )
 	vector<int>* vec = m_Manage->getMoveVec();
 	if (std::find(vec->begin(),vec->end(),grid) == vec->end())
 		return;
-	if (DataCenter::sharedData()->getCombatGuideMg()->IsGuide())					//引导判断
-	{
-		CombatGuideStep* step = DataCenter::sharedData()->getCombatGuideMg()->getCurrStep();
-		if (step->getType()==AliveMove_Type || step->getType() == CallAalive_Type)
-		{
-			if (grid != step->getFinishgrid())
-				return;								//固定格子才算完成(在移动区域内即算完成)
-		}
-	}
+	if (moveGuide(grid,false))
+		return;
 	if (WorldBossJudge(alive,grid))
 		return ;
 	if(!JudgeMove(alive,grid))								//当前位置是否可以放置英雄
 		return;	
-	if (DataCenter::sharedData()->getCombatGuideMg()->IsGuide())					//引导判断
-	{
-		CombatGuideStep* step = DataCenter::sharedData()->getCombatGuideMg()->getCurrStep();
-		if (step->getType()==AliveMove_Type || step->getType() == CallAalive_Type)
-		{
-			if (grid != step->getFinishgrid())
-				return;								//固定格子才算完成(在移动区域内即算完成)
-			DataCenter::sharedData()->getCombatGuideMg()->NextStep();
-		}
-	}
+	if (moveGuide(grid,true))
+		return;
 	alive->setAIState(false);
 }
 
@@ -423,12 +416,9 @@ bool WarAliveLayer::WorldBossJudge( WarAlive* alive,int grid )
 		}else if (alive->getMoveObj()->getgrid() < 80 && grid > 80)
 		{
 			return true;
-		}else{
-			return false;
 		}
-	}else{
-		return false;
 	}
+	return false;
 }
 
 //判断武将是否可以移动的方法
@@ -584,5 +574,28 @@ void WarAliveLayer::clearAlivesPauseMark()
 	{
 		ActObject* act = (ActObject*)obj;
 		act->setUserObject(nullptr);
+	}
+}
+
+void WarAliveLayer::heroWinAction()
+{
+	CCArray* arr = getAlivesOb(AliveType_Hero);
+	CCObject* obj = nullptr;
+	CCARRAY_FOREACH(arr,obj)
+	{
+		ActObject* act = (ActObject*)obj;
+		act->TurnStateTo(victory_Index);
+	}
+}
+
+void WarAliveLayer::createBatchMonster( int batchNumber )
+{
+	CCArray* arr =m_Manage->getMonsts(true);
+	CCObject* obj = nullptr;
+	CCARRAY_FOREACH(arr,obj)
+	{
+		WarAlive* alive = (WarAlive*)obj;
+		if(alive->getAliveID() >= C_BatchMonst+batchNumber*100)
+			createAlive(alive,SceneTrap);
 	}
 }

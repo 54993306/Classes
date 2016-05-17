@@ -10,7 +10,7 @@
 #include "scene/alive/HPObject.h"
 #include "scene/alive/AliveDefine.h"
 #include "scene/effect/EffectObject.h"
-
+#include "Battle/BattleMessage.h"
 BufExp::BufExp():m_hpSize(CCPointZero),m_interval(0){}
 
 BufExp::~BufExp()
@@ -21,9 +21,9 @@ BufExp::~BufExp()
 bool BufExp::init()
 {
 	CCSpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile("warScene/bufficon.plist");
-	NOTIFICATION->addObserver(this,callfuncO_selector(BufExp::AddBuffExcute),ADDBUFF,nullptr);
-	NOTIFICATION->addObserver(this,callfuncO_selector(BufExp::updatePosition),REMOVEBUFF,nullptr);
-	NOTIFICATION->addObserver(this,callfuncO_selector(BufExp::upBuffEffect),UPBUFFEFFECT,nullptr);
+	NOTIFICATION->addObserver(this,callfuncO_selector(BufExp::AddBuffExcute),B_AddBuff,nullptr);
+	NOTIFICATION->addObserver(this,callfuncO_selector(BufExp::updatePosition),B_RemoveBuff,nullptr);
+	NOTIFICATION->addObserver(this,callfuncO_selector(BufExp::upBuffEffect),B_UpdateBuffEffect,nullptr);
 	return true;
 }
 //每个buff新添加时都发送一条消息

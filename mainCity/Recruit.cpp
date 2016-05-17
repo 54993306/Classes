@@ -60,7 +60,6 @@ void CRecruit::onExit()
 {
 	BaseLayer::onExit();
 	CCDirector::sharedDirector()->getTouchDispatcher()->removeDelegate(this);
-	CSceneManager::sharedSceneManager()->removeMsgObserver(UPDATE_RECRUIT,this);
 	GetTcpNet->unRegisterAllMsgHandler(this);
 	NOTIFICATION->removeAllObservers(this);
 	NOTIFICATION->postNotification(SHOW_MAIN_SCENE);

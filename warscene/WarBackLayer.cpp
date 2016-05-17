@@ -11,6 +11,7 @@
 #include "common/CGameSound.h"
 #include "jni/CJniHelper.h"
 #include "warscene/ComBatLogic.h"
+#include "Battle/BattleMessage.h"
 
 WarBackLayer::WarBackLayer()
 {
@@ -127,7 +128,7 @@ void WarBackLayer::returnCity(CCObject* ob)
 		if(Manage->getWorldBoss())
 		{
 			CombatLogic* pLogic = Manage->getLogicObj();
-			pLogic->CombatResult(CCBool::create(false));
+			pLogic->combatResult(CCBool::create(false));
 			return;
 		}
 
@@ -137,7 +138,7 @@ void WarBackLayer::returnCity(CCObject* ob)
 		if (DataCenter::sharedData()->getWar()->getStageID())
 		{
 			((LoadWar*)scene)->setRelease(true,SkipcityScene);
-			CPlayerControl::getInstance().sendBattleFinish(2,false,0,0);
+			CPlayerControl::getInstance().sendBattleFinish(2,false,0);
 		}else{
 			((LoadWar*)scene)->setRelease(true,SkipLoginScene);
 		}
@@ -197,7 +198,7 @@ void WarBackLayer::onResumeBattle( CCObject* pSender )
 		PlayEffectSound(SFX_Button);
 	}
 
-	NOTIFICATION->postNotification(SHOW_PLAN_PANEL);
+	NOTIFICATION->postNotification(B_ReturnLayer);
 }
 
 void WarBackLayer::onEffMusic( CCObject *pSender, bool bChecked )

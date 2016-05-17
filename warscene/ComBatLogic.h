@@ -17,7 +17,6 @@ struct GameFinishData
 	int reason;
 	bool res;
 	int roundNum;
-	int aliveNum;
 };
 
 struct CMonster;
@@ -52,53 +51,32 @@ public:
 	CREATE_FUNC(CombatLogic);
 
 	void updateOneSecond(float dt);
-	void initMember();
-	
-	void AliveDieDispose(CCObject* ob);
-	void ActRemove(CCObject* ob);
-	void NextBatch(float dt);
-	void CBackLayer(CCObject* ob);
-	void CombatResult(CCObject* ob);
-	
-	
-	
-	void StoryEndEvent(CCObject* ob);
-	
-	
-	
-	void CostCount(WarAlive* alive,float dt);
-	
+	void cReturnLayer(CCObject* ob);
 
-	
-	
-	bool StateDispose(WarAlive* alive,float dt);
-	void OnBattleFinish(int type, google::protobuf::Message *msg);
-	
-	void startCountDown(int iTime);		//开始倒计时
-	int getCurrCost(){return m_CurrCost;}
+	void scheduleForRequestFinish();
+	void scheduleForRequesBossFinish();
+	void onPause();
+	void onResume();
 	CC_SYNTHESIZE(WarAssist*,m_Assist,WarAssist);
 	CC_SYNTHESIZE(CCArray*,m_task,TaskArray);
 	CC_SYNTHESIZE(float,m_MaxCost,MaxCost);
 	CC_SYNTHESIZE(bool,m_Run,RunLogic);
 	CC_SYNTHESIZE(int, m_iGameTimeCount, GameTimeCount);		//倒计时时间
 	CC_SYNTHESIZE(bool, m_bCountDown, CountDown);				//倒计时开启
-
-	float getTime() { return m_time; }
-	void scheduleForRequestFinish();
-	void scheduleForRequesBossFinish();
-	
-	void onPause();
-	void onResume();
-	void reliveSuccess();
-
 	void downloadPackageEnd(bool bAnswer);
-	/*****************************************************************************/
-	void ChangeCost(CCObject* ob);
-	void ChangeSpeed(CCObject* ob);
+	void CostCount(WarAlive* alive,float dt);
+	void StoryEndEvent(CCObject* ob);
+	void combatResult(CCObject* ob);
+	void initMember();
+	float getTime() { return m_time; }
+	int getCurrCost(){return m_CurrCost;}
+	void changeCost(CCObject* ob);
+	void costUpdate(float delta);
+	void changeSpeed(CCObject* ob);
 	void RoundStart(CCObject* ob);
 	void TaskArray();
 	void showRound();
-	void RunLogic(float delt);
+	void runLogic(float delt);
 	void ExcuteAI(float dt);
 	bool IsAutoMoveType(WarAlive*alive);
 	bool monsterFlee(WarAlive* alive);
@@ -123,17 +101,26 @@ public:
 	bool autoSkillAlive(WarAlive* alive);
 	void attackTime(WarAlive* alive,float dt);
 	bool aliveAttackState(WarAlive* alive);
-	void displayBatchTips();
+	void displayBatchWarning();
 	void displayRoundTips();
 	void displayGuide();
-	void heroRemove(WarAlive* alive);
 	void monsterRemove(WarAlive* alive);
-protected:
-	void onClickDownloadPackage(CCObject* pSender);
+	void AliveDieDispose(CCObject* ob);
+	void monsterDieDispose(WarAlive* alive);
+	void ActObjectRemove(CCObject* ob);
+	void NextBatch(float dt);
+	bool StateDispose(WarAlive* alive,float dt);
+	void battleWin();
+	void battleFail();
+	void beginStageFloorEffect();
+	void beginStoryEnd();
+	void moveStoryEnd();
+	void wordBossFinish();
+	void OnBattleFinish(int type, google::protobuf::Message *msg);
+	void onWordBossFinish(int type, google::protobuf::Message *msg);
+	
 private:	
 	int m_CurrCost;
-	float m_FrameTime;				//累计时间
-	int m_send;						//记录以请求的消息批次
 	int	m_CurrBatchNum;				//记录当前战斗批次					这个参数+1的地方太多了，需要修改一下初始值
 	float m_time;
 	float m_speed;					//速度变化参数
@@ -142,6 +129,8 @@ private:
 	bool m_Record;					//是否记录连击
 	int m_RecordNum;				//点击次数
 	int m_PlayerNum;				//播放次数
+	bool m_bRecvFinish;				//是否接收到服务器结算信息
+	float m_fCurrentCostAdd;		//当前cost变化速度
 	WarAlive* m_Alive;				//存储释放技能的武将信息
 	BufExp* m_bufExp;
 	WarScene* m_Scene;
@@ -158,9 +147,7 @@ private:
 	TerrainLayer* m_TerrainLayer;
 	CombatEffect* m_CombatEffect;
 	CombatGuideLayer* m_GuideLayer;
-	bool m_bFinish;
-	bool m_bGameOver;
-	GameFinishData m_gameFinishData;
-	float m_fCurrentCostAdd;
+	GameFinishData m_finishData;
+	
 };
 #endif

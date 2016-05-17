@@ -81,17 +81,17 @@ void WarControl::OnClick(CCObject* ob)
 	{
 	case CL_Menu:
 		{
-			NOTIFICATION->postNotification(SHOW_PLAN_PANEL);
+			NOTIFICATION->postNotification(B_ReturnLayer);
 		}break;
 	case CL_StarBtn:
 		{
-			NOTIFICATION->postNotification(WAR_ROUND_START);
+			NOTIFICATION->postNotification(B_RoundStart);
 			m_openEye = false;
 			m_WindResume = false;
 		}break;
 	case CL_AddSpeedBtn:
 		{
-			NOTIFICATION->postNotification(CHANGEBATTLESPEED);
+			NOTIFICATION->postNotification(B_ChangeSceneSpeed);
 		}break;
 	case GU_openGuide:
 		{
@@ -622,7 +622,7 @@ CWidgetTouchModel WarControl::AliveButtonBeginClick(CCObject* ob,CCTouch* pTouch
 			if (!pAlive)
 				return eWidgetTouchTransient;
 			CaptainSkill::create()->ExecuteCaptainSkill();
-			NOTIFICATION->postNotification(ALIVEBATTLETOUCH,pAlive);			//召唤成功才能扣减Cost值
+			NOTIFICATION->postNotification(B_EntranceBattle,pAlive);			//召唤成功才能扣减Cost值
 			return eWidgetTouchNone;
 		}	
 		return eWidgetTouchTransient;											//武将为上阵状态则触摸不传递到下层,否则将触摸传递到下层处理
@@ -634,7 +634,7 @@ CWidgetTouchModel WarControl::AliveButtonBeginClick(CCObject* ob,CCTouch* pTouch
 		}
 		if (cost < alive->role->useCost)
 			return eWidgetTouchTransient;
-		NOTIFICATION->postNotification(ALIVEBATTLETOUCH,alive);
+		NOTIFICATION->postNotification(B_EntranceBattle,alive);
 		showMonsterTips(nullptr);
 		return eWidgetTouchNone;	
 	}
@@ -834,7 +834,7 @@ void WarControl::iniCaptainHurtTips()
 		m_ControLayer->addChild(m_ArmatureTips);
 	}else{
 		CCLOG("[ *ERROR ] WarAssist::PlayBeginAnimation animationData NULL");
-		CCNotificationCenter::sharedNotificationCenter()->postNotification(LAYERMOVEEND,CCInteger::create(1));
+		CCNotificationCenter::sharedNotificationCenter()->postNotification(B_LayerMoveEnd,CCInteger::create(1));
 	}
 }
 
@@ -855,7 +855,7 @@ void WarControl::CaptainHit( CCObject* ob )
 	}
 }
 
-void WarControl::hideUpUiPart()
+void WarControl::hideUiUpPart()
 {
 	m_ControLayer->findWidgetById("layer_up_boss")->setVisible(false);
 	m_ControLayer->findWidgetById("layer_up_normal")->setVisible(false);

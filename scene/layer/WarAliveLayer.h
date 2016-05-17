@@ -64,6 +64,9 @@ public:
 	CC_SYNTHESIZE(CCNode*,m_MoveNode,MoveNode);				//挂载移动节点
 	/*************************************************************************/
 	void clearAlivesPauseMark();
+	void heroWinAction();
+	void createBatchMonster(int batchNumber);
+	bool moveGuide(int grid,bool nextStep);
 protected:
 	WarAlive*		m_TouchAlive;		//被触摸的武将id
 	ActObject*		m_moveTarget;		//拖拽移动对象

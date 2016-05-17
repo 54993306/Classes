@@ -195,7 +195,7 @@ void AliveObject::AliveDie()
 			alive->getActObject()->AliveDie();
 		}
 	}
-	NOTIFICATION->postNotification(Msg_DropItem,this);
+	NOTIFICATION->postNotification(B_DrpItem,this);
 	m_Alive->setHp(0);
 	m_Hp->setHp(0);
 	if (m_Alive->getMoveObj())
@@ -208,7 +208,7 @@ void AliveObject::AliveDie()
 	if (!m_DieState)
 	{
 		m_DieState = true;
-		NOTIFICATION->postNotification(ALIVEDIE,m_Alive);
+		NOTIFICATION->postNotification(B_AliveDie,m_Alive);
 	}
 	if (m_Alive->getEnemy())
 		this->setUserObject(CCBool::create(true));						//死亡流程不被技能暂停处理
@@ -228,7 +228,7 @@ void AliveObject::AtkBegin_Event()
 //操作受击数组,播完掉血则移除当前回合受击数组
 void AliveObject::HpChange_Event()
 {
-	NOTIFICATION->postNotification(ALIVEATTACK,m_Alive);
+	NOTIFICATION->postNotification(B_LostHpEvent,m_Alive);
 	if (m_PlayerEffect)
 		NOTIFICATION->postNotification(B_SkilEffectInMap,this);
 }

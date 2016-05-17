@@ -445,8 +445,6 @@ void CNetClient::reconnectResult(int type, google::protobuf::Message *msg)
 			string name = CSceneManager::sharedSceneManager()->getRunningScene()->getClassName();
 			if (strcmp(name.c_str(),"WarScene"))
 				CCDirector::sharedDirector()->replaceScene(GETSCENE(LoginScene));
-		}else{
-			CCNotificationCenter::sharedNotificationCenter()->postNotification(WARSCENE_EXIT);
 		}
 	}
 }

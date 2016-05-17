@@ -63,7 +63,7 @@ void CPlayerControl::sendGetStagePrize(int prizeType, int stageId)
 	delete req;
 }
 
-void CPlayerControl::sendBattleFinish(int reason, bool res,int roundNum,int aliveNum)
+void CPlayerControl::sendBattleFinish(int reason, bool res,int roundNum)
 {
 	BattleFinish *req = new BattleFinish; 
 	req->set_reason(reason);		//关卡结束的原因(1:正常结束, 2:中途撤退)

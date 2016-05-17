@@ -81,6 +81,7 @@ WarAlive::WarAlive()
 	,m_AliveType(AliveType::Common)	//角色品质等级
 	,m_DieState(false)
 	,m_CallAliveNum(0)				//record can claa alive number
+	,m_LastAlive(false)
 {
 	setBuffManage(nullptr);
 }

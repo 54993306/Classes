@@ -65,7 +65,7 @@ public:												//
 /*******************************************************************************************************************/
 	CCNode* getMoveLayout(int index);							//get role button move part
 
-	void hideUpUiPart();										//hide ui panel above part
+	void hideUiUpPart();										//hide ui panel above part
 
 	void iniTestUi();											//init use to test button
 	

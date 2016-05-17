@@ -11,10 +11,9 @@
 DataCenter* DataCenter::m_dataCenter = nullptr;
 
 DataCenter::DataCenter()
-	:m_war(nullptr),m_map(nullptr),m_ter(nullptr),m_user(nullptr),m_wuJiang(nullptr)
-	,m_battle(nullptr),m_skill(nullptr),m_tollgate(nullptr),m_task(nullptr)
+	:m_war(nullptr),m_map(nullptr),m_ter(nullptr),m_user(nullptr),m_skill(nullptr),m_tollgate(nullptr)
+	,m_task(nullptr),m_rewardData(nullptr), m_cityActionType(CA_None),m_RoleData(nullptr)
 	,m_heroInfo(nullptr),m_itemDesc(nullptr),m_CombatguideMG(nullptr),m_stageData(nullptr)
-	,m_rewardData(nullptr), m_cityActionType(CA_None),m_RoleData(nullptr)
 {}
 DataCenter::~DataCenter()
 {
@@ -22,8 +21,6 @@ DataCenter::~DataCenter()
 	CC_SAFE_RELEASE(m_map);
 	CC_SAFE_RELEASE(m_ter);
 	CC_SAFE_RELEASE(m_user);
-	CC_SAFE_DELETE(m_wuJiang);
-	CC_SAFE_DELETE(m_battle);
 	CC_SAFE_DELETE(m_skill);
 	CC_SAFE_DELETE(m_tollgate);
 	CC_SAFE_DELETE(m_task);
@@ -37,8 +34,6 @@ DataCenter::~DataCenter()
 	m_war = nullptr;
 	m_ter = nullptr;
 	m_user = nullptr;
-	m_wuJiang = nullptr;
-	m_battle = nullptr;
 	m_skill = nullptr;
 	m_tollgate = nullptr;
 	m_task = nullptr;
@@ -85,22 +80,6 @@ TerrainManager* DataCenter::getTer()
 UserManager* DataCenter::getUser()
 {
 	return m_user;
-}
-WuJiangGM* DataCenter::getWuJiang()
-{
-	if(!m_wuJiang)
-	{
-		m_wuJiang = new WuJiangGM();
-	}
-	return m_wuJiang;
-}
-EmBattleModel* DataCenter::getBattle()
-{
-	if(!m_battle)
-	{
-		m_battle = new EmBattleModel();
-	}
-	return m_battle;
 }
 SkillGM* DataCenter::getSkill()
 {

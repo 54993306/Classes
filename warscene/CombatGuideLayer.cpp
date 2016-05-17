@@ -512,7 +512,7 @@ void CombatGuideLayer::ImageTextGuide(CombatGuideStep* step)
 			alive->getMoveObj()->setPosition(p);
 			alive->getActObject()->setPosition(p);											//在视野外进行死亡处理
 			if (!alive->getEnemy()&&alive->getCriAtk())
-				NOTIFICATION->postNotification(SKILLEND,alive);
+				NOTIFICATION->postNotification(B_CritEnd,alive);
 			alive->getActObject()->AliveDie();
 			alive->getActObject()->setReset(true);
 			alive->setActObject(nullptr);

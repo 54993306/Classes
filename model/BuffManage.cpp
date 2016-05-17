@@ -5,7 +5,7 @@
 #include "DataCenter.h"
 #include "scene/alive/AliveDefine.h"
 #include "warscene/ConstNum.h"
-
+#include "Battle/BattleMessage.h"
 using namespace cocos2d;
 using namespace cocos2d::extension;
 #define BUFFMAX (8)
@@ -42,7 +42,14 @@ BuffManage::BuffManage():m_alive(nullptr),m_BufeffectID(0)
 
 BuffManage::~BuffManage()
 {
-	Buffclear();
+	for (auto buf:m_BuffMap)
+	{
+		CC_SAFE_RELEASE(buf.second);
+	}
+	m_BuffMap.clear();
+	for (auto p : m_EffectMap)
+		p.second.clear();
+	m_EffectMap.clear();
 	m_alive = nullptr;
 }
 
@@ -109,7 +116,7 @@ void BuffManage::AddBuff(CBuff& buf)
 	if (m_alive->getHp()<=0)
 		m_alive->getActObject()->AliveDie();
 	CCLOG("[ Tips ] BuffManage::AddBuff succeed bufID = %d",buf.buffId);
-	NOTIFICATION->postNotification(ADDBUFF,m_alive);
+	NOTIFICATION->postNotification(B_AddBuff,m_alive);
 }
 
 BuffInfo* BuffManage::getbuff(int bufID)
@@ -144,7 +151,7 @@ void BuffManage::removeBuf(int id)
 				i = nullptr;
 			}				
 			m_EffectMap.erase(piter);
-			NOTIFICATION->postNotification(REMOVEBUFF,m_alive);//刷新剩余图标信息
+			NOTIFICATION->postNotification(B_RemoveBuff,m_alive);//刷新剩余图标信息
 		}else{
 			CCLOG("[ ERROR ] BuffManage::removeBuf BuffEffect Vector is NULL");
 		}
@@ -254,7 +261,7 @@ void BuffManage::ExcuteBuff(BuffInfo*bfinfo, bool handel /*= true*/)
 				return;			//世界boss免疫buff效果
 			int num = bufCurrHpHandle(bfinfo,handel);							/*1当前血量*/		
 			if (!num)break;
-			NOTIFICATION->postNotification(UPBUFFEFFECT,m_alive);				//每次加减血时显示一次buff的特效
+			NOTIFICATION->postNotification(B_UpdateBuffEffect,m_alive);				//每次加减血时显示一次buff的特效
 			if (bfinfo->getDbuf())
 			{			
 				m_alive->getActObject()->playerNum(num,generalType);

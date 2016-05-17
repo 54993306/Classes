@@ -7,6 +7,7 @@
 #include "guide/GuideManager.h"
 #include "model/DataCenter.h"
 #include "task/TaskControl.h"
+#include "Battle/BattleMessage.h"
 using namespace cocos2d;
 
 BackLayer::BackLayer(void)
@@ -46,7 +47,7 @@ void BackLayer::keyBackClicked()
 		}
 		else if(LayerManager::instance()->getLayerCount()==0&&name=="WarScene")
 		{
-			CCNotificationCenter::sharedNotificationCenter()->postNotification(SHOW_PLAN_PANEL);
+			CCNotificationCenter::sharedNotificationCenter()->postNotification(B_ReturnLayer);
 		}
 		else if (LayerManager::instance()->getLayerCount()==0&&name=="LoginScene")
 		{

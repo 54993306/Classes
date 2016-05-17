@@ -25,7 +25,7 @@
 #include "common/CommonFunction.h"
 #include "Global.h"
 #include "model/MapManager.h"
-
+#include "Battle/BattleMessage.h"
 WarAssist::WarAssist()
 	:m_alive(nullptr)
 	,m_ui(nullptr)
@@ -38,7 +38,7 @@ WarAssist::~WarAssist()
 
 bool WarAssist::init()
 {
-	NOTIFICATION->addObserver(this,callfuncO_selector(WarAssist::PlayBeginAnimation),PLAYERBEGINANIMATION,nullptr);
+	NOTIFICATION->addObserver(this,callfuncO_selector(WarAssist::PlayBeginAnimation),B_PlayBeginAnimation,nullptr);
 	return true;
 }
 
@@ -276,7 +276,7 @@ void WarAssist::WinEffect(CCObject* ob)
 	CCEaseBounceOut * es= CCEaseBounceOut::create(cs1);
 	CCCallFuncO* ef2 = CCCallFuncO::create(this,callfuncO_selector(WarAssist::shake),m_ui);
 	CCDelayTime* dly = CCDelayTime::create(1.5f);
-	CCCallFuncO* RoundOver = CCCallFuncO::create(m_scene->getCombatLogic(), callfuncO_selector(CombatLogic::CombatResult), CCInteger::create(win));
+	CCCallFuncO* RoundOver = CCCallFuncO::create(m_scene->getCombatLogic(), callfuncO_selector(CombatLogic::combatResult), this);
 	CCSequence* sqe = CCSequence::create(es,ef2,dly,RoundOver, NULL);
 	//ziti->setPosition(ccp(-size.width/2,size.height/2));
 	//CCMoveTo* mt = CCMoveTo::create(0.5f,ccp(size.width/2,size.height/2));
@@ -354,7 +354,7 @@ void WarAssist::PlayBeginAnimation(CCObject* obj)
 	else
 	{
 		CCLOG("[ *ERROR ] WarAssist::PlayBeginAnimation animationData NULL");
-		CCNotificationCenter::sharedNotificationCenter()->postNotification(LAYERMOVEEND,CCInteger::create(1));
+		CCNotificationCenter::sharedNotificationCenter()->postNotification(B_LayerMoveEnd,CCInteger::create(1));
 	}
 }
 
@@ -368,7 +368,7 @@ void WarAssist::animationEvent( CCArmature *armature,MovementEventType movementT
 		if (id.compare("open")==0)
 		{
 			int beginStory = 1;
-			CCNotificationCenter::sharedNotificationCenter()->postNotification(LAYERMOVEEND,CCInteger::create(beginStory));
+			CCNotificationCenter::sharedNotificationCenter()->postNotification(B_LayerMoveEnd,CCInteger::create(beginStory));
 		}
 	}
 }

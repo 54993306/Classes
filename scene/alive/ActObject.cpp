@@ -222,7 +222,7 @@ void ActObject::ActionEnd( const char* ActionName )
 	{
 		TurnStateTo(Stand_Index);
 		if (m_Alive->getCritEffect()&&!m_Enemy)		
-			NOTIFICATION->postNotification(SKILLEND,m_Alive);
+			NOTIFICATION->postNotification(B_CritEnd,m_Alive);
 		if (	strcmp(ActionName,Attack_Action) == 0					//普攻转站立
 			||	strcmp(ActionName,SpAttack_Action) == 0				//特攻转站立
 			||	strcmp(ActionName,Skill_Action) == 0					//必杀技转站立
@@ -238,7 +238,7 @@ void ActObject::ActionEnd( const char* ActionName )
 	}else if (strcmp(ActionName,Die_Action) == 0)
 	{
 		if (m_Alive->getCritEffect()&&!m_Enemy)					//放技能的过程中把自己炸死的特殊情况
-			NOTIFICATION->postNotification(SKILLEND,m_Alive);
+			NOTIFICATION->postNotification(B_CritEnd,m_Alive);
 		CCFadeOut* fadeout = CCFadeOut::create(0.5f);
 		m_Armature->runAction(fadeout);
 		getHp()->setVisible(false);
@@ -325,7 +325,7 @@ void ActObject::removeAct( CCNode* node )
 {
 	ActObject* act = (ActObject*) node;
 	WarAlive* alive = act->getAlive();
-	NOTIFICATION->postNotification(ACTREMOVE,alive);		//我方主帅死亡,战斗失败
+	NOTIFICATION->postNotification(B_ActObjectRemove,alive);		//我方主帅死亡,战斗失败
 	if (m_Reset)
 	{
 		m_Reset = false;		

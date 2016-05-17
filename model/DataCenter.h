@@ -2,8 +2,6 @@
 #define _DATA_CENTER_H_
 #include "cocos2d.h"
 #include "UserManager.h"
-#include "WuJiangGM.h"
-#include "EmBattleModel.h"
 #include "SkillGM.h"
 #include "TollgateGM.h"
 #include "TaskGM.h"
@@ -54,8 +52,6 @@ public:
 	TerrainManager* getTer();
 	MapManager* getMap();
 	UserManager* getUser();
-	WuJiangGM* getWuJiang();
-	EmBattleModel* getBattle();
 	SkillGM* getSkill();
 	TaskGM* getTask(int taskType);
 	TollgateGM* tollgate();
@@ -76,8 +72,6 @@ protected:
 	WarManager* m_war;
 	TerrainManager* m_ter;
 	UserManager* m_user;
-	WuJiangGM* m_wuJiang;
-	EmBattleModel* m_battle;
 	SkillGM* m_skill;
 	TaskGM*  m_task;
 	TollgateGM* m_tollgate;
