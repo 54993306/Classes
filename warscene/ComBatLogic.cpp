@@ -1,5 +1,4 @@
 ﻿
-#include "GMessage.h"
 #include "ComBatLogic.h"
 #include "scene/loadWar.h"
 #include "scene/WarScene.h"
@@ -253,7 +252,11 @@ void CombatLogic::runLogic(float delta)
 	costUpdate(delta);
 }
 
-void CombatLogic::changeCost( CCObject* ob ) { m_CurrCost += ((CCFloat*)ob)->getValue(); }
+void CombatLogic::changeCost( CCObject* ob ) 
+{ 
+	m_CurrCost += ((CCFloat*)ob)->getValue(); 
+	costUpdate(0);
+}
 
 void CombatLogic::costUpdate(float delta)
 {

@@ -3,7 +3,6 @@
 #include "tools/ToolDefine.h"
 #include "common/CommonFunction.h"
 #include "tools/commonDef.h"
-#include "GMessage.h"
 #include "common/color.h"
 #include "tools/CCShake.h"
 #include "model/DataCenter.h"

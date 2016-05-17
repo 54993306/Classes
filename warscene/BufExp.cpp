@@ -1,5 +1,4 @@
 ﻿#include "BufExp.h"
-#include "GMessage.h"
 #include "Global.h"
 #include "warscene/ConstNum.h"
 #include "model/DataDefine.h"

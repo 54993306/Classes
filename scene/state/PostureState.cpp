@@ -1,7 +1,6 @@
 ﻿
 #include "AppUI.h"
 #include "Global.h"
-#include "GMessage.h"
 #include "PostureState.h"
 #include "model/DataDefine.h"
 #include "warscene/ConstNum.h"

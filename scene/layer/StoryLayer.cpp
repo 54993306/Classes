@@ -4,19 +4,19 @@
 #include "tools/ToolDefine.h"
 #include "model/DataCenter.h"
 #include "model/WarManager.h"
-#include "GMessage.h"
 #include "common/CommonFunction.h"
 #include "tools/CCShake.h"
 #include "common/CGameSound.h"
 #include "warscene/EffectData.h"
 #include "Battle/BattleMessage.h"
 #include <spine/spine-cocos2dx.h>
+
 using namespace spine;
 StoryLayer::StoryLayer()
-:m_ui(nullptr),m_index(0),m_StoryStep(nullptr)
+:m_ui(nullptr),m_index(0),m_StoryStep(nullptr),m_LastStep(nullptr)
 ,m_isStory(0),m_SType(0),m_Bgm(""), m_bOpenTouch(true),m_lastNum(0)
-,m_LastStep(nullptr)
 {}
+
 StoryLayer::~StoryLayer()
 {
 	NOTIFICATION->removeAllObservers(this);
@@ -39,13 +39,9 @@ bool StoryLayer::init()
 	this->setIsShowBlack(false);
 	this->addChild(m_ui);
 	NOTIFICATION->addObserver(this,callfuncO_selector(StoryLayer::CreateStory),B_LayerMoveEnd,nullptr);
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
 	this->setTouchEnabled(false);
 	m_isStory = false;
-#else
-	this->setTouchEnabled(false);
-	m_isStory = false;
-#endif
+
 	CImageViewScale9* rightJumpBtn = (CImageViewScale9*)m_ui->getChildByTag(rightJumpBtn_tag);
 	rightJumpBtn->setTouchEnabled(true);
 	rightJumpBtn->setOnClickListener(this,ccw_click_selector(StoryLayer::PostEnd));
@@ -217,7 +213,7 @@ void StoryLayer::content()
 		m_ui->setVisible(true);
 		CLabel* talkConten = CLabel::create("",FONT_NAME,30);
 		talkConten->setAnchorPoint(ccp(0,0.5f));
-		talkConten->setPosition(ccp(m_StoryStep->getCx(),m_StoryStep->getCy()));
+		talkConten->setPosition(ccp(/*m_StoryStep->getCx()*/200,m_StoryStep->getCy()));
 		std::string sStory = m_StoryStep->getConten();
 		talkConten->setString(strReplace(sStory,"\\n","\n").c_str());
 		talkConten->runAction(CCFadeIn::create(0.3f));
@@ -239,7 +235,6 @@ void StoryLayer::storyrole()
 		clearRole();
 		return;
 	}
-		
 	if (m_LastStep&&!m_LastStep->getAside())
 	{
 		if ((m_LastStep->getright()==m_StoryStep->getright())

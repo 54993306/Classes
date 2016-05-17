@@ -1,6 +1,5 @@
 ﻿#include "MoveRule.h"
 #include "ConstNum.h"
-#include "GMessage.h"
 #include "model/DataCenter.h"
 #include "model/DataDefine.h"
 #include "model/WarManager.h"

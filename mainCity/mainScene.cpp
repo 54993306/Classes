@@ -8,7 +8,7 @@
 
 #include "Strengthen.h"
 #include "Recruit.h"
-
+#include "GMessage.h"
 #include "CommandLayer.h"
 #include "scene/AnimationManager.h"
 #include "netcontrol/CPlayerControl.h"

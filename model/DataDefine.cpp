@@ -3,7 +3,6 @@
 #include "warscene/ConstNum.h"
 #include "scene/alive/ActObject.h"
 #include "common/CommonFunction.h"
-#include "GMessage.h"
 #include "roleImg/RoleUpdate.h"
 AliveBase::AliveBase()
 	:m_AliveID(0)

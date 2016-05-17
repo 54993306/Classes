@@ -1,6 +1,5 @@
 ﻿#include "HPObject.h"
 #include "ActObject.h"
-#include "GMessage.h"
 #include "warscene/WarControl.h"
 #include "model/DataCenter.h"
 #include "warscene/ConstNum.h"

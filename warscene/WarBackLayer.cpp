@@ -1,7 +1,6 @@
 ﻿#include "WarBackLayer.h"
 #include "scene/CPopTip.h"
 #include "model/DataDefine.h"
-#include "GMessage.h"
 #include "scene/WarScene.h"
 #include "model/DataCenter.h"
 #include "scene/loadWar.h"
@@ -31,10 +30,6 @@ bool WarBackLayer::init()
 		MaskLayer* lay = MaskLayer::create("WarBackLayerMask");
 		lay->setContentSize(CCSizeMake(2824,640));
 		this->addChild(lay);
-
-		//CCLayerColor* layerColor = CCLayerColor::create(ccc4(0, 0, 0, 120));
-		//layerColor->setContentSize(CCSizeMake(2824,640));
-		//this->addChild(layerColor, 1);
 
 		m_ui = LoadComponent("BattleSet.xaml");  
 		m_ui->setPosition(VCENTER);
@@ -107,11 +102,8 @@ void WarBackLayer::returnCity(CCObject* ob)
 	int tag = btn->getTag();
 	if (tag == PopTipCancel)
 	{
-		//NOTIFICATION->postNotification(SHOW_PLAN_PANEL);
 		this->removeChildByTag(tips_tag);
-	}
-	else
-	{
+	}else{
 
 		//如果是在引导,重启游戏
 		if(DataCenter::sharedData()->getWar()->getStageID() == 0)

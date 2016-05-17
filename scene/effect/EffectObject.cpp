@@ -5,7 +5,6 @@
 #include "model/DataCenter.h"
 #include "model/WarManager.h"
 #include "common/CGameSound.h"
-#include "GMessage.h"
 #include "Battle/BattleMessage.h"
 
 EffectObject::EffectObject()

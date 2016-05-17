@@ -16,7 +16,6 @@ class WarAliveLayer;
 class TouchIntercept;
 class CombatGuideStep;
 struct ImageData;
-#define _Test_Guide_					(1)
 
 enum LayerZorder
 {
@@ -45,17 +44,6 @@ public:
 	void ClearGuideLayer();
 	void ImageArray(CombatGuideStep* step);
 	void initguideImage(ImageData& data);
-protected:	
-#if _Test_Guide_	//测试方案
-
-	void ClippingNodeTest();
-	void DrawNodeTest();
-	void RenderTextureinit(CCRect Rect,const char* path,const char* cover = "",bool ClearColor = true);
-	CCSprite * createSprite(const char * name,float point_x,float point_y);//自定义创建精灵的方法
-	CCScale9Sprite* m_TextRect;
-	CCClippingNode* m_Clipping;
-	TouchIntercept* m_TouchIntercept;
-#endif
 private:
 	CCNode* m_root;
 	WarScene* m_Scene;

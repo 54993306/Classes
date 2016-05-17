@@ -2,7 +2,6 @@
 #include "net/CNetClient.h"
 #include "tools/ShowTexttip.h"
 #include "common/color.h"
-#include "GMessage.h"
 SetPanel::SetPanel()
 	:m_panel(nullptr)
 {

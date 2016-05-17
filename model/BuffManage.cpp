@@ -1,6 +1,5 @@
 ﻿#include "BuffManage.h"
 #include "Global.h"
-#include "GMessage.h"
 #include "DataDefine.h"
 #include "DataCenter.h"
 #include "scene/alive/AliveDefine.h"

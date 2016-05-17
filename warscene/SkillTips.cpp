@@ -3,7 +3,6 @@
 #include "common/CommonFunction.h"
 #include "model/DataDefine.h"
 #include "model/DataCenter.h"
-#include "GMessage.h"
 #include "Battle/BattleMessage.h"
 
 SkillTips::SkillTips()

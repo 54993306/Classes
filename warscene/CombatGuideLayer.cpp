@@ -11,143 +11,15 @@
 #include "warscene/ConstNum.h"
 #include "scene/WarScene.h"
 #include "WarControl.h"
-#include "GMessage.h"
 #include "scene/WarScene.h"
 #include <string>
 #include "common/CommonFunction.h"
 #include "Battle/LoadSpineData.h"
 #include "Battle/BattleMessage.h"
 CombatGuideLayer::CombatGuideLayer()
-	:m_TouchIntercept(nullptr),m_Clipping(nullptr),m_TextRect(nullptr)
-	,m_Step(nullptr),m_root(nullptr),m_mapData(nullptr)
+	:m_Step(nullptr),m_root(nullptr),m_mapData(nullptr)
 	,m_RenderTexture(nullptr),m_Scene(nullptr),m_LayerColor(nullptr)
 {}
-
-#if _Test_Guide_	//测试方案
-//方案2   判断触摸是否在裁剪节点区域内
-//方案3   以一个精灵作为触摸区域,其他区域填充灰色精灵。
-void CombatGuideLayer::ClippingNodeTest()
-{
-	CCSize size = CCDirector::sharedDirector()->getVisibleSize(); 
-	m_Clipping=CCClippingNode::create();
-	m_Clipping->setInverted(true);				//设置底板可见
-	m_Clipping->setAlphaThreshold(0.0f);		//设置透明度为0
-	CCLayerColor* back=CCLayerColor::create(ccc4(0,0,0,200));
-	m_Clipping->addChild(back);
-	this->addChild(m_Clipping);
-	//以下模型是带图像遮罩(可以将多个节点加在一个node做遮罩处理)
-	CCSprite* close=CCSprite::create("public/guide/finger.png");
-	close->setPosition(ccp(100,100));
-	close->setAnchorPoint(CCPointZero);
-	CCSprite* sp = CCSprite::create("public/guide/finger.png");
-	sp->setAnchorPoint(CCPointZero);
-	sp->setPosition(ccp(250,250));
-	m_Clipping->setStencil(sp);
-	CCRect bigRect = CCRect(sp->getPositionX()-50,sp->getPositionY()-50,sp->getContentSize().width+100,sp->getContentSize().height+100);
-	CCRect smallRect = CCRect(sp->getPositionX(),sp->getPositionY(),sp->getContentSize().width,sp->getContentSize().height);
-	bool isTest = false;				//是否开启测试模式
-	bool isOppopset = false;			//是否翻转触摸区域 //图形是不规则图形,但是绘制只能绘制出正方形。
-	m_TouchIntercept = TouchIntercept::create(guideLayerPriority,bigRect,smallRect,isOppopset,isTest);
-	this->addChild(m_TouchIntercept);
-
-
-	/*绘制圆形区域*/
-	//设置参数
-	static ccColor4F red={1,0,0,1};//顶点颜色设置为红色，参数是R,G,B,透明度
-	float radius=55.0f;//设置圆的半径
-	const int nCount=200;//设置顶点数，此处我们将圆看成200边型
-	const float angel=2.0f * (float)M_PI/nCount;//两个顶点与中心的夹角（弧度）
-	static CCPoint circle[nCount];  //保存顶点的数组
-	for(int i=0;i<nCount;i++){
-		float radian=i*angel; //弧度
-		circle[i].x=radius * cosf(radian);//顶点x坐标
-		circle[i].y=radius * sinf(radian);//顶点y坐标
-	}
-	/*绘制多边形*/
-	//注意不要将pStencil addChild
-	CCDrawNode *pStencil=CCDrawNode::create();
-	pStencil->drawPolygon(circle, nCount, red, 0, red);//绘制这个多边形(200个顶点的多边形就是圆了)
-
-	/*给圆添加一个放大缩小动作*/
-	pStencil->runAction(CCRepeatForever::create(CCSequence::createWithTwoActions(CCScaleBy::create(0.05f, 0.95f),
-		CCScaleTo::create(0.125f, 1))));
-	pStencil->setPosition(ccp(size.width/2, size.height/2));
-	/*将这个圆形从剪裁节点上面抠出来，Stencil是模板的意思*/
-	m_Clipping->setStencil(pStencil);
-
-
-	CCSprite * sCircle= createSprite("circle.png", size.width/2, size.height/2);//挖出触摸区域后盖一个精灵上去
-	sCircle->runAction(CCRepeatForever::create(CCSequence::createWithTwoActions(
-		CCScaleBy::create(0.05f, 0.95f),
-		CCScaleTo::create(0.125f, 1))));
-	this->addChild(sCircle);
-	this->addChild(createSprite("hand.png", size.width*1/3, size.height/2));
-}
-
-CCSprite * CombatGuideLayer::createSprite(const char * name,float point_x,float point_y)
-{
-	/*快速创建精灵的方法*/
-	CCSprite * sprite=CCSprite::create(name);
-	sprite->setPosition(ccp(point_x,point_y));
-	return sprite;
-}
-
-void CombatGuideLayer::DrawNodeTest()
-{
-	CCSize s = CCDirector::sharedDirector()->getWinSize();
-
-	CCDrawNode *draw = CCDrawNode::create();
-	m_Clipping->addChild(draw, 10);
-
-	ccBlendFunc blend;
-	blend.src = GL_ZERO;
-	blend.dst = GL_ONE_MINUS_SRC_ALPHA;
-	//draw->setBlendFunc(blend);				//可以让节点全变成灰黑色的效果(制作动态光晕)
-
-	// Draw 10 circles
-	for( int i=0; i < 10; i++)
-	{
-		draw->drawDot(ccp(s.width/2, s.height/2), 10*(10-i), ccc4f(CCRANDOM_0_1(), CCRANDOM_0_1(), CCRANDOM_0_1(), 1));
-	}
-
-	// Draw polygons
-	CCPoint points[] = { CCPoint(s.height/4,0), CCPoint(s.width,s.height/5), CCPoint(s.width/3*2,s.height) };
-	draw->drawPolygon(points, sizeof(points)/sizeof(points[0]), ccc4f(1,0,0,0.5), 4, ccc4f(0,0,1,1));
-
-	// star poly (triggers buggs)
-	{
-		const float o=80;
-		const float w=20;
-		const float h=50;
-		CCPoint star[] = 
-		{
-			CCPoint(o+w,o-h), CCPoint(o+w*2, o),						// lower spike
-			CCPoint(o + w*2 + h, o+w ), CCPoint(o + w*2, o+w*2),		// right spike
-			//				{o +w, o+w*2+h}, {o,o+w*2},					// top spike
-			//				{o -h, o+w}, {o,o},							// left spike
-		};
-		draw->drawPolygon(star, sizeof(star)/sizeof(star[0]), ccc4f(1,0,0,0.5), 1, ccc4f(0,0,1,1));
-	}
-	// star poly (doesn't trigger bug... order is important un tesselation is supported.		//这个大括号的作用是防止变量重定义使用的
-	{
-		const float o=180;
-		const float w=20;
-		const float h=50;
-		CCPoint star[] = {
-			CCPoint(o,o), CCPoint(o+w,o-h), CCPoint(o+w*2, o),		// lower spike
-			CCPoint(o + w*2 + h, o+w ), CCPoint(o + w*2, o+w*2),	// right spike
-			CCPoint(o +w, o+w*2+h), CCPoint(o,o+w*2),				// top spike
-			CCPoint(o -h, o+w),                                     // left spike
-		};
-
-		draw->drawPolygon(star, sizeof(star)/sizeof(star[0]), ccc4f(1,0,0,0.5), 1, ccc4f(0,0,1,1));
-	}
-	// Draw segment
-	draw->drawSegment(ccp(20,s.height), ccp(20,s.height/2), 10, ccc4f(0, 1, 0, 1));
-	draw->drawSegment(ccp(10,s.height/2), ccp(s.width/2, s.height/2), 40, ccc4f(1, 0, 1, 0.5));
-}
-
-#endif
 
 CombatGuideLayer::~CombatGuideLayer()
 {
@@ -169,13 +41,6 @@ bool CombatGuideLayer::init()
 		m_root->setPosition(VCENTER);
 		m_root->retain();
 		addChild(m_root);
-		m_TextRect = CCScale9Sprite::create("public/guide/blue.png");	//用于绘制测试区域的精灵
-		m_TextRect->setAnchorPoint(ccp(0, 0));
-		m_TextRect->setVisible(false);
-		//	m_TextRect->setPreferredSize(CCSizeMake(rect.size.width, rect.size.height));	
-		//	m_TextRect->setPosition(ccp(rect.origin.x, rect.origin.y));
-		//	m_TextRect->setVisible(true);
-		addChild(m_TextRect, 99999);
 		m_mapData = DataCenter::sharedData()->getMap()->getCurrWarMap();
 
 		m_LayerColor = CCLayerColor::create(ccc4(0,0,0,250));
@@ -204,43 +69,6 @@ void CombatGuideLayer::ClearGuideLayer()
 	m_MapLayer->CancelGuide();
 	m_RenderTexture = nullptr;
 }
-//根据图片绘制高亮区域
-void CombatGuideLayer::RenderTextureinit(CCRect Rect,const char* path,const char* cover /*=""*/,bool ClearColor /*=true*/) 
-{ 
-	CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize(); 
-	CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
-	if (!m_RenderTexture)
-	{
-		m_RenderTexture = CCRenderTexture::create(visibleSize.width, visibleSize.height, kCCTexture2DPixelFormat_RGBA8888); 
-		m_RenderTexture->setPosition(ccp(visibleSize.width / 2, visibleSize.height / 2)); 
-		m_root->addChild(m_RenderTexture,Background_Z); 
-	}
-	CCSprite* pMask = CCSprite::create(path); 
-	if (!pMask)
-	{
-		CCLOG("[ *ERROR ] CombatGuideLayer::RenderTextureinit pMask NULL");
-		return ;
-	}
-	pMask->setPosition(ccp(Rect.origin.x,Rect.origin.y)); 
-	pMask->setAnchorPoint(ccp(0,0)); 
-	pMask->setScaleX(Rect.size.width/pMask->getContentSize().width); 
-	pMask->setScaleY(Rect.size.height/pMask->getContentSize().height); 
-	ccBlendFunc blend; 
-	blend.src = GL_ZERO; 
-	blend.dst = GL_ONE_MINUS_SRC_ALPHA; 
-	pMask->setBlendFunc(blend);
-	if (ClearColor)m_RenderTexture->clear(0,0,0,0.5f);				//最后一个值为透明度
-	m_RenderTexture->begin(); 
-	pMask->visit();
-	m_RenderTexture->end();
-
-	if (strcmp(cover,""))
-	{
-		CCSprite* sp_cover = CCSprite::create(cover);
-		sp_cover->setPosition(ccp(Rect.origin.x+Rect.size.width/2,Rect.origin.y+Rect.size.height/2));
-		m_root->addChild(sp_cover,Background_Z);
-	}
-} 
 //创建一个指向p点方向为direction的精灵path
 CCSprite* CombatGuideLayer::PointSprite(CCPoint&p,int direction,int spritetype)
 {

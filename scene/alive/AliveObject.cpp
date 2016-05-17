@@ -1,7 +1,6 @@
 ﻿#include "AliveObject.h"
 #include "scene/AnimationManager.h"
 #include "common/CommonFunction.h"
-#include "GMessage.h"
 #include "warscene/ConstNum.h"
 #include "ActObject.h"
 #include "model/DataCenter.h"

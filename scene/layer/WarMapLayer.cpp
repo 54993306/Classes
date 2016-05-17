@@ -1,7 +1,6 @@
 ﻿#include "WarMapLayer.h"
 #include "model/DataCenter.h"
 #include "tools/ToolDefine.h"
-#include "GMessage.h"
 #include "common/CommonFunction.h"
 #include "warscene/ConstNum.h"
 #include "scene/alive/ActObject.h"

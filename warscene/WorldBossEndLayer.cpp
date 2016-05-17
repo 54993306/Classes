@@ -6,7 +6,6 @@
 #include "scene/loadWar.h"
 #include "warscene/WarAssist.h"
 #include "common/ProgressLabel.h"
-#include "GMessage.h"
 #include "bag/bagData.h"
 #include "tollgate/Chapter.h"
 #include "model/DataCenter.h"

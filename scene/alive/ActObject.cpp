@@ -1,5 +1,4 @@
 ﻿
-#include "GMessage.h"
 #include "ActObject.h"
 #include "tools/StringUtil.h"
 #include "model/WarManager.h"

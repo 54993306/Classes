@@ -1,6 +1,5 @@
 ﻿ 
 #include "WarScene.h"
-#include "GMessage.h"
 #include "tools/commonDef.h"
 #include "model/DataCenter.h"
 #include "model/WarManager.h"

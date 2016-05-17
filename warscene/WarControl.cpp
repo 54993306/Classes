@@ -1,7 +1,6 @@
 ﻿
 #include "WarControl.h"
 #include "Global.h"
-#include "GMessage.h"
 #include "scene/CPopTip.h"
 #include "scene/loadWar.h"
 #include "tools/CCShake.h"

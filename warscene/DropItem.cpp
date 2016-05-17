@@ -1,5 +1,4 @@
 ﻿#include "DropItem.h"
-#include "GMessage.h"
 #include "scene/alive/AliveDefine.h"
 #include "model/WarManager.h"
 #include "common/CommonFunction.h"

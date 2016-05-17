@@ -2,7 +2,6 @@
 #include "WarAliveLayer.h"
 #include "model/DataCenter.h"
 #include "Global.h"
-#include "GMessage.h"
 #include "scene/AnimationManager.h"
 #include "common/CommonFunction.h"
 #include "warscene/ConstNum.h"
