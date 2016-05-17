@@ -9,9 +9,7 @@
 #include "common/CGameSound.h"
 #include "warscene/EffectData.h"
 #include "Battle/BattleMessage.h"
-#include <spine/spine-cocos2dx.h>
 
-using namespace spine;
 StoryLayer::StoryLayer()
 :m_ui(nullptr),m_index(0),m_StoryStep(nullptr),m_LastStep(nullptr)
 ,m_isStory(0),m_SType(0),m_Bgm(""), m_bOpenTouch(true),m_lastNum(0)
@@ -27,10 +25,12 @@ StoryLayer::~StoryLayer()
 	m_MapPoint.clear();
 	m_StoryStep = nullptr;
 }
+
 bool StoryLayer::init()
 {
 	if (!BaseLayer::init())
 		return false;
+	m_isStory = false;
 	m_ui = LoadComponent("story.xaml");
 	m_ui->retain();
 	m_ui->setPosition(VCENTER);
@@ -38,21 +38,21 @@ bool StoryLayer::init()
 	this->setTouchPriority(StoryPriority);
 	this->setIsShowBlack(false);
 	this->addChild(m_ui);
-	NOTIFICATION->addObserver(this,callfuncO_selector(StoryLayer::CreateStory),B_LayerMoveEnd,nullptr);
 	this->setTouchEnabled(false);
-	m_isStory = false;
+	NOTIFICATION->addObserver(this,callfuncO_selector(StoryLayer::CreateStory),B_LayerMoveEnd,nullptr);
 
 	CImageViewScale9* rightJumpBtn = (CImageViewScale9*)m_ui->getChildByTag(rightJumpBtn_tag);
 	rightJumpBtn->setTouchEnabled(true);
 	rightJumpBtn->setOnClickListener(this,ccw_click_selector(StoryLayer::PostEnd));
-	//跳过按钮做相对位置处理(屏幕适配用)
-	rightJumpBtn->setPosition(m_ui->convertToNodeSpace(ccp(VRIGHT-60, VTOP-40)));
+	
+	rightJumpBtn->setPosition(m_ui->convertToNodeSpace(ccp(VRIGHT-60, VTOP-40)));						//跳过按钮做相对位置处理(屏幕适配用)
 	CCNode* rightJumpBtnText = (CCNode*)m_ui->getChildByTag(rightJumpLabel_tag);
 	rightJumpBtnText->setPosition(m_ui->convertToNodeSpace(ccp(VRIGHT-60, VTOP-40)));
 	
 	return true;
 }
-bool StoryLayer::LoadFile(int storytype, StoryData* pStoryData)
+
+void StoryLayer::mapAddZero()
 {
 	m_StoryStep = nullptr;
 	if (m_MapPoint.empty())
@@ -60,6 +60,11 @@ bool StoryLayer::LoadFile(int storytype, StoryData* pStoryData)
 		m_MapPoint[storyPanel_tag] = CCPoint(0,0);				//容错处理使用
 		clearNode(true);
 	}
+}
+
+bool StoryLayer::LoadFile(int storytype, StoryData* pStoryData)
+{
+	mapAddZero();
 	if(!pStoryData)
 	{
 #if CC_TARGET_PLATFORM != CC_PLATFORM_WIN32
@@ -68,10 +73,8 @@ bool StoryLayer::LoadFile(int storytype, StoryData* pStoryData)
 #endif	
 		pStoryData = DataCenter::sharedData()->getWar()->getStoryData();
 	}
-		
 	vector<StoryStep*>* vec = pStoryData->getStory(StoryType(storytype));
-	if (! vec)
-		return false;
+	if (! vec) return false;
 	m_VecStep.assign(vec->begin(),vec->end());
 	m_StoryStep = m_VecStep.at(m_index);
 	step();
@@ -113,36 +116,44 @@ CCPoint& StoryLayer::getPointIntag( int tag )
 		return m_MapPoint[storyPanel_tag];
 	}
 }
-//背景图
-void StoryLayer::background()
+
+void StoryLayer::clearBackGround()
 {
-	if (m_StoryStep->getTexture())
+	if (!m_LastStep)
+		return;
+	CCNode* node = m_ui->getChildByTag(talkBg_tag);
+	if (node)
 	{
-		if (m_LastStep&&m_LastStep->getTexture() == m_StoryStep->getTexture())
-			return;
-		if (m_LastStep)
-		{
-			CCNode* node = m_ui->getChildByTag(talkBg_tag);
-			if (node)
-			{
-				node->runAction(CCSequence::create(CCFadeOut::create(0.25f),CCRemoveSelf::create(),nullptr));
-			}else{
-				CCLOG("[ *ERROR ]StoryLayer::background 1");
-			}
-		}
-		char bg_path[60] = {0};
-		sprintf(bg_path,"mainUI/%d.png",m_StoryStep->getTexture());
-		CCSprite* bg = CCSprite::create(bg_path);
-		if (bg)
-		{
-			bg->setTag(talkBg_tag);
-			bg->setPosition(getPointIntag(talkBg_tag));
-			bg->runAction(CCFadeIn::create(0.25f));
-			m_ui->addChild(bg);
-		}else{
-			CCLOG("[ *ERROR ]StoryLayer::background 2");
-		}
+		node->runAction(CCSequence::create(CCFadeOut::create(0.25f),CCRemoveSelf::create(),nullptr));
+	}else{
+		CCLOG("[ *ERROR ]StoryLayer::background 1");
 	}
+}
+
+void StoryLayer::updateBackGround()
+{
+	char bg_path[60] = {0};
+	sprintf(bg_path,"mainUI/%d.png",m_StoryStep->getTexture());
+	CCSprite* bg = CCSprite::create(bg_path);
+	if (bg)
+	{
+		bg->setTag(talkBg_tag);
+		bg->setPosition(getPointIntag(talkBg_tag));
+		bg->runAction(CCFadeIn::create(0.25f));
+		m_ui->addChild(bg);
+	}else{
+		CCLOG("[ *ERROR ]StoryLayer::background 2");
+	}
+}
+//背景图
+void StoryLayer::backGround()
+{
+	if (!m_StoryStep->getTexture())
+		return;
+	if (m_LastStep&&m_LastStep->getTexture() == m_StoryStep->getTexture())
+		return;
+	clearBackGround();
+	updateBackGround();
 }
 //音乐音效
 void StoryLayer::storymusic()
@@ -155,35 +166,77 @@ void StoryLayer::storymusic()
 	sprintf(sfx,"SFX/%d.ogg",m_StoryStep->getSFX());
 #endif	
 	PlayEffectSound(sfx);
-
-	//双引号是没有、0是不变、非0非双引号则播放
-	if (m_StoryStep->getBGM() < 0)
+	
+	if (m_StoryStep->getBGM() < 0)					//双引号是没有、0是不变、非0非双引号则播放
 		GameSound->stopMusic();
-	if (m_StoryStep->getBGM())
-	{
-		if (m_LastStep && m_StoryStep->getBGM() == m_LastStep->getBGM())
-			return;
-		char bgm[60] = {0};
+	if (!m_StoryStep->getBGM())
+		return;
+	if (m_LastStep && m_StoryStep->getBGM() == m_LastStep->getBGM())
+		return;
+	char bgm[60] = {0};
 #if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
-		sprintf(bgm,"BGM/Test/%d.mp3",m_StoryStep->getBGM());
+	sprintf(bgm,"BGM/Test/%d.mp3",m_StoryStep->getBGM());
 #else
-		sprintf(bgm,"BGM/%d.ogg",m_StoryStep->getBGM());
+	sprintf(bgm,"BGM/%d.ogg",m_StoryStep->getBGM());
 #endif	
-		PlayBackgroundMusic(bgm,true);
-	}
+	PlayBackgroundMusic(bgm,true);
 }
-//文字内容
-void StoryLayer::content()
+
+void StoryLayer::clearContent()
 {
-	if (m_LastStep)
-	{
-		CCNode* talkConten1 = (CCNode*)m_ui->getChildByTag(pangbai_tag);
-		if (talkConten1)
-			talkConten1->runAction(CCSequence::create(CCFadeOut::create(0.25f),CCRemoveSelf::create(),nullptr));
-		CCNode* talkConten2 = (CCNode*)m_ui->getChildByTag(talkConten_tag);
-		if (talkConten2)
-			talkConten2->runAction(CCSequence::create(CCFadeOut::create(0.25f),CCRemoveSelf::create(),nullptr));
-	}
+	if (!m_LastStep)
+		return;
+	CCNode* talkConten1 = (CCNode*)m_ui->getChildByTag(pangbai_tag);
+	if (talkConten1)
+		talkConten1->runAction(CCSequence::create(CCFadeOut::create(0.25f),CCRemoveSelf::create(),nullptr));
+	CCNode* talkConten2 = (CCNode*)m_ui->getChildByTag(talkConten_tag);
+	if (talkConten2)
+		talkConten2->runAction(CCSequence::create(CCFadeOut::create(0.25f),CCRemoveSelf::create(),nullptr));
+}
+//旁白
+void StoryLayer::aside()
+{
+	this->setIsShowBlack(true);
+	this->setOpacity(255);
+	CLabel* talkConten = CLabel::create("",FONT_NAME,30);
+	std::string sStory = m_StoryStep->getConten();
+	talkConten->setString(strReplace(sStory,"\\n","\n").c_str());
+	talkConten->stopAllActions();
+	talkConten->setVisible(true);
+	talkConten->runAction(CCFadeIn::create(0.3f));
+	talkConten->setTag(pangbai_tag);
+	talkConten->setPosition(getPointIntag(pangbai_tag));
+	m_ui->addChild(talkConten);
+	//旁白自动步骤,
+	if(m_StoryStep->gettime()<0.5f)
+		m_StoryStep->settime(0.5f);
+	talkConten->runAction(CCSequence::createWithTwoActions(CCDelayTime::create(m_StoryStep->gettime()), CCCallFunc::create(this, callfunc_selector(StoryLayer::updateForAutoStep))));
+}
+//刷新文字内容
+void StoryLayer::updateContent()
+{
+	m_ui->setVisible(true);
+	CLabel* talkConten = CLabel::create("",FONT_NAME,30);
+	talkConten->setAnchorPoint(ccp(0,0.5f));
+	talkConten->setPosition(ccp(/*m_StoryStep->getCx()*/200,m_StoryStep->getCy()));
+	std::string sStory = m_StoryStep->getConten();
+	talkConten->setString(strReplace(sStory,"\\n","\n").c_str());
+	talkConten->runAction(CCFadeIn::create(0.3f));
+	talkConten->setTag(talkConten_tag);
+	m_ui->addChild(talkConten);
+	this->setIsShowBlack(false);
+}
+
+void StoryLayer::blackBackImage()
+{
+	if (!m_StoryStep->getBlack())
+		return;
+	this->setIsShowBlack(true);
+	this->setOpacity(255);
+}
+
+void StoryLayer::displayTackImage()
+{
 	if (m_StoryStep->getShowTalkBg())	//上下黑框
 	{
 		m_ui->getChildByTag(talkDown_Bg)->setVisible(true);
@@ -192,40 +245,19 @@ void StoryLayer::content()
 		m_ui->getChildByTag(talkDown_Bg)->setVisible(false);
 		m_ui->getChildByTag(talkUp_Bg)->setVisible(false);
 	}
+}
+//文字内容
+void StoryLayer::content()
+{
+	clearContent();
+	displayTackImage();
 	if (m_StoryStep->getAside())
 	{
-		this->setIsShowBlack(true);
-		this->setOpacity(255);
-		CLabel* talkConten = CLabel::create("",FONT_NAME,30);
-		std::string sStory = m_StoryStep->getConten();
-		talkConten->setString(strReplace(sStory,"\\n","\n").c_str());
-		talkConten->stopAllActions();
-		talkConten->setVisible(true);
-		talkConten->runAction(CCFadeIn::create(0.3f));
-		talkConten->setTag(pangbai_tag);
-		talkConten->setPosition(getPointIntag(pangbai_tag));
-		m_ui->addChild(talkConten);
-		//旁白自动步骤,
-		if(m_StoryStep->gettime()<0.5f)
-			m_StoryStep->settime(0.5f);
-		talkConten->runAction(CCSequence::createWithTwoActions(CCDelayTime::create(m_StoryStep->gettime()), CCCallFunc::create(this, callfunc_selector(StoryLayer::updateForAutoStep))));
+		aside();
 	}else{
-		m_ui->setVisible(true);
-		CLabel* talkConten = CLabel::create("",FONT_NAME,30);
-		talkConten->setAnchorPoint(ccp(0,0.5f));
-		talkConten->setPosition(ccp(/*m_StoryStep->getCx()*/200,m_StoryStep->getCy()));
-		std::string sStory = m_StoryStep->getConten();
-		talkConten->setString(strReplace(sStory,"\\n","\n").c_str());
-		talkConten->runAction(CCFadeIn::create(0.3f));
-		talkConten->setTag(talkConten_tag);
-		m_ui->addChild(talkConten);
-		this->setIsShowBlack(false);
+		updateContent();
 	}
-	if (m_StoryStep->getBlack())
-	{
-		this->setIsShowBlack(true);
-		this->setOpacity(255);
-	}
+	blackBackImage();
 }
 //剧情角色
 void StoryLayer::storyrole()
@@ -250,9 +282,8 @@ void StoryLayer::storyrole()
 	}
 }
 
-void StoryLayer::newRole()
+void StoryLayer::nameBackground()
 {
-	Skeleton();
 	CCSprite* nameBg = CCSprite::create("public/mask2.png");
 	if (nameBg)
 	{
@@ -267,8 +298,14 @@ void StoryLayer::newRole()
 		nameBg->runAction(CCFadeIn::create(0.25f));
 		m_ui->addChild(nameBg);
 	}else{
-		CCLOG("[ *ERROR ] StoryLayer::storyrole storyID=%d",m_StoryStep->getstoryId());
+		CCLOG("[ *ERROR ] StoryLayer::nameBackground storyID=%d",m_StoryStep->getstoryId());
 	}
+}
+
+void StoryLayer::newRole()
+{
+	Skeleton();
+	nameBackground();
 	CLabel* name = CLabel::create(m_StoryStep->getRoleName().c_str(),FONT_NAME,25);
 	name->runAction(CCFadeIn::create(0.25f));
 	if (m_StoryStep->getright())
@@ -282,65 +319,24 @@ void StoryLayer::newRole()
 	m_ui->addChild(name);
 }
 
-void StoryLayer::Skeleton(bool update/*=false*/)
+SkeletonAnimation* StoryLayer::getSkeleton(bool update)
 {
-	SkeletonAnimation*  Animation = nullptr;
 	if (update)
 	{
 		if (m_StoryStep->getright())
 		{
-			Animation = (SkeletonAnimation*)m_ui->getChildByTag(rightImg_tag);
+			return (SkeletonAnimation*)m_ui->getChildByTag(rightImg_tag);
 		}else{
-			Animation = (SkeletonAnimation*)m_ui->getChildByTag(leftImg_tag);
+			return (SkeletonAnimation*)m_ui->getChildByTag(leftImg_tag);
 		}
 	}else{
 		SpData* data = DataCenter::sharedData()->getWar()->getSpineData(ToString(m_StoryStep->getRoleID()));
 		if (!data)
 		{
 			CCLOG("[ *ERROR ] StoryLayer::storyrole roleId=%d",m_StoryStep->getRoleID());
-			return;
+			return nullptr;
 		}
-		Animation = SkeletonAnimation::createWithData(data->first);
-	}
-	if (!Animation)
-	{
-		CCLOG("[ *ERROR ] StoryLayer::Skeleton");
-		return;
-	}
-	if (!update)
-	{
-		Animation->setVisible(false);
-		if (m_StoryStep->getright())
-		{
-			Animation->setTag(rightImg_tag);
-		}else{
-			Animation->setTag(leftImg_tag);
-		}
-		CCCallFunc* caf = CCCallFunc::create(this,callfunc_selector(StoryLayer::setAnimationPosition));
-		if (m_StoryStep->getRoleShark())
-		{
-			Animation->runAction(CCSequence::create(CCDelayTime::create(0.02f),caf,CCFadeIn::create(0.25f),CCShake::create(0.4f,13.0f),nullptr));
-		}else{
-			Animation->runAction(CCSequence::create(CCDelayTime::create(0.02f),caf,CCFadeIn::create(0.25f),nullptr));
-		}
-		Animation->setZOrder(-1);
-		m_ui->addChild(Animation);
-	}
-	bool fintAction = false;
-	for (int i = 0;i<Animation->state->data->skeletonData->animationsCount;i++)
-	{
-		if (strcmp(Animation->state->data->skeletonData->animations[i]->name,m_StoryStep->getAction().c_str())==0)
-		{
-			fintAction = true;
-			Animation->setAnimation(0,m_StoryStep->getAction().c_str(),true);
-			break;
-		}
-	}
-	if (!fintAction)
-	{
-		string actionName = Animation->state->data->skeletonData->animations[0]->name;
-		Animation->setAnimation(0,actionName.c_str(),true);
-		CCLOG("[ *ERROR ] StoryLayer::storyrole Lost ActionName = %s",m_StoryStep->getAction().c_str());
+		return SkeletonAnimation::createWithData(data->first);
 	}
 }
 //下一帧才能获取得到spine的大小
@@ -366,6 +362,59 @@ void StoryLayer::setAnimationPosition()
 	}
 }
 
+void StoryLayer::updateSkeleton( SkeletonAnimation* Animation )
+{
+	Animation->setVisible(false);
+	if (m_StoryStep->getright())
+	{
+		Animation->setTag(rightImg_tag);
+	}else{
+		Animation->setTag(leftImg_tag);
+	}
+	CCCallFunc* caf = CCCallFunc::create(this,callfunc_selector(StoryLayer::setAnimationPosition));
+	if (m_StoryStep->getRoleShark())
+	{
+		Animation->runAction(CCSequence::create(CCDelayTime::create(0.02f),caf,CCFadeIn::create(0.25f),CCShake::create(0.4f,13.0f),nullptr));
+	}else{
+		Animation->runAction(CCSequence::create(CCDelayTime::create(0.02f),caf,CCFadeIn::create(0.25f),nullptr));
+	}
+	Animation->setZOrder(-1);
+	m_ui->addChild(Animation);
+}
+
+void StoryLayer::setSkeletionAction( SkeletonAnimation* Animation )
+{
+	bool fintAction = false;
+	for (int i = 0;i<Animation->state->data->skeletonData->animationsCount;i++)
+	{
+		if (strcmp(Animation->state->data->skeletonData->animations[i]->name,m_StoryStep->getAction().c_str())==0)
+		{
+			fintAction = true;
+			Animation->setAnimation(0,m_StoryStep->getAction().c_str(),true);
+			break;
+		}
+	}
+	if (!fintAction)
+	{
+		string actionName = Animation->state->data->skeletonData->animations[0]->name;
+		Animation->setAnimation(0,actionName.c_str(),true);
+		CCLOG("[ *ERROR ] StoryLayer::storyrole Lost ActionName = %s",m_StoryStep->getAction().c_str());
+	}
+}
+
+void StoryLayer::Skeleton(bool update/*=false*/)
+{
+	SkeletonAnimation*  Animation = getSkeleton(update);
+	if (!Animation)
+	{
+		CCLOG("[ *ERROR ] StoryLayer::Skeleton");
+		return;
+	}
+	if (!update)
+		updateSkeleton(Animation);
+	setSkeletionAction(Animation);
+}
+
 void StoryLayer::clearRole()
 {
 	for (int i=leftImg_tag;i<=rightName_tag;i++)
@@ -378,12 +427,11 @@ void StoryLayer::clearRole()
 		}
 	}
 }
-
 //不断创建新的对象,而不是使用同一个对象执行淡入淡出操作,就不会出现冲突的情况了
 void StoryLayer::step()
 {
 	storymusic();						//音乐音效
-	background();						//背景图片
+	backGround();						//背景图片
 	content();							//文字内容
 	storyrole();
 	if (m_StoryStep->getShark())
@@ -395,6 +443,7 @@ void StoryLayer::ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent)
 	CWidgetWindow::ccTouchEnded(pTouch,pEvent);
 	if (m_isStory)NextStep(); 
 }
+
 void StoryLayer::PostEnd(CCObject* ob)
 { 
 	clearNode();
@@ -409,16 +458,14 @@ void StoryLayer::PostEnd(CCObject* ob)
 }
 
 void StoryLayer::updateForTouch( float dt ){	m_bOpenTouch = true; }
+
 void StoryLayer::NextStep() 
 { 
 	//触摸加锁，0.35s一次
 	if(!m_bOpenTouch)
-	{
 		return;
-	}else{
-		m_bOpenTouch = false;
-		scheduleOnce(schedule_selector(StoryLayer::updateForTouch), 0.35f);
-	}
+	m_bOpenTouch = false;
+	scheduleOnce(schedule_selector(StoryLayer::updateForTouch), 0.35f);
 
 	m_index += 1;
 	if(m_index >= m_VecStep.size())
@@ -435,7 +482,6 @@ void StoryLayer::CreateStory(CCObject* ob)
 {
 	CreateStoryWithStoryData(ob, nullptr);
 }
-
 
 void StoryLayer::CreateStoryWithStoryData( CCObject* ob, StoryData* pStoryData )
 {
@@ -463,4 +509,3 @@ void StoryLayer::hideJumpBtn()
 	rightJumpBtn->setVisible(false);
 	rightJumpBtnText->setVisible(false);
 }
-

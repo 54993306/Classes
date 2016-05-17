@@ -67,6 +67,7 @@ public:
 	void heroWinAction();
 	void createBatchMonster(int batchNumber);
 	bool moveGuide(int grid,bool nextStep);
+	void monsterSoleSprite(ActObject* aliveOb);
 protected:
 	WarAlive*		m_TouchAlive;		//被触摸的武将id
 	ActObject*		m_moveTarget;		//拖拽移动对象

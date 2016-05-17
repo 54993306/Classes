@@ -1,26 +1,25 @@
 ﻿#ifndef _STORY_LAYER_H_
 #define _STORY_LAYER_H_
+/************************************************************* 
+ *
+ *
+ *		Data : 2016.5.17
+ *	
+ *		Name : 
+ *
+ *		Author : Lin_Xiancheng
+ *
+ *		Description : 剧情层
+ *
+ *
+ *************************************************************/
 #include "AppUI.h"
+#include <spine/spine-cocos2dx.h>
 #include "scene/layer/LayerManager.h"
-enum Story_Tag
-{
-	talkBg_tag				=1,
-	rightJumpBtn_tag,
-	rightJumpLabel_tag,
-	pangbai_tag,
-	talkConten_tag,
-	talkUp_Bg,
-	talkDown_Bg,
-	leftImg_tag,
-	rightImg_tag,		
-	leftNameBg_tag,
-	rightNameBg_tag,
-	leftName_tag,
-	rightName_tag,
-	storyPanel_tag			= 100,
-};
+
 class StoryStep;
 class StoryData;
+using namespace spine;
 class StoryLayer : public BaseLayer
 {
 public:
@@ -43,15 +42,31 @@ protected:
 	void PostEnd(CCObject* ob);	
 protected:
 	CCPoint& getPointIntag(int tag);
-	void background();
+	void mapAddZero();
 	void storymusic();
-	void content();
 	void storyrole();
-	void newRole();
-	void Skeleton(bool update = false);
 	void setAnimationPosition();
 	void clearNode(bool initMap = false);
 	void clearRole();
+
+	void content();
+	void aside();
+	void clearContent();
+	void updateContent();
+	void blackBackImage();
+	void displayTackImage();
+
+	void backGround();
+	void clearBackGround();
+	void updateBackGround();
+
+	void newRole();
+	void nameBackground();
+
+	void Skeleton(bool update = false);
+	SkeletonAnimation* getSkeleton(bool update);
+	void updateSkeleton(SkeletonAnimation*  Animation);
+	void setSkeletionAction(SkeletonAnimation*  Animation);
 protected:	
 	string m_Bgm;
 	CLayout* m_ui;
@@ -62,5 +77,23 @@ protected:
 	int m_lastNum;												//上一个对话人物名字
 	vector<StoryStep*> m_VecStep;
 	map<int,CCPoint> m_MapPoint;
+};
+
+enum Story_Tag
+{
+	talkBg_tag				=1,
+	rightJumpBtn_tag,
+	rightJumpLabel_tag,
+	pangbai_tag,
+	talkConten_tag,
+	talkUp_Bg,
+	talkDown_Bg,
+	leftImg_tag,
+	rightImg_tag,		
+	leftNameBg_tag,
+	rightNameBg_tag,
+	leftName_tag,
+	rightName_tag,
+	storyPanel_tag			= 100,
 };
 #endif // !_STORY_LAYER_H_

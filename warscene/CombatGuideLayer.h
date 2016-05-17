@@ -33,17 +33,28 @@ public:
 	virtual bool init();
 	virtual bool ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent);			//触摸开始调用
 	CCPoint getPointByMapGrid(int grid);
-	bool getUIRect(CCRect& rect , int uiCode);
+	
 	void ResponseRect(CombatGuideStep* step);								//响应区域处理(确定区域,是否在区域添加精灵)
 	void SingleGrid(CombatGuideStep* step);
 	void UIGuide(CombatGuideStep* step);
-	void ImageTextGuide(CombatGuideStep* step);
 	void CallAlive(CombatGuideStep* step);
 	CCSprite* PointSprite(CCPoint&p,int direction,int spritetype);		
 	void initScene(WarScene*scene);
 	void ClearGuideLayer();
 	void ImageArray(CombatGuideStep* step);
+	void spineSkeleton(ImageData& data);
 	void initguideImage(ImageData& data);
+
+	bool getUIRect(CCRect& rect , int uiCode);
+	CCNode* getUINode(int uiCode);
+
+	void ImageTextGuide(CombatGuideStep* step);
+	void backBottom(CombatGuideStep* step);
+	void roleName(CombatGuideStep* step);
+	void describe(CombatGuideStep* step);
+	void captainMark(CombatGuideStep* step);
+	void resetAlive(CombatGuideStep* step);
+	void creaAliveByVector(vector<CCObject*>VecAlive,CombatGuideStep* step);
 private:
 	CCNode* m_root;
 	WarScene* m_Scene;

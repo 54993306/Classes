@@ -30,27 +30,26 @@ CombatGuideLayer::~CombatGuideLayer()
 
 bool CombatGuideLayer::init()
 {
-	if (BaseLayer::init())
-	{
-		this->setTouchPriority(guideLayerPriority);
-		this->setTouchEnabled(true);
-		this->setIsShowBlack(false);
-		m_root = CCNode::create();
-		m_root->setContentSize(CCSizeMake(1138, 640));
-		m_root->setAnchorPoint(ccp(0.5f, 0.5f));
-		m_root->setPosition(VCENTER);
-		m_root->retain();
-		addChild(m_root);
-		m_mapData = DataCenter::sharedData()->getMap()->getCurrWarMap();
+	if (!BaseLayer::init())
+		return false;
+	this->setTouchPriority(guideLayerPriority);
+	this->setTouchEnabled(true);
+	this->setIsShowBlack(false);
+	m_root = CCNode::create();
+	m_root->setContentSize(CCSizeMake(1138, 640));
+	m_root->setAnchorPoint(ccp(0.5f, 0.5f));
+	m_root->setPosition(VCENTER);
+	m_root->retain();
+	addChild(m_root);
+	m_mapData = DataCenter::sharedData()->getMap()->getCurrWarMap();
 
-		m_LayerColor = CCLayerColor::create(ccc4(0,0,0,250));
-		CCSize size = CCDirector::sharedDirector()->getWinSize();
-		m_LayerColor->setContentSize(size);
-		m_LayerColor->setVisible(false);
-		this->addChild(m_LayerColor,-1);
-		return true;
-	}
-	return false;
+	m_LayerColor = CCLayerColor::create(ccc4(0,0,0,250));
+	CCSize size = CCDirector::sharedDirector()->getWinSize();
+	m_LayerColor->setContentSize(size);
+	m_LayerColor->setVisible(false);
+	this->addChild(m_LayerColor,-1);
+
+	return true;
 }
 
 void CombatGuideLayer::initScene( WarScene*scene )
@@ -88,45 +87,36 @@ CCSprite* CombatGuideLayer::PointSprite(CCPoint&p,int direction,int spritetype)
 		{
 			point_sp->setRotation(90);
 			point_sp->setPosition(ccpAdd(p,ccp(0,40)));
-		}
-		break;
+		}break;
 	case D_Left:
 		{
 			point_sp->setRotation(180);
 			point_sp->setPosition(ccpAdd(p,ccp(40,0)));
-		}
-		break;
+		}break;
 	case D_Right:
 		{
 			point_sp->setPosition(ccpAdd(p,ccp(-40,0)));
-		}
-		break;
+		}break;
 	case D_Left_Down:
 		{
 			point_sp->setRotation(45);
 			point_sp->setPosition(ccpAdd(p,ccp(-40,40)));
-		}
-		break;
+		}break;
 	case D_Right_Down:
 		{
 			point_sp->setRotation(135);
 			point_sp->setPosition(ccpAdd(p,ccp(40,40)));	
-		}
-		break;
+		}break;
 	case D_Left_Up:
 		{
 			point_sp->setRotation(-45);
 			point_sp->setPosition(ccpAdd(p,ccp(-40,-40)));
-		}
-		break;
+		}break;
 	case D_Right_Up:
 		{
 			point_sp->setRotation(-135);
 			point_sp->setPosition(ccpAdd(p,ccp(40,-40)));
-		}
-		break;
-	default:
-		break;
+		}break;
 	}
 	point_sp->setPosition(p); 
 	m_root->addChild(point_sp,PointSp_Z);
@@ -200,9 +190,33 @@ void CombatGuideLayer::ResponseRect(CombatGuideStep* step)
 		{
 			UIGuide(step);
 		}break;
-	default:
-		break;
 	}
+}
+
+void CombatGuideLayer::spineSkeleton( ImageData& imagedata )
+{
+	if (imagedata.SendMsg)
+		NOTIFICATION->postNotification(B_CostArea,CCInteger::create(imagedata.SendMsg));
+	char bg_path[60] = {0};
+	sprintf(bg_path,"888%d",imagedata.spineID);
+	spSkeletonData* data = nullptr;
+	SpData* pData = DataCenter::sharedData()->getWar()->getSpineData(bg_path);
+	if (pData)
+	{
+		data = pData->first;
+	}else{
+		CCLOG("[ *ERROR ] CombatGuideLayer::ImageArray roleId=%s",bg_path);
+		char path[60] = {0};
+		sprintf(path,"storyImage/Spine/888%d",imagedata.spineID);
+		data = LoadSpineData::create()->loadSpineImmediately(bg_path,path);
+	}
+	SkeletonAnimation*Animation = SkeletonAnimation::createWithData(data);
+	Animation->setPosition(imagedata.pos);
+	Animation->setAnimation(0,"stand",true);
+	if (imagedata.bFlipX)
+		Animation->setScaleX(-1);
+	Animation->setRotation(imagedata.iRotation);
+	m_root->addChild(Animation, imagedata.iZorder);
 }
 
 void CombatGuideLayer::ImageArray(CombatGuideStep* step)
@@ -214,28 +228,7 @@ void CombatGuideLayer::ImageArray(CombatGuideStep* step)
 		ImageData& imagedata = step->m_imageData[i];
 		if (imagedata.isSpine)
 		{
-			if (imagedata.SendMsg)
-				NOTIFICATION->postNotification(B_CostArea,CCInteger::create(imagedata.SendMsg));
-			char bg_path[60] = {0};
-			sprintf(bg_path,"888%d",imagedata.spineID);
-			spSkeletonData* data = nullptr;
-			SpData* pData = DataCenter::sharedData()->getWar()->getSpineData(bg_path);
-			if (pData)
-			{
-				data = pData->first;
-			}else{
-				CCLOG("[ *ERROR ] CombatGuideLayer::ImageArray roleId=%s",bg_path);
-				char path[60] = {0};
-				sprintf(path,"storyImage/Spine/888%d",imagedata.spineID);
-				data = LoadSpineData::create()->loadSpineImmediately(bg_path,path);
-			}
-			SkeletonAnimation*Animation = SkeletonAnimation::createWithData(data);
-			Animation->setPosition(imagedata.pos);
-			Animation->setAnimation(0,"stand",true);
-			if (imagedata.bFlipX)
-				Animation->setScaleX(-1);
-			Animation->setRotation(imagedata.iRotation);
-			m_root->addChild(Animation, imagedata.iZorder);
+			spineSkeleton(step->m_imageData[i]);
 		}else{
 			initguideImage(step->m_imageData[i]);
 		}
@@ -259,8 +252,7 @@ void CombatGuideLayer::initguideImage( ImageData& data )
 			CCMoveBy::create(0.4f, ccp(90, 0))
 			,CCMoveBy::create(0.4f, ccp(-90, 0)),
 			NULL)));
-	}
-	else if(data.iDir == 2)
+	}else if(data.iDir == 2)
 	{
 		pSprite->runAction(CCRepeatForever::create(CCSequence::create(
 			CCMoveBy::create(0.4f, ccp(0, 90))
@@ -269,98 +261,120 @@ void CombatGuideLayer::initguideImage( ImageData& data )
 	}
 }
 
+void CombatGuideLayer::backBottom( CombatGuideStep* step )
+{
+	if(!step->getBlackBottom())
+		return;
+	CCSprite* bg = CCSprite::create("public/duihuakuang (2).png");
+	CCSize size = CCDirector::sharedDirector()->getWinSize();
+	bg->setPosition(ccp(size.width/2,bg->getContentSize().height/2));
+	//CCSprite* bg2 = CCSprite::create("public/duihuakuang (2).png");
+	//bg2->setFlipY(true);
+	//bg2->setPosition(ccp(size.width/2,size.height-bg->getContentSize().height/2));
+	//m_root->addChild(bg2);
+	m_root->addChild(bg, 2);
+}
+
+void CombatGuideLayer::roleName( CombatGuideStep* step )
+{
+	if (!strcmp("",step->getName().c_str()))		//剧情角色名称
+		return;
+	CCSprite* mask = CCSprite::create("warScene/mask2.png");
+	mask->setAnchorPoint(ccp(0,1));
+	mask->setPosition(step->m_NamePoint-ccp(mask->getContentSize().width/5,-mask->getContentSize().height/4));
+	m_root->addChild(mask, 3);
+	CCLabelTTF* name = CCLabelTTF::create(step->getName().c_str(),"Arial",30);
+	name->setHorizontalAlignment(kCCTextAlignmentLeft);
+	name->setAnchorPoint(ccp(0,1));
+	name->setPosition(step->m_NamePoint);
+	m_root->addChild(name, 4);
+}
+
+void CombatGuideLayer::describe( CombatGuideStep* step )
+{
+	if (!strcmp("",step->getDescribe().c_str()))	//剧情描述内容
+		return;
+	CCLabelTTF* describe = CCLabelTTF::create(step->getDescribe().c_str(),"Arial",step->getsize());
+	describe->setHorizontalAlignment((CCTextAlignment)(step->getDescribeAligment()));
+	describe->setAnchorPoint(step->m_DescribeAnchor);
+	describe->setDimensions(step->m_DescribeDimensions);
+	describe->setPosition(step->m_Despoint);
+	describe->setColor(ccc3(step->getDescribeFontColor(), step->getDescribeFontColor(), step->getDescribeFontColor()));
+	m_root->addChild(describe, 5);
+}
+
+void CombatGuideLayer::captainMark( CombatGuideStep* step )
+{
+	if (!step->getCaptain())						//是否显示主帅标记(出一个标记的横向箭头)
+		return;
+	CCSprite* arrows = CCSprite::create("public/guide/arrows.png"); 
+	arrows->setAnchorPoint(ccp(0.8f,0.5f));
+	WarAlive* alive = DataCenter::sharedData()->getWar()->getAliveByGrid(C_CAPTAINSTAND);
+	CCPoint p = alive->getActObject()->getPosition();									//得到点阵图坐标
+	CCPoint point(p.x-GRID_WIDTH,p.y+GRID_HEIGHT);										//得到偏移坐标
+	CCPoint point_offset = m_root->convertToNodeSpace(m_AliveLayer->convertToWorldSpace(point));					//在warAliveLayer上的点都会默认减去地图的一半,因此直接转化世界坐标就可以，因为m_root的关系，这里还是转为相对坐标
+	arrows->setPosition(point_offset);
+	CCMoveTo* mt = CCMoveTo::create(0.5f,ccp(point_offset.x+GRID_WIDTH/2,point_offset.y));
+	CCMoveTo* mt2 = CCMoveTo::create(0.35f,point_offset);
+	arrows->runAction(CCRepeatForever::create(CCSequence::create(mt,mt2,NULL)));
+	m_root->addChild(arrows, 6);
+}
+
+void CombatGuideLayer::creaAliveByVector( vector<WarAlive*>VecAlive,CombatGuideStep* step )
+{
+	for(WarAlive*alive:VecAlive)
+	{
+		for (auto compel:step->m_VecCompel)
+		{
+			if (alive->getModel() != compel.model)
+				continue;
+			DataCenter::sharedData()->getWar()->initAlive(alive);
+			m_AliveLayer->createAlive(alive);
+			m_AliveLayer->AddAliveToGrid(alive,compel.grid);
+			break;
+		}
+	}
+}
+
+void CombatGuideLayer::resetAlive( CombatGuideStep* step )
+{
+	if (!step->getReset())						//是否重置武将处理
+		return;
+	m_AliveLayer->removeMessage();														//释放掉触摸消息
+	CCMoveTo* mt = CCMoveTo::create(0.2f,ccp(MAP_MINX(DataCenter::sharedData()->getMap()->getCurrWarMap()),0));	//飞到最右侧
+	m_Scene->getMoveLayer()->runAction(mt);
+	CCArray* arr = DataCenter::sharedData()->getWar()->getHeros();
+	CCObject* obj = nullptr;
+	vector<WarAlive*>VecAlive;
+	CCARRAY_FOREACH(arr,obj)
+	{
+		WarAlive* alive = (WarAlive*)obj;
+		if (alive->getCaptain())														//重置我方数据
+			continue;
+		VecAlive.push_back(alive);
+		if (alive->getHp()<=0||!alive->getBattle()||!alive->getActObject())
+			continue;
+		CCPoint p = m_mapData->getPoint(INVALID_GRID);
+		alive->getMoveObj()->setPosition(p);
+		alive->getActObject()->setPosition(p);											//在视野外进行死亡处理
+		if (!alive->getEnemy()&&alive->getCriAtk())
+			NOTIFICATION->postNotification(B_CritEnd,alive);
+		alive->getActObject()->AliveDie();
+		alive->getActObject()->setReset(true);
+		alive->setActObject(nullptr);
+	}
+	creaAliveByVector(VecAlive,step);
+}
+
 void CombatGuideLayer::ImageTextGuide(CombatGuideStep* step)
 {
-	if(step->getBlackBottom())
-	{
-		CCSprite* bg = CCSprite::create("public/duihuakuang (2).png");
-		CCSize size = CCDirector::sharedDirector()->getWinSize();
-		bg->setPosition(ccp(size.width/2,bg->getContentSize().height/2));
-		//CCSprite* bg2 = CCSprite::create("public/duihuakuang (2).png");
-		//bg2->setFlipY(true);
-		//bg2->setPosition(ccp(size.width/2,size.height-bg->getContentSize().height/2));
-		//m_root->addChild(bg2);
-		m_root->addChild(bg, 2);
-	}
-	if (strcmp("",step->getName().c_str()))		//剧情角色名称
-	{
-		CCSprite* mask = CCSprite::create("warScene/mask2.png");
-		mask->setAnchorPoint(ccp(0,1));
-		mask->setPosition(step->m_NamePoint-ccp(mask->getContentSize().width/5,-mask->getContentSize().height/4));
-		m_root->addChild(mask, 3);
-		CCLabelTTF* name = CCLabelTTF::create(step->getName().c_str(),"Arial",30);
-		name->setHorizontalAlignment(kCCTextAlignmentLeft);
-		name->setAnchorPoint(ccp(0,1));
-		name->setPosition(step->m_NamePoint);
-		m_root->addChild(name, 4);
-	}
+	backBottom(step);
+	roleName(step);
 	ImageArray(step);
-	if (strcmp("",step->getDescribe().c_str()))	//剧情描述内容
-	{
-		CCLabelTTF* describe = CCLabelTTF::create(step->getDescribe().c_str(),"Arial",step->getsize());
-		describe->setHorizontalAlignment((CCTextAlignment)(step->getDescribeAligment()));
-		describe->setAnchorPoint(step->m_DescribeAnchor);
-		describe->setDimensions(step->m_DescribeDimensions);
-		describe->setPosition(step->m_Despoint);
-		describe->setColor(ccc3(step->getDescribeFontColor(), step->getDescribeFontColor(), step->getDescribeFontColor()));
-		m_root->addChild(describe, 5);
-	}
-	if (step->getCaptain())						//是否显示主帅标记(出一个标记的横向箭头)
-	{
-		CCSprite* arrows = CCSprite::create("public/guide/arrows.png"); 
-		arrows->setAnchorPoint(ccp(0.8f,0.5f));
-		WarAlive* alive = DataCenter::sharedData()->getWar()->getAliveByGrid(C_CAPTAINSTAND);
-		CCPoint p = alive->getActObject()->getPosition();									//得到点阵图坐标
-		CCPoint point(p.x-GRID_WIDTH,p.y+GRID_HEIGHT);										//得到偏移坐标
-		CCPoint point_offset = m_root->convertToNodeSpace(m_AliveLayer->convertToWorldSpace(point));					//在warAliveLayer上的点都会默认减去地图的一半,因此直接转化世界坐标就可以，因为m_root的关系，这里还是转为相对坐标
-		arrows->setPosition(point_offset);
-		CCMoveTo* mt = CCMoveTo::create(0.5f,ccp(point_offset.x+GRID_WIDTH/2,point_offset.y));
-		CCMoveTo* mt2 = CCMoveTo::create(0.35f,point_offset);
-		arrows->runAction(CCRepeatForever::create(CCSequence::create(mt,mt2,NULL)));
-		m_root->addChild(arrows, 6);
-	}
+	describe(step);
+	captainMark(step);
 	m_LayerColor->setVisible(step->getBlackLayer());
-	if (step->getReset())						//是否重置武将处理
-	{
-		m_AliveLayer->removeMessage();														//释放掉触摸消息
-		CCMoveTo* mt = CCMoveTo::create(0.2f,ccp(MAP_MINX(DataCenter::sharedData()->getMap()->getCurrWarMap()),0));	//飞到最右侧
-		m_Scene->getMoveLayer()->runAction(mt);
-		CCArray* arr = DataCenter::sharedData()->getWar()->getHeros();
-		CCObject* obj = nullptr;
-		vector<WarAlive*>VecAlive;
-		CCARRAY_FOREACH(arr,obj)
-		{
-			WarAlive* alive = (WarAlive*)obj;
-			if (alive->getCaptain())														//重置我方数据
-				continue;
-			VecAlive.push_back(alive);
-			if (alive->getHp()<=0||!alive->getBattle()||!alive->getActObject())
-				continue;
-			CCPoint p = m_mapData->getPoint(INVALID_GRID);
-			alive->getMoveObj()->setPosition(p);
-			alive->getActObject()->setPosition(p);											//在视野外进行死亡处理
-			if (!alive->getEnemy()&&alive->getCriAtk())
-				NOTIFICATION->postNotification(B_CritEnd,alive);
-			alive->getActObject()->AliveDie();
-			alive->getActObject()->setReset(true);
-			alive->setActObject(nullptr);
-		}
-		for(WarAlive*alive:VecAlive)
-		{
-			bool jump = false;
-			for (auto compel:step->m_VecCompel)
-			{
-				if (alive->getModel() == compel.model)
-				{
-					DataCenter::sharedData()->getWar()->initAlive(alive);
-					m_AliveLayer->createAlive(alive);
-					m_AliveLayer->AddAliveToGrid(alive,compel.grid);
-					jump = true;
-					break;
-				}
-			}
-		}
-	}
+	resetAlive(step);
 	if (step->getAddCost())
 	{
 		NOTIFICATION->postNotification(B_ChangeCostNumber,CCFloat::create(-10000));//置空处理
@@ -399,14 +413,9 @@ void CombatGuideLayer::SingleGrid(CombatGuideStep* step)
 	Arraw_sp->runAction(CCRepeatForever::create(CCSequence::create(a_spa1,a_spa2,NULL)));
 }
 
-bool CombatGuideLayer::getUIRect( CCRect& Rect , int uiCode)
+CCNode* CombatGuideLayer::getUINode( int uiCode )
 {
 	WarControl* controlLayer = m_Scene->getWarUI();
-	if (!controlLayer)
-	{
-		CCLOG("[ *ERROR ] CombatGuideLayer::UIGuide controlLayer Is NULL");
-		return false;
-	}
 	CCNode* UINode = nullptr;
 	switch (uiCode)
 	{
@@ -420,9 +429,20 @@ bool CombatGuideLayer::getUIRect( CCRect& Rect , int uiCode)
 				   }break;
 	case skill5Btn:{ UINode = controlLayer->getLaout()->getChildByTag(CL_BtnLayout5)->getChildByTag(CL_HeroNode)->getChildByTag(CL_Btn); 
 				   }break;
-	default:
-		break;
+	default:break;
 	}
+	return UINode;
+}
+
+bool CombatGuideLayer::getUIRect( CCRect& Rect , int uiCode)
+{
+	WarControl* controlLayer = m_Scene->getWarUI();
+	if (!controlLayer)
+	{
+		CCLOG("[ *ERROR ] CombatGuideLayer::UIGuide controlLayer Is NULL");
+		return false;
+	}
+	CCNode* UINode = getUINode(uiCode);
 	if (UINode)
 	{
 		CCRect UIRect = UINode->boundingBox();		//实际的触摸区域要比UI控件的区域小,下一步响应的方式也应该在功能处

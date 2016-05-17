@@ -130,6 +130,21 @@ void WarAliveLayer::AliveObEffect(ActObject* aliveOb,int createType/*=DefaultCre
 	}
 }
 
+void WarAliveLayer::monsterSoleSprite( ActObject* aliveOb )
+{
+	WarAlive* alive = aliveOb->getAlive();
+	if (!alive->getEnemy())
+		return;
+	CCSprite* ef = nullptr;
+	for (int i=0;i<alive->role->row;i++)
+		for (int j =0;j<alive->role->col;j++)
+		{
+			ef = CCSprite::create("warScene/fanglandingwei.png");
+			ef->setPosition(ccp(-aliveOb->getoffs().x+(j*(GRID_WIDTH+C_GRIDOFFSET_X)),-aliveOb->getoffs().y-(i*(GRID_HEIGHT+C_GRIDOFFSET_Y))));
+			//aliveOb->addChild(ef,-1);
+		}
+}
+
 void WarAliveLayer::AddActToGrid(ActObject* aliveOb,int grid)
 {
 	WarAlive* alive = aliveOb->getAlive();
@@ -168,17 +183,7 @@ void WarAliveLayer::AddActToGrid(ActObject* aliveOb,int grid)
 		aliveOb->setMoveObj(nullptr);
 		aliveOb->TurnStateTo(Start_Index);
 	}
-	if (alive->getEnemy())
-	{
-		CCSprite* ef = nullptr;
-		for (int i=0;i<alive->role->row;i++)
-			for (int j =0;j<alive->role->col;j++)
-			{
-				ef = CCSprite::create("warScene/fanglandingwei.png");
-				ef->setPosition(ccp(-aliveOb->getoffs().x+(j*(GRID_WIDTH+C_GRIDOFFSET_X)),-aliveOb->getoffs().y-(i*(GRID_HEIGHT+C_GRIDOFFSET_Y))));
-				//aliveOb->addChild(ef,-1);
-			}
-	}
+	monsterSoleSprite(aliveOb);
 }
 void WarAliveLayer::addEvent(){ this->setTouchEnabled(true); }
 void WarAliveLayer::removeEvent(){ this->setTouchEnabled(false); }
