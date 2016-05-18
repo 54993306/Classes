@@ -858,7 +858,13 @@ void SkillRange::getAtkGrid(AreaCountInfo& CountInfo,vector<int>&VecAtkGrid)
 			{
 				vector<WarAlive*>* vec = m_Manage->getVecHeros();
 				for(auto i:*vec)
-					VecAtkGrid.push_back(i->getGridIndex());
+				{
+					if (vec->size() > 1 && i->getCaptain())
+					{
+						continue;
+						VecAtkGrid.push_back(i->getGridIndex());
+					}
+				}
 			}else{
 				vector<WarAlive*>* vec = m_Manage->getVecMonsters();
 				for(auto i:*vec)

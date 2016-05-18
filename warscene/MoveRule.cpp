@@ -25,7 +25,7 @@ bool MoveRule::MonstMoveExcute(WarAlive* monster)
 {
 	if (!monster->getMove()||monster->getAliveStat() == INVINCIBLE)
 		return false;
-	int grid = MonstMoveAreaDispose(monster);
+	int grid = monsterMove(monster);
 	if( grid!= INVALID_GRID && grid < C_CAPTAINGRID)	
 	{		
 		if (monster->getMoveGrid() != grid)
@@ -35,7 +35,7 @@ bool MoveRule::MonstMoveExcute(WarAlive* monster)
 	return false;
 }
 
-int MoveRule::MonstMoveAreaDispose(WarAlive* alive)
+int MoveRule::monsterMove(WarAlive* alive)
 {
 #if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
 	if (m_testState)
@@ -47,26 +47,11 @@ int MoveRule::MonstMoveAreaDispose(WarAlive* alive)
 	int index = alive->getGridIndex();
 	if (index/C_GRID_ROW >= C_GRID_COL-1)
 		return INVALID_GRID;
-	int grid = One_FourTypeDispose(alive,0);
+	int grid = getMonsterMoveGrid(alive);
 	return grid;
-	if(grid != INVALID_GRID)
-		return grid;
-	grid = Two_FiveTypeDispose(alive,0);
-	if(grid != INVALID_GRID)
-		return grid;
-	grid = ThreeTypeDispose(alive,0);
-	if(grid != INVALID_GRID)
-		return grid;
-	grid = One_FourTypeDispose(alive,0,false);
-	if(grid!= INVALID_GRID)
-		return grid;
-	grid = Two_FiveTypeDispose(alive,0,false);
-	if(grid!= INVALID_GRID)
-		return grid;	 
-	return INVALID_GRID;
 }
 
-int MoveRule::One_FourTypeDispose(WarAlive* alive,int grid,bool typeOne)
+int MoveRule::getMonsterMoveGrid(WarAlive* alive)
 {
 	if (alive->getEnemy())
 	{
@@ -87,155 +72,6 @@ int MoveRule::One_FourTypeDispose(WarAlive* alive,int grid,bool typeOne)
 			Index = Cgrid;
 		}
 		return Index;
-	}
-	return INVALID_GRID;
-	/********************************************************************************/
-	bool Enemy = alive->getEnemy();
-	int range = alive->moves.at(TypeFour);
-	if(typeOne)range = alive->moves.at(TypeOne);
-	if (!range)return INVALID_GRID;
-	int targetRow = grid % C_GRID_ROW;
-	int targetCol = grid / C_GRID_ROW;
-	if (Enemy)
-	{
-		int index = alive->getGridIndex();
-		int row = index % C_GRID_ROW;
-		int col = index / C_GRID_ROW;
-		int Index = INVALID_GRID;
-		for (int i = 1;i <= range;i++)			//一个个区域逐个去进行判断，判断每一个区域的移动范围
-		{
-			if (typeOne)
-			{
-				col += 1;
-			}else{
-				col -= 1;
-			}
-			if(col >= C_GRID_COL||col < 0) break;
-			int TarIndex = col * C_GRID_ROW + row;
-			int Cgrid = MoveJudge(alive,TarIndex);
-			if (Cgrid == INVALID_GRID)break;
-			Index = Cgrid;
-		}
-		return Index;
-	}else{
-		int index = 0/*DataCenter::sharedData()->getWar()->getPoint(alive->getAliveID())*/;
-		if (!index)return INVALID_GRID;
-		int row = index % C_GRID_ROW;				//得到当前英雄行数，从上往下第一行为0
-		int col = index / C_GRID_ROW;				//得到当前英雄列数，从左往右第一列为0
-		if (typeOne)
-		{
-			if (targetRow == row&&col <= targetCol&&targetCol <=col+range)
-				return grid;
-		}else{
-			if (targetRow == row&&col >= targetCol&&targetCol >=col-range)
-				return grid;
-		}
-	}
-	return INVALID_GRID;
-}
-
-int MoveRule::Two_FiveTypeDispose(WarAlive* alive,int grid,bool typeTwo)
-{
-	int range = alive->moves.at(TypeFive);
-	if(typeTwo)range = alive->moves.at(TypeTwo);
-	bool Enemy = alive->getEnemy();
-	if (!range)return INVALID_GRID;
-	int targetRow = grid % C_GRID_ROW;
-	int targetCol = grid / C_GRID_ROW;
-	if (Enemy)
-	{
-		int index = alive->getGridIndex();				    //多格子标记的那个
-		int row = index % C_GRID_ROW;
-		int col = index / C_GRID_ROW;
-		int Index = INVALID_GRID;
-		//从小到大逐个判断，遇到有人则退出循环
-		for (int i=1; i<=range ;i++)						//上对角 列大行小				
-		{
-			int changeCol = col-i;
-			if (typeTwo)changeCol = col+i;
-			if(changeCol >= C_GRID_COL||changeCol < 0||row-i < 0)break;
-			int TarIndex = changeCol * C_GRID_ROW + row-i;
-			int Cgrid = MoveJudge(alive,TarIndex);
-			if (Cgrid == INVALID_GRID)break;
-			Index = Cgrid;
-		}
-		if(Index != INVALID_GRID )return Index;				//优先移动上对角
-
-		for(int j=1; j<=range ;j++)							//下对角 列大行大
-		{
-			int changeCol = col-j;
-			if (typeTwo)changeCol = col+j;
-			if(changeCol >= C_GRID_COL||changeCol < 0||row+j >= C_GRID_ROW)break;
-			int TarIndex = changeCol * C_GRID_ROW + row+j;
-			int Cgrid = MoveJudge(alive,TarIndex);
-			if (Cgrid == INVALID_GRID)break;
-			Index = Cgrid;
-		}
-		if(Index != INVALID_GRID )return Index;
-	}else{
-		int index = 0/*DataCenter::sharedData()->getWar()->getPoint(alive->getAliveID())*/;
-		if (!index)return INVALID_GRID;
-		int row = index % C_GRID_ROW;				//得到当前英雄行数，从上往下第一行为0
-		int col = index / C_GRID_ROW;				//得到当前英雄列数，从左往右第一列为0
-		for (int i=0;i<=range;i++)
-		{
-			if (typeTwo)
-			{
-				if (targetCol == col+i&&targetRow == row+i||targetCol == col+i&&targetRow == row-i)
-					return grid;
-			}else{
-				if (targetCol == col-i&&targetRow == row-i||targetCol == col-i&&targetRow == row+i)
-					return grid;
-			}
-		}
-	}
-	return INVALID_GRID;
-}
-
-int MoveRule::ThreeTypeDispose(WarAlive* alive,int grid)
-{
-	int range = alive->moves.at(TypeThree);
-	bool Enemy = alive->getEnemy();
-	if (!range)return INVALID_GRID;
-	int targetRow = grid % C_GRID_ROW;
-	int targetCol = grid / C_GRID_ROW;
-	if (Enemy)
-	{
-		int index = alive->getGridIndex();
-		int row = index % C_GRID_ROW;
-		int col = index / C_GRID_ROW;
-		int Index = INVALID_GRID;
-		int uprow = row;
-		for (int j=0; j<= range;j++)
-		{
-			uprow -= 1;
-			if(uprow < 0) break;
-			int TarIndex = col * C_GRID_ROW + uprow;
-			int Cgrid = MoveJudge(alive,TarIndex);
-			if (Cgrid == INVALID_GRID)break;
-			Index = Cgrid;
-		}
-		if(Index != INVALID_GRID )return Index;//优先上移
-		int downrow = row;
-		for (int i = 1;i <= range;i++)			//一个个区域逐个去进行判断，判断每一个区域的移动范围
-		{
-			downrow += 1;
-			if(downrow >= C_GRID_ROW) break;
-			int TarIndex = col * C_GRID_ROW + downrow;
-			int Cgrid = MoveJudge(alive,TarIndex);
-			if (Cgrid == INVALID_GRID)break;
-			Index = Cgrid;
-		}
-		if(Index != INVALID_GRID )return Index;	
-	}else{
-		if (grid == 52)
-			int q =0;
-		int index = 0/*DataCenter::sharedData()->getWar()->getPoint(alive->getAliveID())*/;				//多格子怪物处理
-		if (!index)return INVALID_GRID;
-		int row = index % C_GRID_ROW;				//得到当前英雄行数，从上往下第一行为0
-		int col = index / C_GRID_ROW;				//得到当前英雄列数，从左往右第一列为0
-		if (targetCol == col&&targetRow <= row+range&&targetRow >= row-range)
-			return grid;
 	}
 	return INVALID_GRID;
 }
@@ -388,52 +224,4 @@ int MoveRule::getCurrRandomGrid(int grid,bool hasAlive/*=false*/)
 		}	
 	} while (true);
 	return pGrid;
-}
-
-//返回-1是我方武将可移动，返回0表示不可移动，返回位置表示怪物的移动格子
-bool MoveRule::HeroMoveDispose(WarAlive* alive,int grid)
-{
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
-	if (grid == INVALID_GRID || !alive)	return false;
-	return true; 
-#endif
-	if (!alive->getBattle()&&!alive->getEnemy())
-	{
-		WarAlive* pAlive = DataCenter::sharedData()->getWar()->getAliveByGrid(grid);
-		if (pAlive&&!pAlive->getEnemy())
-			return false;
-		if (grid >= /*C_STANDGRID*/96 )
-			return true;
-		return false;
-	}
-	if (grid == INVALID_GRID || !alive)	return false;
-	WarAlive* target = DataCenter::sharedData()->getWar()->getAliveByGrid(grid);
-	if (alive->getEnemy())
-	{
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
-		//if(MonstMoveAreaDispose(alive) == grid)return true;
-		//return true;
-#endif
-		return false;
-	}else{
-		if(!alive->getMove())return false;
-		if(target && target->getEnemy()) return false;					//目标格子有敌人
-		if (alive->getCaptain())
-		{
-			if (grid >= C_CAPTAINGRID)
-				return true;
-			return false;
-		}
-		if (grid >= C_CAPTAINGRID)
-			return false;
-		else
-			return true;
-		//DataCenter::sharedData()->getWar()->addPoint(alive);			//记录武将当前回合站位
-		if (One_FourTypeDispose(alive,grid)			== INVALID_GRID	&&	//不在所有区域范围内则返回false
-			Two_FiveTypeDispose(alive,grid)			== INVALID_GRID	&&
-			ThreeTypeDispose(alive,grid)			== INVALID_GRID	&&
-			One_FourTypeDispose(alive,grid,false)	== INVALID_GRID	&&
-			Two_FiveTypeDispose(alive,grid,false)	== INVALID_GRID	)return false;
-		return true;
-	}
 }

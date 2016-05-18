@@ -634,7 +634,7 @@ void CombatLogic::doLostHp(CCObject* ob)
 				CCLOG("[ *ERROR ] CombatLoginc::AtkLogic CallAlive NULL");
 				return;
 			}		
-			m_AliveLayer->createAlive(pAlive,SceneTrap);
+			m_AliveLayer->initActobject(pAlive,SceneTrap);
 		}break;
 	case CapAtk:break;
 	default:break;

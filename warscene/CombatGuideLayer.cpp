@@ -329,8 +329,8 @@ void CombatGuideLayer::creaAliveByVector( vector<WarAlive*>VecAlive,CombatGuideS
 			if (alive->getModel() != compel.model)
 				continue;
 			DataCenter::sharedData()->getWar()->initAlive(alive);
-			m_AliveLayer->createAlive(alive);
-			m_AliveLayer->AddAliveToGrid(alive,compel.grid);
+			m_AliveLayer->initActobject(alive);
+			m_AliveLayer->MoveAliveToGrid(alive,compel.grid);
 			break;
 		}
 	}

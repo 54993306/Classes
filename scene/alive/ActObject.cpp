@@ -484,22 +484,6 @@ bool MoveObj::init()
 	return false;
 }
 
-void MoveObj::setActObject(ActObject* var)
-{
-	m_Actobject = var;
-	CCSprite* ef = nullptr;
-
-	for (int i=0;i<m_Alive->role->row;i++)
-		for (int j =0;j<m_Alive->role->col;j++)
-		{
-			ef = CCSprite::create("warScene/fanglandingwei.png");
-			ef->setPosition(ccp(-m_Actobject->getoffs().x+(j*(GRID_WIDTH+C_GRIDOFFSET_X)),-m_Actobject->getoffs().y-(i*(GRID_HEIGHT+C_GRIDOFFSET_Y))));
-			addChild(ef);
-		}
-}
-
-ActObject* MoveObj::getActObject(){return m_Actobject;}
-
 void MoveObj::setAlive(WarAlive* var)
 {
 	if (!m_Alive)
@@ -528,3 +512,15 @@ void MoveObj::setgrid(int var)
 	setPosition(p+m_Actobject->getoffs());	
 }
 int MoveObj::getgrid(){return m_grid;}
+
+void MoveObj::initMoveSprite()
+{
+	CCSprite* ef = nullptr;
+	for (int i=0;i<m_Alive->role->row;i++)
+		for (int j =0;j<m_Alive->role->col;j++)
+		{
+			ef = CCSprite::create("warScene/fanglandingwei.png");
+			ef->setPosition(ccp(-m_Actobject->getoffs().x+(j*(GRID_WIDTH+C_GRIDOFFSET_X)),-m_Actobject->getoffs().y-(i*(GRID_HEIGHT+C_GRIDOFFSET_Y))));
+			addChild(ef);
+		}
+}

@@ -410,21 +410,24 @@ void CombatGuideManage::NextStep()
 			return;
 		}
 		if (Curr_step->getNextID())
-		{
-			CombatGuideStep* next_step = getGuideStep(Curr_step->getNextID());
-			if (next_step)
-			{
-				m_CurrStepIndex = Curr_step->getNextID();
-				m_GuideLayer->ClearGuideLayer();
-				m_GuideLayer->setGuideStep(next_step);
-			}else{
-				ExitGuide();
-				CCLOG("[ *ERROR ]CombatGuideManage::NextGuide Next Guide Is NULL");
-			}
-		}
+			NextStepExcute(Curr_step);
 	}else{
 		ExitGuide(); 
 		CCLOG("[ *ERROR ]CombatGuideManage::NextGuide Curr Guide Is NULL");
+	}
+}
+
+void CombatGuideManage::NextStepExcute( CombatGuideStep* Curr_step )
+{
+	CombatGuideStep* next_step = getGuideStep(Curr_step->getNextID());
+	if (next_step)
+	{
+		m_CurrStepIndex = Curr_step->getNextID();
+		m_GuideLayer->ClearGuideLayer();
+		m_GuideLayer->setGuideStep(next_step);
+	}else{
+		ExitGuide();
+		CCLOG("[ *ERROR ]CombatGuideManage::NextGuide Next Guide Is NULL");
 	}
 }
 

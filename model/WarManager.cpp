@@ -217,10 +217,6 @@ void WarManager::initBatchData( int batch )
 			alive->setCloaking(true);
 		alive->setDelaytime(-m_battleInit.monsterList.at(i).delay);
 		alive->moves.push_back(m_battleInit.monsterList.at(i).move1);
-		alive->moves.push_back(m_battleInit.monsterList.at(i).move2);
-		alive->moves.push_back(m_battleInit.monsterList.at(i).move3);
-		alive->moves.push_back(m_battleInit.monsterList.at(i).move4);
-		alive->moves.push_back(m_battleInit.monsterList.at(i).move5);
 		initAlive(alive); 
 	}
 }
@@ -281,9 +277,9 @@ void WarManager::initAlive(WarAlive* alive)
 		//alive->setMaxHp(5);
 		//alive->setHp(5);		//第一次进来是满血状态
 	}else{		
-		alive->setAtk(500000);
-		alive->setMaxHp(500000);
-		alive->setHp(500000);		//第一次进来是满血状态
+		//alive->setAtk(500000);
+		//alive->setMaxHp(500000);
+		//alive->setHp(500000);		//第一次进来是满血状态
 	}
 #endif
 }
@@ -541,10 +537,6 @@ WarAlive* WarManager::getNewCallAlive(WarAlive* Father,int CallId)
 			}
 			child->setMstType(child->role->MstType);
 			child->moves.push_back(i->move1);
-			child->moves.push_back(i->move2);
-			child->moves.push_back(i->move3);
-			child->moves.push_back(i->move4);
-			child->moves.push_back(i->move5);
 		}else{
 			child->setAliveID(m_members.size()+C_CallHero);
 			child->setGridIndex(INVALID_GRID);

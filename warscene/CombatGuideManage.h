@@ -30,6 +30,7 @@ public:
 	int getCurrGuideIndex(){return m_CurrStepIndex;}		//得到当前引导id
 	void EnterGuide();
 	void NextStep();
+	void NextStepExcute(CombatGuideStep* Curr_step);
 	void ExitGuide();
 	bool LoadJsonFile(const char* path);
 	CC_SYNTHESIZE(CombatGuideLayer*,m_GuideLayer,GuideLayer);//保存一个GuideLayer层

@@ -24,15 +24,12 @@ public:
 	virtual bool init();
 	CREATE_FUNC(MoveRule);
 	void changeTestState(CCObject* ob);
-	bool HeroMoveDispose(WarAlive* alive,int grid );
-	int One_FourTypeDispose(WarAlive* alive,int grid,bool typeOne = true);//移动类型1And4处理
-	int Two_FiveTypeDispose(WarAlive* alive,int grid,bool typeTwo = true);//移动类型2And5处理
-	int ThreeTypeDispose(WarAlive* alive,int grid);
+	int getMonsterMoveGrid(WarAlive* alive);
+
 	int getMoveGrid(WarAlive* alive,int grid);
 	int MoveJudge(WarAlive* alive,int grid);				//用于判断是否可以移动，多格站位处理
-	bool TouchJudge(WarAlive* alive,int grid);
 	int FrontBack(WarAlive* alive,int range,bool enemy);
-	int MonstMoveAreaDispose(WarAlive* target);
+	int monsterMove(WarAlive* target);
 	bool MonstMoveExcute(WarAlive* monster);
 	int getCurrRandomGrid(int grid,bool hasAlive = false);
 private:

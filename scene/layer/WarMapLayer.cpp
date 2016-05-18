@@ -347,17 +347,10 @@ void WarMapLayer::SkillBtnDrawSkillArea(CCObject* ob)
 
 void WarMapLayer::MapShake(CCObject* ob)
 {
-	//return;
-	if (ob)
-	{
-		CCFloat* num = (CCFloat*)ob;
-		this->runAction(CCShake::create(0.4f*num->getValue(),13.0f));
-	}else{	
-		this->stopAllActions();		//有可能的情况是,没有执行到回调CCPlace就停止掉动作了	
-		this->setPosition(ccp(0,0));
-		CCPoint p = this->getPosition();
-		this->runAction(CCSequence::create(CCShake::create(0.4f,13.0f),CCPlace::create(p),NULL));
-	}
+	this->stopAllActions();		//有可能的情况是,没有执行到回调CCPlace就停止掉动作了	
+	this->setPosition(ccp(0,0));
+	CCPoint p = this->getPosition();
+	this->runAction(CCSequence::create(CCShake::create(0.4f,13.0f),CCPlace::create(p),NULL));
 }
 
 MapBackgroundManage* WarMapLayer::getBackgroundManage()
@@ -391,18 +384,16 @@ void WarMapLayer::DrawWarningEffect( CCArray* Grids )
 	{
 		CCInteger* pInt = (CCInteger*)pObj;
 		CCSprite* sp = (CCSprite*)m_DisPlayArea->getChildByTag(pInt->getValue() + map_Bg);
-		if(sp)
-		{
-			CCSprite* pNewSp = CCSprite::createWithSpriteFrame(CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(AtksImg));
-			pNewSp->setPosition(sp->getPosition());
-			sp->getParent()->addChild(pNewSp, sp->getZOrder()+1);
-			//pNewSp->setColor(ccc3(255, 0, 0));
-			pNewSp->runAction(CCSequence::create(
-				CCRepeat::create(CCSequence::createWithTwoActions(CCTintTo::create(0.15f, 255, 0, 0), CCTintTo::create(0.15f, 255, 255, 255)), 6),
-				CCRemoveSelf::create(),
-				nullptr
-				));
-		}
+		if(!sp)
+			continue;
+		CCSprite* pNewSp = CCSprite::createWithSpriteFrame(CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(AtksImg));
+		pNewSp->setPosition(sp->getPosition());
+		sp->getParent()->addChild(pNewSp, sp->getZOrder()+1);
+		pNewSp->runAction(CCSequence::create(
+			CCRepeat::create(CCSequence::createWithTwoActions(CCTintTo::create(0.15f, 255, 0, 0), CCTintTo::create(0.15f, 255, 255, 255)), 6),
+			CCRemoveSelf::create(),
+			nullptr
+			));
 	};
 }
 //显示脚底格子

@@ -49,14 +49,14 @@ public:
 	bool JudgeMove(WarAlive*alive,int grid);
 	bool WorldBossJudge(WarAlive* alive,int grid);			//需要重构的方法,应该抽象为关卡对武将移位的影响策略
 	bool BorderJudge(WarAlive* alive,vector<int>&Vec);
-	void createAlive(WarAlive* alive,int createType = 0);
+	void initActobject(WarAlive* alive,int createType = 0);
 	CCArray* getAlivesOb(int AliveType = AliveType_All);
 	void AddActToGrid(ActObject* alive,int grid);
-	void AddAliveToGrid(WarAlive* alive,int grid);
+	void MoveAliveToGrid(WarAlive* alive,int grid);
 	void AliveObEffect(ActObject* alive,int createType = DefaultCreat);
 	float AliceMoveExcute(WarAlive* alive,int Action = 2/*Walk_Index*/);
 	void LayerShake(CCObject* ob);
-	void AliveBattle(CCObject* ob);
+	void aliveEntranceBattle(CCObject* ob);
 	void TouchAlive(WarAlive* alive);
 	MoveObj* getMoveByGrid(int grid);
 	CC_SYNTHESIZE(CCLayerColor*,m_LayerColor,LayerColor);
@@ -68,9 +68,21 @@ public:
 	void createBatchMonster(int batchNumber);
 	bool moveGuide(int grid,bool nextStep);
 	void monsterSoleSprite(ActObject* aliveOb);
+	void createMoveTarget();
+	void createLayerColor();
+	void createActObjects();
+	void initActObjectOffs(ActObject* aliveOb,int grid);
+	void initActObjectPosition(ActObject* aliveOb,int grid);
+	void creatMoveObject(WarAlive* alive);
+	void initMoveActObject(ActObject* aliveOb);
+	void lucencyActObject(bool lucency);												//对其他武将执行透明操作
+	bool touchInAlive(int grid , CCPoint& p);
+	bool swappingGrid(WarAlive* alive,vector<int>& Vec );
+	void setMapAliveGrid(map<int,WarAlive*>& MoveMap);
+	bool moreAliveJudge(map<int , GridMoveObj>& MapMove,MoveObj* mObj);
 protected:
 	WarAlive*		m_TouchAlive;		//被触摸的武将id
-	ActObject*		m_moveTarget;		//拖拽移动对象
+	ActObject*		m_MoveActObject;		//拖拽移动对象
 	WarManager*		m_Manage;
 	WarMapData*		m_map;
 	CCPoint			m_TouchOffs;		//触摸偏移
