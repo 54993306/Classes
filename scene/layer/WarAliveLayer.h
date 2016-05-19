@@ -46,7 +46,6 @@ public:
 	virtual void ccTouchCancelled(CCTouch *pTouch, CCEvent *pEvent);
 	virtual void ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent); 
 public:
-	bool JudgeMove(WarAlive*alive,int grid);
 	bool WorldBossJudge(WarAlive* alive,int grid);			//需要重构的方法,应该抽象为关卡对武将移位的影响策略
 	bool BorderJudge(WarAlive* alive,vector<int>&Vec);
 	void initActobject(WarAlive* alive,int createType = 0);
@@ -77,9 +76,12 @@ public:
 	void initMoveActObject(ActObject* aliveOb);
 	void lucencyActObject(bool lucency);												//对其他武将执行透明操作
 	bool touchInAlive(int grid , CCPoint& p);
-	bool swappingGrid(WarAlive* alive,vector<int>& Vec );
-	void setMapAliveGrid(map<int,WarAlive*>& MoveMap);
-	bool moreAliveJudge(map<int , GridMoveObj>& MapMove,MoveObj* mObj);
+	bool aliveMoveJudge(WarAlive*alive,int grid);
+	void mapAliveMove(map<int,WarAlive*>& MoveMap);
+	bool aliveBattleJudge(WarAlive* pAlive,vector<int>& pDestinationGrid );
+	bool aliveCoverJudge(map<int,GridMoveObj>& pDestinationObject,vector<int>& pDestinationGrid);
+	bool swappingJudge(map<int,GridMoveObj>& pDestinationObject,MoveObj* pAliveMoveObj);
+	
 protected:
 	WarAlive*		m_TouchAlive;		//被触摸的武将id
 	ActObject*		m_MoveActObject;		//拖拽移动对象

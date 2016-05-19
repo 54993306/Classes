@@ -543,23 +543,10 @@ void CombatLogic::AliveCritEnd( WarAlive* alive )
 {
 	if (alive->getHp()>0&&alive->getBattle()&&!alive->getCaptain())				//我方武将释放技能时会扣自己血将自己击杀
 	{
+		alive->getActObject()->setMoveState(Walk_Index);	
+		alive->getActObject()->setUpdateState(true);
 		if (alive->role->alert)
-		{
-			if (alive->getAIState())
-			{
-				alive->setMoveGrid(alive->getMoveObj()->getgrid());
-				alive->getActObject()->setMoveState(Walk_Index);
-				alive->getActObject()->setUpdateState(true);
-				alive->setAIState(false);
-			}else{
-				CCLOG("111");
-				alive->getActObject()->setMoveState(Walk_Index);				//判断当前位置是否有目标而后再做处理，技能没有击杀目标
-				alive->getActObject()->setUpdateState(true);
-			}
-		}else{
-			alive->getActObject()->setMoveState(Walk_Index);	
-			alive->getActObject()->setUpdateState(true);
-		}
+			alive->setAIState(true);
 	}
 }
 //在此处触发连接的大效果播放。并记录当前一共按了多少次技能,延长连击接上的判定时间

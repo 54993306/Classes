@@ -128,7 +128,15 @@ float CombatEffect::CountAliveAtk()
 	CCARRAY_FOREACH(heros,obj)
 	{
 		WarAlive* alive = (WarAlive*)obj;
+		if (alive->role->isCall)
+			continue;
 		const HeroInfoData *c_data = DataCenter::sharedData()->getHeroInfo()->getCfg(alive->role->thumb);
+		if (!c_data)
+		{
+			CCLOG("[ *ERROR ] CombatEffect::CountAliveAtk heroDesc.csv MoveID=%d");
+			attackNum += alive->getAtk()*0.04f;
+			continue;
+		}
 		switch (c_data->iType2)		//近战，远战，坦克，辅助
 		{
 		case 1:

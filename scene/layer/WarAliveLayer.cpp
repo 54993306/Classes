@@ -400,21 +400,20 @@ void WarAliveLayer::MoveAliveToGrid( WarAlive* alive,int grid )
 		return;
 	alive->getActObject()->setVisible(true);
 	alive->getActObject()->getHp()->showHp(nullptr);
-	vector<int>* vec = m_Manage->getMoveVec();
-	if (std::find(vec->begin(),vec->end(),grid) == vec->end())
+	vector<int>* canMove = m_Manage->getMoveVec();
+	if (std::find(canMove->begin(),canMove->end(),grid) == canMove->end())
 		return;
 	if (WorldBossJudge(alive,grid))
 		return ;
 	if (moveGuide(grid,false))
 		return;
-	if(JudgeMove(alive,grid))								//当前位置是否可以放置英雄
+	if(aliveMoveJudge(alive,grid))								//当前位置是否可以放置英雄
 	{
 		alive->getMoveObj()->setgrid(grid);
 		alive->getActObject()->setMoveState(Walk_Index);
 	}else{
 		return;	
 	}
-		
 	if (moveGuide(grid,true))
 		return;
 	alive->setAIState(false);
@@ -437,11 +436,10 @@ bool WarAliveLayer::WorldBossJudge( WarAlive* alive,int grid )
 	return false;
 }
 
-
-bool WarAliveLayer::moreAliveJudge( map<int , GridMoveObj>& MapMove,MoveObj* mObj )
+bool WarAliveLayer::swappingJudge( map<int,GridMoveObj>& pDestinationObject,MoveObj* pAliveMoveObj )
 {
-	map<int,WarAlive*>MoveMap;
-	for (auto i:MapMove)
+	map<int,WarAlive*>MoveAliveMap;
+	for (auto i:pDestinationObject)
 	{
 		int offs = i.first - i.second.first;					//目标格子和当前格子偏移量
 		WarAlive* pAlive = i.second.second->getAlive();			//目标位置武将
@@ -449,31 +447,46 @@ bool WarAliveLayer::moreAliveJudge( map<int , GridMoveObj>& MapMove,MoveObj* mOb
 		for (auto j : i.second.second->grids)					//grids排序过的
 		{									
 			MoveObj* pObj = getMoveByGrid(j+offs);
-			if (pObj&&pObj != mObj)								//如果被替换的武将移动过去的位置有其他人则不可替换位置
+			if (pObj&&pObj != pAliveMoveObj)					//如果被替换的武将移动过去的位置有其他人则不可替换位置
 				return false;
 			pVec.push_back(j+offs);
 		}
 		if (!BorderJudge(pAlive,pVec))
 			return false;
-		MoveMap[pVec.at(0)] = pAlive;
+		MoveAliveMap[pVec.at(0)] = pAlive;
 	}
-	setMapAliveGrid(MoveMap);
+	mapAliveMove(MoveAliveMap);
+	return true;
+}
+//若是双方的目标位置都相同的，且一方包含了另外一方则无法移动
+bool WarAliveLayer::aliveCoverJudge(map<int,GridMoveObj>& pDestinationObject,vector<int>& pDestinationGrid)
+{
+	for (auto i:pDestinationObject)
+	{
+		int offs = i.first - i.second.first;					//目标格子和当前格子偏移量
+		MoveObj* pMove = i.second.second;						//目标位置其他对象
+		for (auto j : pMove->grids)								
+		{	
+			if (std::find(pDestinationGrid.begin(),pDestinationGrid.end(),j+offs) != pDestinationGrid.end())		//双方目标有重叠部分不可换位置
+				return false;
+		}
+	}
 	return true;
 }
 
-bool WarAliveLayer::swappingGrid( WarAlive* alive,vector<int>& VGrid )
+bool WarAliveLayer::aliveBattleJudge( WarAlive* pAlive,vector<int>& pDestinationGrid )
 {
-	MoveObj* mObj = alive->getMoveObj();
-	map<int , GridMoveObj> MapMove;								//pair<int ,MoveObj*> GridMoveObj;
-	for (int i=0;i<VGrid.size();i++)
+	MoveObj* tAliveMove = pAlive->getMoveObj();
+	map<int , GridMoveObj> tDestinationObject;					//pair<int ,MoveObj*> GridMoveObj;
+	for (auto tGrid:pDestinationGrid)
 	{
-		MoveObj* pObj = getMoveByGrid(VGrid.at(i));	
-		if (!pObj||pObj==mObj)									
+		MoveObj* pObj = getMoveByGrid(tGrid);	
+		if (!pObj||pObj==tAliveMove)									
 			continue;
-		if (alive->getBattle())
+		if (pAlive->getBattle())
 		{
-			GridMoveObj pairObj = make_pair(VGrid.at(i),pObj);	//几号格子存在其他我方武将
-			MapMove[mObj->grids.at(i)] = pairObj;				//我方几号格子对应其他武将
+			GridMoveObj pairObj = make_pair(tGrid,pObj);	//几号格子存在其他我方武将
+			tDestinationObject[tGrid] = pairObj;							//我方几号格子对应其他武将
 		}else{
 			if (DataCenter::sharedData()->getCombatGuideMg()->IsGuide())
 			{
@@ -486,10 +499,15 @@ bool WarAliveLayer::swappingGrid( WarAlive* alive,vector<int>& VGrid )
 			}
 		}
 	}
-	return moreAliveJudge(MapMove,mObj);
+	if (aliveCoverJudge(tDestinationObject,pDestinationGrid))
+	{
+		return swappingJudge(tDestinationObject,tAliveMove);
+	}else{
+		return false;
+	}
 }
 
-void WarAliveLayer::setMapAliveGrid( map<int,WarAlive*>& MoveMap )
+void WarAliveLayer::mapAliveMove( map<int,WarAlive*>& MoveMap )
 {
 	for (auto i:MoveMap)
 	{
@@ -501,18 +519,18 @@ void WarAliveLayer::setMapAliveGrid( map<int,WarAlive*>& MoveMap )
 }
 
 //判断武将是否可以移动的方法
-bool WarAliveLayer::JudgeMove(WarAlive*alive,int grid)
+bool WarAliveLayer::aliveMoveJudge(WarAlive*alive,int grid)
 {
-	vector<int> VGrid ;
+	vector<int> VecDestinationGrid ;
 	for (int i=0;i<alive->role->row;i++)
 		for (int j =0;j<alive->role->col;j++)
-			VGrid.push_back(grid+j*C_GRID_ROW+i);
-	sort(VGrid.begin(),VGrid.end());
-	if (!BorderJudge(alive,VGrid))
+			VecDestinationGrid.push_back(grid+j*C_GRID_ROW+i);
+	sort(VecDestinationGrid.begin(),VecDestinationGrid.end());
+	if (!BorderJudge(alive,VecDestinationGrid))
 		return false;
 	if (alive->getCallType() != CommonType)
 		return true;
-	if (!swappingGrid(alive,VGrid))
+	if (!aliveBattleJudge(alive,VecDestinationGrid))
 		return false;
 	return true;
 }
