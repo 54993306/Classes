@@ -77,12 +77,13 @@ public:
 	bool touchInAlive(int grid , CCPoint& p);
 	bool aliveMoveJudge(WarAlive* pMoveAlive,int pGrid);
 	vector<int> getDestinations(WarAlive* pAlive,int pGrid);
+	vector<WarAlive*> getAliveInArea(vector<int>& pAreas);
 	bool absentInMoveArea(int pGrid);
 	bool borderJudge(WarAlive* pAlive,vector<int>& pVector);
-	void moveSwappingAlives(vector<WarAlive*> pVector,int pOffs);
-	bool callAliveJudge(WarAlive* pAlive);
-	bool swappingRule(WarAlive* pMoveAlive,vector<int> pDestination,WarAlive* pSwappingAlive);
-	bool vectorIntersection(vector<int> pVector,vector<int> ptVector);
+	void moveSwappingAlives(vector<WarAlive*>& pVector,int pOffs);
+	bool callAliveJudge(vector<int>& pDestinations);
+	bool swappingRule(WarAlive* pMoveAlive,vector<int>& pDestinations);
+	bool vectorIntersection(vector<int>& pVector,vector<int>& ptVector);
 protected:
 	WarAlive*		m_TouchAlive;		//被触摸的武将id
 	ActObject*		m_MoveActObject;		//拖拽移动对象

@@ -467,21 +467,27 @@ vector<int> WarAliveLayer::getDestinations( WarAlive* pAlive,int pGrid )	//这�
 	return tDestinations;
 }
 //@@召唤新武将的情况
-bool WarAliveLayer::callAliveJudge( WarAlive* pAlive )
+bool WarAliveLayer::callAliveJudge( vector<int>& pDestinations )
 {
-	if (DataCenter::sharedData()->getCombatGuideMg()->IsGuide())
+	for (auto tGrid:pDestinations)
 	{
-		CombatGuideStep* step = DataCenter::sharedData()->getCombatGuideMg()->getCurrStep();
-		if (!step->getReset())
-			return false;								//重置状态我方未上阵可替换其他武将
-	}else{
-		if (pAlive->getCallType() == CommonType)
-			return false;
+		WarAlive* tDestinationAlive = getAliveByMoveGrid(tGrid);
+		if (!tDestinationAlive)
+			continue;
+		if (DataCenter::sharedData()->getCombatGuideMg()->IsGuide())
+		{
+			CombatGuideStep* step = DataCenter::sharedData()->getCombatGuideMg()->getCurrStep();
+			if (!step->getReset())
+				return false;								//重置状态我方未上阵可替换其他武将
+		}else{
+			if (tDestinationAlive->getCallType() == CommonType)
+				return false;
+		}
 	}
 	return true;
 }
 //@@被替换武将移动
-void WarAliveLayer::moveSwappingAlives( vector<WarAlive*> pVector,int pOffs )
+void WarAliveLayer::moveSwappingAlives( vector<WarAlive*>& pVector,int pOffs )
 {
 	for (auto tAlive:pVector)
 	{
@@ -491,7 +497,7 @@ void WarAliveLayer::moveSwappingAlives( vector<WarAlive*> pVector,int pOffs )
 	}
 }
 
-bool WarAliveLayer::vectorIntersection( vector<int> pVector,vector<int> ptVector )
+bool WarAliveLayer::vectorIntersection( vector<int>& pVector,vector<int>& ptVector )
 {
 	for (auto i : pVector)
 	{
@@ -503,23 +509,55 @@ bool WarAliveLayer::vectorIntersection( vector<int> pVector,vector<int> ptVector
 	}
 	return false;
 }
-//交换的规则,可以进行多种拓展,有可能每个武将不一样,但是会乱掉
-bool WarAliveLayer::swappingRule( WarAlive* pMoveAlive,vector<int> pDestination,WarAlive* pSwappingAlive )
+
+vector<WarAlive*> WarAliveLayer::getAliveInArea( vector<int>& pAreas )
 {
-	int tOffs = pMoveAlive->getMoveObj()->getgrid()-pDestination.at(0);
-	int tSwappingGrid = pSwappingAlive->getMoveObj()->getgrid()+tOffs;
-	vector<int> tAliveDes = getDestinations(pSwappingAlive,tSwappingGrid);
-	if (tAliveDes.size() && !vectorIntersection(pDestination,tAliveDes) )
+	vector<WarAlive*> tAreaAlives;
+	for (auto tGrid:pAreas)
 	{
-		for (auto atGrid : tAliveDes)
+		WarAlive* tAlive = getAliveByMoveGrid(tGrid);
+		if (tAlive)
 		{
-			WarAlive* atAlive = getAliveByMoveGrid(atGrid);
-			if (atAlive && atAlive != pMoveAlive && atAlive != pSwappingAlive)
-				return false;
+			bool tAddAlive = true;
+			for (auto atAlive:tAreaAlives)
+			{
+				if (atAlive == tAlive)
+				{
+					tAddAlive = false;
+					break;
+				}
+			}
+			if (tAddAlive)
+				tAreaAlives.push_back(tAlive);
 		}
-	}else{
-		return false;
 	}
+	return tAreaAlives;
+}
+
+//交换的规则,可以进行多种拓展,有可能每个武将不一样,但是会乱掉
+bool WarAliveLayer::swappingRule( WarAlive* pMoveAlive,vector<int>& pDestination)
+{
+	vector<WarAlive*> tAreaAlives = getAliveInArea(pDestination);
+	int tOffs = pMoveAlive->getMoveObj()->getgrid()-pDestination.at(0);
+	for (auto tSwappingAlive:tAreaAlives)
+	{
+		if (tSwappingAlive == pMoveAlive)
+			continue;
+		int tSwappingGrid = tSwappingAlive->getMoveObj()->getgrid()+tOffs;
+		vector<int> tAliveDes = getDestinations(tSwappingAlive,tSwappingGrid);
+		if (tAliveDes.size() && !vectorIntersection(pDestination,tAliveDes) )
+		{
+			for (auto atGrid : tAliveDes)
+			{
+				WarAlive* atAlive = getAliveByMoveGrid(atGrid);
+				if (atAlive && atAlive != pMoveAlive && atAlive != tSwappingAlive)
+					return false;
+			}
+		}else{
+			return false;
+		}
+	}
+	moveSwappingAlives(tAreaAlives,tOffs);
 	return true;
 }
 //@@判断武将是否可以移动的方法
@@ -528,24 +566,14 @@ bool WarAliveLayer::aliveMoveJudge(WarAlive* pMoveAlive,int pGrid)
 	vector<int> tDestinations = getDestinations(pMoveAlive,pGrid);		
 	if (!tDestinations.size())
 		return false;				//没有目标位置(超出边界)
-	int tOffs = pMoveAlive->getMoveObj()->getgrid() - pGrid;			
-	vector<WarAlive*> tSwappingAlives;
-	for (auto tGrid : tDestinations)
+	if (pMoveAlive->getBattle())
 	{
-		WarAlive* tSwappingAlive = getAliveByMoveGrid(tGrid);
-		if (  !tSwappingAlive || tSwappingAlive	== pMoveAlive )									
-			continue;
-		if (pMoveAlive->getBattle())
-		{
-			if (!swappingRule(pMoveAlive,tDestinations,tSwappingAlive))
-				return false;			
-			tSwappingAlives.push_back(tSwappingAlive);
-		}else{
-			if (!callAliveJudge(tSwappingAlive))
-				return false;
-		}
+		if (!swappingRule(pMoveAlive,tDestinations))
+			return false;	
+	}else{
+		if (!callAliveJudge(tDestinations))
+			return false;
 	}
-	moveSwappingAlives(tSwappingAlives,tOffs);
 	return true;
 }
 //放到数据中心供武将调用的方法
