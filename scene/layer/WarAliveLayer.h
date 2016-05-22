@@ -10,12 +10,17 @@ class EffectObject;
 class WarManager;
 class WarMapData;
 class MoveObj;
-/****************************************************************************/
-/*
-	绘制战场上的武将，并实际进行武将移动的地方，武将层	//  [7/28/2014 xc_lin]
-*/
-/****************************************************************************/
-
+/** 
+ *
+ *        @Data : 2016.5.21
+ *    
+ *        @Name : 
+ *
+ *        @Author : Lin_Xiancheng
+ *
+ *        @Description : 人物挂载层
+ *		  
+ */
 enum CreateType
 {
 	DefaultCreat = 0,

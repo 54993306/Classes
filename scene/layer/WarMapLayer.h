@@ -62,7 +62,6 @@ public:
 	void DrawMoveAtkArea(CCObject* ob);
 	void DrawAtkEffect(CCObject* ob);
 	void setBlackBg(CCObject* ob);
-	void MeteoroliteArea(CCArray* arr);					//如果传入的为正数，则做显示操作，负数则做隐藏操作。
 	void CombatArea(CCObject* ob);
 	void CancelCombatArea(CCObject* ob);
 	void SkillBtnDrawSkillArea(CCObject* ob);

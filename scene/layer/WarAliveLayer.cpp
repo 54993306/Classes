@@ -533,8 +533,7 @@ vector<WarAlive*> WarAliveLayer::getAliveInArea( vector<int>& pAreas )
 	}
 	return tAreaAlives;
 }
-
-//交换的规则,可以进行多种拓展,有可能每个武将不一样,但是会乱掉
+//交换的规则,可以进行多种拓展,有可能每个武将不一样,但是控制会乱
 bool WarAliveLayer::swappingRule( WarAlive* pMoveAlive,vector<int>& pDestination)
 {
 	vector<WarAlive*> tAreaAlives = getAliveInArea(pDestination);
@@ -588,15 +587,14 @@ WarAlive* WarAliveLayer::getAliveByMoveGrid( int grid )
 			continue;
 		for (auto i:mo->grids)
 		{
-			if (i==grid)
+			if (i!=grid)
+				continue;
+			if (mo->getAlive()->getHp()<=0  || 
+				!mo->getAlive()->getBattle() )
 			{
-				if (mo->getAlive()->getHp()<=0  || 
-				   !mo->getAlive()->getBattle() )
-				{
-					return nullptr;
-				}else{
-					return mo->getAlive();
-				}
+				return nullptr;
+			}else{
+				return mo->getAlive();
 			}
 		}
 	}

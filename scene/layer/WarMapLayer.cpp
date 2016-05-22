@@ -157,8 +157,8 @@ void WarMapLayer::CancelGuide() { m_DisPlayArea->getChildByTag(map_guide)->setVi
 
 void WarMapLayer::DrawAtkArea(WarAlive* alive)
 {
-	vector<int>VecGrid;
 	alive->setTouchState(true);
+	vector<int>VecGrid;
 	if (alive->role->alert && !alive->getCriAtk())
 	{
 		VecGrid = m_SkillRange->getAliveGuard(alive);
@@ -188,7 +188,7 @@ void WarMapLayer::DrawAtkArea(WarAlive* alive)
 			if(DataCenter::sharedData()->getWar()->getEffect(alive))
 			{
 				if (DataCenter::sharedData()->getWar()->getEffect(alive)->mode == frontAreaVia)
-					break;
+					break;//合并成一个方法,暴露出来的内容太多，每次需要修改effect结构的时候会多很多地方造成影响，不容易维护和拓展
 			}
 		}
 	}
@@ -278,28 +278,13 @@ void WarMapLayer::DrawAtkEffect(CCObject* ob)
 	act->setEffectMusic(0);
 	act->setPlayerEffect(0);
 }
-
-void WarMapLayer::MeteoroliteArea(CCArray* arr)
-{
-	if (!arr)return;
-	CCObject* obj = nullptr;
-	CCARRAY_FOREACH(arr,obj)
-	{
-		CCInteger* num = (CCInteger*)obj;
-		CCSprite* sp = (CCSprite*)m_DisPlayArea->getChildByTag(num->getValue()+map_Bg);
-		if (outPutERRORMsg("WarMapLayer::DrawAtkArea",sp))continue;
-		sp->setDisplayFrame(CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(AtksImg));
-		sp->setVisible(true);
-	}
-}
 //现在攻击的情况已经不绘制攻击范围了
 void WarMapLayer::CancelCombatArea(CCObject* ob)
 {
 	WarAlive* alive = (WarAlive*)ob;
-	vector<int>::iterator iter = alive->AtkGrid.begin();
-	for (;iter != alive->AtkGrid.end();iter++)
+	for (auto tGrid : alive->AtkGrid)
 	{
-		CCSprite* sp = (CCSprite*)m_DisPlayArea->getChildByTag(*iter+map_Bg);
+		CCSprite* sp = (CCSprite*)m_DisPlayArea->getChildByTag(tGrid+map_Bg);
 		sp->setDisplayFrame(CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(AtksImg));
 		sp->setVisible(false);
 	}
@@ -362,16 +347,13 @@ MapBackgroundManage* WarMapLayer::getBackgroundManage()
 
 void WarMapLayer::setMaplayer(CLayout* var)
 {
-	if (!var)return;
 	m_MapLayer = var;
 	CLayout *Floor = dynamic_cast<CLayout*>(m_MapLayer->findWidgetById("jinjing"));
 	if (Floor)
 	{
 		Floor->addChild(m_DisPlayArea);
 		Floor->addChild(m_GridIndex);
-	}else{
-		CCLOG("[ *ERROR ] WarMapLayer::setMaplayer");
-	}
+	}else{ CCLOG("[ *ERROR ] WarMapLayer::setMaplayer"); }
 	this->addChild(m_MapLayer,-2);
 }
 
