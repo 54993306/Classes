@@ -16,6 +16,7 @@
 #include "common/CommonFunction.h"
 #include "Battle/LoadSpineData.h"
 #include "Battle/BattleMessage.h"
+#include "Battle/MoveObject.h"
 CombatGuideLayer::CombatGuideLayer()
 	:m_Step(nullptr),m_root(nullptr),m_mapData(nullptr)
 	,m_RenderTexture(nullptr),m_Scene(nullptr),m_LayerColor(nullptr)
@@ -355,7 +356,7 @@ void CombatGuideLayer::resetAlive( CombatGuideStep* step )
 		if (alive->getHp()<=0||!alive->getBattle()||!alive->getActObject())
 			continue;
 		CCPoint p = m_mapData->getPoint(INVALID_GRID);
-		alive->getMoveObj()->setPosition(p);
+		alive->getMoveObject()->setPosition(p);
 		alive->getActObject()->setPosition(p);											//在视野外进行死亡处理
 		if (!alive->getEnemy()&&alive->getCriAtk())
 			NOTIFICATION->postNotification(B_CritEnd,alive);

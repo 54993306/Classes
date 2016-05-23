@@ -72,21 +72,4 @@ private:
 	int m_lastFrame;
 	ArmatureEventData* m_armatureEventData;
 };
-
-
-class MoveObj :public CCNode
-{
-public:
-	MoveObj();
-	virtual bool init();
-	void initMoveSprite();
-	CREATE_FUNC(MoveObj);
-	CC_SYNTHESIZE(ActObject*,m_Actobject,ActObject);
-	CC_PROPERTY(WarAlive*,m_Alive,Alive);
-	CC_PROPERTY(int,m_grid,grid);
-	vector<int> grids;
-private:
-
-};
-
 #endif // !_ACTOBJECT_H_

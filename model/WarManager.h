@@ -15,7 +15,7 @@ class SpecialEffectInfo;
 class terData;
 class CombatLogic;
 class CritSkillImage;
-class MoveObj;
+class MoveObject;
 class BuffData;
 class StoryData;
 using namespace std;

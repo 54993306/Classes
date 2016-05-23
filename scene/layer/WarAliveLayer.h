@@ -1,6 +1,21 @@
 ﻿
+
 #ifndef _WAR_ALIVE_LAYER_H_
 #define _WAR_ALIVE_LAYER_H_
+
+/************************************************************* 
+ *
+ *
+ *		Data : 2016.5.23
+ *	
+ *		Name : 
+ *
+ *		Author : Lin_Xiancheng
+ *
+ *		Description : 人物挂载层
+ *
+ *
+ *************************************************************/
 #include "AppUI.h"
 #include "scene/layer/LayerManager.h"
 class ActObject;
@@ -9,18 +24,8 @@ class WarAlive;
 class EffectObject;
 class WarManager;
 class WarMapData;
-class MoveObj;
-/** 
- *
- *        @Data : 2016.5.21
- *    
- *        @Name : 
- *
- *        @Author : Lin_Xiancheng
- *
- *        @Description : 人物挂载层
- *		  
- */
+class MoveObject;
+
 enum CreateType
 {
 	DefaultCreat = 0,

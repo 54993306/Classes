@@ -4,6 +4,8 @@
 #include "scene/alive/ActObject.h"
 #include "common/CommonFunction.h"
 #include "roleImg/RoleUpdate.h"
+#include "Battle/MoveObject.h"
+
 AliveBase::AliveBase()
 	:m_AliveID(0)
 	,m_Model(0)

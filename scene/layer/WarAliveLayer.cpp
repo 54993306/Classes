@@ -25,6 +25,7 @@
 #include "Resources.h"
 #include "warscene/CHeroSoundData.h"
 #include "Battle/BattleMessage.h"
+#include "Battle/MoveObject.h"
 WarAliveLayer::WarAliveLayer()
 	:m_TouchAlive(nullptr),m_grid(0),m_AliveNode(0)
 	,m_MoveActObject(nullptr),m_TouchAliveBtn(false),m_Manage(nullptr)
@@ -156,12 +157,12 @@ void WarAliveLayer::creatMoveObject( WarAlive* alive )
 {
 	if (!alive->getEnemy()&&!alive->getCaptain())
 	{
-		MoveObj* Moveobj = MoveObj::create();
+		MoveObject* Moveobj = MoveObject::create();
 		Moveobj->setAlive(alive);
 		Moveobj->setActObject(alive->getActObject());
 		Moveobj->setgrid(alive->getGridIndex());
-		alive->setMoveObj(Moveobj);
-		alive->getActObject()->setMoveObj(Moveobj);
+		alive->setMoveObject(Moveobj);
+		alive->getActObject()->setMoveObject(Moveobj);
 	}else{
 		alive->setAliveStat(INVINCIBLE);
 		alive->getActObject()->TurnStateTo(Start_Index);
@@ -179,10 +180,10 @@ void WarAliveLayer::AddActToGrid(ActObject* aliveOb,int grid)
 	if(aliveOb->getParent() == nullptr)
 	{
 		m_AliveNode->addChild(aliveOb);
-		if (alive->getMoveObj())
+		if (alive->getMoveObject())
 		{
-			alive->getMoveObj()->initMoveSprite();
-			m_MoveNode->addChild(alive->getMoveObj());
+			alive->getMoveObject()->initMoveSprite();
+			m_MoveNode->addChild(alive->getMoveObject());
 		}
 	}
 }
@@ -266,8 +267,8 @@ void WarAliveLayer::initMoveActObject( ActObject* aliveOb )
 	m_MoveActObject->setoffs(aliveOb->getoffs());		//武将原来相对于格子的偏移量
 	if (aliveOb->getAlive()->getGridIndex())
 	{
-		if(aliveOb->getMoveObj())
-			m_MoveActObject->setPosition(aliveOb->getMoveObj()->getPosition());
+		if(aliveOb->getMoveObject())
+			m_MoveActObject->setPosition(aliveOb->getMoveObject()->getPosition());
 	}else{
 		m_MoveActObject->setPosition(ccp(-500,100));
 	}
@@ -310,7 +311,7 @@ bool WarAliveLayer::touchInAlive( int grid,CCPoint& p )
 	for (auto i : *Vec)
 	{
 		if (i->getCallType()!=CommonType)continue;
-		MoveObj* mo = i->getMoveObj();
+		MoveObject* mo = i->getMoveObject();
 		if (!mo)continue;
 		for (auto j :mo->grids)
 		{
@@ -397,10 +398,10 @@ bool WarAliveLayer::WorldBossJudge( WarAlive* alive,int grid )
 		return true;
 	if (DataCenter::sharedData()->getWar()->getWorldBoss())
 	{
-		if (alive->getMoveObj()->getgrid() > 108 && grid < 108)				//写死的格子数
+		if (alive->getMoveObject()->getgrid() > 108 && grid < 108)				//写死的格子数
 		{
 			return true;
-		}else if (alive->getMoveObj()->getgrid() < 80 && grid > 80)
+		}else if (alive->getMoveObject()->getgrid() < 80 && grid > 80)
 		{
 			return true;
 		}
@@ -420,8 +421,8 @@ void WarAliveLayer::MoveAliveToGrid( WarAlive* alive,int grid )
 {
 	if (!alive->getMove() || 
 		!alive->getActObject() || 
-		!alive->getMoveObj()	||
-		grid==alive->getMoveObj()->getgrid())
+		!alive->getMoveObject()	||
+		grid==alive->getMoveObject()->getgrid())
 		return;
 	alive->getActObject()->setVisible(true);
 	alive->getActObject()->getHp()->showHp(nullptr);
@@ -434,7 +435,7 @@ void WarAliveLayer::MoveAliveToGrid( WarAlive* alive,int grid )
 	if(alive->getCallType() != CommonType
 	   || aliveMoveJudge(alive,grid)	)								//当前位置是否可以放置英雄
 	{
-		alive->getMoveObj()->setgrid(grid);
+		alive->getMoveObject()->setgrid(grid);
 		alive->getActObject()->setMoveState(Walk_Index);
 	}else{
 		return;	
@@ -491,8 +492,8 @@ void WarAliveLayer::moveSwappingAlives( vector<WarAlive*>& pVector,int pOffs )
 {
 	for (auto tAlive:pVector)
 	{
-		int tGrid = tAlive->getMoveObj()->getgrid() + pOffs;
-		tAlive->getMoveObj()->setgrid(tGrid);
+		int tGrid = tAlive->getMoveObject()->getgrid() + pOffs;
+		tAlive->getMoveObject()->setgrid(tGrid);
 		tAlive->getActObject()->setMoveState(Walk_Index);
 	}
 }
@@ -509,7 +510,7 @@ bool WarAliveLayer::vectorIntersection( vector<int>& pVector,vector<int>& ptVect
 	}
 	return false;
 }
-
+//得到一个区域内的所有武将
 vector<WarAlive*> WarAliveLayer::getAliveInArea( vector<int>& pAreas )
 {
 	vector<WarAlive*> tAreaAlives;
@@ -537,12 +538,12 @@ vector<WarAlive*> WarAliveLayer::getAliveInArea( vector<int>& pAreas )
 bool WarAliveLayer::swappingRule( WarAlive* pMoveAlive,vector<int>& pDestination)
 {
 	vector<WarAlive*> tAreaAlives = getAliveInArea(pDestination);
-	int tOffs = pMoveAlive->getMoveObj()->getgrid()-pDestination.at(0);
+	int tOffs = pMoveAlive->getMoveObject()->getgrid()-pDestination.at(0);
 	for (auto tSwappingAlive:tAreaAlives)
 	{
 		if (tSwappingAlive == pMoveAlive)
 			continue;
-		int tSwappingGrid = tSwappingAlive->getMoveObj()->getgrid()+tOffs;
+		int tSwappingGrid = tSwappingAlive->getMoveObject()->getgrid()+tOffs;
 		vector<int> tAliveDes = getDestinations(tSwappingAlive,tSwappingGrid);
 		if (tAliveDes.size() && !vectorIntersection(pDestination,tAliveDes) )
 		{
@@ -582,7 +583,7 @@ WarAlive* WarAliveLayer::getAliveByMoveGrid( int grid )
 	CCObject* obj = nullptr;
 	CCARRAY_FOREACH(arr,obj)
 	{
-		MoveObj* mo = (MoveObj*)obj;
+		MoveObject* mo = (MoveObject*)obj;
 		if (mo->getAlive()->getCallType() != CommonType)
 			continue;
 		for (auto i:mo->grids)

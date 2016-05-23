@@ -40,6 +40,7 @@
 #include "Battle/BattleMessage.h"
 #include "update/CDownloadPackage.h"
 #include "jni/CJniHelper.h"
+#include "Battle/MoveObject.h"
 
 CombatLogic::CombatLogic()
 	:m_time(0),m_Assist(nullptr),m_task(nullptr),m_CombatEffect(nullptr),m_bufExp(nullptr),m_terExp(nullptr),m_SkillRange(nullptr)
@@ -285,8 +286,8 @@ void CombatLogic::CostCount(WarAlive* alive,float dt)
 		m_Alive	)				//必杀技状态
 		return;
 	vector<int>* grids = m_Manage->getAddcostVec();
-	if (!alive->getMoveObj()||
-		std::find(grids->begin(),grids->end(),alive->getMoveObj()->getgrid()) != grids->end())
+	if (!alive->getMoveObject()||
+		std::find(grids->begin(),grids->end(),alive->getMoveObject()->getgrid()) != grids->end())
 	{
 		m_CurrCost += alive->getAddCost() * dt;					//怒气值每帧变化率
 		m_fCurrentCostAdd += alive->getAddCost();
@@ -336,10 +337,10 @@ void CombatLogic::HeroExcuteAI( WarAlive* alive )
 		//@@这些逻辑，应该都封装在武将的内部，单个武将去单独处理自身的情况
 		if (IsAutoMoveType(alive) || ActionCode == Walk_Index)//自动移动类,或已经开始执行AI状态
 			return;
-		if (!alive->getCaptain()&&alive->getGridIndex()!=alive->getMoveObj()->getgrid())//武将当前是否在固定位置,如果不在则移动回固定位置(执行AI完毕状态)
+		if (!alive->getCaptain()&&alive->getGridIndex()!=alive->getMoveObject()->getgrid())//武将当前是否在固定位置,如果不在则移动回固定位置(执行AI完毕状态)
 		{			
 			alive->setAIState(false);
-			alive->setMoveGrid(alive->getMoveObj()->getgrid());							//@@武将有一个回到初始位置的方法
+			alive->setMoveGrid(alive->getMoveObject()->getgrid());							//@@武将有一个回到初始位置的方法
 			alive->getActObject()->setMoveState(Walk_Index);
 		}else{
 			int grid = m_SkillRange->GuardMoveArea(alive);								//@@有警戒区域的武将处理

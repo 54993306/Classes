@@ -17,8 +17,8 @@
 #include "common/ShaderDataHelper.h"
 #include "warscene/CHeroSoundData.h"
 #include "model/BuffManage.h"
-
 #include "Battle/BattleMessage.h"
+#include "Battle/MoveObject.h"
 AliveObject::AliveObject()
 	:m_Body(nullptr),m_Hp(nullptr),m_Name(""),m_ActionKey(""),m_MoveState(0)
 	,m_NameLabel(nullptr),m_Armature(nullptr),m_DropItem(0),m_offs(CCPointZero),m_Speed(CCPointZero)
@@ -197,9 +197,9 @@ void AliveObject::AliveDie()
 	NOTIFICATION->postNotification(B_DrpItem,this);
 	m_Alive->setHp(0);
 	m_Hp->setHp(0);
-	if (m_Alive->getMoveObj())
-		m_Alive->getMoveObj()->removeFromParentAndCleanup(true);
-	m_Alive->setMoveObj(nullptr);
+	if (m_Alive->getMoveObject())
+		m_Alive->getMoveObject()->removeFromParentAndCleanup(true);
+	m_Alive->setMoveObject(nullptr);
 	m_MoveObj = nullptr;
 	m_Alive->setDieState(true);
 	m_Alive->getBuffManage()->Buffclear();

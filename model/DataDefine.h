@@ -14,7 +14,7 @@ USING_NS_CC;
 using namespace std;
 class BuffManage;
 class ActObject;
-class MoveObj;
+class MoveObject;
 enum MoveRange
 {
 	TypeOne,
@@ -123,7 +123,7 @@ public:
 	vector<WarAlive*> HittingAlive;				//受击目标中被击中对象				(用于做buff和受击目标死亡结算处理)
 	CC_PROPERTY(BuffManage*,m_BuffManage,BuffManage);
 	CC_SYNTHESIZE(ActObject*,m_ActObject,ActObject);
-	CC_SYNTHESIZE(MoveObj*,m_MoveObj,MoveObj);			//设置移动对象
+	CC_SYNTHESIZE(MoveObject*,m_MoveObj,MoveObject);			//设置移动对象
 	CC_SYNTHESIZE(bool,m_IsEnemy,Enemy);				//怪物
 	CC_PROPERTY(bool,m_NorAtk,NorAtk);					//普通攻击状态
 	CC_SYNTHESIZE(bool,m_SpecialAtk,SpeAtk);			//特殊攻击
