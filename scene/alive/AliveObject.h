@@ -50,7 +50,7 @@ public:
 	void AtkBegin_Event();
 	void HpChange_Event();
 	void PlayAnimat_Event(string sData);
-	void initTypeIcon();
+	void initAliveTypeIcon();
 	void playerNum(int num,int type);
 public:
 	CC_SYNTHESIZE(WarAlive*,m_Alive,Alive);				//设置逻辑对象
@@ -75,6 +75,8 @@ public:
 	CC_SYNTHESIZE(CCPoint,m_Speed,Speed);				//移动速度
 	CC_SYNTHESIZE(bool,m_DieState,DieState);			//是否已死亡
 	CC_SYNTHESIZE(bool,m_IsSpine,IsSpine);				//spine动画
+private:
+	void testLabel();
 protected:									
 	CCLabelTTF* m_NameLabel;							//武将显示名称
 };

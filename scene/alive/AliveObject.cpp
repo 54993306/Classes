@@ -59,7 +59,7 @@ void AliveObject::setBody(CCSprite* body)
 }
 CCSprite* AliveObject::getBody() { return m_Body; }
 
-void AliveObject::setHp(HPObject* hp)
+void AliveObject::testLabel()
 {
 	CCLabelTTF* AliveID = CCLabelTTF::create(ToString(C_ALIVE_OB+m_Alive->getAliveID()),"arial",20);
 	AliveID->setColor(ccc3(255,0,0));
@@ -71,31 +71,22 @@ void AliveObject::setHp(HPObject* hp)
 	this->addChild(AliveMode);
 	this->addChild(AliveID);
 #endif
+}
 
+void AliveObject::setHp(HPObject* hp)
+{
+	m_Hp = HPObject::create();
 	if( m_Hp == nullptr )
-	{
-		m_Hp = HPObject::create();
-		if( m_Hp == nullptr )
-			return;
-		m_Hp->retain();
-	}
-	if (m_Enemy)
-	{
-		m_Hp->setSkin(PUBLIC_ROOT("black.png"),"warScene/bar_yellow.png",m_Enemy);	
-	}else{
-		m_Hp->setSkin(PUBLIC_ROOT("black.png"),"warScene/bar_green.png",m_Enemy);
-	}
-	m_Hp->setMaxHp(m_Alive->getMaxHp());
-	m_Hp->setHp(m_Alive->getHp());
-	m_Hp->setScale(1/m_Alive->getZoom());
-	m_Hp->setVisible(false);
+		return;
+	m_Hp->initHp(this);
+	m_Hp->retain();
 	m_Hp->setPosition(ccp(0,-5));
 	m_Armature->addChild(m_Hp, 100);
-	initTypeIcon();
+	initAliveTypeIcon();
 }
 HPObject* AliveObject::getHp() { return m_Hp; }
 
-void AliveObject::initTypeIcon()
+void AliveObject::initAliveTypeIcon()
 {
 	char str[60]={0};
 	const HeroInfoData *c_data = DataCenter::sharedData()->getHeroInfo()->getCfg(m_Alive->role->thumb);
@@ -104,12 +95,13 @@ void AliveObject::initTypeIcon()
 		sprintf(str,"common/type_%d_%d.png", m_Alive->role->roletype, c_data->iType2);
 	}else{
 		sprintf(str,"common/type_1_1.png");
+		CCLOG("[ *ERROR ] AliveObject::initAliveTypeIcon %d",m_Alive->role->thumb);
 	}
 	CCSprite* sp = CCSprite::create(str);
 	if (!sp)
 	{
 		sp = CCSprite::create("common/type_1_1.png");
-		CCLOG("AliveObject::setHp ERROR");
+		CCLOG("[ *ERROR ] AliveObject::initAliveTypeIcon %s",str);
 	}
 	sp->setScale(0.5f);
 	sp->setPosition(ccp(-m_Hp->getContentSize().width/2,0));			//在body处设置了翻转了
@@ -196,7 +188,7 @@ void AliveObject::AliveDie()
 	}
 	NOTIFICATION->postNotification(B_DrpItem,this);
 	m_Alive->setHp(0);
-	m_Hp->setHp(0);
+	m_Hp->setHpNumber(0);
 	if (m_Alive->getMoveObject())
 		m_Alive->getMoveObject()->removeFromParentAndCleanup(true);
 	m_Alive->setMoveObject(nullptr);
@@ -289,7 +281,22 @@ void AliveObject::playerNum( int num,int type )
 		CCLOG(" [ Tips ] AliveObject::playerNum Num = 0!");
 		return	;
 	}
-	m_Hp->playerNum(this,num,type);
+	m_Hp->playChangeNumber(num,type);
 	if (m_Alive->getAliveType() == AliveType::WorldBoss)														//boss的情况处理应该在血量条的内部,自己进行。
-		NOTIFICATION->postNotification(B_WorldBoss_HurtUpdate,CCInteger::create(m_Hp->getHp()));	
+		NOTIFICATION->postNotification(B_WorldBoss_HurtUpdate,CCInteger::create(m_Hp->getHpNumber()));	
+
+	if (type > gainType )																						//武将的受击表现,抽成一个函数
+	{
+		//这个函数应该是多余的,在武将创建的时候，应该就经过一次武将的特殊信息初始化，根据配置文件来初始化武将的一些配置的信息，而不是每次武将受击的时候才去找
+		CCNode* Effect = DataCenter::sharedData()->getRoleData()->getActionEffect(m_Alive->getModel());			
+		if (Effect)
+			this->addChild(Effect);
+		m_Armature->runAction(CCSequence::create(
+			CCTintTo::create(0.25f,255,0,0),CCTintTo::create(0,255,255,255),NULL));								//变红处理
+		if (m_Alive->getCaptain())
+		{
+			NOTIFICATION->postNotification(B_CaptainHurt,m_Alive);
+			NOTIFICATION->postNotification(B_Shark,nullptr);
+		}
+	}
 }

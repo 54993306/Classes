@@ -18,9 +18,6 @@ StoryLayer::StoryLayer()
 StoryLayer::~StoryLayer()
 {
 	NOTIFICATION->removeAllObservers(this);
-	REMOVE_TARGET(m_ui);
-	CC_SAFE_RELEASE(m_ui);
-	m_ui = nullptr;
 	m_VecStep.clear();
 	m_MapPoint.clear();
 	m_StoryStep = nullptr;
@@ -32,7 +29,6 @@ bool StoryLayer::init()
 		return false;
 	m_isStory = false;
 	m_ui = LoadComponent("story.xaml");
-	m_ui->retain();
 	m_ui->setPosition(VCENTER);
 	this->setContentSize(m_ui->getContentSize());
 	this->setTouchPriority(StoryPriority);

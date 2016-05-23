@@ -7,13 +7,6 @@
 #include "scene/alive/ActObject.h"
 MoveObject::MoveObject():m_grid(0),m_Actobject(nullptr),m_Alive(nullptr){}
 
-bool MoveObject::init()
-{
-	if (CCNode::init())
-		return true;
-	return false;
-}
-
 void MoveObject::setAlive(WarAlive* var)
 {
 	if (!m_Alive)

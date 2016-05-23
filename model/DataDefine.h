@@ -46,17 +46,6 @@ enum AttributeType
 	atb_hp_recover,		//31	血量回复
 };
 
-enum MoreGridAlive		//多格子武将定义
-{
-	oneGrid		=1,
-	twoGrid		=2,
-	threeGrid	=3,
-	fourGrid	=4,
-	sixGrid		=6,
-	eightGrid	=8,
-	twelveGrid	=12,
-};
-
 enum CALL_Type			//定义武将召唤类型类型,不同类型武将处理不同
 {
 	CommonType = 0,			//普通类型武将

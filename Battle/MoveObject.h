@@ -25,7 +25,6 @@ class MoveObject : public CCNode
 {
 public:
 	MoveObject();
-	virtual bool init();
 	void initMoveSprite();
 	CREATE_FUNC(MoveObject);
 	CC_SYNTHESIZE(ActObject*,m_Actobject,ActObject);

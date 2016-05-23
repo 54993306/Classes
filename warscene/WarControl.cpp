@@ -43,12 +43,7 @@ WarControl::WarControl()
 	,m_batchNodeEffect(nullptr)
 {}
 
-WarControl::~WarControl()
-{
-	REMOVE_TARGET(m_ControLayer);
-	CC_SAFE_RELEASE(m_ControLayer);
-	m_ControLayer = nullptr;
-}
+WarControl::~WarControl(){}
 
 void WarControl::onEnter()
 {
@@ -153,7 +148,6 @@ bool WarControl::init()
 	if (outPutERRORMsg("WarControl::init",m_ControLayer))
 		return false;
 	m_ControLayer->setPosition(VCENTER);
-	m_ControLayer->retain();
 	this->setIsShowBlack(false);
 	this->setTouchPriority(WarControlPriority);
 	this->setTouchEnabled(false);

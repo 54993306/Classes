@@ -8,210 +8,248 @@
 #include "common/ShaderDataHelper.h"
 #include "warscene/CHeroSoundData.h"
 #include "Battle/BattleMessage.h"
+#include "model/DataDefine.h"
+
 HPObject::HPObject()
-	:m_hp(nullptr)
-	,m_bg(nullptr)
-	,m_hpVal(0)
-	,m_maxHpVal(0)
-	,m_percent(0)
+	:m_Skin(nullptr),m_Background(nullptr),m_HpNumber(0),m_HpNumberMax(0),m_Percent(0)
+	,m_Alive(nullptr),m_ActObject(nullptr)
 {}
+
 HPObject::~HPObject()
 {
-	if(m_hp) removeChild(m_hp);
-	if(m_bg) removeChild(m_bg);
-	CC_SAFE_RELEASE(m_hp);
-	CC_SAFE_RELEASE(m_bg);
-	m_hp = nullptr;
-	m_bg = nullptr;
+	if(m_Skin) removeChild(m_Skin);
+	if(m_Background) removeChild(m_Background);
+	CC_SAFE_RELEASE(m_Skin);
+	CC_SAFE_RELEASE(m_Background);
+	m_Skin = nullptr;
+	m_Background = nullptr;
 }
-void HPObject::setSkin(const char* bgSkin,const char* hpSkin,bool isEnemy)
+
+void HPObject::initBackground( const char* pPath )
 {
-	do{
-		if( m_bg != nullptr ) break;
-		if( bgSkin == nullptr ) break;
-		m_bg = CCSprite::create(bgSkin);
-		if( m_bg != nullptr )
-		{
-			m_bg->retain();
-			this->addChild(m_bg);
-		}
-		this->setContentSize(m_bg->getContentSize());
-	} while (0);
-	do{
-		if(m_hp != nullptr) break;
-		if(hpSkin == nullptr ) break;
-		CCSprite* hp = CCSprite::create(hpSkin);
-		if(hp == nullptr ) break;
-		m_hp = CCProgressTimer::create(hp);
-		if( m_hp != nullptr )
-		{
-			m_hp->setType(kCCProgressTimerTypeBar);
-			if (isEnemy)
-			{
-				m_hp->setBarChangeRate(ccp(1,0));
-				m_hp->setMidpoint(ccp(0,0));
-			}else{
-				m_hp->setBarChangeRate(ccp(1,0));
-				m_hp->setMidpoint(ccp(1,0));
-			}
-			m_hp->setPercentage(0.0f);
-			m_hp->retain();
-			this->addChild( m_hp );
-		}
-	} while (0);
-}
-void HPObject::setHp(float hp)
-{
-	if( m_hpVal == hp )
+	m_Background = CCSprite::create(pPath);
+	if( m_Background != nullptr )
 	{
-		CCLOG("[ *TIPS ] HPObject::setHp m_hpVal == hp");
+		m_Background->retain();
+		this->addChild(m_Background);
+	}else{
+		CCLOG("[ *ERROR ] HPObject::initBackground");
+		m_Background = NULL;
 		return;
 	}
-	m_hpVal = hp;
-	if (m_hpVal >= m_maxHpVal)
-		m_hpVal = m_maxHpVal;
-	updateShow();
+	this->setContentSize(m_Background->getContentSize());
 }
-void HPObject::setMaxHp(float maxHp)
+
+void HPObject::setSkinDirection()
 {
-	if( m_maxHpVal == maxHp ) return;
-	m_maxHpVal = maxHp;
+	if ( !m_Skin)
+		return ;
+	if (m_Alive->getEnemy())
+	{
+		m_Skin->setBarChangeRate(ccp(1,0));
+		m_Skin->setMidpoint(ccp(0,0));
+	}else{
+		m_Skin->setBarChangeRate(ccp(1,0));
+		m_Skin->setMidpoint(ccp(1,0));
+	}
+}
+
+void HPObject::initSkinByEnemy()
+{
+	if (m_Alive->getEnemy())
+	{
+		initSkin("warScene/bar_yellow.png");
+	}else{
+		initSkin("warScene/bar_green.png");
+	}
+	setSkinDirection();
+}
+
+void HPObject::initSkin( const char* pPath )
+{
+	CCSprite* tSkin = CCSprite::create(pPath);
+	if (tSkin)
+	{
+		m_Skin = CCProgressTimer::create(tSkin);
+		m_Skin->setType(kCCProgressTimerTypeBar);
+
+		m_Skin->setPercentage(0.0f);
+		m_Skin->retain();
+		this->addChild( m_Skin );
+	}else{
+		CCLOG("[ *ERROR ] HPObject::initSkin %s",pPath);
+		m_Skin = nullptr;
+		return ;
+	}
+}
+
+void HPObject::initHp(AliveObject* pAlive)
+{
+	m_ActObject = pAlive;
+	m_Alive = pAlive->getAlive();
+	initBackground("public/black.png");
+	initSkinByEnemy();
+	this->setHpNumberMax(m_Alive->getMaxHp());
+	this->setHpNumber(m_Alive->getHp());
+	this->setScale(1/m_Alive->getZoom());
+	this->setVisible(false);
+}
+
+void HPObject::setHpNumber(float hp)
+{
+	if( m_HpNumber == hp )
+		return;
+	m_HpNumber = hp;
+	if (m_HpNumber >= m_HpNumberMax)
+		m_HpNumber = m_HpNumberMax;
 	updateShow();
 }
+float HPObject::getHpNumber(){return m_HpNumber;}
+
+void HPObject::setHpNumberMax(float maxHp)
+{
+	if( m_HpNumberMax == maxHp ) return;
+	m_HpNumberMax = maxHp;
+	updateShow();
+}
+float HPObject::getHpNumberMax(){return m_HpNumberMax;}
+
 void HPObject::updateShow()
 {
-	if( m_maxHpVal <= 0 ) return;
-	m_percent = m_hpVal / m_maxHpVal * 100;
-	if( !m_hp ) 
+	if( m_HpNumberMax <= 0 ) return;
+	m_Percent = m_HpNumber / m_HpNumberMax * 100;
+	if( !m_Skin ) 
 		return;
-	float oldPe = m_hp->getPercentage();
-	CCProgressFromTo* proto = CCProgressFromTo::create(0.3f,oldPe,m_percent);
-	m_hp->runAction(proto);
+	float oldPe = m_Skin->getPercentage();
+	CCProgressFromTo* proto = CCProgressFromTo::create(0.3f,oldPe,m_Percent);
+	m_Skin->runAction(proto);
 }
 
-bool HPObject::hitEffect(AliveObject* target)
+CCSequence* HPObject::normalAction(int pDistance)
 {
-	CCNode* Effect = DataCenter::sharedData()->getRoleData()->getActionEffect(target->getModel());
-	if (Effect)
-	{
-		target->addChild(Effect);
-		return false;
-	}
-	return true;
-}
-
-void HPObject::playerNum(AliveObject* target,int num,int type)
-{
-	showHp(nullptr);
-	float scale = target->getScale();								//得到目标的缩放比例
-	int moveNum = CCRANDOM_0_1()*170;
-	CCScaleTo* sc = CCScaleTo::create(0.15f,1/scale*1.3f);
-	CCScaleTo* sc1 = CCScaleTo::create(0.15f,1/scale*1.0f);
-	CCMoveBy* moveBy = CCMoveBy::create(0.25f, ccp(0,moveNum));
+	CCScaleTo* sc = CCScaleTo::create(0.15f,1.3f);
+	CCScaleTo* sc1 = CCScaleTo::create(0.15f,1.0f);
+	CCMoveBy* moveBy = CCMoveBy::create(0.25f, ccp(0,pDistance));
 	CCFadeOut* fadeout = CCFadeOut::create(0.6f);
 	CCDelayTime* dely = CCDelayTime::create(0.25f);
 	CCSpawn* spw = CCSpawn::create((CCMoveBy*)moveBy->copy(),(CCFadeOut*)fadeout->copy(),NULL);
-	CCSequence* sqe = CCSequence::create(sc,sc1,(CCDelayTime*)dely->copy(),spw, CCRemoveSelf::create() , NULL);
+	CCSequence* tSequence = CCSequence::create(sc,sc1,dely,spw, CCRemoveSelf::create() , NULL);
+	return tSequence;
+}
 
-	CCScaleTo* crit_sc = CCScaleTo::create(0.05f,1);
-	CCScaleTo* crit_sc2 = CCScaleTo::create(0.1f,1.2f);
-	CCMoveBy* moveBy2 = CCMoveBy::create(0.05f, ccp(0,moveNum));
-	CCSpawn* crit_up = CCSpawn::create(crit_sc,moveBy2,NULL);
-	CCFadeOut* fadeout1 = CCFadeOut::create(0.8f);
-	CCSequence* crit_sqeBg = CCSequence::create(crit_up,crit_sc2,(CCDelayTime*)dely->copy(),fadeout1,CCRemoveSelf::create(),NULL);
+CCSequence* HPObject::critAction( int pDistance )
+{
+	CCScaleTo* tScaleTo = CCScaleTo::create(0.05f,1);
+	CCScaleTo* tScaleTo2 = CCScaleTo::create(0.1f,2.3f);
+	CCMoveBy* tMoveBy = CCMoveBy::create(0.2f, ccp(0,pDistance));
+	CCSpawn* tSpawn = CCSpawn::create(tScaleTo,tMoveBy,NULL);
+	CCFadeOut* tFadeOut = CCFadeOut::create(1.3f);
+	CCDelayTime* tDelaty = CCDelayTime::create(0.25f);
+	CCSequence* tSequence = CCSequence::create(tSpawn,tScaleTo2,tDelaty,tFadeOut,CCRemoveSelf::create(),NULL);
+	return tSequence;
+}
 
-	CCScaleTo* crit_sc3 = CCScaleTo::create(0.05f,1);
-	CCScaleTo* crit_sc4 = CCScaleTo::create(0.1f,2.3f);
-	CCMoveBy* moveBy3 = CCMoveBy::create(0.2f, ccp(0,moveNum));
-	CCSpawn* crit_up2 = CCSpawn::create(crit_sc3,moveBy3,NULL);
-	CCFadeOut* fadeout2 = CCFadeOut::create(1.3f);
-	CCSequence* crit_sqe = CCSequence::create(crit_up2,crit_sc4,(CCDelayTime*)dely->copy(),fadeout2,CCRemoveSelf::create(),NULL);
+void HPObject::missEffect()
+{
+	CCSprite*font = CCSprite::create("label/miss.png");
+	font->runAction(normalAction(CCRANDOM_0_1()*170));
+	font->setPosition(ccp(-100,0));
+	m_ActObject->addChild(font);
+}
 
-	int HpNum = abs(num);
-	CCLabelAtlas* NumLabel = nullptr;
-	CCSprite* font = nullptr;
-	string str ="/"+string(ToString(HpNum));
-	switch (type)
+void HPObject::critEffect( int pDistance )
+{
+	CCDelayTime* tDelay = CCDelayTime::create(0.25f);
+	CCScaleTo* tScaleTo = CCScaleTo::create(0.05f,1);
+	CCScaleTo* tScaleTo2 = CCScaleTo::create(0.1f,1.2f);
+	CCMoveBy* tMoveBy = CCMoveBy::create(0.05f, ccp(0,pDistance));
+	CCSpawn* tSpawn = CCSpawn::create(tScaleTo,tMoveBy,NULL);
+	CCFadeOut* tFadeOut = CCFadeOut::create(0.8f);
+	CCSequence* tSequcece = CCSequence::create(tSpawn,tScaleTo2,tDelay,tFadeOut,CCRemoveSelf::create(),NULL);
+
+	CCSprite* tCritBackground = CCSprite::create("warScene/blood_mobile.png");
+	if (m_Alive->getEnemy())										//暴击的显示方式，字体旋转一定角度，敌我双方显示位置不同
+	{
+		tCritBackground->setPosition(ccp(-40,120));
+	}else{
+		tCritBackground->setPosition(ccp(20,120));
+	}
+	tCritBackground->runAction(tSequcece);
+	m_ActObject->addChild(tCritBackground);
+}
+
+void HPObject::runActionByType( int pType,CCNode* pLabel )
+{
+	if (pType >=  genralCritType)
+	{
+		int tDistance = CCRANDOM_0_1()*170;
+		pLabel->setScale(0.1f);
+		pLabel->runAction(critAction(tDistance));
+		critEffect(tDistance);
+	}else{
+		pLabel->runAction(normalAction(CCRANDOM_0_1()*170));
+	}
+}
+
+void HPObject::offsByEnemy( CCNode* pLabel )
+{
+	if (m_Alive->getEnemy())
+	{
+		pLabel->setPosition(ccp(-170,100));
+	}else{
+		pLabel->setPosition(ccp(-50,100));
+	}
+}
+
+void HPObject::gainNumberPlay( int pChangeNumber )
+{
+	string str ="."+string(ToString(abs(pChangeNumber)));
+	CCLabelAtlas* tNumberLabel = CCLabelAtlas::create(str.c_str(),"label/green.png",31,39,46);
+	setHpNumber(m_HpNumber + abs(pChangeNumber));								//存在交替变化的清楚出现如果合击的话
+	PlayEffectSound(SFX_513);
+	if (!tNumberLabel)
+	{
+		CCLOG("[ *ERROR ] HPObject::gainNumberPlay = %d",m_Alive->getModel());
+		return;
+	}
+	offsByEnemy(tNumberLabel);
+	tNumberLabel->runAction(normalAction(CCRANDOM_0_1()*170));
+	m_ActObject->addChild(tNumberLabel,1);
+}
+
+void HPObject::lostNumberPlay( int pChangeNumber,int pType )
+{
+	string str ="/"+string(ToString(abs(pChangeNumber)));
+	CCLabelAtlas* tNumberLabel = CCLabelAtlas::create(str.c_str(),"label/myred.png",31,39,46); 
+	setHpNumber(m_HpNumber - abs(pChangeNumber));	
+	if (!tNumberLabel)
+	{
+		CCLOG("[ *ERROR ] HPObject::lostNumberPlay = %d",m_Alive->getModel());
+		return;
+	}
+	runActionByType(pType,tNumberLabel);
+	offsByEnemy(tNumberLabel);
+	m_ActObject->addChild(tNumberLabel,1);
+}
+
+void HPObject::playChangeNumber(int pChangeNumber,int pType)
+{
+	showHp(nullptr);
+	switch (pType)
 	{
 	case typeface:
 		{
-			font = CCSprite::create("label/miss.png");
-			font->setScale(1/scale);
-			font->runAction(sqe);
-			font->setPosition(ccp(-100,0));
-			target->addChild(font);
-			return;
-		}	break;
+			missEffect();
+		}break;
 	case gainType:
 		{
-			str ="."+string(ToString(HpNum));
-			NumLabel = CCLabelAtlas::create(str.c_str(),"label/green.png",31,39,46);
-			setHp(m_hpVal + HpNum);								//存在交替变化的清楚出现如果合击的话
-			PlayEffectSound(SFX_513);
-		}	break;
-	case angerType:
-		{
-			str ="."+string(ToString(HpNum));
-			NumLabel = CCLabelAtlas::create(str.c_str(),"label/yellow.png",26,32,46);
+			gainNumberPlay(pChangeNumber);
 		}break;
-	case generalType:	{ NumLabel = CCLabelAtlas::create(str.c_str(),"label/number1.png",26,32,46); } break;
-	case cutType:		{ NumLabel = CCLabelAtlas::create(str.c_str(),"label/number2.png",26,32,46); } break;
-	case addType:		{ NumLabel = CCLabelAtlas::create(str.c_str(),"label/number3.png",26,32,46); } break;
-	case genralCritType:{ NumLabel = CCLabelAtlas::create(str.c_str(),"label/number1.png",26,32,46); } break;
-	case cutCritType:	{ NumLabel = CCLabelAtlas::create(str.c_str(),"label/number2.png",26,32,46); } break;
-	case addCritType:	{ NumLabel = CCLabelAtlas::create(str.c_str(),"label/number3.png",26,32,46); } break;
-	default:	break;
-	}
-	if (type > gainType)										//武将掉血变红
-	{
-		target->getAlive()->setCloaking(false);					//潜行状态取消
-		NumLabel = CCLabelAtlas::create(str.c_str(),"label/myred.png",31,39,46); 
-		setHp(m_hpVal - HpNum);	
-		if (hitEffect(target))
+	default:
 		{
-			CCTintTo* to1 = CCTintTo::create(0.25f,255,0,0);
-			CCTintTo* to2 = CCTintTo::create(0,255,255,255);
-			target->getArmature()->runAction(CCSequence::create(to1,to2,NULL));
-		}
-		if (target->getAlive()->getCaptain())					//主帅掉血提示
-		{
-			NOTIFICATION->postNotification(B_CaptainHurt,target->getAlive());
-			NOTIFICATION->postNotification(B_Shark,nullptr);
-		}
+			lostNumberPlay(pChangeNumber,pType);
+		}break;
 	}
-	if (!NumLabel)return;
-	if (type >=  genralCritType)
-	{
-		font = CCSprite::create("warScene/blood_mobile.png");
-		CCSequence* runSqu = (CCSequence*)crit_sqe->copy();
-		NumLabel->setScale(0.1f);
-		NumLabel->runAction(runSqu);
-	}else{
-		CCSequence* runSqu = (CCSequence*)sqe->copy();
-		NumLabel->runAction(runSqu);
-	}
-	if (target->getEnemy())
-	{
-		NumLabel->setPosition(ccp(-170,100));
-	}else{
-		NumLabel->setPosition(ccp(-50,100));
-	}
-	target->addChild(NumLabel,1);
-	if (!font)return;						//暴击的显示方式，字体旋转一定角度，敌我双方显示位置不同
-	if (target->getEnemy())
-	{
-		font->setPosition(ccp(-40,120));
-	}else{
-		font->setPosition(ccp(20,120));
-	}
-	CCSequence* runSqu = (CCSequence*)crit_sqeBg->copy();
-	font->runAction(runSqu);
-	target->addChild(font);
-}
-
-CCProgressTimer* HPObject::getPro()
-{
-	return m_hp;
 }
 
 void HPObject::showHp( CCObject* ob )

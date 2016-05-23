@@ -56,10 +56,10 @@ public:
 	void AddEvent();
 	void RemoveEvent();
 	void LayerMoveEnd(CCObject* ob);
-	void ShakeLayer(CCObject* ob);
 	virtual bool ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent);
 	virtual void ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent);
 	virtual void ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent);
+	virtual void ccTouchCancelled(CCTouch *pTouch, CCEvent *pEvent);
 public:
 	CC_SYNTHESIZE(CCNode*,m_MoveLayer,MoveLayer);
 	CC_SYNTHESIZE(WarMapLayer*,m_MapLayer,WarMapLayer);
@@ -73,5 +73,6 @@ public:
 protected:
 	CCPoint m_StartPos;				//记录触摸起始点
 	DropItem* _dropItem;
+	CCTouch * m_Touch;
 };
 #endif // !_WAR_SCENE_H_

@@ -624,18 +624,6 @@ bool LoginScene::ProcessMsg(int type, google::protobuf::Message *msg)
 			UserData* userData = DataCenter::sharedData()->getUser()->getUserData();
 			userData->setRaceType(role.rolenation());
 		
-			if(role.rolenation()==RaceType_1)
-			{
-				//userData->setAliveModel("hero6");
-			}
-			else if(role.rolenation()==RaceType_2)
-			{
-				//userData->setAliveModel("hero2");
-			}
-			else
-			{
-				//userData->setAliveModel("hero5");
-			}
 			userData->setAliveID(role.roleid());
 			userData->setRoleID(role.roleid());
 			userData->setLevel(role.rolelv());

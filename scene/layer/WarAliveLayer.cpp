@@ -45,13 +45,15 @@ bool WarAliveLayer::init()
 	this->setTouchPriority(AliveLayerPriority);
 	this->setTouchEnabled(false);
 	this->setIsShowBlack(false);
-	createMoveTarget();
 	m_MoveNode = CCNode::create();
 	addChild(m_MoveNode);
 	m_AliveNode = CCNode::create();
 	addChild(m_AliveNode);
 	m_Manage = DataCenter::sharedData()->getWar();
 	m_map = DataCenter::sharedData()->getMap()->getCurrWarMap();
+
+	createMoveTarget();
+	createLayerColor();
 	createActObjects();
 	return true;
 }
@@ -275,7 +277,6 @@ void WarAliveLayer::initMoveActObject( ActObject* aliveOb )
 	m_MoveActObject->getBody()->setScale(aliveOb->getBody()->getScale());;
 	m_MoveActObject->setVisible(true);
 }
-
 
 void WarAliveLayer::lucencyActObject(bool lucency)
 {

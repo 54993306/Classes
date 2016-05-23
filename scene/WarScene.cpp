@@ -22,7 +22,7 @@
 WarScene::WarScene()
 	:m_MapLayer(nullptr),m_AliveLayer(nullptr),m_StoryLayer(nullptr)
 	,m_MoveLayer(nullptr),m_UILayer(nullptr),_dropItem(nullptr)
-	,m_Loginc(nullptr)
+	,m_Loginc(nullptr),m_Touch(nullptr)
 {}
 WarScene::~WarScene()
 {
@@ -35,7 +35,6 @@ void WarScene::onEnter()
 	DataCenter::sharedData()->getUser()->setoldLevel();									//设置开始战斗前等级
 	m_Loginc->initMember();
 	LayerMoveEnd(CCInteger::create((int)StoryType::beginStory));						//这个方法不应该放在这里的发条消息也能解决的问题
-	NOTIFICATION->addObserver(this,callfuncO_selector(WarScene::ShakeLayer),B_Shark,nullptr);
 }
 
 void WarScene::onEnterTransitionDidFinish()
@@ -109,19 +108,23 @@ void WarScene::RemoveEvent()
 
 bool WarScene::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
 {
-	m_StartPos = pTouch->getLocation();
+	if (! m_Touch)
+	{
+		m_Touch = pTouch;
+		m_StartPos = pTouch->getLocation();
+	}
 	return true;
 }
 //拖动地图
 void WarScene::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)
 {
-	//CCPoint pMove = this->convertToNodeSpace(pTouch->getLocation());
 #if CC_TARGET_PLATFORM != CC_PLATFORM_WIN32
 	if (!DataCenter::sharedData()->getWar()->getNormal())
 		return;
 #endif
-	
-	CCPoint pMove = pTouch->getLocation();
+	if (m_Touch != pTouch)
+		return ;
+	CCPoint pMove = m_Touch->getLocation();
 	float dx = pMove.x - m_StartPos.x;							//地图只能x轴移动
 	float newX = dx + m_MoveLayer->getPositionX();
 	WarMapData* mapData = DataCenter::sharedData()->getMap()->getCurrWarMap();
@@ -130,7 +133,6 @@ void WarScene::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)
 #if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
 	if( newX > MAP_MAXX(mapData) )
 		newX = MAP_MAXX(mapData);
-	//if (newX > 0)newX = 0;
 #else
 	if (newX > 0)newX = 0;
 #endif
@@ -148,36 +150,17 @@ void WarScene::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)
 	m_MoveLayer->setPositionX(newX);	
 	lay->setPositionX(layx-px);					
 }
+
+void WarScene::ccTouchCancelled( CCTouch *pTouch, CCEvent *pEvent )
+{
+	if (pTouch == m_Touch)
+		m_Touch = nullptr;
+}
+
 void WarScene::ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent)
 {
-	return;
-	CCPoint endP = pTouch->getLocation();
-	float dx = endP.x - m_StartPos.x;							//地图只能x轴移动
-	float time  = 0.5f;
-	if (dx > 130)
-	{
-		dx = dx +300;
-		time += 0.5f;
-	}else if (dx < - 130)
-	{
-		dx = dx -300;
-		time += 0.5f;
-	}
-	CCPoint layerP = m_MoveLayer->getPosition();
-	float newX = dx + layerP.x;
-	WarMapData* mapData = DataCenter::sharedData()->getMap()->getCurrWarMap();
-	if( newX < MAP_MINX(mapData) )
-		newX = MAP_MINX(mapData);
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
-	if( newX > MAP_MAXX(mapData) )
-		newX = MAP_MAXX(mapData);
-	//if (newX > 0)newX = 0;
-#else
-	if (newX > 0)newX = 0;
-#endif
-	CCMoveTo* moveTo = CCMoveTo::create(time,ccp(newX,m_MoveLayer->getPositionY()));
-	CCActionInterval * easeExponentialIn= CCEaseExponentialOut::create(moveTo); //缓慢终止
-	m_MoveLayer->runAction(easeExponentialIn);
+	if (pTouch == m_Touch)
+		m_Touch = nullptr;
 }		
 
 CCArray* WarScene::getTaskArray()
@@ -215,13 +198,4 @@ void WarScene::LayerMoveEnd(CCObject* ob)
 			CCNotificationCenter::sharedNotificationCenter()->postNotification(B_LayerMoveEnd,ob);
 	}
 #endif
-}
-
-void WarScene::ShakeLayer( CCObject* ob )
-{
-	//if (m_MoveLayer->getActionByTag(100))
-	//	return;
-	//CCShake* shake = CCShake::create(0.4f,13.0f);
-	//shake->setTag(100);
-	//m_MoveLayer->runAction(shake);
 }

@@ -213,7 +213,7 @@ void ActObject::TurnToStand( float dt ){ TurnStateTo(Stand_Index); }
 void ActObject::ActionEnd( const char* ActionName )
 {
 	if (	strcmp(ActionName,Attack_Action) == 0					//普攻转站立
-		||	strcmp(ActionName,SpAttack_Action) == 0				//特攻转站立
+		||	strcmp(ActionName,SpAttack_Action) == 0					//特攻转站立
 		||	strcmp(ActionName,Hit_Action) == 0						//受击转站立(连续受击问题)
 		||	strcmp(ActionName,Dizzy_Action) == 0					//眩晕转站立
 		||	strcmp(ActionName,Skill_Action) == 0					//必杀技转站立
@@ -338,10 +338,7 @@ void ActObject::removeAct( CCNode* node )
 
 void ActObject::setAlive( WarAlive* var )
 {
-	if (var)
-		m_Alive = var;
-	else
-		CCLOG("[ **ERROR ]  ActObject::setAlive");
+	m_Alive = var;
 	GameStateManager* stateManage = GameStateManager::create();						//继承实现状态管理器
 	GameStateTransition* transition = GameStateTransition::create();				//继承实现状态切换列表对象
 	this->setStateManager(stateManage);												//设置状态机的状态管理器
