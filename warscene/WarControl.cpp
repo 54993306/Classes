@@ -584,7 +584,7 @@ void WarControl::AliveBattlefield( WarAlive* alive )
 		MoveLaout->runAction(CCMoveBy::create(0.2f,ccp(0,30)));					//武将上阵
 		CdBar->startProgressFromTo(0,100,skill.coldDown);						//技能CD
 		NeedCost->setString(ToString(skill.cost));								//初始化值为上阵消耗cost
-		NOTIFICATION->postNotification(B_ChangeCostNumber,CCFloat::create(-alive->role->useCost));
+		NOTIFICATION->postNotification(B_ChangeCostNumber,CCInteger::create(-alive->role->useCost));
 	}
 	CButton* btn = (CButton*)MoveLaout->getChildByTag(CL_Btn);
 	btn->setEnabled(false);
@@ -652,7 +652,7 @@ void WarControl::AliveButtonClick( CCObject* ob )
 	CProgressBar* CdBar = (CProgressBar*)MoveLaout->getChildByTag(CL_HeroPro);
 	CdBar->setValue(0);
 	NOTIFICATION->postNotification(B_RecordContinuousSkill);
-	NOTIFICATION->postNotification(B_ChangeCostNumber,CCInteger::create(-skill.cost));
+	NOTIFICATION->postNotification(B_ChangeCostNumber,CCInteger::create(- skill.cost));
 	if (alive->getCaptain())
 		ResetButtonState(alive);
 	else

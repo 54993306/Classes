@@ -378,8 +378,8 @@ void CombatGuideLayer::ImageTextGuide(CombatGuideStep* step)
 	resetAlive(step);
 	if (step->getAddCost())
 	{
-		NOTIFICATION->postNotification(B_ChangeCostNumber,CCFloat::create(-10000));//置空处理
-		NOTIFICATION->postNotification(B_ChangeCostNumber,CCFloat::create(step->getAddCost()));
+		NOTIFICATION->postNotification(B_ChangeCostNumber,CCInteger::create(-10000));//置空处理
+		NOTIFICATION->postNotification(B_ChangeCostNumber,CCInteger::create(step->getAddCost()));
 	}
 }
 

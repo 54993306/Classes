@@ -264,9 +264,14 @@ void WarAliveLayer::aliveEntranceBattle(CCObject* ob)
 
 void WarAliveLayer::initMoveActObject( ActObject* aliveOb )
 {
-	m_MoveActObject->setModel(aliveOb->getModel());	//移动的目标是模型是被点击的目标模型
+	if (m_MoveActObject->getModel() != aliveOb->getModel())
+	{
+		m_MoveActObject->getArmature()->removeFromParentAndCleanup(true);
+		m_MoveActObject->setModel(aliveOb->getModel());	//移动的目标是模型是被点击的目标模型'
+		m_MoveActObject->setoffs(aliveOb->getoffs());		//武将原来相对于格子的偏移量
+		m_MoveActObject->getBody()->setScale(aliveOb->getBody()->getScale());
+	}
 	m_MoveActObject->TurnStateTo(Stand_Index);
-	m_MoveActObject->setoffs(aliveOb->getoffs());		//武将原来相对于格子的偏移量
 	if (aliveOb->getAlive()->getGridIndex())
 	{
 		if(aliveOb->getMoveObject())
@@ -274,7 +279,6 @@ void WarAliveLayer::initMoveActObject( ActObject* aliveOb )
 	}else{
 		m_MoveActObject->setPosition(ccp(-500,100));
 	}
-	m_MoveActObject->getBody()->setScale(aliveOb->getBody()->getScale());;
 	m_MoveActObject->setVisible(true);
 }
 

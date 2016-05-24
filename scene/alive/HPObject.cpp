@@ -149,15 +149,7 @@ CCSequence* HPObject::critAction( int pDistance )
 	return tSequence;
 }
 
-void HPObject::missEffect()
-{
-	CCSprite*font = CCSprite::create("label/miss.png");
-	font->runAction(normalAction(CCRANDOM_0_1()*170));
-	font->setPosition(ccp(-100,0));
-	m_ActObject->addChild(font);
-}
-
-void HPObject::critEffect( int pDistance )
+CCSequence* HPObject::critBackgroundAction( int pDistance )
 {
 	CCDelayTime* tDelay = CCDelayTime::create(0.25f);
 	CCScaleTo* tScaleTo = CCScaleTo::create(0.05f,1);
@@ -165,17 +157,16 @@ void HPObject::critEffect( int pDistance )
 	CCMoveBy* tMoveBy = CCMoveBy::create(0.05f, ccp(0,pDistance));
 	CCSpawn* tSpawn = CCSpawn::create(tScaleTo,tMoveBy,NULL);
 	CCFadeOut* tFadeOut = CCFadeOut::create(0.8f);
-	CCSequence* tSequcece = CCSequence::create(tSpawn,tScaleTo2,tDelay,tFadeOut,CCRemoveSelf::create(),NULL);
+	CCSequence* tSequence = CCSequence::create(tSpawn,tScaleTo2,tDelay,tFadeOut,CCRemoveSelf::create(),NULL);
+	return tSequence;
+}
 
-	CCSprite* tCritBackground = CCSprite::create("warScene/blood_mobile.png");
-	if (m_Alive->getEnemy())										//暴击的显示方式，字体旋转一定角度，敌我双方显示位置不同
-	{
-		tCritBackground->setPosition(ccp(-40,120));
-	}else{
-		tCritBackground->setPosition(ccp(20,120));
-	}
-	tCritBackground->runAction(tSequcece);
-	m_ActObject->addChild(tCritBackground);
+void HPObject::missEffect()
+{
+	CCSprite*font = CCSprite::create("label/miss.png");
+	font->runAction(normalAction(CCRANDOM_0_1()*170));
+	font->setPosition(ccp(-100,0));
+	m_ActObject->addChild(font);
 }
 
 void HPObject::runActionByType( int pType,CCNode* pLabel )
@@ -185,10 +176,23 @@ void HPObject::runActionByType( int pType,CCNode* pLabel )
 		int tDistance = CCRANDOM_0_1()*170;
 		pLabel->setScale(0.1f);
 		pLabel->runAction(critAction(tDistance));
-		critEffect(tDistance);
+		critBackgroundEffect(tDistance);
 	}else{
 		pLabel->runAction(normalAction(CCRANDOM_0_1()*170));
 	}
+}
+
+void HPObject::critBackgroundEffect( int pDistance )
+{
+	CCSprite* tCritBackground = CCSprite::create("warScene/blood_mobile.png");
+	if (m_Alive->getEnemy())										//暴击的显示方式，字体旋转一定角度，敌我双方显示位置不同
+	{
+		tCritBackground->setPosition(ccp(-40,120));
+	}else{
+		tCritBackground->setPosition(ccp(20,120));
+	}
+	tCritBackground->runAction(critBackgroundAction(pDistance));
+	m_ActObject->addChild(tCritBackground);
 }
 
 void HPObject::offsByEnemy( CCNode* pLabel )

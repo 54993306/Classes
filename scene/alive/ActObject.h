@@ -23,6 +23,7 @@ class EffectData;
 class WarControl;
 class ArmatureEventData;
 class WarMapData;
+class WarManager;
 
 enum ActObjectTag
 {
@@ -61,14 +62,29 @@ public:
 	void updateFrameEvent(float dt);
 	void updatePosition(float dt);							//刷新武将位置
 	void MoveUpdate(float dt);
-	void TurnToStand(float dt);
 	CC_SYNTHESIZE(bool,m_Reset,Reset);						//武将是否置空过(引导重置用)
-
+	bool isDistination(float pDt);
+	void moveEnd();
 	bool firstBattle(CCPoint& p);
-	void walkDirection(CCPoint& p,CCPoint& cp);
+	void walkDirection(CCPoint& p);
 	void roleMoveSpeed();
+	float getMoveTime();
+private:
+	void actionEvent(int pFremIndex);
+	void dieActionEnd();
+	void attackActionEnd();
+	void initSpineModel();
+	void initSpineEffect();
+	void initCocosModel();
+	void toWlkActionDispose();
+	void setCocosAction();
+	void lostAction();
+	void hideSpineEffect();
+	void setSpineAction();
+	void setSpineEffectAction();
 private:
 	WarMapData* m_MapData;
+	WarManager* m_Manage;
 	int m_lastFrame;
 	ArmatureEventData* m_armatureEventData;
 };

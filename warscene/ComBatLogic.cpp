@@ -87,6 +87,49 @@ void CombatLogic::onExit()
 	this->unscheduleAllSelectors();
 }
 
+void CombatLogic::onEnter()
+{
+	CCNode::onEnter();
+	m_Scene = (WarScene*)this->getParent(); 
+	m_Assist->setScene(m_Scene);
+	m_CombatEffect->setScene(m_Scene);
+	m_UILayer = m_Scene->getWarUI();
+	m_UILayer->setVisible(false);
+	m_MapLayer = m_Scene->getWarMapLayer();
+	m_StoryLayer = m_Scene->getStoryLayer();
+	m_AliveLayer = m_Scene->getWarAliveLayer();
+	m_TerrainLayer = m_Scene->getTerrainLayer();
+	m_GuideLayer = m_Scene->getCombatGuideLayer();
+	m_BatchNum = m_Manage->getBatch();
+
+	addEvent();
+	initCost();
+	initMapBackground();
+	initWordBossTime();
+}
+
+void CombatLogic::initCost()
+{
+	CCObject* obj = nullptr;
+	CCArray* arr = m_Manage->getHeros(true);
+	CCARRAY_FOREACH(arr,obj)
+	{
+		WarAlive* alive = (WarAlive*)obj;
+		m_MaxCost += alive->getCostmax();
+		if (alive->getCaptain())
+			m_CurrCost += alive->getInitCost();
+	}
+}
+
+void CombatLogic::initWordBossTime()
+{
+	if (m_Manage->getWorldBoss())
+	{
+		m_iGameTimeCount = 180;			//世界boss打180s,3min
+		m_bCountDown = true;
+	}
+}
+
 bool CombatLogic::init()
 {
 	m_time = 0;
@@ -106,41 +149,13 @@ bool CombatLogic::init()
 	m_MoveRule->retain();
 	m_HurtCount = HurtCount::create();
 	m_HurtCount->retain();
-
 	m_Manage = DataCenter::sharedData()->getWar();
 	m_MapData = DataCenter::sharedData()->getMap()->getCurrWarMap();
-	if (m_Manage->getWorldBoss())
-	{
-		m_iGameTimeCount = 180;			//世界boss打180s,3min
-		m_bCountDown = true;
-	}
-		
-	CCObject* obj = nullptr;
-	CCArray* arr = m_Manage->getHeros(true);
-	CCARRAY_FOREACH(arr,obj)
-	{
-		WarAlive* alive = (WarAlive*)obj;
-		m_MaxCost += alive->getCostmax();
-		if (alive->getCaptain())
-			m_CurrCost += alive->getInitCost();
-	}
 	return true;
 }
 
-void CombatLogic::initMember() 
-{ 
-	m_Scene = (WarScene*)this->getParent(); 
-	m_Assist->setScene(m_Scene);
-	m_CombatEffect->setScene(m_Scene);
-	m_UILayer = m_Scene->getWarUI();
-	m_UILayer->setVisible(false);
-	m_MapLayer = m_Scene->getWarMapLayer();
-	m_StoryLayer = m_Scene->getStoryLayer();
-	m_AliveLayer = m_Scene->getWarAliveLayer();
-	m_TerrainLayer = m_Scene->getTerrainLayer();
-	m_GuideLayer = m_Scene->getCombatGuideLayer();
-	m_BatchNum = m_Manage->getBatch();
-
+void CombatLogic::addEvent()
+{
 	NOTIFICATION->addObserver(this,callfuncO_selector(CombatLogic::StoryEndEvent),B_StoryOver,nullptr);
 	NOTIFICATION->addObserver(this,callfuncO_selector(CombatLogic::RoundStart),B_RoundStart,nullptr);
 	NOTIFICATION->addObserver(this,callfuncO_selector(CombatLogic::doLostHp),B_LostHpEvent,nullptr);
@@ -153,8 +168,10 @@ void CombatLogic::initMember()
 	NOTIFICATION->addObserver(this,callfuncO_selector(CombatLogic::BatterRecord),B_RecordContinuousSkill,nullptr);
 	CNetClient::getShareInstance()->registerMsgHandler(ExitStage,this,CMsgHandler_selector(CombatLogic::OnBattleFinish));
 	CNetClient::getShareInstance()->registerMsgHandler(BossFinishReqMsg,this,CMsgHandler_selector(CombatLogic::onWordBossFinish));
-	
+}
 
+void CombatLogic::initMapBackground() 
+{ 
 	if (m_MapLayer->getBackgroundManage())
 	{
 		m_MapLayer->getBackgroundManage()->setMap(m_MapLayer);
@@ -255,7 +272,7 @@ void CombatLogic::runLogic(float delta)
 
 void CombatLogic::changeCost( CCObject* ob ) 
 { 
-	m_CurrCost += ((CCFloat*)ob)->getValue(); 
+	m_CurrCost += ((CCInteger*)ob)->getValue(); 
 	costUpdate(0);
 }
 
@@ -308,7 +325,6 @@ void CombatLogic::ExcuteAI(float delta)
 			continue;										
 		if (!AttackJudge(alive))
 			continue;
-		//CCLOG("test alive id=%d",alive->getAliveID());
 		if (alive->getEnemy())
 		{
 			MonsterExcuteAI(alive,delta);
@@ -316,7 +332,6 @@ void CombatLogic::ExcuteAI(float delta)
 			HeroExcuteAI(alive);			
 		}
 	}
-	//int i=0;
 }
 //@@
 void CombatLogic::HeroExcuteAI( WarAlive* alive )
@@ -578,21 +593,6 @@ void CombatLogic::CritAtkEnd(CCObject* ob)
 	m_Alive = nullptr;
 	critComboEffect();
 }
-
-void CombatLogic::attackEnd( WarAlive* alive)
-{
-	for (auto i:alive->HittingAlive)
-	{
-		if (i->getHp()>0)
-		{
-			m_HurtCount->BuffHandleLogic(alive,i);									//伤害计算完成才能添加新的BUFF
-		}else{
-			if(i->getActObject() != nullptr)
-				i->getActObject()->AliveDie();
-		}
-	}
-	alive->HittingAlive.clear();
-}
 //攻击帧回调逻辑处理、武将执行一次伤害计算并播放效果
 void CombatLogic::doLostHp(CCObject* ob)
 {
@@ -628,7 +628,10 @@ void CombatLogic::doLostHp(CCObject* ob)
 	default:break;
 	}
 	if( alive->getSortieNum() >= effect->batter )
-		attackEnd(alive);													//武将攻击结束处理
+	{
+		m_HurtCount->BuffHandleLogic(alive);									//伤害计算完成才能添加新的BUFF
+		alive->clearHitAlive();
+	}
 }
 //延迟出场武将
 bool CombatLogic::delayEntrance( WarAlive* alive,float dt )

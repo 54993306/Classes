@@ -93,7 +93,7 @@ protected:
 //太多地方引用了导致整个类都不敢修改，实际上应该以接口的方式来处理的。接口修改少，但是继承接口的实现就难说了
 /******************* 战场武将数据 ********************/
 
-class WarAlive:public AliveBase					//定义数据的顺序结构是为了方便查看数据
+class WarAlive:public CCObject					//定义数据的顺序结构是为了方便查看数据
 {
 public:
 	WarAlive();
@@ -101,6 +101,8 @@ public:
 	CREATE_FUNC(WarAlive);		//父类存在init方法，所有这里就不需要了。
 	void ResetAttackState();					//重置武将当前状态信息
 	void ExcuteNextEffect();					//重置武将下执行下一个效果状态
+	bool canSummonAlive();								//是否可以召唤武将
+	void clearHitAlive();
 	ROLE* role;									//服务器角色信息
 	vector<int> grids;							//多格子站位
 	vector<int> moves;							//各方向移动范围
@@ -113,6 +115,8 @@ public:
 	CC_PROPERTY(BuffManage*,m_BuffManage,BuffManage);
 	CC_SYNTHESIZE(ActObject*,m_ActObject,ActObject);
 	CC_SYNTHESIZE(MoveObject*,m_MoveObj,MoveObject);			//设置移动对象
+	CC_SYNTHESIZE(unsigned int,m_AliveID,AliveID);
+	CC_SYNTHESIZE(int,m_Model,Model);
 	CC_SYNTHESIZE(bool,m_IsEnemy,Enemy);				//怪物
 	CC_PROPERTY(bool,m_NorAtk,NorAtk);					//普通攻击状态
 	CC_SYNTHESIZE(bool,m_SpecialAtk,SpeAtk);			//特殊攻击
@@ -167,7 +171,8 @@ public:
 	CC_SYNTHESIZE(int,m_TerType,TerType);				//地形影响属性类型
 	CC_SYNTHESIZE(int,m_TerTypeNum,TerTypeNum);			//地形影响属性数值
 	CC_SYNTHESIZE(bool,m_LastAlive,LastAlive);			//隐身状态
-	bool canSummonAlive();								//是否可以召唤武将
+protected:
+	inline bool init(){return true;}
 };
 
 class CityAlive:public AliveBase

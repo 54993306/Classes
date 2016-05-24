@@ -45,14 +45,16 @@ class CombatLogic : public CCNode, public DownloadPackageDelegate
 public:
 	CombatLogic(); 
 	~CombatLogic();
+	virtual void onEnter();
 	virtual void onExit();
 	virtual bool init();
 	virtual void update(float delta);
 	CREATE_FUNC(CombatLogic);
-
+	void addEvent();
 	void updateOneSecond(float dt);
 	void cReturnLayer(CCObject* ob);
-
+	void initCost();
+	void initWordBossTime();
 	void scheduleForRequestFinish();
 	void scheduleForRequesBossFinish();
 	void onPause();
@@ -67,7 +69,7 @@ public:
 	void CostCount(WarAlive* alive,float dt);
 	void StoryEndEvent(CCObject* ob);
 	void combatResult(CCObject* ob);
-	void initMember();
+	void initMapBackground();
 	float getTime() { return m_time; }
 	int getCurrCost(){return m_CurrCost;}
 	void changeCost(CCObject* ob);
@@ -93,7 +95,6 @@ public:
 	void attackEffect(WarAlive*alive);
 	void attackDirection(WarAlive*alive);
 	void critComboEffect();
-	void attackEnd(WarAlive* alive);
 	void doLostHp(CCObject* ob);
 	bool walkState(WarAlive* alive);
 	bool AttackJudge(WarAlive* alive);

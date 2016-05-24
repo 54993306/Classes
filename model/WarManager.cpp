@@ -261,7 +261,6 @@ void WarManager::initAlive(WarAlive* alive)
 	alive->setCrit(alive->role->crit);
 	alive->setDef(alive->role->def);
 	alive->setHit(alive->role->hit);
-	alive->setName(alive->role->name.c_str());
 	alive->setRenew(alive->role->renew);
 	alive->setDoge(alive->role->dodge);
 	alive->setZoom(alive->role->zoom*0.01f);
@@ -277,9 +276,9 @@ void WarManager::initAlive(WarAlive* alive)
 		//alive->setMaxHp(5);
 		//alive->setHp(5);		//第一次进来是满血状态
 	}else{		
-		//alive->setAtk(500000);
-		//alive->setMaxHp(500000);
-		//alive->setHp(500000);		//第一次进来是满血状态
+		alive->setAtk(500000);
+		alive->setMaxHp(500000);
+		alive->setHp(500000);		//第一次进来是满血状态
 	}
 #endif
 }

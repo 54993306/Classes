@@ -18,28 +18,20 @@ public:
 	void setSkinDirection();
 	CC_PROPERTY(float,m_HpNumber,HpNumber);
 	CC_PROPERTY(float,m_HpNumberMax,HpNumberMax);
-
 	void playChangeNumber(int pChangeNumber,int pType);
 	void showHp(CCObject* ob);
 	void hideHp(float dt);
-	/***
-	*@Data : 2016.4.20
-	*@MethodName : bool hitEffect(ActObject* target);
-	*@Author : Lin_Xiancheng
-	*@Description : 武将收集叠加特效,添加一张图片做淡出操作,若存在淡出特效则不播放变红效果
-	*
-	*@brief : 武将可能在其他动作时播放特效，后续可能添加的是特效而不是图片,spine骨骼动画,帧动画等拓展,涉及到动作和资源加载
-	*/ 
+protected:
+	void updateShow();
 	CCSequence* normalAction(int pDistance);
 	CCSequence* critAction(int pDistance);
+	CCSequence* critBackgroundAction(int pDistance);
 	void missEffect();
-	void critEffect(int pDistance);
+	void critBackgroundEffect(int pDistance);
 	void runActionByType(int pType,CCNode* pLabel);
 	void offsByEnemy(CCNode* pLabel);
 	void gainNumberPlay(int pChangeNumber);
 	void lostNumberPlay(int pChangeNumber,int pType);
-protected:
-	void updateShow();
 protected:
 	CCProgressTimer* m_Skin;
 	CCSprite* m_Background;

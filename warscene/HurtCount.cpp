@@ -285,36 +285,40 @@ float HurtCount::attributeHurt(WarAlive* AtcTarget)
 	}
 	return num;
 }
-
-void HurtCount::BuffHandleLogic(WarAlive* AtcTarget , WarAlive* HitTarget)
+//只能计算最后一个效果添加在武将身上的buff
+void HurtCount::BuffHandleLogic(WarAlive* pAlive)
 {
-	CEffect* effect = m_Manage->getEffect(AtcTarget);
-	BuffManage* AtcbufManege = AtcTarget->getBuffManage();
-	for (vector<CBuff>::iterator itre = effect->buffList.begin();itre != effect->buffList.end();++itre)
+	CEffect* effect = m_Manage->getEffect(pAlive);
+	BuffManage* AtcbufManege = pAlive->getBuffManage();
+	for (auto tAlive : pAlive->HittingAlive)
 	{
-		CBuff buff = *itre;
-		int ranNum = CCRANDOM_0_1()*100;
-		if (ranNum > buff.useRate/*true*/)//每个buf都需要进行添加判断
+		if (tAlive->getHp()<=0 || tAlive->getDieState())
+			continue;
+		for (vector<CBuff>::iterator itre = effect->buffList.begin();itre != effect->buffList.end();++itre)
 		{
-			//CCLOG("[ TIPS ]Buff Add Fail [BuffID= %d, userRate= %d, ranNum=%d]",buff.buffId,buff.useRate,ranNum);
-			continue;		
-		}
-
-		if (buff.pTarget == usTargetType)					//自己
-		{
-			//CCLOG("\nAtcTargetID = %d ,AddBuff ID: %d",AtcTarget->getAliveID(),buff.buffId);
-			if (buff.typelimit&&buff.typelimit!=AtcTarget->role->roletype)//判断buf的限定种族
-				continue;
-			AtcbufManege->AddBuff(buff);
-		}else if (buff.pTarget == hitTargetType && HitTarget)				//受击目标
-		{
-			BuffManage* HitbufManege = HitTarget->getBuffManage();
-			if (buff.typelimit&&buff.typelimit!=HitTarget->role->roletype)
-				continue;
-			//CCLOG("\nHitTargetID = %d ,AddBuff ID: %d",HitTarget->getAliveID(),buff.buffId);
-			HitbufManege->AddBuff(buff);
-		}else{
-			CCLOG("[ ERROR ] buff.target can find bufid:%d ,aliveid:%d",buff.buffId,AtcTarget->getAliveID());
+			CBuff buff = *itre;
+			int ranNum = CCRANDOM_0_1()*100;
+			if (ranNum > buff.useRate/*true*/)//每个buf都需要进行添加判断
+			{
+				//CCLOG("[ TIPS ]Buff Add Fail [BuffID= %d, userRate= %d, ranNum=%d]",buff.buffId,buff.useRate,ranNum);
+				continue;		
+			}
+			if (buff.pTarget == usTargetType)					//自己
+			{
+				//CCLOG("\nAtcTargetID = %d ,AddBuff ID: %d",AtcTarget->getAliveID(),buff.buffId);
+				if (buff.typelimit&&buff.typelimit!=pAlive->role->roletype)//判断buf的限定种族
+					continue;
+				AtcbufManege->AddBuff(buff);
+			}else if (buff.pTarget == hitTargetType && tAlive)				//受击目标
+			{
+				BuffManage* HitbufManege = tAlive->getBuffManage();
+				if (buff.typelimit&&buff.typelimit!=tAlive->role->roletype)
+					continue;
+				//CCLOG("\nHitTargetID = %d ,AddBuff ID: %d",HitTarget->getAliveID(),buff.buffId);
+				HitbufManege->AddBuff(buff);
+			}else{
+				CCLOG("[ ERROR ] buff.target can find bufid:%d ,aliveid:%d",buff.buffId,pAlive->getAliveID());
+			}
 		}
 	}
 }

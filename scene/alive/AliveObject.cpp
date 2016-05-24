@@ -20,21 +20,21 @@
 #include "Battle/BattleMessage.h"
 #include "Battle/MoveObject.h"
 AliveObject::AliveObject()
-	:m_Body(nullptr),m_Hp(nullptr),m_Name(""),m_ActionKey(""),m_MoveState(0)
-	,m_NameLabel(nullptr),m_Armature(nullptr),m_DropItem(0),m_offs(CCPointZero),m_Speed(CCPointZero)
-	,m_Enemy(false),m_EffectMusic(0),m_DieState(false),m_IsSpine(false)
+	:m_Body(nullptr),m_HpObject(nullptr),m_Name(""),m_ActionKey(""),m_MoveState(0)
+	,m_NameLabel(nullptr),m_Armature(nullptr),m_DropItem(0),m_offs(CCPointZero)
+	,m_Enemy(false),m_EffectMusic(0),m_IsSpine(false),m_Speed(CCPointZero)
 	,m_Direction(0),m_ID(0),m_Model(0),m_Alive(nullptr),m_MoveObj(nullptr)
 	,m_AtkEffect(0),m_PlayerEffect(0),m_UpdateState(true),m_Skeleton(nullptr)
 {}
 AliveObject::~AliveObject()
 {
-	if(m_Hp) removeChild(m_Hp);
+	if(m_HpObject) removeChild(m_HpObject);
 	if(m_NameLabel) removeChild(m_NameLabel);
 	if(m_Body) removeChild(m_Body);
-	CC_SAFE_RELEASE(m_Hp);
+	CC_SAFE_RELEASE(m_HpObject);
 	CC_SAFE_RELEASE(m_NameLabel);
 	CC_SAFE_RELEASE(m_Body);
-	m_Hp = nullptr;
+	m_HpObject = nullptr;
 	m_NameLabel = nullptr;
 	m_Body = nullptr;
 }
@@ -75,37 +75,42 @@ void AliveObject::testLabel()
 
 void AliveObject::setHp(HPObject* hp)
 {
-	m_Hp = HPObject::create();
-	if( m_Hp == nullptr )
+	m_HpObject = HPObject::create();
+	if( m_HpObject == nullptr )
 		return;
-	m_Hp->initHp(this);
-	m_Hp->retain();
-	m_Hp->setPosition(ccp(0,-5));
-	m_Armature->addChild(m_Hp, 100);
+	m_HpObject->initHp(this);
+	m_HpObject->retain();
+	m_HpObject->setPosition(ccp(0,-5));
+	m_Armature->addChild(m_HpObject, 100);
 	initAliveTypeIcon();
 }
-HPObject* AliveObject::getHp() { return m_Hp; }
+HPObject* AliveObject::getHp() { return m_HpObject; }
 
-void AliveObject::initAliveTypeIcon()
+void AliveObject::initTypeIconPath(char* pPath)
 {
-	char str[60]={0};
 	const HeroInfoData *c_data = DataCenter::sharedData()->getHeroInfo()->getCfg(m_Alive->role->thumb);
 	if(c_data)
 	{
-		sprintf(str,"common/type_%d_%d.png", m_Alive->role->roletype, c_data->iType2);
+		sprintf(pPath,"common/type_%d_%d.png", m_Alive->role->roletype, c_data->iType2);
 	}else{
-		sprintf(str,"common/type_1_1.png");
+		sprintf(pPath,"common/type_1_1.png");
 		CCLOG("[ *ERROR ] AliveObject::initAliveTypeIcon %d",m_Alive->role->thumb);
 	}
-	CCSprite* sp = CCSprite::create(str);
-	if (!sp)
+}
+
+void AliveObject::initAliveTypeIcon()
+{
+	char tPath[60]={0};								//在外部创建存储空间再传入赋值的写法比较安全
+	initTypeIconPath(tPath);
+	CCSprite* tTypeIcon = CCSprite::create(tPath);
+	if (!tTypeIcon)
 	{
-		sp = CCSprite::create("common/type_1_1.png");
-		CCLOG("[ *ERROR ] AliveObject::initAliveTypeIcon %s",str);
+		tTypeIcon = CCSprite::create("common/type_1_1.png");
+		CCLOG("[ *ERROR ] AliveObject::initAliveTypeIcon %s",tPath);
 	}
-	sp->setScale(0.5f);
-	sp->setPosition(ccp(-m_Hp->getContentSize().width/2,0));			//在body处设置了翻转了
-	m_Hp->addChild(sp);
+	tTypeIcon->setScale(0.5f);
+	tTypeIcon->setPosition(ccp(-m_HpObject->getContentSize().width/2,0));			//在body处设置了翻转了
+	m_HpObject->addChild(tTypeIcon);
 }
 
 void AliveObject::setNickName(string nickName)//设置武将名字
@@ -135,75 +140,49 @@ void AliveObject::setDirection(int direction)//设置人物方向
 	if( m_Direction == direction || !m_Armature)
 		return;
 	m_Direction = direction;
-	if (m_IsSpine)
+	if (m_IsSpine && DataCenter::sharedData()->getRoleData()->isTurn(m_Model))
 	{
-		if (DataCenter::sharedData()->getRoleData()->isTurn(m_Model))
+		if(m_Direction == Ditection_Left)
 		{
-			if(m_Direction == Ditection_Left)
-			{
-				if (m_Skeleton)
-					m_Skeleton->setScaleX(1);//spine特效
-				m_Armature->setScaleX(1);//spine人物
-			}else{
-				if (m_Skeleton)
-					m_Skeleton->setScaleX(-1);//翻转
-				m_Armature->setScaleX(-1);//spine人物
-			}
+			if (m_Skeleton)
+				m_Skeleton->setScaleX(1);//spine特效
+			m_Armature->setScaleX(1);//spine人物
 		}else{
-			if(m_Direction == Ditection_Left)
-			{
-				if (m_Skeleton)
-					m_Skeleton->setScaleX(-1);//翻转
-				m_Armature->setScaleX(-1);//spine人物
-			}else{
-				if (m_Skeleton)
-					m_Skeleton->setScaleX(1);//翻转
-				m_Armature->setScaleX(1);//spine人物
-				
-			}
+			if (m_Skeleton)
+				m_Skeleton->setScaleX(-1);//翻转
+			m_Armature->setScaleX(-1);//spine人物
 		}
 	}else{
 		if(m_Direction == Ditection_Left)
-			m_Armature->setScaleX(-1);//翻转
-		else
-			m_Armature->setScaleX(1);//翻转
+		{
+			if (m_Skeleton)
+				m_Skeleton->setScaleX(-1);//spine特效
+			m_Armature->setScaleX(-1);//spine人物
+		}else{
+			if (m_Skeleton)
+				m_Skeleton->setScaleX(1);//spine特效
+			m_Armature->setScaleX(1);//spine人物
+		}
 	}
 }
 int AliveObject::getDirection() { return m_Direction; }
 //这个方法不属于数据类，也不属于显示类，但是应该在武将自身的身上，每个武将的死亡处理都不一样。
 void AliveObject::AliveDie()
 {
-	//判断武将当前状态是否可以死亡,(攻击目标的连击是否结束)
-	if (!m_Alive->getActObject())
+	if (!m_Alive->getActObject() || m_Alive->getDieState())
 		return;
-	for (auto alive:m_Alive->HittingAlive)
-	{
-		if (alive == m_Alive)
-			continue;
-		if (alive->getHp()<=0 && alive->getActObject() && !alive->getActObject()->getDieState())
-		{
-			alive->getActObject()->setDieState(true);
-			alive->getActObject()->AliveDie();
-		}
-	}
-	NOTIFICATION->postNotification(B_DrpItem,this);
+	m_Alive->clearHitAlive();
+	m_Alive->setDieState(true);
 	m_Alive->setHp(0);
-	m_Hp->setHpNumber(0);
+	m_HpObject->setHpNumber(0);
 	if (m_Alive->getMoveObject())
 		m_Alive->getMoveObject()->removeFromParentAndCleanup(true);
 	m_Alive->setMoveObject(nullptr);
-	m_MoveObj = nullptr;
-	m_Alive->setDieState(true);
+	this->setMoveObject(nullptr);
 	m_Alive->getBuffManage()->Buffclear();
-	//m_Alive->setActObject(nullptr);
-	if (!m_DieState)
-	{
-		m_DieState = true;
-		NOTIFICATION->postNotification(B_AliveDie,m_Alive);
-	}
-	if (m_Alive->getEnemy())
-		this->setUserObject(CCBool::create(true));						//死亡流程不被技能暂停处理
 	m_Alive->getActObject()->TurnStateTo(Die_Index);
+	NOTIFICATION->postNotification(B_DrpItem,this);
+	NOTIFICATION->postNotification(B_AliveDie,m_Alive);
 }
 //做受击判断和一个冲锋0号格子特殊处理,攻击音效攻击特效播放,使用了受击数组但是未操作
 void AliveObject::AtkBegin_Event()
@@ -226,30 +205,21 @@ void AliveObject::HpChange_Event()
 //攻击区域必杀技状态才绘制,攻击完毕可以将武将传出去,进行下一个效果的判断或是重置武将信息等
 void AliveObject::AtkEnd_Event()
 {
-	if (!m_UpdateState)return;
-	NOTIFICATION->postNotification(B_CancelDrawAttackArea,m_Alive);//取消绘制攻击范围(针对性的取消绘制)
+	if (!m_UpdateState)
+		return;
+	NOTIFICATION->postNotification(B_CancelDrawAttackArea,m_Alive);		//取消绘制攻击范围(针对性的取消绘制)
 	if (m_Alive->AtkAlive.size())
 	{
 		if (DataCenter::sharedData()->getWar()->NextEffect(m_Alive))
 		{
 			m_Alive->ExcuteNextEffect();
 		}else{
-			if (m_Alive->getCriAtk()||m_Alive->getSpeAtk())
-			{
-				m_Alive->ResetAttackState();	//逻辑处理完毕重置武将状态信息
-			}else{
-				m_Alive->ResetAttackState();	//逻辑处理完毕重置武将状态信息
-				m_Alive->setAtkNum(1);			//攻击次数累加
-			}
+			m_Alive->ResetAttackState();								//逻辑处理完毕重置武将状态信息
+			if (!m_Alive->getCriAtk()&&!m_Alive->getSpeAtk())
+				m_Alive->setAtkNum(1);									//普通攻击次数累加
 		}	
 	}else{
-		if (m_Alive->getCriAtk()||m_Alive->getSpeAtk())
-		{
-			m_Alive->ResetAttackState();	//逻辑处理完毕重置武将状态信息
-		}else{
-			m_Alive->ResetAttackState();	//逻辑处理完毕重置武将状态信息
-			m_Alive->setAtkNum(1);								//攻击次数累加
-		}
+		m_Alive->ResetAttackState();									//逻辑处理完毕重置武将状态信息
 	}																					
 }
 //分解sData//0.动画名称1.scalex2.scaley3.offx4.offy5.offZorder
@@ -281,22 +251,23 @@ void AliveObject::playerNum( int num,int type )
 		CCLOG(" [ Tips ] AliveObject::playerNum Num = 0!");
 		return	;
 	}
-	m_Hp->playChangeNumber(num,type);
+	m_HpObject->playChangeNumber(num,type);
 	if (m_Alive->getAliveType() == AliveType::WorldBoss)														//boss的情况处理应该在血量条的内部,自己进行。
-		NOTIFICATION->postNotification(B_WorldBoss_HurtUpdate,CCInteger::create(m_Hp->getHpNumber()));	
+		NOTIFICATION->postNotification(B_WorldBoss_HurtUpdate,CCInteger::create(m_HpObject->getHpNumber()));	
+	if (type > gainType)
+		lostHpDispose();
+}
 
-	if (type > gainType )																						//武将的受击表现,抽成一个函数
+void AliveObject::lostHpDispose()
+{		//这个函数应该是多余的,在武将创建的时候，应该就经过一次武将的特殊信息初始化，根据配置文件来初始化武将的一些配置的信息，而不是每次武将受击的时候才去找
+	CCNode* Effect = DataCenter::sharedData()->getRoleData()->getActionEffect(m_Alive->getModel());			
+	if (Effect)
+		this->addChild(Effect);
+	m_Armature->runAction(CCSequence::create(
+		CCTintTo::create(0.25f,255,0,0),CCTintTo::create(0,255,255,255),NULL));								//变红处理
+	if (m_Alive->getCaptain())
 	{
-		//这个函数应该是多余的,在武将创建的时候，应该就经过一次武将的特殊信息初始化，根据配置文件来初始化武将的一些配置的信息，而不是每次武将受击的时候才去找
-		CCNode* Effect = DataCenter::sharedData()->getRoleData()->getActionEffect(m_Alive->getModel());			
-		if (Effect)
-			this->addChild(Effect);
-		m_Armature->runAction(CCSequence::create(
-			CCTintTo::create(0.25f,255,0,0),CCTintTo::create(0,255,255,255),NULL));								//变红处理
-		if (m_Alive->getCaptain())
-		{
-			NOTIFICATION->postNotification(B_CaptainHurt,m_Alive);
-			NOTIFICATION->postNotification(B_Shark,nullptr);
-		}
+		NOTIFICATION->postNotification(B_CaptainHurt,m_Alive);
+		NOTIFICATION->postNotification(B_Shark,nullptr);
 	}
 }

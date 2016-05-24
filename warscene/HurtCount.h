@@ -28,7 +28,7 @@ public:
 	float attributeHurt(WarAlive* AtcTarget);								//属性对技能伤害影响
 	float raceDispose(WarAlive* AtcTarget , WarAlive* HitTarget);			//属性伤害计算
 	int lostType(float race,int crit);
-	void BuffHandleLogic(WarAlive* AtcTarget , WarAlive* HitTarget);		//对每一个效果进行BUF逻辑处理
+	void BuffHandleLogic(WarAlive* pAlive);								//对每一个效果进行BUF逻辑处理
 	int ChangeLocation(WarAlive* AtcTarget , WarAlive* HitTarget);			//改变位置效果处理
 	void addHittingAlive(WarAlive* AtcTarget , WarAlive* HitTarget);
 	

@@ -33,7 +33,6 @@ void WarScene::onEnter()
 {
 	CScene::onEnter();
 	DataCenter::sharedData()->getUser()->setoldLevel();									//设置开始战斗前等级
-	m_Loginc->initMember();
 	LayerMoveEnd(CCInteger::create((int)StoryType::beginStory));						//这个方法不应该放在这里的发条消息也能解决的问题
 }
 

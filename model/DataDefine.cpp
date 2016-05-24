@@ -5,6 +5,7 @@
 #include "common/CommonFunction.h"
 #include "roleImg/RoleUpdate.h"
 #include "Battle/MoveObject.h"
+#include "Battle/BattleMessage.h"
 
 AliveBase::AliveBase()
 	:m_AliveID(0)
@@ -280,12 +281,7 @@ void WarAlive::ExcuteNextEffect()
 	AliveS.clear();																	//清除随机固定武将
 	AtkAlive.clear();
 	AtkGrid.clear();
-	for (auto alive:HittingAlive)
-	{
-		if (alive->getHp()<=0 && alive->getActObject())
-			alive->getActObject()->AliveDie();
-	}
-	HittingAlive.clear();
+	clearHitAlive();
 }
 
 bool WarAlive::canSummonAlive()
@@ -297,6 +293,18 @@ bool WarAlive::canSummonAlive()
 		return true;
 	}
 	return false;
+}
+
+void WarAlive::clearHitAlive()
+{
+	for (auto alive:HittingAlive)
+	{
+		if (alive == this)
+			continue;
+		if (!alive->getDieState()&&alive->getHp()<=0 && alive->getActObject())
+			alive->getActObject()->AliveDie();
+	}
+	HittingAlive.clear();
 }
 
 void UserData::read(const protos::common::Role& role)
