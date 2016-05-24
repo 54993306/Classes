@@ -182,8 +182,6 @@ void ActObject::setModel(int pModel)//设置人物对应模型
 	//	setDirection(Ditection_Left);
 	//else
 	//	m_Direction = Ditection_Right;
-	if (m_Armature)
-		m_Armature->removeFromParentAndCleanup(true);
 	if ( m_Manage->isSpine(m_Model) )
 	{
 		m_IsSpine = true;

@@ -266,7 +266,11 @@ void WarAliveLayer::initMoveActObject( ActObject* aliveOb )
 {
 	if (m_MoveActObject->getModel() != aliveOb->getModel())
 	{
-		m_MoveActObject->getArmature()->removeFromParentAndCleanup(true);
+		if (m_MoveActObject->getArmature())
+		{
+			m_MoveActObject->getArmature()->removeFromParentAndCleanup(true);
+			m_MoveActObject->setArmature(nullptr);
+		}
 		m_MoveActObject->setModel(aliveOb->getModel());	//移动的目标是模型是被点击的目标模型'
 		m_MoveActObject->setoffs(aliveOb->getoffs());		//武将原来相对于格子的偏移量
 		m_MoveActObject->getBody()->setScale(aliveOb->getBody()->getScale());
