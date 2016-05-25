@@ -6,7 +6,7 @@
 #include "model/MapManager.h"
 #include "scene/alive/AliveDefine.h"
 #include "Battle/BattleMessage.h"
-MoveRule::MoveRule():m_testState(false){}
+MoveRule::MoveRule():m_testState(true){}
 
 MoveRule::~MoveRule(){NOTIFICATION->removeAllObservers(this);}
 

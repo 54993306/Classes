@@ -523,9 +523,9 @@ void CombatLogic::attackDirection( WarAlive*alive )
 	{
 		if (alive->getEnemy())
 		{
-			pActObject->setDirection(Ditection_Left);
+			pActObject->setRoleDirection(Ditection_Left);
 		}else{
-			pActObject->setDirection(Ditection_Right);
+			pActObject->setRoleDirection(Ditection_Right);
 		}
 	}
 }
@@ -1061,7 +1061,7 @@ void CombatLogic::OnBattleFinish( int type, google::protobuf::Message *msg )
 void CombatLogic::onPause()
 {
 	this->pauseSchedulerAndActions();
-	if (!m_Manage->getWorldBoss())			//停掉主循环,打boss时间继续计算
+	if (m_Manage->getWorldBoss())			//停掉主循环,打boss时间继续计算
 	{
 		unschedule(schedule_selector(CombatLogic::updateOneSecond));
 		schedule(schedule_selector(CombatLogic::updateOneSecond), 1.0f);

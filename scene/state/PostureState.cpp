@@ -51,9 +51,9 @@ void StandState::entryState(StateManager* actor,StateMachine* self)
 	if(outPutERRORMsg("StandState::entryState",act))return;
 	if (act->getEnemy())										//动作播放完成均做方向判定处理
 	{
-		act->setDirection(Ditection_Right);
+		act->setRoleDirection(Ditection_Right);
 	}else{
-		act->setDirection(Ditection_Left);
+		act->setRoleDirection(Ditection_Left);
 	}
 	act->setActionKey(Stand_Action);
 }
@@ -128,9 +128,9 @@ void StartState::entryState( StateManager* actor,StateMachine* self )
 	if(outPutERRORMsg("StandState::entryState",act))return;
 	if (act->getEnemy())										//动作播放完成均做方向判定处理
 	{
-		act->setDirection(Ditection_Right);
+		act->setRoleDirection(Ditection_Right);
 	}else{
-		act->setDirection(Ditection_Left);
+		act->setRoleDirection(Ditection_Left);
 	}
 	act->setActionKey(Start_Action);
 	if (act->getModel() == 1056)			//海兽出场特殊处理

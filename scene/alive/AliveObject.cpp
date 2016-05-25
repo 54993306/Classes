@@ -23,7 +23,7 @@ AliveObject::AliveObject()
 	:m_Body(nullptr),m_HpObject(nullptr),m_Name(""),m_ActionKey(""),m_MoveState(0)
 	,m_NameLabel(nullptr),m_Armature(nullptr),m_DropItem(0),m_offs(CCPointZero)
 	,m_Enemy(false),m_EffectMusic(0),m_IsSpine(false),m_Speed(CCPointZero)
-	,m_Direction(0),m_ID(0),m_Model(0),m_Alive(nullptr),m_MoveObj(nullptr)
+	,m_Direction(-1),m_ID(0),m_Model(0),m_Alive(nullptr),m_MoveObj(nullptr)
 	,m_AtkEffect(0),m_PlayerEffect(0),m_UpdateState(true),m_Skeleton(nullptr)
 {}
 AliveObject::~AliveObject()
@@ -49,11 +49,6 @@ bool AliveObject::init()
 void AliveObject::setBody(CCSprite* body)
 {
 	m_Body = CCSprite::create();
-	if(!m_Body)
-	{
-		CCLOG("[ *ERROR ] AliveObject::setBody");
-		return;
-	}
 	m_Body->retain();
 	this->addChild(m_Body);
 }
@@ -76,8 +71,6 @@ void AliveObject::testLabel()
 void AliveObject::setHp(HPObject* hp)
 {
 	m_HpObject = HPObject::create();
-	if( m_HpObject == nullptr )
-		return;
 	m_HpObject->initHp(this);
 	m_HpObject->retain();
 	m_HpObject->setPosition(ccp(0,-5));
@@ -135,10 +128,8 @@ void AliveObject::setNickName(string nickName)//设置武将名字
 }
 string AliveObject::getNickName() { return m_Name; }//设置名字颜色
 
-void AliveObject::setDirection(int direction)//设置人物方向
+void AliveObject::setRoleDirection(int direction)//设置人物方向
 {
-	if( m_Direction == direction || !m_Armature)
-		return;
 	m_Direction = direction;
 	if (m_IsSpine && DataCenter::sharedData()->getRoleData()->isTurn(m_Model))
 	{
@@ -165,7 +156,7 @@ void AliveObject::setDirection(int direction)//设置人物方向
 		}
 	}
 }
-int AliveObject::getDirection() { return m_Direction; }
+int AliveObject::getRoleDirection() { return m_Direction; }
 //这个方法不属于数据类，也不属于显示类，但是应该在武将自身的身上，每个武将的死亡处理都不一样。
 void AliveObject::AliveDie()
 {

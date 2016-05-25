@@ -67,7 +67,7 @@ public:
 	CC_SYNTHESIZE(bool,m_UpdateState,UpdateState);		//是否在攻击结束刷新武将状态
 	CC_PROPERTY(string,m_Name,NickName);				//设置武将显示名称
 	CC_PROPERTY(CCSprite*,m_Body,Body);					//显示搭载
-	CC_PROPERTY(int,m_Direction,Direction);				//武将方向
+	CC_PROPERTY(int,m_Direction,RoleDirection);			//武将方向
 	CC_PROPERTY(HPObject*,m_HpObject,Hp);				//血量对象
 	CC_SYNTHESIZE(CCPoint,m_offs,offs);					//实际位置相对于
 	CC_SYNTHESIZE(int,m_MoveState,MoveState);			//刷新位置执行的动作

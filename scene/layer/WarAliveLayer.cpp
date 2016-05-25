@@ -275,7 +275,7 @@ void WarAliveLayer::initMoveActObject( ActObject* aliveOb )
 		m_MoveActObject->setoffs(aliveOb->getoffs());		//武将原来相对于格子的偏移量
 		m_MoveActObject->getBody()->setScale(aliveOb->getBody()->getScale());
 	}
-	m_MoveActObject->TurnStateTo(Stand_Index);
+	//m_MoveActObject->TurnStateTo(Stand_Index);
 	if (aliveOb->getAlive()->getGridIndex())
 	{
 		if(aliveOb->getMoveObject())

@@ -1,5 +1,5 @@
 ﻿
-#include "ActObject.h"
+#include "scene/alive/ActObject.h"
 #include "tools/StringUtil.h"
 #include "model/WarManager.h"
 #include "model/DataCenter.h"
@@ -35,6 +35,50 @@ bool ActObject::init()
 	return true;
 }
 
+void ActObject::setAlive( WarAlive* var )
+{
+	AliveObject::setAlive(var);
+	initStateManage(); 
+}
+
+void ActObject::initStateManage()
+{
+	GameStateManager* stateManage = GameStateManager::create();						//继承实现状态管理器
+	GameStateTransition* transition = GameStateTransition::create();				//继承实现状态切换列表对象
+	this->setStateManager(stateManage);												//设置状态机的状态管理器
+	this->setTransition(transition);												//设置状态切换对象
+	transition->RoleTransition(m_Alive->getEnemy());
+}
+
+void ActObject::setModel(int pModel)//设置人物对应模型
+{
+	m_Model = pModel;
+	if ( m_Manage->isSpine(m_Model) )
+	{
+		m_IsSpine = true;
+		initSpineModel();
+	}else{
+		m_IsSpine = false;
+		initCocosModel();
+	}
+	m_Armature->setPosition(ccp(0,-GRID_HEIGHT/2));
+	m_Body->addChild(m_Armature);
+	this->getStateManage()->initState(this);							//设置人物的初始动作为站立也可为其他						
+}
+
+void ActObject::setActionKey(string ActionKey)//设置人物对应动作(动作切换)然后刷新人物运行动作
+{
+	m_ActionKey = ActionKey;
+	if (m_ActionKey == Walk_Action)			//我方突然中断整个战斗流程的情况(玩家操纵拖动武将)
+		toWlkActionDispose();
+	if (m_IsSpine)
+	{
+		setSpineAction();
+	}else{
+		setCocosAction();
+	}
+}
+
 void ActObject::toWlkActionDispose()
 {
 	NOTIFICATION->postNotification(B_CancelDrawAttackArea,m_Alive);//取消绘制攻击范围(针对性的取消绘制)
@@ -44,21 +88,6 @@ void ActObject::toWlkActionDispose()
 		m_Alive->setNorAtk(true);					//普通攻击情况下,移动不需重置攻击时间
 	}else{
 		m_Alive->ResetAttackState();
-	}
-}
-
-void ActObject::setActionKey(string ActionKey)//设置人物对应动作(动作切换)然后刷新人物运行动作
-{
-	if( ActionKey.c_str() == nullptr || !strcmp(ActionKey.c_str(),"") || !m_Armature)
-		return;
-	m_ActionKey = ActionKey;
-	if (m_ActionKey == Walk_Action)			//我方突然中断整个战斗流程的情况(玩家操纵拖动武将)
-		toWlkActionDispose();
-	if (m_Manage->isSpine(m_Model))
-	{
-		setSpineAction();
-	}else{
-		setCocosAction();
 	}
 }
 
@@ -75,7 +104,7 @@ void ActObject::setSpineAction()
 			else
 				((SkeletonAnimation*)m_Armature)->setAnimation(0,m_ActionKey.c_str(),true);
 			setSpineEffectAction();
-			break;
+			return;
 		}
 	}
 	lostAction();
@@ -91,7 +120,7 @@ void ActObject::setSpineEffectAction()
 		{
 			m_Skeleton->setVisible(true);
 			m_Skeleton->setAnimation(0,m_ActionKey.c_str(),false);
-			break;
+			return;
 		}
 	}
 	hideSpineEffect();
@@ -105,6 +134,21 @@ void ActObject::hideSpineEffect()
 	m_Skeleton->setVisible(false);
 }
 
+void ActObject::lostAction()
+{
+	if (m_ActionKey.compare(Start_Action)==0)
+	{
+		m_Alive->setAliveStat(COMMONSTATE);
+	}else if ( !strcmp(m_ActionKey.c_str(),Stand_Action))
+	{
+		CCLOG("[ **ERROR ] ActObject::lostAction Lost StandAction");
+		return;
+	}else{
+		CCLOG("[ *ERROR ] ActObject::lostAction Lost Action=[%s],model=[%d]",m_ActionKey.c_str(),m_Model);
+	}
+	this->TurnStateTo(Stand_Index);
+}
+
 void ActObject::setCocosAction()
 {
 	CCArmature* Armature = (CCArmature*) m_Armature;
@@ -114,18 +158,6 @@ void ActObject::setCocosAction()
 		Armature->getAnimation()->play(m_ActionKey.c_str(),0.01f);
 	}else{
 		lostAction();
-	}
-}
-
-void ActObject::lostAction()
-{
-	if (m_ActionKey.compare(Start_Action)==0)
-		m_Alive->setAliveStat(COMMONSTATE);
-	else if ( !strcmp(m_ActionKey.c_str(),Stand_Action))
-		CCLOG("[ *ERROR ] ActObject::lostAction Lost StandAction");
-	else{
-		CCLOG("[ *ERROR ] ActObject::lostAction Lost Action=[%s],model=[%d]",m_ActionKey.c_str(),m_Model);
-		this->TurnStateTo(Stand_Index);
 	}
 }
 
@@ -173,26 +205,6 @@ void ActObject::initCocosModel()
 	Armature->getAnimation()->setMovementEventCallFunc(this, movementEvent_selector(ActObject::AnimationEvent));		//动作结束回调
 	m_Armature = Armature;
 	m_armatureEventData = m_Manage->getArmatureDataMgr()->getArmatureEventData(m_Model);
-}
-
-void ActObject::setModel(int pModel)//设置人物对应模型
-{
-	m_Model = pModel;
-	//if (m_Enemy)
-	//	setDirection(Ditection_Left);
-	//else
-	//	m_Direction = Ditection_Right;
-	if ( m_Manage->isSpine(m_Model) )
-	{
-		m_IsSpine = true;
-		initSpineModel();
-	}else{
-		m_IsSpine = false;
-		initCocosModel();
-	}
-	m_Armature->setPosition(ccp(0,-GRID_HEIGHT/2));
-	m_Body->addChild(m_Armature);
-	this->getStateManage()->initState(this);							//设置人物的初始动作为站立也可为其他						
 }
 //动作结束回调
 void ActObject::AnimationEvent(CCArmature *armature, MovementEventType movementType, const char *movementID)
@@ -326,7 +338,7 @@ void ActObject::actionEvent( int pFremIndex )
 
 void ActObject::updateFrameEvent( float dt )
 {
-	if (m_Manage->isSpine(m_Model))
+	if (m_IsSpine)
 		return;
 	if( !m_armatureEventData					||
 		m_ActionKey.compare(Stand_Action)==0	||
@@ -368,16 +380,6 @@ void ActObject::removeAct( CCNode* node )
 		CCDirector::sharedDirector()->getScheduler()->setTimeScale(1);
 }
 
-void ActObject::setAlive( WarAlive* var )
-{
-	m_Alive = var;
-	GameStateManager* stateManage = GameStateManager::create();						//继承实现状态管理器
-	GameStateTransition* transition = GameStateTransition::create();				//继承实现状态切换列表对象
-	this->setStateManager(stateManage);												//设置状态机的状态管理器
-	this->setTransition(transition);												//设置状态切换对象
-	transition->RoleTransition(m_Alive->getEnemy());
-}
-
 void ActObject::updatePosition(float dt)
 {
 	int ActionCode = this->getCurrActionCode();
@@ -393,7 +395,7 @@ void ActObject::updatePosition(float dt)
 	if (this->getMoveState())
 		MoveUpdate(dt);
 }
-
+//改进方向，使用像素计算速度，而不是使用格子来计算速度。格子只能用于计算距离
 bool ActObject::isDistination(float pDt)
 {
 	CCPoint pPosition = m_MapData->getPoint(m_Alive->getMoveGrid());
@@ -505,16 +507,16 @@ void ActObject::walkDirection( CCPoint& p )
 	{
 		if (m_Enemy)									//改变武将方向
 		{
-			this->setDirection(Ditection_Left);
+			this->setRoleDirection(Ditection_Left);
 		}else{
-			this->setDirection(Ditection_Right);
+			this->setRoleDirection(Ditection_Right);
 		}
 	}else{
 		if (m_Enemy)									//改变武将方向
 		{
-			this->setDirection(Ditection_Right);
+			this->setRoleDirection(Ditection_Right);
 		}else{
-			this->setDirection(Ditection_Left);
+			this->setRoleDirection(Ditection_Left);
 		}
 	}
 }

@@ -14,7 +14,7 @@
  *
  *
  *************************************************************/
-#include "AliveObject.h"
+#include "scene/alive/AliveObject.h"
 #include "scene/state/StateDefine.h"
 
 class WarAlive;
@@ -53,6 +53,7 @@ public:
 	virtual void setActionKey(string actionKey);			//
 	virtual void setAlive(WarAlive* var);
 	virtual void setMoveState(int var = Walk_Index);
+	void initStateManage();
 	void SpineActionEvent(int trackIndex,spEvent* Event);
 	void SpineActionEnd(int trackIndex);
 	void SpineComplete(int trackIndex,int loopCount);
