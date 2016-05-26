@@ -46,12 +46,12 @@ bool CPlayerControl::init()
 
 void CPlayerControl::sendChangeHero(int nionId, int pos, int heroId)
 {
-//     ChangeHeroRequest *req = new ChangeHeroRequest;
-// 	req->set_unionid(nionId);
-// 	req->set_pos(pos);
-// 	req->set_heroid(heroId);
-// 	GetTcpNet->sendData(req,ChangeHeroMsg);
-// 	delete req;
+	//     ChangeHeroRequest *req = new ChangeHeroRequest;
+	// 	req->set_unionid(nionId);
+	// 	req->set_pos(pos);
+	// 	req->set_heroid(heroId);
+	// 	GetTcpNet->sendData(req,ChangeHeroMsg);
+	// 	delete req;
 }
 
 void CPlayerControl::sendGetStagePrize(int prizeType, int stageId)
@@ -111,14 +111,14 @@ void CPlayerControl::sendHeroList(int mask,int unionId,int roleId) //请求获�
 {
 	HeroListRequest *req = new HeroListRequest;
 	req->set_mark(mask);
-// 	if (unionId!=0)
-// 	{
-// 		req->set_unionid(unionId);
-// 	}
-// 	if (roleId!=0)
-// 	{
-// 		req->set_roleid(roleId);
-// 	}
+	// 	if (unionId!=0)
+	// 	{
+	// 		req->set_unionid(unionId);
+	// 	}
+	// 	if (roleId!=0)
+	// 	{
+	// 		req->set_roleid(roleId);
+	// 	}
 	GetTcpNet->sendData(req,HeroListMsg,true);
 	delete req;
 }
@@ -172,13 +172,13 @@ bool CPlayerControl::ProcessMsg(int type, google::protobuf::Message *msg)
 		//角色上线
 	case RoleOnlineMsg:
 		{
-// 		    Role *role = (Role*)msg;
-// 			DataCenter::sharedData()->getUser()->addRoleAlive(role);
-// 			if (CSceneManager::sharedSceneManager()->getRunningScene()->getClassName()=="CityScene")
-// 			{
-// 				CityScene *ctScene = (CityScene*)CSceneManager::sharedSceneManager()->getRunningScene();
-// 				ctScene->addAlive(role->roleid());
-// 			}
+			// 		    Role *role = (Role*)msg;
+			// 			DataCenter::sharedData()->getUser()->addRoleAlive(role);
+			// 			if (CSceneManager::sharedSceneManager()->getRunningScene()->getClassName()=="CityScene")
+			// 			{
+			// 				CityScene *ctScene = (CityScene*)CSceneManager::sharedSceneManager()->getRunningScene();
+			// 				ctScene->addAlive(role->roleid());
+			// 			}
 		}
 		return true;
 		//角色移动
@@ -193,18 +193,17 @@ bool CPlayerControl::ProcessMsg(int type, google::protobuf::Message *msg)
 			roleExit(msg);
 		}
 		return true;
-// 	case StageList:
-// 		{
-// 			stageListResponse(msg);
-// 		}
-// 		return true;
-	//战斗信息
+		// 	case StageList:
+		// 		{
+		// 			stageListResponse(msg);
+		// 		}
+		// 		return true;
+		//战斗信息
 	case EnterStage:
 		{
 			NOTIFICATION->postNotification(RECEIVE_BATTLE_INFO);
 			battleInfo(msg);
-		}
-		return true;
+		}return true;
 	case WarRequestMsg:
 		{
 			NOTIFICATION->postNotification(RECEIVE_BATTLE_INFO);
@@ -230,12 +229,12 @@ bool CPlayerControl::ProcessMsg(int type, google::protobuf::Message *msg)
 		{
 			Bulletin *bullet = (Bulletin*)msg;
 			printf("bullet %s",bullet->text().c_str());
-			
+
 			m_bulletText = bullet->text();
-		//	this->scheduleOnce(schedule_selector(CPlayerControl::showBullet),2.0f);
-		//	if (CSceneManager::sharedSceneManager()->getRunningScene()->getClassName()!="LoginScene")
+			//	this->scheduleOnce(schedule_selector(CPlayerControl::showBullet),2.0f);
+			//	if (CSceneManager::sharedSceneManager()->getRunningScene()->getClassName()!="LoginScene")
 			{
- 				CCScene* scene =  GETCURRSCENE();//CCDirector::sharedDirector()->getRunningScene();
+				CCScene* scene =  GETCURRSCENE();//CCDirector::sharedDirector()->getRunningScene();
 
 				scene->removeChildByTag(88888);
 				CCNode *rollNode = CCNode::create();
@@ -245,50 +244,12 @@ bool CPlayerControl::ProcessMsg(int type, google::protobuf::Message *msg)
 				rollBg->setTag(1200);
 				rollNode->addChild(rollBg);
 				CRollLabel *rollLab = CRollLabel::create(bullet->text().c_str(),"Arial",20,
-				CCRectMake(rollBg->getPositionX()-rollBg->getContentSize().width/2,rollBg->getPositionY()-rollBg->getContentSize().height/2+8,rollBg->getContentSize().width,rollBg->getContentSize().height));
+					CCRectMake(rollBg->getPositionX()-rollBg->getContentSize().width/2,rollBg->getPositionY()-rollBg->getContentSize().height/2+8,rollBg->getContentSize().width,rollBg->getContentSize().height));
 				rollLab->setRollTime(1);
 				rollNode->addChild(rollLab);
 			}     
 		}
 		return true;
-	//伏兵(已废弃)
-	case AmbushMsg:
-		{
-			BattleResponse *batRes = (BattleResponse *)msg;
-			//地形列表
-			vector<CTerrain> terrList;
-			for (int i=0;i<batRes->traplist_size();i++)
-			{
-				Trap terr = batRes->traplist(i);
-				CTerrain obj;
-				obj.readData(terr);
-				terrList.push_back(obj);
-			}
-			//怪物列表
-			vector<CMonster> monsterList;
-			for (int j=0; j< batRes->monsterlist_size(); j++)
-			{
-				Monster monster = batRes->monsterlist(j);
-				CMonster obj;
-				obj.readData(monster);
-				monsterList.push_back(obj);
-			}
-
-			if (monsterList.size()>0)
-			{
-				if (terrList.size()>0)
-					DataCenter::sharedData()->getTer()->initData(terrList);
-				WarScene *scene = (WarScene *)CSceneManager::sharedSceneManager()->getRunningScene();
-				//scene->getCombatLogic()->ReceiveMonster(monsterList);
-				//层次陷阱处理
-				CSceneTrap trap;
-				trap.readData(batRes->field());
-				if (trap.id)
-					DataCenter::sharedData()->getWar()->setSceneTrap(trap);
-			}
-		}
-		return true;
-	
 	default:
 		break;
 	}
@@ -319,20 +280,20 @@ void CPlayerControl::showBullet(float delt)
 //角色列表
 void CPlayerControl::roleOnlineList(google::protobuf::Message *msg)
 {
-//	RoleListResponse *roleList = (RoleListResponse*)msg;
-//	CityScene *ctScene = (CityScene*)CSceneManager::sharedSceneManager()->getRunningScene();
-//	for (int i=0; i<roleList->rolelist_size(); i++)
-//	{
-//		Role role = roleList->rolelist(i);
-//		DataCenter::sharedData()->getUser()->addRoleAlive(&role);
-//		ctScene->addAlive(role.roleid());
-//	}
-//	//ctScene->onAddAliveData();
-//// 	LayerManager::instance()->setPriority(-1);
-//// 	GameTip *tip = GameTip::create();
-//// 	tip->setPosition(VCENTER);
-//// 	tip->showTip(m_bulletText.c_str(),VCENTER,CCSizeMake(400,200));
-//// 	LayerManager::instance()->push(tip);
+	//	RoleListResponse *roleList = (RoleListResponse*)msg;
+	//	CityScene *ctScene = (CityScene*)CSceneManager::sharedSceneManager()->getRunningScene();
+	//	for (int i=0; i<roleList->rolelist_size(); i++)
+	//	{
+	//		Role role = roleList->rolelist(i);
+	//		DataCenter::sharedData()->getUser()->addRoleAlive(&role);
+	//		ctScene->addAlive(role.roleid());
+	//	}
+	//	//ctScene->onAddAliveData();
+	//// 	LayerManager::instance()->setPriority(-1);
+	//// 	GameTip *tip = GameTip::create();
+	//// 	tip->setPosition(VCENTER);
+	//// 	tip->showTip(m_bulletText.c_str(),VCENTER,CCSizeMake(400,200));
+	//// 	LayerManager::instance()->push(tip);
 }
 
 //角色退出
@@ -385,7 +346,7 @@ void CPlayerControl::sendEnterStage(int stageId,int hero1,int hero2, int hero3, 
 	batReq->set_fid(fid);
 	if (questId>0)
 	{	
-	//	batReq->set_questid(questId);
+		//	batReq->set_questid(questId);
 	}
 	GetTcpNet->sendData(batReq,EnterStage);
 	delete batReq;
@@ -405,84 +366,15 @@ void CPlayerControl::sendEnterStageForBoss( int hero1,int hero2, int hero3, int 
 
 void CPlayerControl::BossBattleInfo( Message * msg )
 {
-	DataCenter::sharedData()->getWar()->BattleDataClear();
-	DataCenter::sharedData()->getMap()->clearMap();
-	srandNum();
 	WarResponse*batRes=(WarResponse*)msg;
-	BattleDataInit battle;
-	//英雄
-	for (int i=0; i< batRes->herolist_size(); i++)                   
-	{
-		Hero hero = batRes->herolist(i);
-		CHero obj;
-		obj.readData(hero);
-		battle.heroList.push_back(obj);
-	}
-	//怪物
-	for (int j=0; j< batRes->monsters_size(); j++)
-	{
-		Monster monster = batRes->monsters(j);
-		CMonster obj;
-		obj.readData(monster);
-		battle.monsterList.push_back(obj);
-	}
-	DataCenter::sharedData()->getWar()->setStageID(DataCenter::sharedData()->getWar()->getWorldBoss());
-	DataCenter::sharedData()->getMap()->setMapWith(90+32*(GRID_WIDTH+C_GRIDOFFSET_X));//格子从中间向两边绘制
-	DataCenter::sharedData()->getMap()->setCol(32);
-	DataCenter::sharedData()->getMap()->initMap(DataCenter::sharedData()->getWar()->getWorldBoss());
-	DataCenter::sharedData()->getWar()->initBattleData(battle);
-	DataCenter::sharedData()->getWar()->setBatch(0);
-	DataCenter::sharedData()->getWar()->setBossHurtPe(batRes->addhurt());
-	CScene* scene = GETSCENE(LoadWar);
-	LayerManager::instance()->closeAll();
-	CSceneManager::sharedSceneManager()->replaceScene(scene);
+	DataCenter::sharedData()->getWar()->initWordBossData(batRes);
 }
 
 //进入关卡战斗信息
 void CPlayerControl::battleInfo(Message * msg)
 {
-	DataCenter::sharedData()->getWar()->BattleDataClear();
-	DataCenter::sharedData()->getMap()->clearMap();
-	srandNum();
 	BattleResponse *batRes = (BattleResponse *)msg;
-	BattleDataInit battle;
-	CSceneTrap tarp;
-	tarp.readData(batRes->field());
-	//英雄
-	for (int i=0; i< batRes->herolist_size(); i++)                   
-	{
-		Hero hero = batRes->herolist(i);
-		CHero obj;
-		obj.readData(hero);
-		battle.heroList.push_back(obj);
-	}
-	//怪物
-	for (int j=0; j< batRes->monsterlist_size(); j++)
-	{
-		Monster monster = batRes->monsterlist(j);
-		CMonster obj;
-		obj.readData(monster);
-		battle.monsterList.push_back(obj);
-	}
-	//地形
-	for (int k=0; k< batRes->traplist_size(); k++)
-	{
-		Trap terr = batRes->traplist(k);
-		CTerrain obj;
-		obj.readData(terr);
-		battle.terrList.push_back(obj);
-	}
-	DataCenter::sharedData()->getWar()->setStageID(batRes->stageid());
-	DataCenter::sharedData()->getMap()->setMapWith(90+32*(GRID_WIDTH+C_GRIDOFFSET_X));//格子从中间向两边绘制
-	DataCenter::sharedData()->getMap()->setCol(32);
-	DataCenter::sharedData()->getMap()->initMap(batRes->stageid()); 
-	DataCenter::sharedData()->getWar()->initBattleData(battle);
-	DataCenter::sharedData()->getWar()->setSceneTrap(tarp);
-	DataCenter::sharedData()->getWar()->setBatch(batRes->batch());
-	DataCenter::sharedData()->getWar()->setReliveNeedGoldNum(batRes->param());
-	CScene* scene = GETSCENE(LoadWar);
-	LayerManager::instance()->closeAll();
-	CSceneManager::sharedSceneManager()->replaceScene(scene);
+	DataCenter::sharedData()->getWar()->initBattleData(batRes);
 }
 
 void CPlayerControl::sendChapterList(int type)
@@ -589,7 +481,7 @@ void CPlayerControl::sendUnion(int stageId/*=0*/, int questId/*=0*/, bool bBoss/
 	{
 		req->set_stageid(stageId);
 	}
- 	
+
 	if (questId>0)
 	{
 		//req->set_questid(questId);
@@ -754,7 +646,7 @@ void CPlayerControl::sendExchangeCode(const char* str)
 
 void CPlayerControl::sendBuyCard(int cardId)
 {
-    BuyCardReq *req = new BuyCardReq;
+	BuyCardReq *req = new BuyCardReq;
 	req->set_cardid(cardId);
 	GetTcpNet->sendData(req,BuyCardMsg);
 	delete req;

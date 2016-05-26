@@ -149,14 +149,14 @@ Terrain* TerrainManager::getTerrain(unsigned int terrainID)
 	return nullptr;
 }
 //添加服务器传过来的地形
-void TerrainManager::initData(vector<CTerrain>& VecTerrain)
+void TerrainManager::initData(vector<BattleTrap>& VecTerrain)
 {
 	clear();
 	terData* data = DataCenter::sharedData()->getWar()->getTerData();
 	for (int i =0 ; i<VecTerrain.size() ; i++)
 	{
 		Terrain* terrain = Terrain::create();
-		CTerrain* cterrain = & VecTerrain.at(i);				//这个对象会一直存在，且只存在一个每一次新的获取就会重新赋值
+		BattleTrap* cterrain = & VecTerrain.at(i);				//这个对象会一直存在，且只存在一个每一次新的获取就会重新赋值
 		terrain->setTerrainID(i+1000);							//自定义的地形id在当前场景地形的唯一id
 		terrain->setTerEffect(cterrain->terrainId);				//用ID来表示绘制地形的特效
 		terrain->setGridIndex(cterrain->posX*4+cterrain->posY);
@@ -169,7 +169,7 @@ void TerrainManager::initData(vector<CTerrain>& VecTerrain)
 		terrain->setExistNum(cterrain->existNum);
 		terrain->setAliveEffect(data->getEffect(cterrain->terrainId));
 		terrain->setAliveMusic(data->getMusic(cterrain->terrainId));
-		terrain->buff = cterrain->buff;							//对象复制
+		//terrain->m_Buff = cterrain->buff;							//对象复制
 		this->addTerrain(terrain);
 	}
 }
@@ -238,11 +238,11 @@ terRound* TerrainManager::TerrainAI(WarAlive* alive)
 			round->m_music = ter->getAliveMusic();								//地形伤害音效
 			AttributeDispose(alive,ter);										//地形影响属性处理
 			int ranNum = CCRANDOM_0_1()*100;
-			if (ranNum < ter->buff.useRate)										//添加地形buf
+			if (ranNum < ter->m_Buff.useRate)										//添加地形buf
 			{
 				BuffManage* bfmg = alive->getBuffManage();							
 				//bfmg->AddBuff(ter->buff);
-			}else{	CCLOG("Terrain Buf Add Fail terId = %d,ranNum=%d,useRate=%d",ter->getTerrainID(),ranNum,ter->buff.useRate);	}
+			}else{	CCLOG("Terrain Buf Add Fail terId = %d,ranNum=%d,useRate=%d",ter->getTerrainID(),ranNum,ter->m_Buff.useRate);	}
 			return round;
 		}else{ return nullptr; }
 	}else{ return nullptr; }

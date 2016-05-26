@@ -165,12 +165,12 @@ void LoadWar::SkillParse( ROLE& role,vector<int>&VecEffect,vector<int>&VecBuff )
 //数据解析
 void LoadWar::DataParse()
 {
-	BattleDataInit* data = m_Manage->getBattleData();
+	BattleServerData* data = m_Manage->getBattleData();
 	vector<int> VecRole;
 	vector<int> VecEffect;
 	vector<int> VecBuff;
 	vector<int> VecTerrain;
-	for (auto i: data->heroList)
+	for (auto i: data->HeroList)
 	{
 		if (m_Manage->isSpine(i.thumb))
 		{
@@ -183,7 +183,7 @@ void LoadWar::DataParse()
 	m_LoadSpine->AddRoleSpineID(146);
 	m_LoadSpine->AddRoleSpineID(9999);
 	VecRole.push_back(516);
-	for (auto i: data->monsterList)
+	for (auto i: data->MonsterList)
 	{
 		if (m_Manage->isSpine(i.thumb))
 		{
@@ -193,7 +193,7 @@ void LoadWar::DataParse()
 		}
 		SkillParse(i,VecEffect,VecBuff);	
 	}
-	for (auto i:data->terrList)
+	for (auto i:data->TrapList)
 		VecTerrain.push_back(i.terrainId);
 	RemoveVectorRepeat(VecRole);
 	RemoveVectorRepeat(VecEffect);
@@ -520,7 +520,7 @@ void LoadWar::ProgressEnd()
 		this->unscheduleAllSelectors();
 		DataCenter::sharedData()->getCombatGuideMg()->clearGuideData(true);
 		m_Manage->BattleDataClear();
-		DataCenter::sharedData()->getWar()->setWorldBoss(0);
+		DataCenter::sharedData()->getWar()->setWorldBoss(false);
 		DataCenter::sharedData()->getWar()->setWorldBossRank(0);
 		DataCenter::sharedData()->getTer()->clear();
 		DataCenter::sharedData()->getMap()->clearMap();

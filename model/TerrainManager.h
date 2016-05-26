@@ -3,6 +3,8 @@
 #include "cocos2d.h"
 #include <map>
 #include "BattleData.h"
+#include "Battle/BattleTrap.h"
+#include "Battle/RoleBuff.h"
 using namespace std;
 USING_NS_CC;
 class WarAlive;
@@ -62,7 +64,7 @@ public:
 	CC_SYNTHESIZE(int,m_TerEffect,TerEffect);		//地形特效id
 	CC_SYNTHESIZE(int,m_AliveEffect,AliveEffect);	//地形伤害特效
 	CC_SYNTHESIZE(int,m_AliveMusic,AliveMusic);		//地形伤害音效
-	CBuff buff;
+	CBuff m_Buff;
 	inline void setName(const char* name){m_name = name;}
 	inline string getName(){return m_name;}
 protected:
@@ -77,7 +79,7 @@ typedef map<unsigned int,Terrain*> Terrainobj;
 class TerrainManager : public CCObject
 {
 public:
-	TerrainManager():m_battleInit(nullptr){};
+	TerrainManager(){};
 	virtual ~TerrainManager();
 	CREATE_FUNC(TerrainManager);	
 
@@ -90,12 +92,11 @@ public:
 	bool addAliveAtGrid(unsigned int terrainID,char grid);
 	void AttributeDispose(WarAlive* alive,Terrain* ter = nullptr);	//处理地形对武将属性的影响
 	void clear();
-	void initData(vector<CTerrain>& VecTerrain);
+	void initData(vector<BattleTrap>& VecTerrain);
 	terRound* TerrainAI(WarAlive* alive);
 	void reduceRoundNum();									//减少所有地形持续回合数
 protected:
 	bool init(){return true;};
 	Terrainobj m_terrainobj;											//战场上的地形
-	BattleDataInit* m_battleInit;										//服务器传过来的信息
 };
 #endif // !_TEERAIN_MANAGER_H_

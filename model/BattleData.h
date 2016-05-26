@@ -4,77 +4,10 @@
 #include <string>
 #include <protos/protocol.h>
 #include "bag/bagData.h"
+#include "Battle/SkillEffect.h"
+
 using namespace std;
 
-//enum HeroType
-//{
-//	FireType = 1,	//火属性武将
-//	WaterType,		//水属性武将
-//	WoodType,		//木属性武将
-//};
-////技能类型(1 普通攻击，2 特殊攻击，3 必杀技，4 召唤技，5 队长技)没有必要分skill1-skill7了,不过已经是分了才加的这个类型
-//enum ROLESKILLTYPE
-//{
-//	NorAtk = 1,
-//	SpeAtk,
-//	CriAtk,
-//	CallAtk,
-//	CapAtk, 
-//};
-//enum struct AliveType
-//{
-//	Common,					//普通型武将
-//	Elite,					//精英型武将
-//	Boss,					//boss(我方主帅类)
-//	WorldBoss,				//世界boss
-//};
-//技能Buff
-//影响类型(0:清除DeBuff，1:攻击，2:伤害，3:命中，4:防御，5:血量，6:暴击，7:迟缓，8:减速，9:沉默，10:定身，11:昏迷，12:沉睡，13:冻结，14:混乱，15:能量)
-
-struct CBuff
-{
-	CBuff();				//详细参见datadefine Bufinfo
-	int		buffId;			//buff ID
-	int		buffType;		//buff影响类型
-	int		damage;			//buff影响数值
-	int		damage_rate;	//buff影响百分比
-	int		useRate;		//buff触发概率
-	bool	debuf;			//是否为减益buff
-	int		duration;		//buff持续时间
-	int		pTarget;		//目标，1：自己，2：受击目标，3：敌方目标
-	int		level;			//buff等级
-	int		typelimit;		//种族限制(火1,木2,水3,0是不限制)
-	string	name;			//buff名称
-	void readData(const protos::common::Buff &buff);
-};
-
-struct CEffect
-{
-	CEffect();				//详细参见datadefine Bufinfo
-	vector<CBuff> buffList;	//buf列表
-	int	effectId;			//效果ID
-	int group;				//效果组
-	int pos;				//效果组内位置
-	int Efftype;			//效果类型
-	int	userRate;			//触发概率
-	int	cost;				//怒气值影响(可增减)
-	int	damage;				//伤害百分比
-	int	hurt;				//真实伤害
-	int	pTarget;			//效果影响的对象(1:友方  2:敌方  3:敌我双方)
-	int	batter;				//连击数(怪物配置一次召唤多少怪物时使用)
-	int	repel;				//受击移动距离(受击对象移动距离，分敌我双方)
-	int	erange;				//伤害浮动值(百分比)
-	int	mode;				//攻击范围(1 直线群体...27 随机固定武将区域)
-	int	distance;			//攻击距离 间隔多少行
-	int	range;				//技能范围
-	int pro_Type;			//属性影响类型(召唤数量限制)
-	int pro_Rate;			//属性影响比率(加血吸血使用)
-	string name;			//效果名称
-	int	element;			//元素类型影响(1:冰 2:火 3:雷)
-	int	element_hurt;		//元素伤害
-	void readData(const protos::common::Effect &effect);
-};
-bool EffectSort(CEffect Effect1,CEffect Effect2);//{return Effect1.pos>Effect2.pos;}
 struct CSkill
 {
 	CSkill();
@@ -106,7 +39,7 @@ struct ROLE
 	CSkill skill5;				//主帅特殊攻击
 	CSkill skill6;				
 	CSkill skill7;				
-	vector<CBuff> buffList;		//武将进入战场时带进来的buf
+	//vector<CBuff> buffList;	//武将进入战场时带进来的buf
 	int thumb;					//模型id
 	bool enemy;					//是否为怪物
 	int alert;					//警戒区域类型
@@ -203,53 +136,5 @@ struct CHero :public ROLE
 	int iColor;					//1 白色， 2 绿色， 3 蓝色，4 紫色， 5 红色
 	bool evol;					//英雄是否可进阶
 	void readData(const protos::common::Hero &hero);
-};
-
-struct CTerrain
-{
-	CTerrain();
-	int  id;					//关卡地形ID
-	int  terrainId;				//地形标识ID
-	string name;				//地形名称
-	int  terrainType;			//地形类型
-	int  pro_type;				//影响属性
-	int  pro_rate;				//影响属性值
-	int  damage;				//地形造成的伤害
-	int  posX;					//在地图上的位置X
-	int  posY;					//在地图上的位置Y
-	int  triggerNum;			//被触发次数
-	int	 existNum;				//存在时间
-	int  batch;					//批次
-	CBuff buff;					//地形附带buf 
-	void readData(const protos::common::Trap &terr);
-};
-//场地效果类型与参数说明
-//风暴：参数1表示风向(1聚拢，2扩散，3向左，4向右，5向上，6向下)，参数2表示移动格子数
-//陨石：参数1表示伤害，参数2为0
-//死者：参数1、2为0，参数3为出现的怪物
-//黑暗：无
-//泥地：参数1表示基本范围变化类型(文档中的5种类型)，参数2为0
-//复活：无
-//场地效果
-struct CSceneTrap
-{
-	CSceneTrap();
-	CMonster monster;	//参数3(死者效果参数)
-	int id;				//陷阱id 
-	int trapType;		//效果类型 (1 风暴，2 陨石，3 死者，4 黑暗，5 泥地，6 复活)
-	string name;		//效果名称
-	int interval;		//发动间隔(秒)
-	int limit;			//最大发动次数
-	int param1;			//参数1
-	int param2;			//参数2
-	int batch;			//批次
-	void readData(const protos::FieldEff &fieldeff);
-};
-//战斗数据初始化
-struct BattleDataInit 
-{
-	vector<CMonster> monsterList;
-	vector<CHero> heroList;
-	vector<CTerrain> terrList;
 };
 #endif // ! __CMONSTER_

@@ -99,9 +99,9 @@ void WarControl::OnClick(CCObject* ob)
 		}break;
 	case TEST_BattleData:																	//测试重置当前关卡
 		{
-			BattleDataInit* data = DataCenter::sharedData()->getWar()->getBattleData();
+			BattleServerData* data = DataCenter::sharedData()->getWar()->getBattleData();
 			int stageId = DataCenter::sharedData()->getWar()->getStageID();
-			CPlayerControl::getInstance().sendEnterStage(stageId,data->heroList.at(0).id,data->heroList.at(1).id,data->heroList.at(2).id,data->heroList.at(3).id,data->heroList.at(4).id);
+			CPlayerControl::getInstance().sendEnterStage(stageId,data->HeroList.at(0).id,data->HeroList.at(1).id,data->HeroList.at(2).id,data->HeroList.at(3).id,data->HeroList.at(4).id);
 		}break;
 	default:break;
 	}

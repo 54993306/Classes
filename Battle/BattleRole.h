@@ -21,6 +21,8 @@
 #include "cocos2d.h"
 #include "Battle/BattleMacro.h"
 #include "model/BattleData.h"
+#include "Battle/SkillEffect.h"
+#include "Battle/RoleBuff.h"
 
 using namespace cocos2d;
 using namespace std;

@@ -97,6 +97,8 @@ bool MapManager::init()
 //把地图的0号位置去掉
 void MapManager::initMap(int levelId)
 {
+	setMapWith(90+32*(GRID_WIDTH+C_GRIDOFFSET_X));//格子从中间向两边绘制							//关卡地图的长度,之前设计是变化的现在不变了
+	setCol(32);
 	//地图以左下角为原点，向右为X正方向，向上为Y正方向,格子以左上角为第一个格子
 	WarMapData* map = WarMapData::create();
 	int i = 0;
@@ -109,7 +111,7 @@ void MapManager::initMap(int levelId)
 			float dx = ( i + 1 )*GRID_WIDTH + i*C_GRIDOFFSET_X - GRID_WIDTH/2;
 			float dy = ( j + 1 )*GRID_HEIGHT + j*C_GRIDOFFSET_Y - GRID_HEIGHT/2;
 			int index = ((m_col/2-1) - i )* C_GRID_ROW +j;
-			map->addPoint(index, -dx ,MapMax_Y - dy);								//从中间开始往回算X值,从上往下算Y值
+			map->addPoint(index, -dx ,MapMax_Y - dy);											//从中间开始往回算X值,从上往下算Y值
 		}
 	}
 	for(i = 0; i < m_col / 2; ++i)																//算右半屏点阵
@@ -119,7 +121,7 @@ void MapManager::initMap(int levelId)
 			float dx = ( i + 1 )*GRID_WIDTH + i*C_GRIDOFFSET_X - GRID_WIDTH/2;
 			float dy = ( j + 1 )*GRID_HEIGHT + j*C_GRIDOFFSET_Y - GRID_HEIGHT/2;
 			int index = m_col*m_row/2+i*C_GRID_ROW+j;
-			map->addPoint(index, dx ,MapMax_Y - dy);								//从中间开始往前算X值,从上往下算Y值
+			map->addPoint(index, dx ,MapMax_Y - dy);												//从中间开始往前算X值,从上往下算Y值
 		}
 	}
 	map->setMapID(100+levelId);

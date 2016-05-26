@@ -2,42 +2,83 @@
 #include "BattleData.h"
 #include "bag/bagData.h"
 #include "warscene/ConstNum.h"
-CBuff::CBuff()
-	:buffId(0)		//buff ID
-	,buffType(0)		//buff影响类型
-	,name("")		//buff名称
-	,damage(0)		//buff影响数值
-	,damage_rate(0) //buff影响百分比
-	,useRate(0)		//buff触发概率
-	,debuf(false)	//是否为减益buff
-	,duration(0)	//buff持续回合数
-	,pTarget(0)		//目标类型
-	,level(0)		//等级
-	,typelimit(0)	//种族限制,1僵尸，2道士，3神将
-{}
-
-CEffect::CEffect()
-	:effectId(0)			//效果ID
-	,Efftype(0)				//效果类型
-	,name("")				//效果名称
-	,userRate(0)			//触发概率
-	,cost(0)				//怒气值影响(可增减)
-	,damage(0)				//效果伤害值
-	,hurt(0)				//真实伤害
-	,pTarget(0)				//效果影响的对象(1:友方  2:敌方  3:敌我双方)
-	,element(0)				//元素类型影响(1:冰 2:火 3:风 4:雷)
-	,element_hurt(0)		//元素伤害
-	,batter(0)				//连击数
-	,repel(0)				//击退距离(多少个格子)
-	,erange(5)				//伤害浮动值(百分比)
-	,mode(0)				//攻击方式(1 直线群体，2 可移动区域，3 纵向格子，4 十字，5 斜线, 6 敌方全体，7 前方向下 N*N，8 我方全体， 9 全图，10 直线单体， 11 前方区域, 12 敌方前排)
-	,distance(0)			//攻击距离
-	,range(0)				//技能范围
-	,pro_Type(0)			//属性影响类型
-	,pro_Rate(0)			//属性影响比率
-{}
-
-bool EffectSort(CEffect Effect1,CEffect Effect2){return Effect1.pos<Effect2.pos;}
+//CBuff::CBuff()
+//	:buffId(0)		//buff ID
+//	,buffType(0)		//buff影响类型
+//	,name("")		//buff名称
+//	,damage(0)		//buff影响数值
+//	,damage_rate(0) //buff影响百分比
+//	,useRate(0)		//buff触发概率
+//	,debuf(false)	//是否为减益buff
+//	,duration(0)	//buff持续回合数
+//	,pTarget(0)		//目标类型
+//	,level(0)		//等级
+//	,typelimit(0)	//种族限制,1僵尸，2道士，3神将
+//{}
+//
+//CEffect::CEffect()
+//	:effectId(0)			//效果ID
+//	,Efftype(0)				//效果类型
+//	,name("")				//效果名称
+//	,userRate(0)			//触发概率
+//	,cost(0)				//怒气值影响(可增减)
+//	,damage(0)				//效果伤害值
+//	,hurt(0)				//真实伤害
+//	,pTarget(0)				//效果影响的对象(1:友方  2:敌方  3:敌我双方)
+//	,element(0)				//元素类型影响(1:冰 2:火 3:风 4:雷)
+//	,element_hurt(0)		//元素伤害
+//	,batter(0)				//连击数
+//	,repel(0)				//击退距离(多少个格子)
+//	,erange(5)				//伤害浮动值(百分比)
+//	,mode(0)				//攻击方式(1 直线群体，2 可移动区域，3 纵向格子，4 十字，5 斜线, 6 敌方全体，7 前方向下 N*N，8 我方全体， 9 全图，10 直线单体， 11 前方区域, 12 敌方前排)
+//	,distance(0)			//攻击距离
+//	,range(0)				//技能范围
+//	,pro_Type(0)			//属性影响类型
+//	,pro_Rate(0)			//属性影响比率
+//{}
+//void CBuff::readData(const protos::common::Buff &buff)
+//{
+//	this->buffId = buff.buffid();		
+//	this->buffType = buff.type();
+//	this->name = buff.name();	
+//	this->damage = buff.damage();	
+//	this->damage_rate = buff.damage_rate();
+//	this->useRate = buff.userate();
+//	this->debuf = buff.debuf();
+//	this->duration = buff.duration();
+//	this->pTarget = buff.target();
+//	this->level = buff.level();
+//	//this->durative = buf.durative();	//来自atbType 属性影响类型，僵尸/道士/神将
+//	this->typelimit = buff.element();
+//}
+//void CEffect::readData(const protos::common::Effect &effect)
+//{
+//	this->effectId = effect.effectid();
+//	this->Efftype = effect.type();
+//	this->name = effect.name();
+//	this->userRate = effect.userrate();
+//	this->cost = effect.cost();
+//	this->damage = effect.damage();
+//	this->hurt = effect.hurt();
+//	this->pTarget = effect.target();
+//	this->batter = effect.batter();
+//	this->repel = effect.repel();
+//	this->erange = effect.erange();
+//	this->mode = effect.mode();
+//	this->distance = effect.distance();
+//	this->range = effect.range();
+//	this->pro_Type = effect.pro_type();
+//	this->pro_Rate = effect.pro_rate();
+//	this->pos = effect.pos();
+//	this->group = effect.group();
+//	for (int i=0; i<effect.bufflist_size();i++)
+//	{
+//		CBuff buff;
+//		buff.readData(effect.bufflist(i));
+//		this->buffList.push_back(buff);
+//	}
+//}
+//bool EffectSort(CEffect Effect1,CEffect Effect2){return Effect1.pos<Effect2.pos;}
 
 CSkill::CSkill()
 	:id(0)			//英雄技能ID(唯一)
@@ -121,22 +162,6 @@ CHero::CHero()
 	,evol(false)
 {}
 
-void CBuff::readData(const protos::common::Buff &buff)
-{
-	this->buffId = buff.buffid();		
-	this->buffType = buff.type();
-	this->name = buff.name();	
-	this->damage = buff.damage();	
-	this->damage_rate = buff.damage_rate();
-	this->useRate = buff.userate();
-	this->debuf = buff.debuf();
-	this->duration = buff.duration();
-	this->pTarget = buff.target();
-	this->level = buff.level();
-	//this->durative = buf.durative();	//来自atbType 属性影响类型，僵尸/道士/神将
-	this->typelimit = buff.element();
-}
-
 void CSkill::readData(const protos::common::Skill &skill)
 {
 	this->id = skill.skillid();
@@ -175,34 +200,6 @@ void CSkill::readData(const protos::common::Skill &skill)
 	}
 // 	this->star = skill.star();
 	this->maxLevel = skill.maxlevel();
-}
-
-void CEffect::readData(const protos::common::Effect &effect)
-{
-	this->effectId = effect.effectid();
-	this->Efftype = effect.type();
-	this->name = effect.name();
-	this->userRate = effect.userrate();
-	this->cost = effect.cost();
-	this->damage = effect.damage();
-	this->hurt = effect.hurt();
-	this->pTarget = effect.target();
-	this->batter = effect.batter();
-	this->repel = effect.repel();
-	this->erange = effect.erange();
-	this->mode = effect.mode();
-	this->distance = effect.distance();
-	this->range = effect.range();
-	this->pro_Type = effect.pro_type();
-	this->pro_Rate = effect.pro_rate();
-	this->pos = effect.pos();
-	this->group = effect.group();
-	for (int i=0; i<effect.bufflist_size();i++)
-	{
-		CBuff buff;
-		buff.readData(effect.bufflist(i));
-		this->buffList.push_back(buff);
-	}
 }
 
 void CMonster::readData(const protos::common::Monster &monster)
@@ -322,15 +319,6 @@ void CHero::readData(const protos::common::Hero &hero)
 		this->row = hero.posy();
 	if (hero.posx())
 		this->col = hero.posx();
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
-	if (!this->battle)
-	{
-		//this->guardType = 1;
-		//this->guardRange = 3;
-		//this->row=3;
-		//this->col=2;
-	}
-#endif
 	if (hero.has_skill1())
 		this->skill1.readData(hero.skill1());
 	if (hero.has_skill2())		//has判断是否为真
@@ -370,59 +358,59 @@ void CHero::readData(const protos::common::Hero &hero)
 	this->evol = hero.evol();
 }
 
-CTerrain::CTerrain()
-	:id(0),
-	terrainId(0),
-	name(""),
-	terrainType(0),
-	pro_type(0),
-	pro_rate(0),
-	damage(0),
-	posX(0),
-	posY(0),
-	triggerNum(0),   
-	existNum(0),
-	batch(0)
-	{}
+//BattleTrap::BattleTrap()
+//	:id(0),
+//	terrainId(0),
+//	name(""),
+//	terrainType(0),
+//	pro_type(0),
+//	pro_rate(0),
+//	damage(0),
+//	posX(0),
+//	posY(0),
+//	triggerNum(0),   
+//	existNum(0),
+//	batch(0)
+//	{}
+//
+//void BattleTrap::readData(const protos::common::Trap &terr)
+//{
+//	this->id = terr.id();
+//	this->terrainId = terr.trapid();
+//	this->name =terr.name();
+//	this->terrainType =terr.type();
+//	this->pro_type =terr.pro_type();
+//	this->pro_rate = terr.pro_rate();
+//	this->damage = terr.damage();
+//	this->posX = terr.posx();
+//	this->posY = terr.posy();
+//	this->triggerNum = terr.round();
+//	this->existNum = terr.touch();
+//	this->batch = terr.batch();
+//	if (terr.has_buff())
+//		this->buff.readData(terr.buff());
+//}
 
-void CTerrain::readData(const protos::common::Trap &terr)
-{
-	this->id = terr.id();
-	this->terrainId = terr.trapid();
-	this->name =terr.name();
-	this->terrainType =terr.type();
-	this->pro_type =terr.pro_type();
-	this->pro_rate = terr.pro_rate();
-	this->damage = terr.damage();
-	this->posX = terr.posx();
-	this->posY = terr.posy();
-	this->triggerNum = terr.round();
-	this->existNum = terr.touch();
-	this->batch = terr.batch();
-	if (terr.has_buff())
-		this->buff.readData(terr.buff());
-}
+//BattleField::BattleField()
+//	:id(0)
+//	,trapType(0)			//效果类型 (1 风暴，2 陨石，3 死者，4 黑暗，5 泥地，6 复活)
+//	,name("")			//效果名称
+//	,interval(0)		//发动间隔(秒)
+//	,limit(0)			//最大发动次数
+//	,param1(0)			//参数1
+//	,param2(0)			//参数2
+//	,batch(0)
+//{}
 
-CSceneTrap::CSceneTrap()
-	:id(0)
-	,trapType(0)			//效果类型 (1 风暴，2 陨石，3 死者，4 黑暗，5 泥地，6 复活)
-	,name("")			//效果名称
-	,interval(0)		//发动间隔(秒)
-	,limit(0)			//最大发动次数
-	,param1(0)			//参数1
-	,param2(0)			//参数2
-	,batch(0)
-{}
-
-void CSceneTrap::readData(const protos::FieldEff &fieldeff)
-{
-	this->id = fieldeff.id();
-	this->trapType = fieldeff.type();
-	this->name = fieldeff.name();
-	this->interval = fieldeff.interval();
-	this->limit = fieldeff.limit();
-	this->param1 = fieldeff.param1();
-	this->param2 = fieldeff.param2();
-	this->batch = fieldeff.batch();
-	this->monster.readData(fieldeff.monster());
-}
+//void BattleField::readData(const protos::FieldEff &fieldeff)
+//{
+//	this->id = fieldeff.id();
+//	this->trapType = fieldeff.type();
+//	this->name = fieldeff.name();
+//	this->interval = fieldeff.interval();
+//	this->limit = fieldeff.limit();
+//	this->param1 = fieldeff.param1();
+//	this->param2 = fieldeff.param2();
+//	this->batch = fieldeff.batch();
+//	this->monster.readData(fieldeff.monster());
+//}

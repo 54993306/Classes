@@ -26,7 +26,7 @@
 WarManager::WarManager()
 	:m_SceneTarpID(0),m_efdata(nullptr),m_terData(nullptr),m_armatureEventDataMgr(nullptr)
 	,m_StageID(-1),m_Batch(-1),m_Logic(nullptr),m_iLastStageId(0),m_StageType(0),m_BuffData(nullptr)
-	,m_bNormal(true),m_ChapterCount(0),m_ChapterIndex(0),m_iReliveNeedGoldNum(0), m_BossModel(0)
+	,m_bNormal(true),m_ChapterCount(0),m_ChapterIndex(0),m_iReliveNeedGoldNum(0), m_BossModel(false)
 	,m_VerifyNum(0),m_BossHurtCount(0),m_BossHurtPe(0),m_iWorldBossRank(0),m_StoryData(nullptr)
 	,m_BattleOver(false)
 {
@@ -59,6 +59,8 @@ void WarManager::BattleDataClear()
 		CC_SAFE_RELEASE(iter->second);
 		iter->second = nullptr;
 	}
+	m_ServerData.HeroList.clear();
+	m_ServerData.MonsterList.clear();
 	m_BattleOver = true;
 	m_BossHurtPe = 0;
 	ReleaseSpineData();
@@ -69,8 +71,6 @@ void WarManager::BattleDataClear()
 	m_Batch = -1;
 	m_Logic = nullptr;
 	m_VecBossHurt.clear();
-	CSceneTrap nullSceneTarp;
-	setSceneTrap(nullSceneTarp);
 	m_Heros.clear();
 	m_Monsters.clear();
 	m_CantMoveGrid.clear();
@@ -97,7 +97,7 @@ void WarManager::ReleaseSpineData()
 	m_MapSpineData.clear();
 }
 //初始化验证伤害值(服务器约定值),多个地方记录造成伤害防止被修改内存
-void WarManager::setWorldBoss(int model)
+void WarManager::setWorldBoss(bool model)
 {
 	if (model)
 	{
@@ -107,7 +107,7 @@ void WarManager::setWorldBoss(int model)
 		m_VerifyNum = 0;
 	m_BossModel = model;
 }
-int WarManager::getWorldBoss(){return m_BossModel;}
+bool WarManager::getWorldBoss(){return m_BossModel;}
 
 int WarManager::getVerifyNum(){ return m_VerifyNum; }
 void WarManager::setVerifyNum(int num){ m_VerifyNum -= num; }
@@ -137,13 +137,6 @@ WarAlive* WarManager::getAlive(unsigned int aliveID)
 	return nullptr;
 }
 
-CSceneTrap* WarManager::getSceneTarp() { return &m_SceneTarp;}
-void WarManager::setSceneTrap(CSceneTrap& tarp)
-{
-	m_SceneTarpID = m_SceneTarp.id;			//记录前一个场景效果的id
-	m_SceneTarp = tarp; 
-}
-
 SpData* WarManager::getSpineData( std::string Name )
 {
 	MapSkeletonData::iterator iter = m_MapSpineData.find(Name);
@@ -165,10 +158,10 @@ void WarManager::initData()
 	m_armatureEventDataMgr = ArmatureEventDataMgr::create();
 	m_armatureEventDataMgr->retain();
 	//添加我方武将
-	for (int i = 1 ; i <= m_battleInit.heroList.size() ; i++)
+	for (int i = 1 ; i <= m_ServerData.HeroList.size() ; i++)
 	{
 		WarAlive* alive = WarAlive::create();						//创建数据对象
-		alive->role = &m_battleInit.heroList.at(i-1);
+		alive->role = &m_ServerData.HeroList.at(i-1);
 		alive->setAliveID(i);			//战场上武将的唯一id
 		alive->setEnemy(false);
 		initAlive(alive);
@@ -178,45 +171,32 @@ void WarManager::initData()
 	CaptainSkill* captain = CaptainSkill::create();
 	captain->ExecuteCaptainSkill();
 }
-
-//初始化战斗数据
-void WarManager::initBattleData(const BattleDataInit& bat)
-{
-	m_BattleOver = false;
-	ReleaseSpineData();												//应该有更好的管理方法
-	ParseMoveGrid(m_StageID,m_CantMoveGrid);
-	ParseAddCostGrid(m_StageID,m_AddCostGrid);
-	m_battleInit = bat;
-	DataCenter::sharedData()->getWar()->initData();
-	DataCenter::sharedData()->getTer()->initData(m_battleInit.terrList);//所有波次的地形效果一次推送,自行管理自己的数据
-	m_StoryData->initStoryData(m_StageID);
-}
 //初始化关卡批次数据到战斗武将列表
 void WarManager::initBatchData( int batch )
 {
-	for (int i = 0 ; i < m_battleInit.monsterList.size() ; i++)
+	for (int i = 0 ; i < m_ServerData.MonsterList.size() ; i++)
 	{
-		if (!batch&&m_battleInit.monsterList.at(i).isCall)
+		if (!batch&&m_ServerData.MonsterList.at(i).isCall)
 		{
-			m_CallRole.push_back(&m_battleInit.monsterList.at(i));
+			m_CallRole.push_back(&m_ServerData.MonsterList.at(i));
 			continue;
 		}
-		if (m_battleInit.monsterList.at(i).batch!=batch)					//开始只创建第0批次怪物
+		if (m_ServerData.MonsterList.at(i).batch!=batch)					//开始只创建第0批次怪物
 			continue;
 		WarAlive* alive = WarAlive::create();								//创建数据对象
-		if (m_battleInit.monsterList.at(i).isBoss)							//大怪物提示
+		if (m_ServerData.MonsterList.at(i).isBoss)							//大怪物提示
 			if (m_BossModel)
 				alive->setAliveType(AliveType::WorldBoss);					//世界boss
 			else
 				alive->setAliveType(AliveType::Boss);						//一般类型大boss
-		alive->role = &m_battleInit.monsterList.at(i);
+		alive->role = &m_ServerData.MonsterList.at(i);
 		alive->setAliveID(C_BatchMonst+i+batch*100);
 		alive->setEnemy(true);
 		alive->setMstType(alive->role->MstType);
 		if (alive->role->MstType == MST_HIDE)
 			alive->setCloaking(true);
-		alive->setDelaytime(-m_battleInit.monsterList.at(i).delay);
-		alive->moves.push_back(m_battleInit.monsterList.at(i).move1);
+		alive->setDelaytime(-m_ServerData.MonsterList.at(i).delay);
+		alive->moves.push_back(m_ServerData.MonsterList.at(i).move1);
 		initAlive(alive); 
 	}
 }
@@ -224,8 +204,8 @@ void WarManager::initBatchData( int batch )
 void WarManager::initAlive(WarAlive* alive)
 {
 	alive->grids.clear();
-	for (int j = 0 ; j<alive->role->buffList.size();j++ )
-		alive->getBuffManage()->AddBuff(alive->role->buffList.at(j));
+	//for (int j = 0 ; j<alive->role->buffList.size();j++ )
+	//	alive->getBuffManage()->AddBuff(alive->role->buffList.at(j));
 	if (alive->getEnemy())
 	{
 		alive->setGridIndex(alive->role->grid);
@@ -269,12 +249,7 @@ void WarManager::initAlive(WarAlive* alive)
 #if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
 	if (alive->getEnemy())
 	{
-		//alive->setMaxHp(1000000);
-		//alive->setHp(7500000);		//第一次进来是满血状态
-		//alive->setAtk(1000);
-		//alive->setGridIndex(122);
-		//alive->setMaxHp(5);
-		//alive->setHp(5);		//第一次进来是满血状态
+
 	}else{		
 		alive->setAtk(500000);
 		alive->setMaxHp(500000);
@@ -394,8 +369,8 @@ bool WarManager::checkMonstOver()
 	return true;
 }
 
-BattleDataInit* WarManager::getBattleData() { 
-	return &m_battleInit; }
+BattleServerData* WarManager::getBattleData() { 
+	return &m_ServerData; }
 vector<CMonster*>* WarManager::getCallMonst() { 
 	return & m_CallRole; }
 ArmatureEventDataMgr* WarManager::getArmatureDataMgr() { 
@@ -412,10 +387,6 @@ BuffData* WarManager::getBuffData(){
 	return m_BuffData;}
 StoryData* WarManager::getStoryData(){
 	return m_StoryData;}
-
-//先判断是否已经存在我方的召唤武将且未上阵的
-//判断召唤数量是否达到上限
-//获取我方将要召唤武将信息
 
 WarAlive* WarManager::getAbsentCallAlive( WarAlive* fatherAlive )
 {
@@ -517,17 +488,6 @@ void WarManager::initCallAlive(WarAlive* alive,WarAlive*pAlive)
 		alive->setHit((alive->role->hit*0.01f)*pAlive->role->hit);
 		alive->setRenew((alive->role->renew*0.01f)*pAlive->role->renew);
 		alive->setDoge((alive->role->dodge*0.01f)*pAlive->role->dodge);				//数值型是召唤它武将的百分比
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
-		if (alive->getEnemy())
-		{
-			//alive->setMaxHp(5);
-			//alive->setHp(5);		//第一次进来是满血状态
-		}else{	
-			//alive->setMaxHp(500000);
-			//alive->setHp(500000);		//第一次进来是满血状态
-			//alive->setAtk(10);
-		}
-#endif
 	}
 	addAlive(alive);
 }
@@ -550,4 +510,75 @@ void WarManager::updateAlive()
 			m_Heros.push_back(alive);
 		}															
 	}
+}
+
+void WarManager::clearBeforeData()
+{
+	srandNum();
+	DataCenter::sharedData()->getWar()->BattleDataClear();
+	DataCenter::sharedData()->getMap()->clearMap();
+}
+//初始化战斗数据
+void WarManager::initBattleData(BattleResponse*batRes)
+{
+	clearBeforeData();
+	for (int i=0; i< batRes->herolist_size(); i++)				//英雄		     
+	{
+		CHero obj;
+		obj.readData(batRes->herolist(i));
+		m_ServerData.HeroList.push_back(obj);
+	}
+	for (int j=0; j< batRes->monsterlist_size(); j++)			//怪物
+	{
+		CMonster obj;
+		obj.readData(batRes->monsterlist(j));
+		m_ServerData.MonsterList.push_back(obj);
+	}
+	setBatch(batRes->batch());
+	setStageID(batRes->stageid());
+	setReliveNeedGoldNum(batRes->param());
+	DataCenter::sharedData()->getMap()->initMap(batRes->stageid()); 
+	initCommonData();
+}
+
+void WarManager::initWordBossData( WarResponse*batRes )
+{
+	clearBeforeData();
+	for (int i=0; i< batRes->herolist_size(); i++)			//英雄       
+	{
+		CHero obj;
+		obj.readData(batRes->herolist(i));
+		m_ServerData.HeroList.push_back(obj);
+	}
+	int bossID = 0;
+	for (int j=0; j< batRes->monsters_size(); j++)			//怪物
+	{
+		CMonster obj;
+		obj.readData(batRes->monsters(j));
+		if (obj.isBoss)
+			bossID = obj.mId;
+		{
+		}
+		m_ServerData.MonsterList.push_back(obj);
+	}
+	setBatch(0);
+	setStageID(bossID);
+	setBossHurtPe(batRes->addhurt());
+	setWorldBoss(true);
+	DataCenter::sharedData()->getMap()->initMap(bossID);
+	initCommonData();
+}
+
+void WarManager::initCommonData()
+{
+	initData();
+	ReleaseSpineData();													//应该有更好的管理方法
+	ParseMoveGrid(m_StageID,m_CantMoveGrid);
+	ParseAddCostGrid(m_StageID,m_AddCostGrid);
+	m_BattleOver = false;
+	m_StoryData->initStoryData(m_StageID);
+
+	CScene* scene = GETSCENE(LoadWar);
+	LayerManager::instance()->closeAll();
+	CSceneManager::sharedSceneManager()->replaceScene(scene);
 }

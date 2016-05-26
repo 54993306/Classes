@@ -427,9 +427,6 @@ void CSelectArmy::onCombat(CCObject* pSender)
 
 		CButton *combat= (CButton *)pSender;
 		combat->setEnabled(false);
-
-		//有世界BOSS
-		DataCenter::sharedData()->getWar()->setWorldBoss(m_WorldBoss);
 		if(m_WorldBoss)
 		{
 			CPlayerControl::getInstance().sendEnterStageForBoss(

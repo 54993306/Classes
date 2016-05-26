@@ -2,10 +2,13 @@
 #define _WAR_MANAGER_H_
 #include "AppUI.h"
 #include <map>
-#include "BattleData.h"
+#include "model/BattleData.h"
 #include "tollgate/Chapter.h"
 #include <spine/spine-cocos2dx.h>
 #include "Battle/BattleMacro.h"
+#include "Battle/BattleTrap.h"
+#include "protos/boss_protocol.pb.h"
+#include "protos/stage_protocol.pb.h"
 class WarAlive;
 class EffectData;
 class ArmatureEventDataMgr;
@@ -30,6 +33,14 @@ typedef map<std::string,SpData> MapSkeletonData;
 				战场信息分发管理							//  [9/9/2014 xc_lin]
 */
 /************************************************************************/
+//战斗数据初始化
+struct BattleServerData 
+{
+	vector<CMonster> MonsterList;
+	vector<CHero> HeroList;
+	vector<BattleTrap> TrapList;
+};
+
 class WarManager : public CCObject
 {
 public:
@@ -46,16 +57,13 @@ public:
 	WarAlive* getAliveByType(AliveType type,bool Monster = true);
 	WarAlive* getAbsentCallAlive(WarAlive* fatherAlive);
 	void BattleDataClear();
+	void ReleaseSpineData();
 	void initData();
 	bool checkMonstOver();
-	void initBattleData(const BattleDataInit& bat);
-	void setSceneTrap(CSceneTrap& tarp);
-	void ReleaseSpineData();
-	CSceneTrap* getSceneTarp();
 	void initBatchData(int batch);
 	void initAlive(WarAlive* alive);
 	void initCallAlive(WarAlive* alive,WarAlive*cAlive);	//召唤类武将初始化
-	BattleDataInit* getBattleData();						//得到战场数据
+	BattleServerData* getBattleData();						//得到战场数据
 	vector<CMonster*>* getCallMonst();
 	EffectData* getEffData();
 	BuffData* getBuffData();
@@ -80,42 +88,48 @@ public:
 	CCArray* getMonsts(bool isAlive = false,bool sort = true);
 	CCArray* getAlivesByCamp(bool enemy,bool isAlive,bool sort);
 	WarAlive* getNewCallAlive(WarAlive* Father,int CallId);
+	BattleServerData* getServerData(){return &m_ServerData;}
+
+	void initBattleData( BattleResponse*batRes );
+	void initWordBossData( WarResponse*batRes );
+	void initCommonData();
+	void clearBeforeData();
 public:
+	CC_SYNTHESIZE(int, m_iWorldBossRank, WorldBossRank);			//世界BOSS狂暴状态
+
 	CC_SYNTHESIZE_READONLY(CritSkillImage*,m_CritImage,CritImage)
-	CC_SYNTHESIZE(int,m_LoadImage,LoadImage);				//用于记录加载图片的id
-	CC_SYNTHESIZE(int,m_StageID,StageID);					//关卡ID
-	CC_SYNTHESIZE(int,m_Batch,Batch);						//批次ID
-	CC_SYNTHESIZE(CombatLogic*,m_Logic,LogicObj);			//存储一个逻辑对象
-	CC_SYNTHESIZE(CChapter, m_chapter, Chapter);				//存储章节信息
-	CC_SYNTHESIZE(int, m_iLastStageId, LastStageId);			//上一次关卡信息(-1标记悬赏府)
-	CC_SYNTHESIZE(int, m_StageType, StageType);					//大关卡还是小关卡
-	CC_SYNTHESIZE(bool, m_bNormal, Normal);						//精英还是普通
-	CC_PROPERTY(int, m_BossModel, WorldBoss);					//世界BOSS模型
-	CC_SYNTHESIZE(int, m_iWorldBossRank, WorldBossRank); //世界BOSS狂暴状态
-	CC_SYNTHESIZE(int, m_ChapterIndex, ChapterIndex);			//在打哪一章节
-	CC_SYNTHESIZE(int, m_ChapterCount, ChapterCount);			//章节个数
-	CC_SYNTHESIZE(int, m_iReliveNeedGoldNum, ReliveNeedGoldNum);//续关需要的元宝数量
-	CC_SYNTHESIZE(int, m_BossHurtPe,BossHurtPe);				//世界boss伤害加成百分比
-	CC_PROPERTY(int, m_VerifyNum,VerifyNum);					//验证所有武将造成的伤害信息(验证伤害是否被恶意修改)
-	CC_PROPERTY(int, m_BossHurtCount,BossHurtCount);			//造成的总伤害
-	CC_SYNTHESIZE(bool, m_BattleOver, battleOver);				//战斗结束
+	CC_SYNTHESIZE(int,m_LoadImage,LoadImage);						//用于记录加载图片的id
+	CC_SYNTHESIZE(int,m_StageID,StageID);							//关卡ID
+	CC_SYNTHESIZE(int,m_Batch,Batch);								//批次ID
+	CC_SYNTHESIZE(CombatLogic*,m_Logic,LogicObj);					//存储一个逻辑对象
+	CC_SYNTHESIZE(CChapter, m_chapter, Chapter);					//存储章节信息
+	CC_SYNTHESIZE(int, m_iLastStageId, LastStageId);				//上一次关卡信息(-1标记悬赏府)
+	CC_SYNTHESIZE(int, m_StageType, StageType);						//大关卡还是小关卡
+	CC_SYNTHESIZE(bool, m_bNormal, Normal);							//精英还是普通
+	CC_PROPERTY(bool, m_BossModel, WorldBoss);						//世界BOSS模型
+	CC_SYNTHESIZE(int, m_ChapterIndex, ChapterIndex);				//在打哪一章节
+	CC_SYNTHESIZE(int, m_ChapterCount, ChapterCount);				//章节个数
+	CC_SYNTHESIZE(int, m_iReliveNeedGoldNum, ReliveNeedGoldNum);	//续关需要的元宝数量
+	CC_SYNTHESIZE(int, m_BossHurtPe,BossHurtPe);					//世界boss伤害加成百分比
+	CC_PROPERTY(int, m_VerifyNum,VerifyNum);						//验证所有武将造成的伤害信息(验证伤害是否被恶意修改)
+	CC_PROPERTY(int, m_BossHurtCount,BossHurtCount);				//造成的总伤害
+	CC_SYNTHESIZE(bool, m_BattleOver, battleOver);					//战斗结束
 protected:
-	vector<int> m_CantMoveGrid;								//可移动格子存储
-	vector<int> m_AddCostGrid;								//可增加cost格子存储
-	vector<int> m_VecBossHurt;								//服务器验证伤害,每5秒存储一次当前造成总伤害信息
-	MapSkeletonData m_MapSpineData;							//
-	vector<int> m_SpineID;									//记录spine的ID
-	Members m_members;										//战场上活着的英雄
-	BattleDataInit m_battleInit;							//存储战场信息
-	CSceneTrap m_SceneTarp;									//存储关卡陷阱信息
-	vector<CMonster*> m_CallRole;							//存储召唤类型武将
+	vector<int> m_CantMoveGrid;									//可移动格子存储
+	vector<int> m_AddCostGrid;									//可增加cost格子存储
+	vector<int> m_VecBossHurt;									//服务器验证伤害,每5秒存储一次当前造成总伤害信息
+	MapSkeletonData m_MapSpineData;								//
+	vector<int> m_SpineID;										//记录spine的ID
+	Members m_members;											//战场上活着的英雄
+	BattleServerData m_ServerData;								//存储战场信息
+	vector<CMonster*> m_CallRole;								//存储召唤类型武将
 	EffectData* m_efdata;
 	BuffData* m_BuffData;
 	StoryData* m_StoryData;
 	ArmatureEventDataMgr* m_armatureEventDataMgr;
 	terData* m_terData;
 	CStage tollgateInfo;
-	int m_SceneTarpID;										//场景效果类型记录
+	int m_SceneTarpID;											//场景效果类型记录
 	vector<WarAlive*> m_Heros;
 	vector<WarAlive*> m_Monsters;
 };

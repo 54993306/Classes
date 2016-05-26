@@ -118,14 +118,11 @@ void HurtCount::addHittingAlive( WarAlive* AtcTarget , WarAlive* HitTarget )
 
 void HurtCount::woldBossHurt( WarAlive* pAlive,float pHurt )
 {
-	if (m_Manage->getWorldBoss())
+	if (pAlive->getAliveType() == AliveType::WorldBoss)							//世界boss受击
 	{
 		pHurt *= (1+m_Manage->getBossHurtPe()*0.01f);								//鼓舞效果
-		if (pAlive->getAliveType() == AliveType::WorldBoss)							//世界boss受击
-		{
-			m_Manage->setBossHurtCount(pHurt);
-			m_Manage->setVerifyNum(pHurt);
-		}
+		m_Manage->setBossHurtCount(pHurt);
+		m_Manage->setVerifyNum(pHurt);
 	}
 }
 
