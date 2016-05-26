@@ -9,7 +9,6 @@
 #include "bag/bagData.h"
 #include "tollgate/Chapter.h"
 #include "model/DataCenter.h"
-#include "model/DataDefine.h"
 #include "model/WarManager.h"
 #include "warscene/RandomBusineseMan.h"
 #include "guide/GuideManager.h"

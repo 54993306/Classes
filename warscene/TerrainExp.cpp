@@ -4,7 +4,7 @@
 #include "model/terrainLayer.h"
 #include "scene/alive/AliveDefine.h"
 #include "Global.h"
-#include "model/DataDefine.h"
+#include "Battle/BattleRole.h"
 #include "model/TerrainManager.h"
 #include "scene/effect/EffectDefine.h"
 

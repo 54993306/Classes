@@ -4,7 +4,7 @@
 #include "model/WarManager.h"
 #include "model/DataCenter.h"
 #include "model/BuffManage.h"
-#include "model/DataDefine.h"
+#include "Battle/BattleRole.h"
 #include "model/MapManager.h"
 #include "warscene/ConstNum.h"
 #include "warscene/EffectData.h"

@@ -17,6 +17,7 @@
 #include "Battle/LoadSpineData.h"
 #include "Battle/BattleMessage.h"
 #include "Battle/MoveObject.h"
+#include "Battle/BattleRole.h"
 CombatGuideLayer::CombatGuideLayer()
 	:m_Step(nullptr),m_root(nullptr),m_mapData(nullptr)
 	,m_RenderTexture(nullptr),m_Scene(nullptr),m_LayerColor(nullptr)

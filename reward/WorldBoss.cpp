@@ -1,5 +1,4 @@
 ﻿#include "WorldBoss.h"
-#include "model/DataDefine.h"
 #include "GMessage.h"
 #include "common/CGameSound.h"
 #include "Resources.h"

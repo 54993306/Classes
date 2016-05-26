@@ -41,6 +41,7 @@
 #include "update/CDownloadPackage.h"
 #include "jni/CJniHelper.h"
 #include "Battle/MoveObject.h"
+#include "Battle/BattleRole.h"
 
 CombatLogic::CombatLogic()
 	:m_time(0),m_Assist(nullptr),m_task(nullptr),m_CombatEffect(nullptr),m_bufExp(nullptr),m_terExp(nullptr),m_SkillRange(nullptr)
@@ -435,7 +436,7 @@ void CombatLogic::MonsterExcuteAI( WarAlive* alive,float dt )
 		}
 		AliveExcuteAI(alive,AttackInfo);
 	}else{
-		if (m_Manage->getSkill(alive)->skillType == CallAtk)
+		if (alive->getSkillType() == CallAtk)
 		{
 			alive->getActObject()->setMoveState(0);
 			alive->getActObject()->TurnStateTo(Stand_Index);
@@ -505,7 +506,7 @@ void CombatLogic::excuteCritEffect( WarAlive* alive ,CCDictionary*pDic)
 void CombatLogic::attackEffect( WarAlive*alive )
 {
 	ActObject* pActObject = alive->getActObject();
-	CEffect* effect = m_Manage->getEffect(alive);						//开始播放攻击音效攻击特效的时机可以由策划配置
+	CEffect* effect = alive->getCurrEffect();						//开始播放攻击音效攻击特效的时机可以由策划配置
 	EffectInfo* info = m_Manage->getEffData()->getEffectInfo(effect->effectId);
 	if (!info)
 	{
@@ -597,10 +598,10 @@ void CombatLogic::CritAtkEnd(CCObject* ob)
 void CombatLogic::doLostHp(CCObject* ob)
 {
 	WarAlive* alive = (WarAlive*)ob;
-	CEffect* effect = DataCenter::sharedData()->getWar()->getEffect(alive);
+	CEffect* effect = alive->getCurrEffect();
 	if(!effect || alive->getSortieNum() >= effect->batter )										//当掉血帧多于实际逻辑值，少于实际逻辑值情况处理
 		return;	
-	switch (m_Manage->getSkill(alive)->skillType)
+	switch (alive->getSkillType())
 	{
 	case NorAtk:
 	case SpeAtk:
@@ -616,7 +617,7 @@ void CombatLogic::doLostHp(CCObject* ob)
 	case CallAtk:
 		{
 			alive->setSortieNum(alive->getSortieNum()+1);								//一次性可召唤多个武将
-			WarAlive* pAlive = m_Manage->getCallAlive(alive,m_Manage->getSkill(alive));	//得到被召唤的武将
+			WarAlive* pAlive = m_Manage->getCallAlive(alive,alive->getCurrSkill());	//得到被召唤的武将
 			if (!pAlive)
 			{
 				CCLOG("[ *ERROR ] CombatLoginc::AtkLogic CallAlive NULL");

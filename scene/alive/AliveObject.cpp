@@ -9,7 +9,7 @@
 #include "scene/alive/RageObject.h"
 #include "scene/effect/EffectObject.h"
 #include "Global.h"
-#include "model/DataDefine.h"
+#include "Battle/BattleRole.h"
 #include "scene/layer/WarAliveLayer.h"
 #include "model/WarManager.h"
 #include "model/BattleData.h"
@@ -201,7 +201,7 @@ void AliveObject::AtkEnd_Event()
 	NOTIFICATION->postNotification(B_CancelDrawAttackArea,m_Alive);		//取消绘制攻击范围(针对性的取消绘制)
 	if (m_Alive->AtkAlive.size())
 	{
-		if (DataCenter::sharedData()->getWar()->NextEffect(m_Alive))
+		if (m_Alive->NextEffect())
 		{
 			m_Alive->ExcuteNextEffect();
 		}else{

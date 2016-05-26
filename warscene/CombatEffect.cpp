@@ -8,7 +8,7 @@
 #include "WarAssist.h"
 #include "tools/CCShake.h"
 #include "warscene/EffectData.h"
-#include "model/DataDefine.h"
+#include "Battle/BattleRole.h"
 #include "scene/alive/ActObject.h"
 #include "CombatTask.h"
 #include "scene/alive/RageObject.h"
@@ -182,7 +182,7 @@ void CombatEffect::BattleEffect(BattleResult* Result)
 {
 	WarAlive*alive = Result->getAlive();
 	ActObject* aliveOb = alive->getActObject();
-	CEffect* efInfo = DataCenter::sharedData()->getWar()->getEffect(alive);									//状态性的数据	
+	CEffect* efInfo = alive->getCurrEffect();									//状态性的数据	
 	EffectInfo* effectinfo = DataCenter::sharedData()->getWar()->getEffData()->getEffectInfo(efInfo->effectId);	
 	if (!effectinfo)
 	{
@@ -234,7 +234,7 @@ void CombatEffect::AttackNull(BattleResult* Result)
 {
 	WarAlive*alive = Result->getAlive();
 	ActObject* aliveOb = alive->getActObject();
-	CEffect* efInfo = DataCenter::sharedData()->getWar()->getEffect(alive);
+	CEffect* efInfo = alive->getCurrEffect();
 	EffectInfo* effectinfo = DataCenter::sharedData()->getWar()->getEffData()->getEffectInfo(efInfo->effectId);
 	if (!effectinfo)
 	{
@@ -316,7 +316,7 @@ void CombatEffect::SkillEfHandleForEnemy( CCObject* ob )
 
 	//获取技能文本
 	WarManager* warManager = DataCenter::sharedData()->getWar();
-	const SkillCfg* pSkillCfg = DataCenter::sharedData()->getSkill()->getCfg(warManager->getSkill(((WarAlive*)SkillEffect->getUserData()))->skillId);
+	const SkillCfg* pSkillCfg = DataCenter::sharedData()->getSkill()->getCfg(((WarAlive*)SkillEffect->getUserData())->getCurrSkill()->skillId);
 	std::string text = pSkillCfg->name;
 	CCSprite* pSprite = CCSprite::create(CCString::createWithFormat("warScene/playerSkill/%d.png", pSkillCfg->id)->getCString());
 	if(!pSprite)

@@ -1,5 +1,4 @@
 #include "CommonFunction.h"
-//#include "Vector2D.h"
 #include "platform/CCEGLViewProtocol.h"
 #include "platform/CCFileUtils.h"
 #include <stdio.h>
@@ -7,7 +6,6 @@
 #include <string>
 #include <typeinfo>
 #include "warscene/ConstNum.h"
-#include "model/DataDefine.h"
 #include "model/DataCenter.h"
 #include "GMessage.h"
 #include "common/CGameSound.h"

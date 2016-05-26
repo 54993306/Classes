@@ -3,7 +3,7 @@
 #include "MoveRule.h"
 #include "model/BattleData.h"
 #include "model/BuffManage.h"
-#include "model/DataDefine.h"
+#include "Battle/BattleRole.h"
 #include "model/DataCenter.h"
 #include "model/WarManager.h"
 #include "warscene/BattleResult.h"
@@ -52,7 +52,7 @@ int HurtCount::ChangeLocation(WarAlive* AtcAlive , WarAlive* HitAlive)
 		|| HitAlive->getCallType() == NotAttack||HitAlive->getCaptain()
 		|| HitAlive->getAliveType() == AliveType::WorldBoss)//不可被击飞类型武将
 		return HitAlive->getGridIndex();
-	CEffect* effect =m_Manage->getEffect(AtcAlive);
+	CEffect* effect = AtcAlive->getCurrEffect();
 	if (effect->batter != AtcAlive->getSortieNum())
 		return HitAlive->getGridIndex();									//连击的最后一次才做击退
 	bool enemy = AtcAlive->getEnemy();
@@ -83,7 +83,7 @@ void HurtCount::HurtExcute(BattleResult*Result,WarAlive*AtkAlive,WarAlive*HitAli
 STR_LostHp HurtCount::hitNum(WarAlive* AtcTarget , WarAlive* HitTarget)
 {
 	STR_LostHp vec;
-	CEffect* effect = m_Manage->getEffect(AtcTarget);
+	CEffect* effect = AtcTarget->getCurrEffect();
 	if (effect->pTarget == usTargetType)						//判断是攻击还是加血
 	{
 		vec = gainCount(AtcTarget,HitTarget);
@@ -116,6 +116,19 @@ void HurtCount::addHittingAlive( WarAlive* AtcTarget , WarAlive* HitTarget )
 	}
 }
 
+void HurtCount::woldBossHurt( WarAlive* pAlive,float pHurt )
+{
+	if (m_Manage->getWorldBoss())
+	{
+		pHurt *= (1+m_Manage->getBossHurtPe()*0.01f);								//鼓舞效果
+		if (pAlive->getAliveType() == AliveType::WorldBoss)							//世界boss受击
+		{
+			m_Manage->setBossHurtCount(pHurt);
+			m_Manage->setVerifyNum(pHurt);
+		}
+	}
+}
+
 //对一个武将造成伤害计算
 STR_LostHp HurtCount::lostCount(WarAlive* AtcTarget , WarAlive* HitTarget)
 {
@@ -125,38 +138,95 @@ STR_LostHp HurtCount::lostCount(WarAlive* AtcTarget , WarAlive* HitTarget)
 	int crit_pe = critJudge(AtcTarget,HitTarget);										//暴伤修正百分比
 	hp.hitType = lostType(race_hurt,crit_pe);											//得到掉血类型
 	//普通伤害 =(攻击力*(1+百分比))^2/(攻击力*(1+百分比)+目标防御))*暴击伤害*属性伤害
-	CEffect* effect = m_Manage->getEffect(AtcTarget);
-	float BaseHurt = pow(AtcTarget->getAtk()*(1+effect->damage*0.01f),2)/(AtcTarget->getAtk()*(1+effect->damage*0.01f)+HitTarget->getDef());
-	float erange = effect->erange * 0.01f;
+	CEffect* effect = AtcTarget->getCurrEffect();
+	float tAttackNum = pow(AtcTarget->getAtk()*(1+effect->damage*0.01f),2);
+	float tDefenseNum = AtcTarget->getAtk()*(1+effect->damage*0.01f)+HitTarget->getDef();
+	float BaseHurt = tAttackNum / tDefenseNum;
+	float erange = effect->erange * 0.01f;												//伤害浮动值
 	if (!erange)erange = 0.05f;
 	float base_hurt_max = BaseHurt * (1 + erange);										//基础伤害max
 	float base_hurt_min = BaseHurt * (1 - erange);										//基础伤害min
 	BaseHurt = CCRANDOM_0_1()*(base_hurt_max-base_hurt_min) + base_hurt_min;			//浮动后的基础伤害
 	float TotlaHurt = BaseHurt * crit_pe * race_hurt + effect->hurt;
-	if (m_Manage->getWorldBoss())
-	{
-		TotlaHurt *= (1+m_Manage->getBossHurtPe()*0.01f);								//鼓舞效果
-		if (HitTarget->getAliveType() == AliveType::WorldBoss)							//世界boss受击
-		{
-			m_Manage->setBossHurtCount(TotlaHurt);
-			m_Manage->setVerifyNum(TotlaHurt);
-		}
-	}
+	woldBossHurt(HitTarget,TotlaHurt);
 	if (TotlaHurt <= 0)
 		TotlaHurt = 1;
 	hp.hitNum = -TotlaHurt;
 	HitTarget->setHp(HitTarget->getHp() - TotlaHurt);									//实际扣血
 	return hp;
 }
+
+STR_LostHp HurtCount::gainCount(WarAlive* AtcTarget, WarAlive* HitTarget)
+{
+	STR_LostHp str;
+	float addNum = 0;	//加血只与加血方有关
+	CEffect* effect = AtcTarget->getCurrEffect();	
+	float erange = effect->erange * 0.01f;							//伤害浮动值
+	float hurt   = effect->hurt;									//真实伤害
+	//注意百分比和正负值运算问题
+	float addhp = attributeHurt(AtcTarget);							//属性伤害的值
+	if (!erange)erange = 0.05f;
+	float hp_max = addhp*(1 + erange);			  
+	float hp_min = addhp*(1 - erange);			  
+	float base_hp = CCRANDOM_0_1()*(hp_max-hp_min) + hp_min;		//浮动后的血量
+	//属性影响类型*属性影响频率*浮动值+真实伤害
+	addNum = base_hp + hurt;
+	str.hitType = gainType;											//加血只显示一种字体
+	str.hitNum = addNum;		
+	if (HitTarget->getCallType() != UNAddHP)						//不可被加血类型武将
+		HitTarget->setHp(HitTarget->getHp() + str.hitNum);			//血量实际变化的位置
+	return str;
+}
+//命中=命中/(命中+目标闪避）* 100
+bool HurtCount::hitJudge(WarAlive* AtcTarget , WarAlive* HitTarget)
+{
+	int ranNum = CCRANDOM_0_1()*100;									//0到100的数
+	float atc_hit = AtcTarget->getHit();
+	float hit_dodge = HitTarget->getDoge();
+	int hitNum = atc_hit/(atc_hit+hit_dodge)*100;
+	if (ranNum > hitNum)
+		return true;
+	return false;
+}
+
+int  HurtCount::critJudge(WarAlive* AtcTarget , WarAlive* HitTarget)
+{
+	//暴击百分比 = 暴击*0.25/300
+	int ranNum = CCRANDOM_0_1()*100;		//0到100的数
+	if ((AtcTarget->getCrit() * 0.25f/300 * 100) > ranNum)
+		return 2;							//暴击造成2倍伤害
+	return 1;
+}
+
+int HurtCount::lostType(float race,int crit)
+{
+	if (crit == 2)
+	{
+		if (race == 1)
+		{
+			return genralCritType;
+		}else{
+			if (race > 1)
+				return addCritType;
+			return cutCritType;
+		}
+	}else{
+		if (race == 1)
+		{
+			return generalType;
+		}else{
+			if (race > 1)
+				return addType;
+			return cutType;
+		}
+	}
+}
 //根据不同的效果类型对攻击武将进行不同处理,扣自己血量给其他目标加血
 void HurtCount::EffectTypeExcute( BattleResult*Result )
 {
 	WarAlive *alive = Result->getAlive();
-	CEffect* effect = m_Manage->getEffect(alive);
-	int lostHp = 0;
-	vector<unsigned int>::iterator iter = Result->m_HitTargets.begin();
-	for(;iter!=Result->m_HitTargets.end();++iter)
-		lostHp += Result->m_LostHp[*iter].hitNum;
+	CEffect* effect = alive->getCurrEffect();
+	int lostHp = getAllTargetLostHp(Result);
 	switch (effect->Efftype)
 	{
 	case Suckblood_Type:	//吸血型效果
@@ -194,101 +264,53 @@ void HurtCount::EffectTypeExcute( BattleResult*Result )
 	}
 }
 
-STR_LostHp HurtCount::gainCount(WarAlive* AtcTarget, WarAlive* HitTarget)
+float HurtCount::getAllTargetLostHp( BattleResult* pResult )
 {
-	STR_LostHp str;
-	float addNum = 0;	//加血只与加血方有关
-	CEffect* effect = m_Manage->getEffect(AtcTarget);	
-	float erange = effect->erange * 0.01f;							//伤害浮动值
-	float hurt   = effect->hurt;									//真实伤害
-	//注意百分比和正负值运算问题
-	float addhp = attributeHurt(AtcTarget);							//属性伤害的值
-	if (!erange)erange = 0.05f;
-	float hp_max = addhp*(1 + erange);			  
-	float hp_min = addhp*(1 - erange);			  
-	float base_hp = CCRANDOM_0_1()*(hp_max-hp_min) + hp_min;		//浮动后的血量
-	//属性影响类型*属性影响频率*浮动值+真实伤害
-	addNum = base_hp + hurt;
-	str.hitType = gainType;											//加血只显示一种字体
-	str.hitNum = addNum;		
-	if (HitTarget->getCallType() != UNAddHP)						//不可被加血类型武将
-		HitTarget->setHp(HitTarget->getHp() + str.hitNum);			//血量实际变化的位置
-	return str;
-}
-
-bool HurtCount::hitJudge(WarAlive* AtcTarget , WarAlive* HitTarget)
-{
-	//命中=命中/(命中+目标闪避）* 100
-
-	int ranNum = CCRANDOM_0_1()*100;									//0到100的数
-	float atc_hit = AtcTarget->getHit();
-	float hit_dodge = HitTarget->getDoge();
-	int hitNum = atc_hit/(atc_hit+hit_dodge)*100;
-	if (ranNum > hitNum)
-		return true;
-	return false;
-}
-
-int  HurtCount::critJudge(WarAlive* AtcTarget , WarAlive* HitTarget)
-{
-	//暴击百分比 = 暴击*0.25/300
-	int ranNum = CCRANDOM_0_1()*100;		//0到100的数
-	if ((AtcTarget->getCrit() * 0.25f/300 * 100) > ranNum)
-		return 2;							//暴击造成2倍伤害
-	return 1;
+	int lostHp = 0;
+	vector<unsigned int>::iterator iter = pResult->m_HitTargets.begin();
+	for(;iter!=pResult->m_HitTargets.end();++iter)
+		lostHp += pResult->m_LostHp[*iter].hitNum;
+	return lostHp;
 }
 
 float HurtCount::attributeHurt(WarAlive* AtcTarget)
 {
-	if (!AtcTarget)return 0;
-	int num = 0;
-	CEffect* effect = m_Manage->getEffect(AtcTarget);
+	CEffect* effect = AtcTarget->getCurrEffect();
 	//属性影响类型*属性影响频率
-	int atbType = effect->pro_Type; 
-	int atbRate = effect->pro_Rate;	
-	switch (atbType)
+	switch (effect->pro_Type)
 	{
-	case atb_normal:
-		{
-			return num;
-		}break;
 	case atb_attak:
 		{
-			num = AtcTarget->getAtk() * atbRate *0.01f;
-			return num;
+			return AtcTarget->getAtk() * effect->pro_Rate *0.01f;
 		}break;
 	case atb_def:
 		{
-			num = AtcTarget->getDef() * atbRate *0.01f;
-			return num;
+			return AtcTarget->getDef() * effect->pro_Rate*0.01f;
 		}break;
 	case atb_hp:
 		{
-			num = AtcTarget->getHp() * atbRate *0.01f;
-			return num;
+			return AtcTarget->getHp() * effect->pro_Rate*0.01f;
 		}break;
 	case atb_hit:
 		{
-			num = AtcTarget->getHit() * atbRate *0.01f;
-			return num;
+			return AtcTarget->getHit() * effect->pro_Rate*0.01f;
 		}break;
 	case atb_crit:
 		{
-			num = AtcTarget->getCrit() * atbRate *0.01f;
-			return num;
+			return AtcTarget->getCrit() * effect->pro_Rate*0.01f;
 		}break;
 	default:
 		{
-			CCLOG("ERROR: in [ HurtCount::attribute_hurt ]");
-			return num;
+			if (effect->pro_Type)
+				CCLOG("ERROR: in [ HurtCount::attribute_hurt ]");
+			return 0;
 		}break;
 	}
-	return num;
 }
 //只能计算最后一个效果添加在武将身上的buff
 void HurtCount::BuffHandleLogic(WarAlive* pAlive)
 {
-	CEffect* effect = m_Manage->getEffect(pAlive);
+	CEffect* effect = pAlive->getCurrEffect();
 	BuffManage* AtcbufManege = pAlive->getBuffManage();
 	for (auto tAlive : pAlive->HittingAlive)
 	{
@@ -322,12 +344,11 @@ void HurtCount::BuffHandleLogic(WarAlive* pAlive)
 		}
 	}
 }
-
+//属性克制
 float HurtCount::raceDispose(WarAlive* AtcTarget , WarAlive* HitTarget)
 {
 	return 1;
 	//火1>木3; 木3>水2; 水2>火1
-	//克制種族*120%攻擊力;克制则加重,被克制则减轻
 	int atkType = AtcTarget->role->roletype;
 	int hitType = HitTarget->role->roletype;
 	if (atkType == hitType)
@@ -353,28 +374,4 @@ float HurtCount::raceDispose(WarAlive* AtcTarget , WarAlive* HitTarget)
 			return 0.7f;
 	}
 	return 1.0f;
-}
-
-int HurtCount::lostType(float race,int crit)
-{
-	if (crit == 2)
-	{
-		if (race == 1)
-		{
-			return genralCritType;
-		}else{
-			if (race > 1)
-				return addCritType;
-			return cutCritType;
-		}
-	}else{
-		if (race == 1)
-		{
-			return generalType;
-		}else{
-			if (race > 1)
-				return addType;
-			return cutType;
-		}
-	}
 }

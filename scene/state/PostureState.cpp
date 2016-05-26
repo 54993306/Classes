@@ -2,7 +2,7 @@
 #include "AppUI.h"
 #include "Global.h"
 #include "PostureState.h"
-#include "model/DataDefine.h"
+#include "Battle/BattleRole.h"
 #include "warscene/ConstNum.h"
 #include "common/CommonFunction.h"
 #include "scene/alive/AliveDefine.h"

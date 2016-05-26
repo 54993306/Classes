@@ -10,7 +10,7 @@
 #include "tools/commonDef.h"
 #include "scene/layer/WarAliveLayer.h"
 #include <functional>					//sort 的降序排序使用
-#include "DataDefine.h"
+#include "Battle/BattleRole.h"
 #include "warscene/EffectData.h"
 #include "tollgate/Chapter.h"
 #include "scene/alive/AliveDefine.h"
@@ -283,69 +283,6 @@ void WarManager::initAlive(WarAlive* alive)
 #endif
 }
 
-CSkill* WarManager::getSkill( WarAlive* alive )
-{
-	CSkill* skill = nullptr;
-	if (alive->getCriAtk())
-	{
-		if (alive->role->skill3.skillId)
-		{
-			return &alive->role->skill3;
-		}else{
-			CCLOG("[ *ERROR ] WarManager::getSkill CritSKILL IS NULL");
-			//alive->setCriAtk(false);
-			return &alive->role->skill1;
-		}
-	}else if (alive->getSpeAtk())
-	{
-		if (alive->role->skill2.skillId)
-		{
-			return &alive->role->skill2;
-		}else{
-			CCLOG("[ *ERROR ] WarManager::getSkill SpecialSKILL IS NULL");
-			return &alive->role->skill1;
-		}
-	}else{
-		skill = &alive->role->skill1;
-	}
-	return skill;
-}
-//得到武将当前状态技能效果
-CEffect* WarManager::getEffect(WarAlive* alive)
-{
-	CSkill* skill = getSkill(alive);
-	int efid = alive->getEffIndex();		//效果index
-	if (alive->getEffectGroup()<=skill->EffectList.size())
-		if (skill->EffectList.at(alive->getEffectGroup()-1).size()>efid)
-			return &skill->EffectList.at(alive->getEffectGroup()-1).at(efid);
-		else
-			CCLOG("[ *ERROR ] EffIndex > EffectListSize  AliveID=%d mode=%d",alive->getAliveID(),alive->role->thumb);
-	else{
-		CCLOG("[ *ERROR ]Skill Effect Is NULL  AliveID=%d mode=%d EffectGroup=%d",alive->getAliveID(),alive->role->thumb,alive->getEffectGroup());
-		alive->setEffectGroup(1);
-	}	
-	return nullptr;
-	CCTextureCache::sharedTextureCache()->dumpCachedTextureInfo();
-}
-
-bool WarManager::NextEffect(WarAlive* alive)
-{
-	int effId = alive->getEffIndex() + 1;
-	int ranNum = CCRANDOM_0_1()*100;								//0到100的数
-	CSkill* skill = getSkill(alive);
-	if (alive->getEffectGroup()>skill->EffectList.size())
-		return false;
-	if (skill->skillId&&effId < skill->EffectList.at(alive->getEffectGroup()-1).size())			//判断是否为最后的一个特效
-	{
-		if (skill->EffectList.at(alive->getEffectGroup()-1).at(effId).userRate > ranNum)
-		{
-			alive->setEffIndex(effId);
-			return true;
-		}
-	}
-	return false;
-}
-
 CCArray* WarManager::getAlives(bool isAlive /*=false*/)
 {
 	if(m_members.empty()) return nullptr;
@@ -379,15 +316,15 @@ void WarManager::sortArrayByGridIndex(CCArray* arr)
 //这两个方法可以合并。。。
 CCArray* WarManager::getHeros(bool isAlive,bool sort/*= true*/)
 {
-	return getAlivesByFaction(false,isAlive,sort);
+	return getAlivesByCamp(false,isAlive,sort);
 }
 
 CCArray* WarManager::getMonsts(bool isAlive,bool sort /*=true*/)
 {
-	return getAlivesByFaction(true,isAlive,sort);
+	return getAlivesByCamp(true,isAlive,sort);
 }
 
-CCArray* WarManager::getAlivesByFaction( bool enemy,bool isAlive,bool sort )
+CCArray* WarManager::getAlivesByCamp( bool enemy,bool isAlive,bool sort )
 {
 	if(m_members.empty()) return nullptr;
 	CCArray* arr = CCArray::create();
@@ -496,20 +433,6 @@ WarAlive* WarManager::getAbsentCallAlive( WarAlive* fatherAlive )
 	return nullptr;
 }
 
-bool WarManager::captainCallNumberJudge( WarAlive* alive )
-{
-	if (alive->getCaptain() )
-	{
-		if (alive->getCallAliveNum()<1)
-		{
-			return true;
-		}else{
-			alive->setCallAliveNum(alive->getCallAliveNum() - 1);
-		}
-	}
-	return false;
-}
-
 WarAlive* WarManager::getNewCallAlive(WarAlive* Father,int CallId)
 {
 	for (auto i:m_CallRole)
@@ -553,7 +476,7 @@ WarAlive* WarManager::getCallAlive(WarAlive* Father,CSkill* skill)
 	WarAlive* alive = getAbsentCallAlive(Father);					
 	if (alive)
 		return alive;
-	if (captainCallNumberJudge(Father))
+	if (Father->captainCallNumberJudge())
 		return nullptr;
 	CEffect* effect = getSummonEffect(skill);
 	if (!effect)

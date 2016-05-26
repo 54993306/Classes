@@ -1,6 +1,6 @@
 
 #include "terrainLayer.h"
-#include "model/DataDefine.h"
+#include "Battle/BattleRole.h"
 #include "model/DataCenter.h"
 #include "scene/effect/EffectObject.h"
 #include "model/MapManager.h"

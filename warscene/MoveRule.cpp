@@ -1,7 +1,7 @@
 ﻿#include "MoveRule.h"
 #include "ConstNum.h"
 #include "model/DataCenter.h"
-#include "model/DataDefine.h"
+#include "Battle/BattleRole.h"
 #include "model/WarManager.h"
 #include "model/MapManager.h"
 #include "scene/alive/AliveDefine.h"

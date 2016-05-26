@@ -8,7 +8,7 @@
 #include "common/ShaderDataHelper.h"
 #include "warscene/CHeroSoundData.h"
 #include "Battle/BattleMessage.h"
-#include "model/DataDefine.h"
+#include "Battle/BattleRole.h"
 
 HPObject::HPObject()
 	:m_Skin(nullptr),m_Background(nullptr),m_HpNumber(0),m_HpNumberMax(0),m_Percent(0)

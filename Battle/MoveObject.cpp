@@ -1,6 +1,6 @@
 
 #include "Battle/MoveObject.h"
-#include "model/DataDefine.h"
+#include "Battle/BattleRole.h"
 #include "model/DataCenter.h"
 #include "model/MapManager.h"
 #include "warscene/ConstNum.h"

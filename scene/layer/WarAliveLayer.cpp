@@ -26,6 +26,7 @@
 #include "warscene/CHeroSoundData.h"
 #include "Battle/BattleMessage.h"
 #include "Battle/MoveObject.h"
+#include "Battle/BattleRole.h"
 WarAliveLayer::WarAliveLayer()
 	:m_TouchAlive(nullptr),m_grid(0),m_AliveNode(0)
 	,m_MoveActObject(nullptr),m_TouchAliveBtn(false),m_Manage(nullptr)

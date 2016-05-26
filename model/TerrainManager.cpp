@@ -9,6 +9,7 @@
 #include "model/WarManager.h"
 #include "model/MapManager.h"
 #include "common/CommonFunction.h"
+#include "Battle/BattleRole.h"
 
 using namespace cocos2d;
 

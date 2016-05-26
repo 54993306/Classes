@@ -5,7 +5,7 @@
 #include "warscene/ConstNum.h"
 #include "scene/alive/ActObject.h"
 #include "tools/commonDef.h"
-#include "model/DataDefine.h"
+#include "Battle/BattleRole.h"
 #include "warscene/SkillRange.h"
 #include "scene/layer/WarAliveLayer.h"
 #include "warscene/MoveRule.h"
@@ -185,9 +185,9 @@ void WarMapLayer::DrawAtkArea(WarAlive* alive)
 				m_BackArea = true;
 			else
 				m_FrontArea = true;
-			if(DataCenter::sharedData()->getWar()->getEffect(alive))
+			if(alive->getCurrEffect())
 			{
-				if (DataCenter::sharedData()->getWar()->getEffect(alive)->mode == frontAreaVia)
+				if (alive->getCurrEffect()->mode == frontAreaVia)
 					break;//合并成一个方法,暴露出来的内容太多，每次需要修改effect结构的时候会多很多地方造成影响，不容易维护和拓展
 			}
 		}

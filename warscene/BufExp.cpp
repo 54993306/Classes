@@ -1,7 +1,7 @@
 ﻿#include "BufExp.h"
 #include "Global.h"
 #include "warscene/ConstNum.h"
-#include "model/DataDefine.h"
+#include "Battle/BattleRole.h"
 #include "model/BuffManage.h"
 #include "model/DataCenter.h"
 #include "model/WarManager.h"

@@ -31,7 +31,8 @@ public:
 	void BuffHandleLogic(WarAlive* pAlive);								//对每一个效果进行BUF逻辑处理
 	int ChangeLocation(WarAlive* AtcTarget , WarAlive* HitTarget);			//改变位置效果处理
 	void addHittingAlive(WarAlive* AtcTarget , WarAlive* HitTarget);
-	
+	void woldBossHurt(WarAlive* pAlive,float pHurt);
+	float getAllTargetLostHp(BattleResult* pResult);
 private:
 	WarManager* m_Manage;
 };

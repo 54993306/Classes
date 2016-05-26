@@ -5,7 +5,7 @@
 #include "BattleData.h"
 #include "tollgate/Chapter.h"
 #include <spine/spine-cocos2dx.h>
-
+#include "Battle/BattleMacro.h"
 class WarAlive;
 class EffectData;
 class ArmatureEventDataMgr;
@@ -45,7 +45,6 @@ public:
 	WarAlive* getCallAlive(WarAlive* pAlive,CSkill* skill);
 	WarAlive* getAliveByType(AliveType type,bool Monster = true);
 	WarAlive* getAbsentCallAlive(WarAlive* fatherAlive);
-	bool captainCallNumberJudge(WarAlive* alive);
 	void BattleDataClear();
 	void initData();
 	bool checkMonstOver();
@@ -63,9 +62,6 @@ public:
 	StoryData* getStoryData();
 	ArmatureEventDataMgr* getArmatureDataMgr();
 	terData* getTerData(){return m_terData;};
-	CEffect* getEffect(WarAlive* alive);					//得到武将当前效果
-	CSkill* getSkill(WarAlive* alive);						//得到武将当前效果
-	bool NextEffect(WarAlive* alive);						//判断第二个效果是否释放
 	void setTollgate(CStage& tag);
 	CStage* getTollgete();
 	Members* getMembers();
@@ -82,7 +78,7 @@ public:
 	void sortArrayByGridIndex(CCArray* arr);
 	CCArray* getHeros(bool isAlive = false,bool sort = true);
 	CCArray* getMonsts(bool isAlive = false,bool sort = true);
-	CCArray* getAlivesByFaction(bool enemy,bool isAlive,bool sort);
+	CCArray* getAlivesByCamp(bool enemy,bool isAlive,bool sort);
 	WarAlive* getNewCallAlive(WarAlive* Father,int CallId);
 public:
 	CC_SYNTHESIZE_READONLY(CritSkillImage*,m_CritImage,CritImage)

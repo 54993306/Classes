@@ -1,6 +1,6 @@
 ﻿#include "BuffManage.h"
 #include "Global.h"
-#include "DataDefine.h"
+#include "Battle/BattleRole.h"
 #include "DataCenter.h"
 #include "scene/alive/AliveDefine.h"
 #include "warscene/ConstNum.h"

@@ -1,12 +1,11 @@
 #ifndef _TEERAIN_MANAGER_H_
 #define _TEERAIN_MANAGER_H_
 #include "cocos2d.h"
-#include "DataDefine.h"
 #include <map>
 #include "BattleData.h"
 using namespace std;
 USING_NS_CC;
-
+class WarAlive;
 //  [12/10/2014 xc_lin]
 /**************** 地形数据 *****************/
 class terData : public CCObject

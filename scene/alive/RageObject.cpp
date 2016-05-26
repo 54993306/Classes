@@ -2,9 +2,9 @@
 #include "ActObject.h"
 #include "warscene/ConstNum.h"
 #include "common/color.h"
-#include "model/DataDefine.h"
 #include "scene/alive/HPObject.h"
 #include "model/DataCenter.h"
+#include "Battle/BattleRole.h"
 
 RageObject::RageObject()
 	:m_rage(nullptr)

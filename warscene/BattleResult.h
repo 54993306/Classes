@@ -36,8 +36,8 @@ public:
 	map<unsigned int,unsigned int> m_AddBuf;
 	map<unsigned int,unsigned int> m_DelBuf;
 	CC_SYNTHESIZE(WarAlive*,m_alive,Alive);
-	CC_SYNTHESIZE(int,m_usType,usType);
-	CC_SYNTHESIZE(int,m_usNum,usNum);
+	CC_SYNTHESIZE(int,m_usType,usType);								//攻击目标血量变化类型
+	CC_SYNTHESIZE(int,m_usNum,usNum);								//攻击目标血量变化
 protected:
 };
 #endif

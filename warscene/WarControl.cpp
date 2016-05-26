@@ -6,7 +6,7 @@
 #include "tools/CCShake.h"
 #include "scene/WarScene.h"
 #include "model/DataCenter.h"
-#include "model/DataDefine.h"
+#include "Battle/BattleRole.h"
 #include "model/WarManager.h"
 #include "model/MapManager.h"
 #include "tools/ShowTexttip.h"
@@ -652,7 +652,8 @@ void WarControl::AliveButtonClick( CCObject* ob )
 	CProgressBar* CdBar = (CProgressBar*)MoveLaout->getChildByTag(CL_HeroPro);
 	CdBar->setValue(0);
 	NOTIFICATION->postNotification(B_RecordContinuousSkill);
-	NOTIFICATION->postNotification(B_ChangeCostNumber,CCInteger::create(- skill.cost));
+	int tCutCost = skill.cost;
+	NOTIFICATION->postNotification(B_ChangeCostNumber,CCInteger::create(-tCutCost));
 	if (alive->getCaptain())
 		ResetButtonState(alive);
 	else

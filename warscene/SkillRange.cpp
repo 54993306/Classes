@@ -3,7 +3,7 @@
 #include "model/BattleData.h"
 #include "common/CommonFunction.h"
 #include "tools/commonDef.h"
-#include "model/DataDefine.h"
+#include "Battle/BattleRole.h"
 #include "warscene/ConstNum.h"
 #include "model/WarManager.h"
 #include "model/MapManager.h"
@@ -27,7 +27,7 @@ bool SkillRange::init()
 CCArray* SkillRange::UnderAttackArea(WarAlive* alive)
 {
 	CCArray* Area = CCArray::create();
-	CEffect* effect = m_Manage->getEffect(alive);				//对武将技能效果进行逻辑把关的第一位置
+	CEffect* effect = alive->getCurrEffect();				//对武将技能效果进行逻辑把关的第一位置
 	if (!effect)
 		return Area;
 	vector<int> CountGrid = getAliveAtkGrid(alive);
@@ -92,7 +92,7 @@ CCArray* SkillRange::UnderAttackArea(WarAlive* alive)
 CCArray* SkillRange::UnderAttackAlive(WarAlive* self,CCArray* Area)
 {
 	CCArray* Alives = CCArray::create();
-	CEffect* effect = m_Manage->getEffect(self);;
+	CEffect* effect = self->getCurrEffect();
 	vector<WarAlive*>* VecAlive;
 	if ((self->getEnemy()&&effect->pTarget == enemyTyep)||(!self->getEnemy()&&effect->pTarget != enemyTyep))
 	{
@@ -159,7 +159,7 @@ CCDictionary* SkillRange::PlaySkillInfo( WarAlive* alive )
 	if (alive->getAliveStat() == UNATK	||
 		alive->getAliveStat() == INVINCIBLE)					//超出边界的武将不再进行技能处理
 		return pDic;
-	switch (m_Manage->getSkill(alive)->skillType)
+	switch (alive->getSkillType())
 	{
 	case NorAtk:
 	case SpeAtk:
@@ -215,8 +215,7 @@ CCDictionary* SkillRange::NextGroupAtkInfo( WarAlive* alive )
 {
 	if (alive->getEffectGroup()!=1)
 		return nullptr;
-	CSkill*skill = m_Manage->getSkill(alive);
-	if (skill->EffectList.size()<=1)											//判断是否存在多效果组
+	if (alive->getCurrSkill()->EffectList.size()<=1)											//判断是否存在多效果组
 		return nullptr;
 	alive->setEffectGroup(2);
 	CCDictionary* AttackInfo = UnderAttackInfo(alive);
@@ -233,8 +232,7 @@ int SkillRange::CaptainGuard( WarAlive* alive )
 	int currgrid = alive->getGridIndex();
 	for (int i=1;i<3;i++)
 	{
-		CSkill*skill = m_Manage->getSkill(alive);
-		if (skill->EffectList.size()<i)											//判断是否存在多效果组
+		if (alive->getCurrSkill()->EffectList.size()<i)											//判断是否存在多效果组
 			return INVALID_GRID;
 		alive->setEffectGroup(i);
 		for (int j=C_CAPTAINGRID;j<=C_ENDGRID;j++)
@@ -684,7 +682,7 @@ vector<int> SkillRange::getAliveAtkGrid( WarAlive* alive )
 	int aliveGrid = 0;
 	vector<int>VecAtkGrid;
 	vector<int> CountGrid;
-	CEffect* effect = m_Manage->getEffect(alive);
+	CEffect* effect = alive->getCurrEffect();
 	if (alive->getTouchState())								//单格子武将触摸状态下处理(此处应进行移动状态下攻击格子特殊处理)
 	{
 		aliveGrid = alive->getTouchGrid();

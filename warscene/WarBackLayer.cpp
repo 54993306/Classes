@@ -1,6 +1,5 @@
 ﻿#include "WarBackLayer.h"
 #include "scene/CPopTip.h"
-#include "model/DataDefine.h"
 #include "scene/WarScene.h"
 #include "model/DataCenter.h"
 #include "scene/loadWar.h"

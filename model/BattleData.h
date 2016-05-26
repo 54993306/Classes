@@ -6,30 +6,31 @@
 #include "bag/bagData.h"
 using namespace std;
 
-enum HeroType
-{
-	FireType = 1,	//火属性武将
-	WaterType,		//水属性武将
-	WoodType,		//木属性武将
-};
-//技能类型(1 普通攻击，2 特殊攻击，3 必杀技，4 召唤技，5 队长技)没有必要分skill1-skill7了,不过已经是分了才加的这个类型
-enum ROLESKILLTYPE
-{
-	NorAtk = 1,
-	SpeAtk,
-	CriAtk,
-	CallAtk,
-	CapAtk, 
-};
-enum struct AliveType
-{
-	Common,					//普通型武将
-	Elite,					//精英型武将
-	Boss,					//boss(我方主帅类)
-	WorldBoss,				//世界boss
-};
+//enum HeroType
+//{
+//	FireType = 1,	//火属性武将
+//	WaterType,		//水属性武将
+//	WoodType,		//木属性武将
+//};
+////技能类型(1 普通攻击，2 特殊攻击，3 必杀技，4 召唤技，5 队长技)没有必要分skill1-skill7了,不过已经是分了才加的这个类型
+//enum ROLESKILLTYPE
+//{
+//	NorAtk = 1,
+//	SpeAtk,
+//	CriAtk,
+//	CallAtk,
+//	CapAtk, 
+//};
+//enum struct AliveType
+//{
+//	Common,					//普通型武将
+//	Elite,					//精英型武将
+//	Boss,					//boss(我方主帅类)
+//	WorldBoss,				//世界boss
+//};
 //技能Buff
 //影响类型(0:清除DeBuff，1:攻击，2:伤害，3:命中，4:防御，5:血量，6:暴击，7:迟缓，8:减速，9:沉默，10:定身，11:昏迷，12:沉睡，13:冻结，14:混乱，15:能量)
+
 struct CBuff
 {
 	CBuff();				//详细参见datadefine Bufinfo

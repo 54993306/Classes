@@ -1,8 +1,8 @@
 ﻿#ifndef _MAP_MANAGER_H_
 #define _MAP_MANAGER_H_
 #include "cocos2d.h"
-#include "DataDefine.h"
 USING_NS_CC;
+using namespace std;
 /** 
 *        col-> 
 *      +-------+-------+-------+-------+-------+-------+-------+ 
