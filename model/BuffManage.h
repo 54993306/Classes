@@ -2,8 +2,8 @@
 #define _BUFF_MANAGER_H_
 #include "AppUI.h"
 #include <map>
-#include "BattleData.h"
-
+//#include "BattleData.h"
+#include "Battle/TempData.h"
 /************************************************************* 
  *
  *

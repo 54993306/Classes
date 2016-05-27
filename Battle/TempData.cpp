@@ -1,16 +1,13 @@
-ï»¿
-#include "BattleData.h"
-#include "bag/bagData.h"
+#include "Battle/TempData.h"
 #include "warscene/ConstNum.h"
-
-CSkill::CSkill()
-	:id(0)			//è‹±é›„æŠ€èƒ½ID(å”¯ä¸€)
-	,skillId(0)		//æŠ€èƒ½ID
-	,name("")		//æŠ€èƒ½åç§°
-	,skillType(0)		//æŠ€èƒ½ç±»åž‹(1 æ™®é€šæ”»å‡»ï¼Œ2 æ™®é€šæŠ€èƒ½ï¼Œ3 è¢«åŠ¨æŠ€èƒ½ï¼Œ4 å¿…æ€æŠ€ï¼Œ5 ä¸»å¸…æŠ€)
-	,useRate(0)		//æˆåŠŸæ–½æ”¾æ¦‚çŽ‡
-	,cost(0)		//é‡Šæ”¾æŠ€èƒ½æ‰€éœ€çš„æ€’æ°”å€¼
-	,level(0)		//æŠ€èƒ½ç­‰çº§
+TempSkill::TempSkill()
+	:id(0)			//Ó¢ÐÛ¼¼ÄÜID(Î¨Ò»)
+	,skillId(0)		//¼¼ÄÜID
+	,name("")		//¼¼ÄÜÃû³Æ
+	,skillType(0)		//¼¼ÄÜÀàÐÍ(1 ÆÕÍ¨¹¥»÷£¬2 ÆÕÍ¨¼¼ÄÜ£¬3 ±»¶¯¼¼ÄÜ£¬4 ±ØÉ±¼¼£¬5 Ö÷Ë§¼¼)
+	,useRate(0)		//³É¹¦Ê©·Å¸ÅÂÊ
+	,cost(0)		//ÊÍ·Å¼¼ÄÜËùÐèµÄÅ­ÆøÖµ
+	,level(0)		//¼¼ÄÜµÈ¼¶
 	,move(false)
 	,pTarget(0)
 	,pro_rate(0)
@@ -20,26 +17,26 @@ CSkill::CSkill()
 	,star(0)
 {}
 
-ROLE::ROLE()
-	:name("")				//åç§°
-	,thumb(0)				//æ¨¡åž‹ID
-	,roletype(0)			//æ­¦å°†ç±»åž‹(åƒµå°¸ç¥žå°†é“å£«)
-	,level(1)				//æ­¦å°†ç­‰çº§
-	,hp(0)					//è¡€é‡
-	,atk(0)					//æ”»å‡»åŠ›
-	,def(0)					//é˜²å¾¡
-	,crit(0)				//æš´å‡»å‡ çŽ‡
-	,hit(0)					//å‘½ä¸­
-	,dodge(0)				//é—ªé¿
-	,renew(0)				//å›žå¤
+TempRole::TempRole()
+	:name("")				//Ãû³Æ
+	,thumb(0)				//Ä£ÐÍID
+	,roletype(0)			//Îä½«ÀàÐÍ(½©Ê¬Éñ½«µÀÊ¿)
+	,level(1)				//Îä½«µÈ¼¶
+	,hp(0)					//ÑªÁ¿
+	,atk(0)					//¹¥»÷Á¦
+	,def(0)					//·ÀÓù
+	,crit(0)				//±©»÷¼¸ÂÊ
+	,hit(0)					//ÃüÖÐ
+	,dodge(0)				//ÉÁ±Ü
+	,renew(0)				//»Ø¸´
 	,dex(0)
-	,initCost(0)			//æ€’æ°”å€¼
-	,addCost(0)				//æ€’æ°”å€¼å›žåˆå˜åŒ–
-	,maxCost(0)				//æœ€å¤§æ€’æ°”å€¼
-	,grid(0)				//æ­¦å°†æ ‡è®°ç«™ä½æ ¼å­
+	,initCost(0)			//Å­ÆøÖµ
+	,addCost(0)				//Å­ÆøÖµ»ØºÏ±ä»¯
+	,maxCost(0)				//×î´óÅ­ÆøÖµ
+	,grid(0)				//Îä½«±ê¼ÇÕ¾Î»¸ñ×Ó
 	,row(1)
 	,col(1)
-	,zoom(0)				//ç¼©æ”¾æ¯”
+	,zoom(0)				//Ëõ·Å±È
 	,hasitem(0)				//
 	,enemy(false)
 	,coldDown(0)
@@ -50,16 +47,16 @@ ROLE::ROLE()
 	,CallID(0)
 	,alert(0)
 	,alertRange(0)
-	,CallType(0)			//æ­¦å°†ç±»åž‹
-	,MstType(0)				//æ€ªç‰©ç±»åž‹
-	,maxhp(0)				//ä¸–ç•Œbossä¸“æœ‰å±žæ€§
+	,CallType(0)			//Îä½«ÀàÐÍ
+	,MstType(0)				//¹ÖÎïÀàÐÍ
+	,maxhp(0)				//ÊÀ½çboss×¨ÓÐÊôÐÔ
 {}
 
-CMonster::CMonster()
-	:mId(0)				//å…³å¡æ€ªç‰©ID
-	,monsterId(0)		//æ€ªç‰©ID(æ ‡è¯†ID)
-	,batch(0)			//æ‰¹æ¬¡
-	,delay(0)		//å»¶è¿Ÿæ—¶é—´
+TempMonster::TempMonster()
+	:mId(0)				//¹Ø¿¨¹ÖÎïID
+	,monsterId(0)		//¹ÖÎïID(±êÊ¶ID)
+	,batch(0)			//Åú´Î
+	,delay(0)		//ÑÓ³ÙÊ±¼ä
 	,quality(0)
 	,move1(0)
 	,move2(0)
@@ -69,23 +66,7 @@ CMonster::CMonster()
 	,isBoss(false)
 {}
 
-CHero::CHero() 
-	:id(0)				//çŽ©å®¶è‹±é›„ID(å…¨æœå”¯ä¸€)
-	,recLevel(0)		//å¯æ‹›å‹Ÿç­‰çº§
-	,coin(0)			//æ‹›å‹Ÿä»·æ ¼
-	,addHp(0)			//è¡€é‡æˆé•¿ç³»æ•°
-	,addAtk(0)			//æ”»å‡»æˆé•¿ç³»æ•°
-	,addDef(0)			//é˜²å¾¡æˆé•¿ç³»æ•°
-	,index(0)			//å¸ƒé˜µçš„é¡ºåº
-	,recruit(false)
-	,star(0)
-	,heroid(0)
-	,own(false)
-	,iColor(0)
-	,evol(false)
-{}
-
-void CSkill::readData(const protos::common::Skill &skill)
+void TempSkill::readData(const protos::common::Skill &skill)
 {
 	this->id = skill.skillid();
 	this->skillId = skill.skillid();
@@ -99,10 +80,33 @@ void CSkill::readData(const protos::common::Skill &skill)
 	this->pro_rate = skill.pro_rate();
 	this->pro_type = skill.pro_type();
 	this->coldDown = skill.colddown();
+	vector<SkillEffect>	EffectList1;//¼¼ÄÜµÄÐ§¹ûÁÐ±í1
+	vector<SkillEffect>	EffectList2;//¼¼ÄÜµÄÐ§¹ûÁÐ±í2
+	for (int i=0;i<skill.effect_size();i++)
+	{
+		SkillEffect effect;
+		effect.readData(skill.effect(i));
+		if (effect.group == 1)
+		{
+			EffectList1.push_back(effect);
+		}else if(effect.group == 2){
+			EffectList2.push_back(effect);
+		}else{
+			CCLOG("[*ERROR] BattleData CSkill::readData");
+		}
+	}
+	std::sort(EffectList1.begin(),EffectList1.end(),EffectSort);
+	EffectList.push_back(EffectList1);
+	if (EffectList2.size())
+	{
+		std::sort(EffectList2.begin(),EffectList2.end(),EffectSort);
+		EffectList.push_back(EffectList2);
+	}
+	// 	this->star = skill.star();
 	this->maxLevel = skill.maxlevel();
 }
 
-void CMonster::readData(const protos::common::Monster &monster)
+void TempMonster::readData(const protos::common::Monster &monster)
 {
 	this->mId = monster.id();
 	this->monsterId = monster.monsterid();
@@ -123,7 +127,7 @@ void CMonster::readData(const protos::common::Monster &monster)
 	this->atkInterval = monster.atkinterval();
 	this->mCritTime = CCRANDOM_0_1()*(monster.maxround()- monster.minround()) +  monster.minround();
 	this->MoveSpeed = monster.movespeed();
-	this->isCall = monster.iscall();				//å¬å”¤ç±»çš„æ­¦å°†éƒ½æ”¾åœ¨æ€ªç‰©åˆ—è¡¨ä¸­ä¼ è¾“è¿‡æ¥
+	this->isCall = monster.iscall();				//ÕÙ»½ÀàµÄÎä½«¶¼·ÅÔÚ¹ÖÎïÁÐ±íÖÐ´«Êä¹ýÀ´
 	this->CallID = monster.monsterid();
 	this->MstType = monster.buff();
 	this->batch = monster.batch();
@@ -138,7 +142,7 @@ void CMonster::readData(const protos::common::Monster &monster)
 	this->maxhp = monster.maxhp();
 	if (monster.poslist().size()>0)
 	{
-		if (monster.poslist().size() > 1)					//æ ¹æ®ä¼ å…¥çš„ç»§ç»­çš„æ ¼å­,å¾—åˆ°è¡Œåˆ—æ•°
+		if (monster.poslist().size() > 1)					//¸ù¾Ý´«ÈëµÄ¼ÌÐøµÄ¸ñ×Ó,µÃµ½ÐÐÁÐÊý
 		{
 			vector<int>VecCol;
 			vector<int>VecRow;
@@ -162,98 +166,53 @@ void CMonster::readData(const protos::common::Monster &monster)
 				this->col = monster.posx();
 		}
 	}
- 	if (monster.has_skill1())
+	if (monster.has_skill1())
 		this->skill1.readData(monster.skill1());
- 	if (monster.has_skill2())		//hasåˆ¤æ–­æ˜¯å¦ä¸ºçœŸ
-		this->skill2.readData(monster.skill2());	//skill2å–å¾—å¯¹è±¡ä¼ å…¥è§£æž
- 	if (monster.has_skill3())
+	if (monster.has_skill2())		//hasÅÐ¶ÏÊÇ·ñÎªÕæ
+		this->skill2.readData(monster.skill2());	//skill2È¡µÃ¶ÔÏó´«Èë½âÎö
+	if (monster.has_skill3())
 		this->skill3.readData(monster.skill3());
 	this->quality = monster.quality();
 	this->level = monster.level();
 }
 
-void CHero::readData(const protos::common::Hero &hero)
+void TempHero::readData(const protos::common::Hero &hero)
 {
-	this->id = hero.id();
-	this->addAtk = hero.addatk();
-	this->addDef = hero.adddef();
-	this->addHp = hero.addhp();
-	this->coin = hero.coin();
 	this->crit = hero.crit();
 	this->atk = hero.atk();
 	this->def = hero.def();
 	this->dex = hero.dex();
-	this->heroid = hero.heroid();
 	this->hp = hero.hp();
 	this->renew = hero.renew();
 	this->name = hero.name();
 	this->level = hero.level();
 	this->zoom = hero.zoom();
-	this->combat = hero.combat();
 	this->initCost = hero.initcost();
 	this->addCost = hero.addcost();
 	this->maxCost = hero.maxcost();
 	this->hit = hero.hit();
 	this->thumb = hero.thumb();
 	this->roletype = hero.herotype();
-	this->prate = hero.prate();
-	this->exp = hero.exp();
-	this->nextExp = hero.nextexp();
 	this->enemy = false;
-	this->addDex = hero.adddex();
-	this->addHit = hero.addhit();
-	this->addCrit = hero.addcrit();
-	this->addDodge = hero.adddodge();
-	this->addRenew = hero.addrenew();
-	this->maxLevel = hero.maxlevel();
-	this->atkInterval = hero.atkinterval();
-	this->maxQuality = hero.maxquality();
 	this->coldDown = hero.colddown();
 	this->useCost = hero.usecost();
 	this->MoveSpeed = hero.movespeed();
 	this->battle = hero.battle();
 	this->alert = hero.alert();
 	this->alertRange = hero.alertrange();
-	this->remove = hero.remove();
 	if (hero.posy())
 		this->row = hero.posy();
 	if (hero.posx())
 		this->col = hero.posx();
 	if (hero.has_skill1())
 		this->skill1.readData(hero.skill1());
-	if (hero.has_skill2())		//hasåˆ¤æ–­æ˜¯å¦ä¸ºçœŸ
-		this->skill2.readData(hero.skill2());	//skill2å–å¾—å¯¹è±¡ä¼ å…¥è§£æž
+	if (hero.has_skill2())		//hasÅÐ¶ÏÊÇ·ñÎªÕæ
+		this->skill2.readData(hero.skill2());	//skill2È¡µÃ¶ÔÏó´«Èë½âÎö
 	if (hero.has_skill3())
 		this->skill3.readData(hero.skill3());
 	if (hero.has_skill4())
 		this->skill4.readData(hero.skill4()); 
 	if (hero.has_skill5())
 		this->skill5.readData(hero.skill5());
-	this->quality = hero.quality();
-	this->coin = hero.coin();
-	//this->armorNum = hero.armornum();
-	if (hero.has_armor1())
-		this->armor1.read(hero.armor1());
-	if (hero.has_armor2())
-		this->armor2.read(hero.armor2());
-	if (hero.has_armor3())
-	{
-		this->armor3.read(hero.armor3());
-	}
-	if (hero.has_armor4())
-	{
-		this->armor4.read(hero.armor4());
-	}
 	this->dodge = hero.dodge();
-	this->itemId = hero.itemid();
-	this->itemNum1 = hero.itemnum1();
-	this->itemNum2 = hero.itemnum2();
-	if (hero.has_own())
-	{
-		this->own = hero.own();
-	}else{
-		this->own = true;
-	}
-	this->iColor = hero.color();
-	this->evol = hero.evol();
 }

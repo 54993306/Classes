@@ -639,7 +639,7 @@ bool CombatLogic::delayEntrance( WarAlive* alive,float dt )
 {
 	if (alive->getBattle())
 		return false;
-	if (((CMonster*)alive->role)->delay)
+	if (((TempMonster*)alive->role)->delay)
 	{
 		if (alive->getDelaytime()<=0)
 		{

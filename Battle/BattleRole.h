@@ -20,7 +20,8 @@
 /******************* 战场武将数据 ********************/
 #include "cocos2d.h"
 #include "Battle/BattleMacro.h"
-#include "model/BattleData.h"
+//#include "model/BattleData.h"
+#include "Battle/TempData.h"
 #include "Battle/SkillEffect.h"
 #include "Battle/RoleBuffData.h"
 
@@ -40,13 +41,13 @@ public:
 	bool canSummonAlive();						//是否可以召唤武将
 	void clearHitAlive();
 	SkillEffect* getCurrEffect();						//得到武将当前效果
-	CSkill* getCurrSkill();							//得到武将当前效果
+	TempSkill* getCurrSkill();							//得到武将当前效果
 	bool NextEffect();							//判断第二个效果是否释放
 	int getSkillType();
 	int getEffectType();
 	bool captainCallNumberJudge();
 public:
-	ROLE* role;									//服务器角色信息
+	TempRole* role;									//服务器角色信息
 	vector<int> grids;							//多格子站位
 	vector<int> moves;							//各方向移动范围
 	vector<int> TouchGrids;						//移动状态下武将多格子处理

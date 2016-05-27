@@ -10,8 +10,8 @@
 #ifndef _CAPTAINSKILL_
 #define _CAPTAINSKILL_
 #include "AppUI.h"
-#include "model/BattleData.h"
-
+//#include "model/BattleData.h"
+#include "Battle/TempData.h"
 class WarAlive;
 
 class CaptainSkill : public CCObject
@@ -24,7 +24,7 @@ public:
 	void ExecuteCaptainSkill();
 	CCArray* RaceJudgeCap(CCArray* arr,int type);
 	CCArray* RaceJudge(CCArray* arr,int type,bool exclude = false,bool And = false);
-	CCArray* AttributeJudgeArrCap(CSkill& skill,CCArray* arr);
+	CCArray* AttributeJudgeArrCap(TempSkill& skill,CCArray* arr);
 	bool AttributeJudge(WarAlive* alive,int type,int rate);
 	CCArray* PositionJudgeArrCap(CCArray* arr,int type);
 	bool PositionJudge(bool Enemy,int grid,int type);

@@ -8,7 +8,8 @@
 #include "common/CommonFunction.h"
 #include "warscene/EffectData.h"
 #include "warscene/CombatGuideManage.h"
-#include "model/BattleData.h"
+//#include "model/BattleData.h"
+#include "Battle/TempData.h"
 #include "model/TerrainManager.h"
 #include "model/WarManager.h"
 #include "model/MapManager.h"
@@ -139,9 +140,9 @@ void LoadWar::updateTips(float fdetal)
 	m_tip->setVisible(false);
 }
 //技能解析,通过技能得到加载数据
-void LoadWar::SkillParse( ROLE& role,vector<int>&VecEffect,vector<int>&VecBuff )
+void LoadWar::SkillParse( TempRole& role,vector<int>&VecEffect,vector<int>&VecBuff )
 {
-	vector<CSkill*> VSkill;
+	vector<TempSkill*> VSkill;
 	VSkill.push_back(&role.skill1);
 	VSkill.push_back(&role.skill2);
 	VSkill.push_back(&role.skill3);

@@ -34,7 +34,7 @@ void CaptainSkill::ExecuteCaptainSkill()
 	CCArray* arr = DataCenter::sharedData()->getWar()->getHeros(true);
 	if (!alive||!arr||alive->role->skill4.skillId == 0)
 		return;
-	CSkill skill = alive->role->skill4;							//需同时满足种族限制且满足属性限制
+	TempSkill skill = alive->role->skill4;							//需同时满足种族限制且满足属性限制
 	CCArray* RaceArr = RaceJudgeCap(arr,skill.pTarget);			//种族限制判定
 	if (!RaceArr||!RaceArr->count())
 		return;																//不满足种族限制条件
@@ -184,7 +184,7 @@ CCArray* CaptainSkill::RaceJudge(CCArray* arr,int type,bool exclude/*= false*/,b
 	return targetArr;
 }
 //属性判定通过数组
-CCArray* CaptainSkill::AttributeJudgeArrCap(CSkill& skill,CCArray* arr)
+CCArray* CaptainSkill::AttributeJudgeArrCap(TempSkill& skill,CCArray* arr)
 {
 	CCArray* _arr = CCArray::create();
 	CCObject* obj = nullptr;

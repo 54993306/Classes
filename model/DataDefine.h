@@ -3,11 +3,10 @@
 #include "cocos2d.h"
 #include <string>
 #include <vector>
-#include "model/BattleData.h"
 #include "tools/commonDef.h"
-
+#include <protos/common/role_common.pb.h>
 USING_NS_CC;
-
+using namespace std;
 #define NOTIFICATION CCNotificationCenter::sharedNotificationCenter()
 
 class BaseObject : public CCObject

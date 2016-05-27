@@ -371,7 +371,7 @@ bool WarManager::checkMonstOver()
 
 BattleServerData* WarManager::getBattleData() { 
 	return &m_ServerData; }
-vector<CMonster*>* WarManager::getCallMonst() { 
+vector<TempMonster*>* WarManager::getCallMonst() { 
 	return & m_CallRole; }
 ArmatureEventDataMgr* WarManager::getArmatureDataMgr() { 
 	return m_armatureEventDataMgr; }
@@ -442,7 +442,7 @@ WarAlive* WarManager::getNewCallAlive(WarAlive* Father,int CallId)
 	return nullptr;
 }
 
-WarAlive* WarManager::getCallAlive(WarAlive* Father,CSkill* skill)
+WarAlive* WarManager::getCallAlive(WarAlive* Father,TempSkill* skill)
 {
 	WarAlive* alive = getAbsentCallAlive(Father);					
 	if (alive)
@@ -524,13 +524,13 @@ void WarManager::initBattleData(BattleResponse*pServerData)
 	clearBeforeData();
 	for (int i=0; i< pServerData->herolist_size(); i++)				//英雄		     
 	{
-		CHero obj;
+		TempHero obj;
 		obj.readData(pServerData->herolist(i));
 		m_ServerData.HeroList.push_back(obj);
 	}
 	for (int j=0; j< pServerData->monsterlist_size(); j++)			//怪物
 	{
-		CMonster obj;
+		TempMonster obj;
 		obj.readData(pServerData->monsterlist(j));
 		m_ServerData.MonsterList.push_back(obj);
 	}
@@ -547,14 +547,14 @@ void WarManager::initWordBossData( WarResponse*pServerData )
 	clearBeforeData();
 	for (int i=0; i< pServerData->herolist_size(); i++)			//英雄       
 	{
-		CHero obj;
+		TempHero obj;
 		obj.readData(pServerData->herolist(i));
 		m_ServerData.HeroList.push_back(obj);
 	}
 	int bossID = 0;
 	for (int j=0; j< pServerData->monsters_size(); j++)			//怪物
 	{
-		CMonster obj;
+		TempMonster obj;
 		obj.readData(pServerData->monsters(j));
 		if (obj.isBoss)
 			bossID = obj.mId;

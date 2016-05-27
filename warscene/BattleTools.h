@@ -16,7 +16,7 @@
  *************************************************************/
 
 class WarAlive;
-struct CSkill;
+struct TempSkill;
 class SkillEffect;
 
 
@@ -29,7 +29,7 @@ int getHeroNewCol(int originCol ,int aimCol ,int aim_col);
 int getMonsterNewCol(int originCol ,int aimCol ,int aim_col);
 void CallAliveByFixRange( WarAlive*father , WarAlive*child );
 
-SkillEffect* getSummonEffect(CSkill* skill);
+SkillEffect* getSummonEffect(TempSkill* skill);
 
 void RemoveVectorRepeat(vector<int>& Vec);
 

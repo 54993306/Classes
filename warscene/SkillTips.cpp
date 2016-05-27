@@ -67,7 +67,7 @@ void SkillTips::setSkillInfo(CCObject* target,WarAlive* alive)
 	CLabel *desc = (CLabel*)(m_ui->findWidgetById("desc"));
 	this->setVisible(true);
 	this->setPosition(ccpAdd(point,ccp(-326,-85)));
-	CSkill skill = alive->role->skill3;
+	TempSkill skill = alive->role->skill3;
 	if (level)
 		level->setString(ToString(skill.level));
 	const SkillCfg *cfg = DataCenter::sharedData()->getSkill()->getCfg(skill.skillId);

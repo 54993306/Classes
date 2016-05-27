@@ -2,7 +2,8 @@
 #define _TEERAIN_MANAGER_H_
 #include "cocos2d.h"
 #include <map>
-#include "BattleData.h"
+//#include "BattleData.h"
+#include "Battle/TempData.h"
 #include "Battle/BattleTrap.h"
 #include "Battle/RoleBuffData.h"
 using namespace std;

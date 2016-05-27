@@ -1,6 +1,7 @@
 ﻿#include "SkillRange.h"
 #include "model/DataCenter.h"
-#include "model/BattleData.h"
+//#include "model/BattleData.h"
+#include "Battle/TempData.h"
 #include "common/CommonFunction.h"
 #include "tools/commonDef.h"
 #include "Battle/BattleRole.h"

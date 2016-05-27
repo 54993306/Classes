@@ -2,7 +2,8 @@
 #define _WAR_MANAGER_H_
 #include "AppUI.h"
 #include <map>
-#include "model/BattleData.h"
+//#include "model/BattleData.h"
+#include "Battle/TempData.h"
 #include "tollgate/Chapter.h"
 #include <spine/spine-cocos2dx.h>
 #include "Battle/BattleMacro.h"
@@ -24,7 +25,7 @@ class StoryData;
 using namespace std;
 typedef map<unsigned int,WarAlive*> Members;	
 typedef map<unsigned int,unsigned int> Movemap;			//存储当前回合可移动位置
-typedef map<unsigned int,vector<CMonster>> BatchMonster;
+typedef map<unsigned int,vector<TempMonster>> BatchMonster;
 typedef std::pair<spSkeletonData*,spAtlas*> SpData;
 typedef map<std::string,SpData> MapSkeletonData;
 
@@ -36,8 +37,8 @@ typedef map<std::string,SpData> MapSkeletonData;
 //战斗数据初始化
 struct BattleServerData 
 {
-	vector<CMonster> MonsterList;
-	vector<CHero> HeroList;
+	vector<TempMonster> MonsterList;
+	vector<TempHero> HeroList;
 	vector<BattleTrap> TrapList;
 };
 
@@ -53,7 +54,7 @@ public:
 	WarAlive* getAlive(unsigned int aliveID);
 	CCArray* getAlives(bool isAlive = false);
 	WarAlive* getAliveByGrid(int grid);
-	WarAlive* getCallAlive(WarAlive* pAlive,CSkill* skill);
+	WarAlive* getCallAlive(WarAlive* pAlive,TempSkill* skill);
 	WarAlive* getAliveByType(AliveType type,bool Monster = true);
 	WarAlive* getAbsentCallAlive(WarAlive* fatherAlive);
 	void BattleDataClear();
@@ -64,7 +65,7 @@ public:
 	void initAlive(WarAlive* alive);
 	void initCallAlive(WarAlive* alive,WarAlive*cAlive);	//召唤类武将初始化
 	BattleServerData* getBattleData();						//得到战场数据
-	vector<CMonster*>* getCallMonst();
+	vector<TempMonster*>* getCallMonst();
 	EffectData* getEffData();
 	BuffData* getBuffData();
 	StoryData* getStoryData();
@@ -122,7 +123,7 @@ protected:
 	vector<int> m_SpineID;										//记录spine的ID
 	Members m_members;											//战场上活着的英雄
 	BattleServerData m_ServerData;								//存储战场信息
-	vector<CMonster*> m_CallRole;								//存储召唤类型武将
+	vector<TempMonster*> m_CallRole;								//存储召唤类型武将
 	EffectData* m_efdata;
 	BuffData* m_BuffData;
 	StoryData* m_StoryData;

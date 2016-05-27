@@ -37,7 +37,7 @@ enum SceneType
 	SkipLoginScene,			//登陆界面
 	skipSelectHero,
 };
-struct ROLE;
+struct TempRole;
 class WarManager;
 class LoadSpineData;
 class LoadWar : public CScene
@@ -64,7 +64,7 @@ public:
 
 	void CocosBoneCallBack(float dt);
 	void TextureThread(const char* url, const char* model, LoadType type = LoadType::Load_Effect);		//异步加载处理
-	void SkillParse(ROLE& skill,vector<int>&VecEffect,vector<int>&VecBuff);
+	void SkillParse(TempRole& skill,vector<int>&VecEffect,vector<int>&VecBuff);
 	void LoadBeingAnimation();
 	void ProgressEnd();
 	void LoadCocosEffect();

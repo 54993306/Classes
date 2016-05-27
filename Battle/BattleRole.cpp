@@ -251,7 +251,7 @@ void WarAlive::clearHitAlive()
 	HittingAlive.clear();
 }
 
-CSkill* WarAlive::getCurrSkill()
+TempSkill* WarAlive::getCurrSkill()
 {
 	if (getCriAtk())
 	{

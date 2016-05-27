@@ -4,14 +4,12 @@
 #include <string>
 #include <protos/protocol.h>
 #include "bag/bagData.h"
-#include "Battle/SkillEffect.h"
 
 using namespace std;
 
 struct CSkill
 {
 	CSkill();
-	vector<vector<SkillEffect>>EffectList;
 	int		id;					//英雄技能ID(唯一)
 	int		skillId;			//技能ID
 	int		skillType;			//技能类型( ROLESKILLTYPE )
