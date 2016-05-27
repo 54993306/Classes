@@ -52,11 +52,7 @@ struct TempRole
 	TempSkill skill1;				//普通攻击     主帅特殊攻击 主帅被动技
 	TempSkill skill2;				//特殊攻击
 	TempSkill skill3;				//必杀技能(必杀技有召唤的技能类型)
-	TempSkill skill4;				//主帅普通攻击 
-	TempSkill skill5;				//主帅特殊攻击
-	TempSkill skill6;				
-	TempSkill skill7;				
-	//vector<CBuff> buffList;	//武将进入战场时带进来的buf
+	TempSkill skill4;				//主帅普通攻击 			
 	int thumb;					//模型id
 	bool enemy;					//是否为怪物
 	int alert;					//警戒区域类型
@@ -95,7 +91,7 @@ struct TempRole
 };
 //怪物
 struct TempMonster :public TempRole
-{
+{ 
 	TempMonster();
 	int mId;					//关卡怪物ID
 	int monsterId;				//怪物ID(标识ID)
@@ -103,10 +99,6 @@ struct TempMonster :public TempRole
 	float delay;				//延迟时间
 	bool isBoss;				//是否为boss
 	int move1;					//多方向移动怪物
-	int move2;
-	int move3;
-	int move4;
-	int move5;
 	int  quality;				//英雄品质 1白色,2绿色,3蓝色,4紫色,5红色
 	void readData(const protos::common::Monster &monster);
 };

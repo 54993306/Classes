@@ -204,8 +204,6 @@ void WarManager::initBatchData( int batch )
 void WarManager::initAlive(WarAlive* alive)
 {
 	alive->grids.clear();
-	//for (int j = 0 ; j<alive->role->buffList.size();j++ )
-	//	alive->getBuffManage()->AddBuff(alive->role->buffList.at(j));
 	if (alive->getEnemy())
 	{
 		alive->setGridIndex(alive->role->grid);

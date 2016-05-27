@@ -24,7 +24,7 @@
 #include "Battle/TempData.h"
 #include "Battle/SkillEffect.h"
 #include "Battle/RoleBuffData.h"
-
+  
 using namespace cocos2d;
 using namespace std;
 class BuffManage;

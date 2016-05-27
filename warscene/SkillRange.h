@@ -12,22 +12,22 @@ class WarAlive;
 enum AreaMark
 {
 	ustarget	= 1,		//我方目标
-	enemyTyep,					//敌方目标
+	enemyTyep,				//敌方目标
 	allType,				//双方目标
 
-	Grid		= 10,		//格子	(单个目标)
-	Front		= 11,		//前
-	Centen		= 12,		//中
-	Back		= 13,		//后
+	FrontArea		= 11,		//前
+	CentenArea		= 12,		//中
+	BackArea		= 13,		//后
 
-	Row			= 20,		//行
-	Disperse	= 30,		//扩散
+	RowArea			= 20,		//行
+	DisperseArea	= 30,		//扩散
 
 	Hit_Alive	= 100,
 	Atk_Area	= 200,
 };
-struct AreaCountInfo
+class AreaCountInfo
 {
+public:
 	AreaCountInfo();
 	WarAlive* alive;
 	int CountGrid;		//武将当前格子
@@ -35,11 +35,12 @@ struct AreaCountInfo
 	bool BackAtk;		//反向攻击
 	int type;			//技能类型
 	int range;			//技能范围
-	int distance;		//范围距离
+	int attackDistance;		//范围距离
 	int pTarget;		//效果目标类型
+	void initData(WarAlive* pAlive,int pGrid);
 };
 //技能施放区域类型
-enum skillType{
+enum SkillAreaType{
 	nullArea = 0,
 	front,							//前方格子类型				1
 	roundArea,						//周边范围					2
@@ -107,6 +108,9 @@ public:
 	vector<int>getAliveGuard(WarAlive* alive);												//
 	CCDictionary* PlaySkillInfo(WarAlive* alive);
 	int CaptainGuard(WarAlive* alive);
+	void getSelfArea(CCArray* pArray,WarAlive* pAlive);
+	void getAreaByAlive(CCArray* pAreaArray,WarAlive*pAlive);
+	void sortAreaByAlive(CCArray* pAreaArray,WarAlive* pAlive);
 private:
 	WarManager* m_Manage;
 };

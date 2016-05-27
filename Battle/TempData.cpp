@@ -50,6 +50,8 @@ TempRole::TempRole()
 	,CallType(0)			//武将类型
 	,MstType(0)				//怪物类型
 	,maxhp(0)				//世界boss专有属性
+	,atkInterval(0)
+	,battle(false)
 {}
 
 TempMonster::TempMonster()
@@ -59,10 +61,6 @@ TempMonster::TempMonster()
 	,delay(0)		//延迟时间
 	,quality(0)
 	,move1(0)
-	,move2(0)
-	,move3(0)
-	,move4(0)
-	,move5(0)
 	,isBoss(false)
 {}
 
@@ -134,10 +132,6 @@ void TempMonster::readData(const protos::common::Monster &monster)
 	this->delay = monster.delay();
 	this->initCost = monster.initcost();
 	this->move1 = monster.move1();
-	this->move2 = monster.move2();
-	this->move3 = monster.move3();
-	this->move4 = monster.move4();
-	this->move5 = monster.move5();
 	this->isBoss = monster.isboss();
 	this->maxhp = monster.maxhp();
 	if (monster.poslist().size()>0)
@@ -200,6 +194,7 @@ void TempHero::readData(const protos::common::Hero &hero)
 	this->battle = hero.battle();
 	this->alert = hero.alert();
 	this->alertRange = hero.alertrange();
+	this->atkInterval = hero.atkinterval();
 	if (hero.posy())
 		this->row = hero.posy();
 	if (hero.posx())
@@ -212,7 +207,5 @@ void TempHero::readData(const protos::common::Hero &hero)
 		this->skill3.readData(hero.skill3());
 	if (hero.has_skill4())
 		this->skill4.readData(hero.skill4()); 
-	if (hero.has_skill5())
-		this->skill5.readData(hero.skill5());
 	this->dodge = hero.dodge();
 }

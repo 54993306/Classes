@@ -74,7 +74,7 @@ public:
 	void addMap(BaseMapData* map);
 	BaseMapData* getMap( unsigned int mapID);
 	inline void setCurrWarMap(unsigned int mapID){m_currWarMap = mapID;}
-	CC_SYNTHESIZE(int,m_row,Row);		//行数默认4行
+	CC_SYNTHESIZE(int,m_row,RowArea);		//行数默认4行
 	CC_SYNTHESIZE(int,m_col,Col);		//列数默认8列
 	CC_SYNTHESIZE(int,m_mapwith,MapWith);
 	CC_SYNTHESIZE(int,m_maphight,MapHight);	
