@@ -17,7 +17,7 @@
 
 class WarAlive;
 struct CSkill;
-struct CEffect;
+class SkillEffect;
 
 
 bool RowUp_InBoundary(int originRow,int aimRow);
@@ -29,7 +29,7 @@ int getHeroNewCol(int originCol ,int aimCol ,int aim_col);
 int getMonsterNewCol(int originCol ,int aimCol ,int aim_col);
 void CallAliveByFixRange( WarAlive*father , WarAlive*child );
 
-CEffect* getSummonEffect(CSkill* skill);
+SkillEffect* getSummonEffect(CSkill* skill);
 
 void RemoveVectorRepeat(vector<int>& Vec);
 

@@ -176,11 +176,11 @@ void CSkill::readData(const protos::common::Skill &skill)
 	this->pro_rate = skill.pro_rate();
 	this->pro_type = skill.pro_type();
 	this->coldDown = skill.colddown();
-	vector<CEffect>	EffectList1;//技能的效果列表1
-	vector<CEffect>	EffectList2;//技能的效果列表2
+	vector<SkillEffect>	EffectList1;//技能的效果列表1
+	vector<SkillEffect>	EffectList2;//技能的效果列表2
 	for (int i=0;i<skill.effect_size();i++)
 	{
-		CEffect effect;
+		SkillEffect effect;
 		effect.readData(skill.effect(i));
 		if (effect.group == 1)
 		{

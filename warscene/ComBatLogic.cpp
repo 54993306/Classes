@@ -506,7 +506,7 @@ void CombatLogic::excuteCritEffect( WarAlive* alive ,CCDictionary*pDic)
 void CombatLogic::attackEffect( WarAlive*alive )
 {
 	ActObject* pActObject = alive->getActObject();
-	CEffect* effect = alive->getCurrEffect();						//开始播放攻击音效攻击特效的时机可以由策划配置
+	SkillEffect* effect = alive->getCurrEffect();						//开始播放攻击音效攻击特效的时机可以由策划配置
 	EffectInfo* info = m_Manage->getEffData()->getEffectInfo(effect->effectId);
 	if (!info)
 	{
@@ -598,7 +598,7 @@ void CombatLogic::CritAtkEnd(CCObject* ob)
 void CombatLogic::doLostHp(CCObject* ob)
 {
 	WarAlive* alive = (WarAlive*)ob;
-	CEffect* effect = alive->getCurrEffect();
+	SkillEffect* effect = alive->getCurrEffect();
 	if(!effect || alive->getSortieNum() >= effect->batter )										//当掉血帧多于实际逻辑值，少于实际逻辑值情况处理
 		return;	
 	switch (alive->getSkillType())

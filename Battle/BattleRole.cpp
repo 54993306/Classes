@@ -3,6 +3,21 @@
 #include "warscene/ConstNum.h"
 #include "scene/alive/ActObject.h"
 
+WarAlive::WarAlive()
+:m_Enemy(false),m_Hp(0),m_MaxHp(0),m_GridIndex(INVALID_GRID),m_MoveGrid(0),m_AtkDelay(0)
+,m_AtkNum(0),m_Move(true),m_CritSkill(false),role(nullptr),m_Hrt(0),m_HrtPe(0),m_AIState(false)
+,m_initCost(0),m_Batch(0),m_CostMax(0),m_AddCost(0),m_Atk(0),m_Def(0),m_Hit(0),m_NorAtk(true)
+,m_Doge(0),m_Crit(0),m_Zoom(0),m_Renew(0),m_EfGroup(1),m_EffectIndex(0),m_LastAlive(false)
+,m_Negate(false),m_ExecuteCap(false),m_TerType(0),m_TerTypeNum(0),m_cloaking(false)
+,m_SortieNum(0),m_ActObject(nullptr),m_BuffManage(nullptr),m_UILayout(0),m_Atktime(0)
+,m_AtkInterval(0),m_TimePercent(1),m_SpecialAtk(false),m_Battle(false),m_MoveSpeed(0)
+,m_CritTime(0),m_FatherID(0),m_Captain(false),m_CritEffect(false),m_DieState(false)
+,m_TouchGrid(0),m_TouchState(false),m_MoveObj(nullptr),m_CallType(0),m_CallAliveNum(0)
+,m_Delaytime(0),m_AliveState(COMMONSTATE),m_AliveType(AliveType::Common),m_StateDelay(0)	
+{
+	setBuffManage(nullptr);
+}
+
 WarAlive::~WarAlive()
 {
 	CC_SAFE_RELEASE(m_BuffManage);
@@ -15,68 +30,6 @@ WarAlive::~WarAlive()
 	AliveS.clear();
 	AtkGrid.clear();
 	AtkAlive.clear();
-}
-
-WarAlive::WarAlive()
-	:m_Enemy(false)
-	,m_Hp(0)
-	,m_MaxHp(0)
-	,m_GridIndex(INVALID_GRID)
-	,m_MoveGrid(0)					//移动状态下当前位置
-	,m_AtkNum(0)					//攻击次数
-	,m_Move(true)					//是否可移动
-	,m_CritSkill(false)				//是否释放必杀技
-	,role(nullptr)					//存储服务器信息
-	,m_Hrt(0)						//伤害值
-	,m_HrtPe(0)						//伤害百分比
-	,m_initCost(0)					//怒气值
-	,m_Batch(0)						//批次
-	,m_CostMax(0)					//最大怒气值
-	,m_AddCost(0)					//回合怒气值变化
-	,m_Atk(0)						//攻击		//用于实际的伤害计算为buff和服务器数据计算后的值
-	,m_Def(0)						//防御
-	,m_Hit(0)						//命中
-	,m_Doge(0)						//闪避
-	,m_Crit(0)						//暴击
-	,m_Zoom(0)						//缩放比
-	,m_Renew(0)						//回复
-	,m_EfGroup(1)					//默认执行效果组0
-	,m_EffectIndex(0)				//记录当前处理效果
-	,m_Negate(false)				//标记是否反向
-	,m_ExecuteCap(false)			//执行队长技标记
-	,m_TerType(0)					//地形影响类型
-	,m_TerTypeNum(0)				//地形影响数值
-	,m_cloaking(false)				//是否为隐身武将
-	,m_SortieNum(0)					//当前回合出击次数
-	,m_ActObject(nullptr)			//对应的显示对象
-	,m_BuffManage(nullptr)			//buf管理器
-	,m_UILayout(0)					//对应的UI控件ID
-	,m_Atktime(0)					//蓄气时间
-	,m_AtkInterval(0)				//可攻击时间
-	,m_TimePercent(1)				//增减攻速百分比
-	,m_SpecialAtk(false)			//特殊攻击
-	,m_Battle(false)				//默认为不上阵状态
-	,m_MoveSpeed(0)					//移动速度
-	,m_CritTime(0)					//释放必杀技时间
-	,m_NorAtk(true)					//普通攻击
-	,m_FatherID(0)					//被召唤的武将才有此信息
-	,m_Captain(false)				//是否为队长
-	,m_CritEffect(false)			//是否播放过必杀技特效
-	,m_TouchGrid(0)					//触摸移动格子
-	,m_AIState(false)				//武将是否在AI状态
-	,m_TouchState(false)			//武将是否被触摸
-	,m_MoveObj(nullptr)				//存储武将移动对象
-	,m_CallType(0)					//武将类型
-	,m_Delaytime(0)					//武将出现延迟时间
-	,m_AtkDelay(0)					//武将攻击延迟时间
-	,m_StateDelay(0)				//武将状态延迟时间
-	,m_AliveState(COMMONSTATE)		//武将状态
-	,m_AliveType(AliveType::Common)	//角色品质等级
-	,m_DieState(false)
-	,m_CallAliveNum(0)				//record can claa alive number
-	,m_LastAlive(false)
-{
-	setBuffManage(nullptr);
 }
 
 void WarAlive::setMoveGrid(int var)
@@ -323,7 +276,7 @@ CSkill* WarAlive::getCurrSkill()
 	}
 }
 
-CEffect* WarAlive::getCurrEffect()
+SkillEffect* WarAlive::getCurrEffect()
 {
 	if (getEffectGroup()<= getCurrSkill()->EffectList.size())
 		if ( getCurrSkill()->EffectList.at(getEffectGroup()-1).size()>getEffIndex())

@@ -389,7 +389,7 @@ void WarControl::initAliveButton(CCNode* Layout,WarAlive* alive)
 	AliveSkillEffect->setPosition(btn->getPosition());
 	Layout->addChild(AliveSkillEffect, -1);
 
-	CEffect* effect = getSummonEffect(&alive->role->skill3);									//这个方法是应该放在武将身上的
+	SkillEffect* effect = getSummonEffect(&alive->role->skill3);									//这个方法是应该放在武将身上的
 	if (!effect)
 		return;
 	initButtonBackImage(btn,effect->pro_Type);													//reason call number init back image

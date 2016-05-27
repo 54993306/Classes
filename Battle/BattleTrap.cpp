@@ -1,19 +1,10 @@
 
 #include "Battle/BattleTrap.h"
+#include "Battle/RoleBuffData.h"
 
 BattleTrap::BattleTrap()
-	:id(0),
-	terrainId(0),
-	name(""),
-	terrainType(0),
-	pro_type(0),
-	pro_rate(0),
-	damage(0),
-	posX(0),
-	posY(0),
-	triggerNum(0),   
-	existNum(0),
-	batch(0)
+:id(0),terrainId(0),name(""),terrainType(0),pro_type(0),pro_rate(0),
+damage(0),posX(0),posY(0),triggerNum(0),existNum(0),batch(0)
 {}
 
 void BattleTrap::readData(const protos::common::Trap &terr)
@@ -31,5 +22,5 @@ void BattleTrap::readData(const protos::common::Trap &terr)
 	this->existNum = terr.touch();
 	this->batch = terr.batch();
 	//if (terr.has_buff())
-		//this->buff.readData(terr.buff());
+	//	this->buff.readData(terr.buff());
 }

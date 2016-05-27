@@ -40,7 +40,7 @@ void BufExp::AddBuffExcute( CCObject* ob )
 		if (!i.second->getAddFirst())										//找到数组中没有处理过添加效果的buff
 			continue;
 		i.second->setAddFirst(false);
-		BuffEffect* effect = DataCenter::sharedData()->getWar()->getBuffData()->getBuffEffect(i.second->getType(),i.second->getDbuf());
+		BuffEffect* effect = DataCenter::sharedData()->getWar()->getBuffData()->getBuffEffect(i.second->getBuffType(),i.second->getIsDBuff());
 		vector<CCNode*> VecEffect;
 		if (effect)
 		{
@@ -73,7 +73,7 @@ void BufExp::AddBuffExcute( CCObject* ob )
 			}
 		}
 		CCSprite* smallIcon = CreateSmallIcon(i.second,VecEffect);			//创建小图标
-		alive->getBuffManage()->AddEffectVec(i.second->getID(),VecEffect);	//加入到map才能刷新位置
+		alive->getBuffManage()->AddEffectVec(i.second->getBuffID(),VecEffect);	//加入到map才能刷新位置
 		if (smallIcon)
 		{
 			alive->getActObject()->getBody()->addChild(smallIcon);
@@ -87,19 +87,19 @@ void BufExp::AddBuffExcute( CCObject* ob )
 CCSprite* BufExp::CreateSmallIcon( BuffInfo* info,vector<CCNode*>&Vec )
 {
 	char smalstr[30] = {0};
-	sprintf(smalstr,"icon_%d.png",info->getType());
+	sprintf(smalstr,"icon_%d.png",info->getBuffType());
 	CCSpriteFrame *pFrame = CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(smalstr);
 	if (pFrame)
 	{
 		CCSprite* smallIcon = CCSprite::createWithSpriteFrame(pFrame);
 		float x = smallIcon->getContentSize().width;
-		if (!info->getDbuf())
+		if (!info->getIsDBuff())
 			smallIcon->setFlipY(true);
 		Vec.push_back(smallIcon);
 		return smallIcon;
 	}else{
-		if (info->getType() > CURRHP )
-			CCLOG("[ ERROR ] BufExp::CreateSmallIcon Lost Small Icon type=%d",info->getType());
+		if (info->getBuffType() > CURRHP )
+			CCLOG("[ ERROR ] BufExp::CreateSmallIcon Lost Small Icon type=%d",info->getBuffType());
 	}
 	return NULL;
 }
@@ -110,9 +110,9 @@ void BufExp::CreateBigIcon( BuffInfo* info,CCSprite* body )
 	CCSprite* bigIcon = nullptr;	
 	char bigstr[30]={0};
 	CCDelayTime* dely = CCDelayTime::create(1.0f);
-	if (info->getDbuf())		//减益大图标由上往下
+	if (info->getIsDBuff())		//减益大图标由上往下
 	{
-		sprintf(bigstr,"%d_down.png",info->getType());
+		sprintf(bigstr,"%d_down.png",info->getBuffType());
 		CCSpriteFrame *bFrame = CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(bigstr);		
 		if (bFrame)
 		{
@@ -125,11 +125,11 @@ void BufExp::CreateBigIcon( BuffInfo* info,CCSprite* body )
 			bigIcon->runAction(CCSequence::create(dely,spa,CCRemoveSelf::create(),NULL));
 			body->addChild(bigIcon,100-m_interval*10);
 		}else{
-			if (info->getType() > CURRHP )
-				CCLOG("[ ERROR ] BufExp::CreateBigIcon Lost Big Icon type=%d",info->getType());
+			if (info->getBuffType() > CURRHP )
+				CCLOG("[ ERROR ] BufExp::CreateBigIcon Lost Big Icon type=%d",info->getBuffType());
 		}
 	}else{
-		sprintf(bigstr,"%d_up.png",info->getType());
+		sprintf(bigstr,"%d_up.png",info->getBuffType());
 		CCSpriteFrame *bFrame = CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(bigstr);
 		if (bFrame)
 		{
@@ -141,8 +141,8 @@ void BufExp::CreateBigIcon( BuffInfo* info,CCSprite* body )
 			bigIcon->runAction(CCSequence::create(dely,spa,CCRemoveSelf::create(),NULL));
 			body->addChild(bigIcon,100-m_interval*10);
 		}else{
-			if (info->getType() > CURRHP )
-				CCLOG("[ ERROR ] BufExp::CreateBigIcon Lost Big Icon type=%d",info->getType());
+			if (info->getBuffType() > CURRHP )
+				CCLOG("[ ERROR ] BufExp::CreateBigIcon Lost Big Icon type=%d",info->getBuffType());
 		}
 	}
 }

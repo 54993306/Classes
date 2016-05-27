@@ -308,7 +308,7 @@ bool CaptainSkill::PositionJudge(bool Enemy,int grid,int type)
 	return false;
 }
 //目标数组获得
-CCArray* CaptainSkill::getTargetArrCap(CEffect&effect,CCArray*targetArr,CCArray*AllArr)
+CCArray* CaptainSkill::getTargetArrCap(SkillEffect&effect,CCArray*targetArr,CCArray*AllArr)
 {
 	CCArray* arr = nullptr;
 	switch (effect.pTarget)
@@ -367,7 +367,7 @@ CCArray* CaptainSkill::getTargetArrCap(CEffect&effect,CCArray*targetArr,CCArray*
 	return arr;
 }
 //目标武将执行效果
-void CaptainSkill::ExecuteArrCap(CEffect&effect,CCArray* arr)
+void CaptainSkill::ExecuteArrCap(SkillEffect&effect,CCArray* arr)
 {
 	if (!arr)
 	{
@@ -383,7 +383,7 @@ void CaptainSkill::ExecuteArrCap(CEffect&effect,CCArray* arr)
 	}
 }
 //队长技效果武将属性变化
-void CaptainSkill::AliveExecute(CEffect&effect,WarAlive*alive)
+void CaptainSkill::AliveExecute(SkillEffect&effect,WarAlive*alive)
 {
 	switch (effect.pro_Type)
 	{

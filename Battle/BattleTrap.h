@@ -17,12 +17,13 @@
 
 #include <protos/common/trap_common.pb.h>
 
-struct BattleTrap
+class BattleTrap
 {
+public:
 	BattleTrap();
 	int  id;					//关卡地形ID
 	int  terrainId;				//地形标识ID
-	std::string name;				//地形名称
+	std::string name;			//地形名称
 	int  terrainType;			//地形类型
 	int  pro_type;				//影响属性
 	int  pro_rate;				//影响属性值
@@ -32,7 +33,7 @@ struct BattleTrap
 	int  triggerNum;			//被触发次数
 	int	 existNum;				//存在时间
 	int  batch;					//批次
-	//CBuff buff;					//地形附带buf 
+	//RoleBuffData buff;			//地形附带buf 
 	void readData(const protos::common::Trap &terr);
 };
 

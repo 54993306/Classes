@@ -214,7 +214,7 @@ void WarManager::initAlive(WarAlive* alive)
 		{
 			alive->setCaptain(true);
 			alive->setGridIndex(C_CAPTAINSTAND);
-			CEffect* effect = getSummonEffect(&alive->role->skill3);
+			SkillEffect* effect = getSummonEffect(&alive->role->skill3);
 			if (effect)
 				alive->setCallAliveNum(effect->pro_Type);
 		}else{
@@ -449,7 +449,7 @@ WarAlive* WarManager::getCallAlive(WarAlive* Father,CSkill* skill)
 		return alive;
 	if (Father->captainCallNumberJudge())
 		return nullptr;
-	CEffect* effect = getSummonEffect(skill);
+	SkillEffect* effect = getSummonEffect(skill);
 	if (!effect)
 	{
 		CCLOG("[ *ERROR ] WarManager::getCallAlive Skill Effect NULL");
@@ -519,51 +519,50 @@ void WarManager::clearBeforeData()
 	DataCenter::sharedData()->getMap()->clearMap();
 }
 //初始化战斗数据
-void WarManager::initBattleData(BattleResponse*batRes)
+void WarManager::initBattleData(BattleResponse*pServerData)
 {
 	clearBeforeData();
-	for (int i=0; i< batRes->herolist_size(); i++)				//英雄		     
+	for (int i=0; i< pServerData->herolist_size(); i++)				//英雄		     
 	{
 		CHero obj;
-		obj.readData(batRes->herolist(i));
+		obj.readData(pServerData->herolist(i));
 		m_ServerData.HeroList.push_back(obj);
 	}
-	for (int j=0; j< batRes->monsterlist_size(); j++)			//怪物
+	for (int j=0; j< pServerData->monsterlist_size(); j++)			//怪物
 	{
 		CMonster obj;
-		obj.readData(batRes->monsterlist(j));
+		obj.readData(pServerData->monsterlist(j));
 		m_ServerData.MonsterList.push_back(obj);
 	}
-	setBatch(batRes->batch());
-	setStageID(batRes->stageid());
-	setReliveNeedGoldNum(batRes->param());
-	DataCenter::sharedData()->getMap()->initMap(batRes->stageid()); 
+	pServerData->herolist();
+	setBatch(pServerData->batch());
+	setStageID(pServerData->stageid());
+	setReliveNeedGoldNum(pServerData->param());
+	DataCenter::sharedData()->getMap()->initMap(pServerData->stageid()); 
 	initCommonData();
 }
 
-void WarManager::initWordBossData( WarResponse*batRes )
+void WarManager::initWordBossData( WarResponse*pServerData )
 {
 	clearBeforeData();
-	for (int i=0; i< batRes->herolist_size(); i++)			//英雄       
+	for (int i=0; i< pServerData->herolist_size(); i++)			//英雄       
 	{
 		CHero obj;
-		obj.readData(batRes->herolist(i));
+		obj.readData(pServerData->herolist(i));
 		m_ServerData.HeroList.push_back(obj);
 	}
 	int bossID = 0;
-	for (int j=0; j< batRes->monsters_size(); j++)			//怪物
+	for (int j=0; j< pServerData->monsters_size(); j++)			//怪物
 	{
 		CMonster obj;
-		obj.readData(batRes->monsters(j));
+		obj.readData(pServerData->monsters(j));
 		if (obj.isBoss)
 			bossID = obj.mId;
-		{
-		}
 		m_ServerData.MonsterList.push_back(obj);
 	}
 	setBatch(0);
 	setStageID(bossID);
-	setBossHurtPe(batRes->addhurt());
+	setBossHurtPe(pServerData->addhurt());
 	setWorldBoss(true);
 	DataCenter::sharedData()->getMap()->initMap(bossID);
 	initCommonData();

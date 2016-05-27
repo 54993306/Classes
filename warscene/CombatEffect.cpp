@@ -182,7 +182,7 @@ void CombatEffect::BattleEffect(BattleResult* Result)
 {
 	WarAlive*alive = Result->getAlive();
 	ActObject* aliveOb = alive->getActObject();
-	CEffect* efInfo = alive->getCurrEffect();									//状态性的数据	
+	SkillEffect* efInfo = alive->getCurrEffect();									//状态性的数据	
 	EffectInfo* effectinfo = DataCenter::sharedData()->getWar()->getEffData()->getEffectInfo(efInfo->effectId);	
 	if (!effectinfo)
 	{
@@ -234,7 +234,7 @@ void CombatEffect::AttackNull(BattleResult* Result)
 {
 	WarAlive*alive = Result->getAlive();
 	ActObject* aliveOb = alive->getActObject();
-	CEffect* efInfo = alive->getCurrEffect();
+	SkillEffect* efInfo = alive->getCurrEffect();
 	EffectInfo* effectinfo = DataCenter::sharedData()->getWar()->getEffData()->getEffectInfo(efInfo->effectId);
 	if (!effectinfo)
 	{

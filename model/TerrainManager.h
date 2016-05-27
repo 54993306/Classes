@@ -4,7 +4,7 @@
 #include <map>
 #include "BattleData.h"
 #include "Battle/BattleTrap.h"
-#include "Battle/RoleBuff.h"
+#include "Battle/RoleBuffData.h"
 using namespace std;
 USING_NS_CC;
 class WarAlive;
@@ -64,7 +64,7 @@ public:
 	CC_SYNTHESIZE(int,m_TerEffect,TerEffect);		//地形特效id
 	CC_SYNTHESIZE(int,m_AliveEffect,AliveEffect);	//地形伤害特效
 	CC_SYNTHESIZE(int,m_AliveMusic,AliveMusic);		//地形伤害音效
-	CBuff m_Buff;
+	RoleBuffData m_Buff;
 	inline void setName(const char* name){m_name = name;}
 	inline string getName(){return m_name;}
 protected:

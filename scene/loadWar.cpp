@@ -154,7 +154,7 @@ void LoadWar::SkillParse( ROLE& role,vector<int>&VecEffect,vector<int>&VecBuff )
 				BuffData* Buffdata = m_Manage->getBuffData();
 				for (auto p:k.buffList)
 				{
-					BuffEffect* effect = Buffdata->getBuffEffect(p.buffType,p.debuf);
+					BuffEffect* effect = Buffdata->getBuffEffect(p.getBuffType(),p.getIsDBuff());
 					if (!effect)
 						continue;
 					VecBuff.push_back(effect->getEffect_up());

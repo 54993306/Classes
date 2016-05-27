@@ -27,7 +27,7 @@ bool SkillRange::init()
 CCArray* SkillRange::UnderAttackArea(WarAlive* alive)
 {
 	CCArray* Area = CCArray::create();
-	CEffect* effect = alive->getCurrEffect();				//对武将技能效果进行逻辑把关的第一位置
+	SkillEffect* effect = alive->getCurrEffect();				//对武将技能效果进行逻辑把关的第一位置
 	if (!effect)
 		return Area;
 	vector<int> CountGrid = getAliveAtkGrid(alive);
@@ -92,7 +92,7 @@ CCArray* SkillRange::UnderAttackArea(WarAlive* alive)
 CCArray* SkillRange::UnderAttackAlive(WarAlive* self,CCArray* Area)
 {
 	CCArray* Alives = CCArray::create();
-	CEffect* effect = self->getCurrEffect();
+	SkillEffect* effect = self->getCurrEffect();
 	vector<WarAlive*>* VecAlive;
 	if ((self->getEnemy()&&effect->pTarget == enemyTyep)||(!self->getEnemy()&&effect->pTarget != enemyTyep))
 	{
@@ -682,7 +682,7 @@ vector<int> SkillRange::getAliveAtkGrid( WarAlive* alive )
 	int aliveGrid = 0;
 	vector<int>VecAtkGrid;
 	vector<int> CountGrid;
-	CEffect* effect = alive->getCurrEffect();
+	SkillEffect* effect = alive->getCurrEffect();
 	if (alive->getTouchState())								//单格子武将触摸状态下处理(此处应进行移动状态下攻击格子特殊处理)
 	{
 		aliveGrid = alive->getTouchGrid();

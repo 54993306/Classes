@@ -52,7 +52,7 @@ int HurtCount::ChangeLocation(WarAlive* AtcAlive , WarAlive* HitAlive)
 		|| HitAlive->getCallType() == NotAttack||HitAlive->getCaptain()
 		|| HitAlive->getAliveType() == AliveType::WorldBoss)//不可被击飞类型武将
 		return HitAlive->getGridIndex();
-	CEffect* effect = AtcAlive->getCurrEffect();
+	SkillEffect* effect = AtcAlive->getCurrEffect();
 	if (effect->batter != AtcAlive->getSortieNum())
 		return HitAlive->getGridIndex();									//连击的最后一次才做击退
 	bool enemy = AtcAlive->getEnemy();
@@ -83,7 +83,7 @@ void HurtCount::HurtExcute(BattleResult*Result,WarAlive*AtkAlive,WarAlive*HitAli
 STR_LostHp HurtCount::hitNum(WarAlive* AtcTarget , WarAlive* HitTarget)
 {
 	STR_LostHp vec;
-	CEffect* effect = AtcTarget->getCurrEffect();
+	SkillEffect* effect = AtcTarget->getCurrEffect();
 	if (effect->pTarget == usTargetType)						//判断是攻击还是加血
 	{
 		vec = gainCount(AtcTarget,HitTarget);
@@ -135,7 +135,7 @@ STR_LostHp HurtCount::lostCount(WarAlive* AtcTarget , WarAlive* HitTarget)
 	int crit_pe = critJudge(AtcTarget,HitTarget);										//暴伤修正百分比
 	hp.hitType = lostType(race_hurt,crit_pe);											//得到掉血类型
 	//普通伤害 =(攻击力*(1+百分比))^2/(攻击力*(1+百分比)+目标防御))*暴击伤害*属性伤害
-	CEffect* effect = AtcTarget->getCurrEffect();
+	SkillEffect* effect = AtcTarget->getCurrEffect();
 	float tAttackNum = pow(AtcTarget->getAtk()*(1+effect->damage*0.01f),2);
 	float tDefenseNum = AtcTarget->getAtk()*(1+effect->damage*0.01f)+HitTarget->getDef();
 	float BaseHurt = tAttackNum / tDefenseNum;
@@ -157,7 +157,7 @@ STR_LostHp HurtCount::gainCount(WarAlive* AtcTarget, WarAlive* HitTarget)
 {
 	STR_LostHp str;
 	float addNum = 0;	//加血只与加血方有关
-	CEffect* effect = AtcTarget->getCurrEffect();	
+	SkillEffect* effect = AtcTarget->getCurrEffect();	
 	float erange = effect->erange * 0.01f;							//伤害浮动值
 	float hurt   = effect->hurt;									//真实伤害
 	//注意百分比和正负值运算问题
@@ -222,7 +222,7 @@ int HurtCount::lostType(float race,int crit)
 void HurtCount::EffectTypeExcute( BattleResult*Result )
 {
 	WarAlive *alive = Result->getAlive();
-	CEffect* effect = alive->getCurrEffect();
+	SkillEffect* effect = alive->getCurrEffect();
 	int lostHp = getAllTargetLostHp(Result);
 	switch (effect->Efftype)
 	{
@@ -272,7 +272,7 @@ float HurtCount::getAllTargetLostHp( BattleResult* pResult )
 
 float HurtCount::attributeHurt(WarAlive* AtcTarget)
 {
-	CEffect* effect = AtcTarget->getCurrEffect();
+	SkillEffect* effect = AtcTarget->getCurrEffect();
 	//属性影响类型*属性影响频率
 	switch (effect->pro_Type)
 	{
@@ -307,36 +307,36 @@ float HurtCount::attributeHurt(WarAlive* AtcTarget)
 //只能计算最后一个效果添加在武将身上的buff
 void HurtCount::BuffHandleLogic(WarAlive* pAlive)
 {
-	CEffect* effect = pAlive->getCurrEffect();
+	SkillEffect* effect = pAlive->getCurrEffect();
 	BuffManage* AtcbufManege = pAlive->getBuffManage();
 	for (auto tAlive : pAlive->HittingAlive)
 	{
 		if (tAlive->getHp()<=0 || tAlive->getDieState())
 			continue;
-		for (vector<CBuff>::iterator itre = effect->buffList.begin();itre != effect->buffList.end();++itre)
+		for (vector<RoleBuffData>::iterator itre = effect->buffList.begin();itre != effect->buffList.end();++itre)
 		{
-			CBuff buff = *itre;
+			RoleBuffData buff = *itre;
 			int ranNum = CCRANDOM_0_1()*100;
-			if (ranNum > buff.useRate/*true*/)//每个buf都需要进行添加判断
+			if (ranNum > buff.getTriggerRate()/*true*/)//每个buf都需要进行添加判断
 			{
 				//CCLOG("[ TIPS ]Buff Add Fail [BuffID= %d, userRate= %d, ranNum=%d]",buff.buffId,buff.useRate,ranNum);
 				continue;		
 			}
-			if (buff.pTarget == usTargetType)					//自己
+			if (buff.getBuffTarget() == usTargetType)					//自己
 			{
 				//CCLOG("\nAtcTargetID = %d ,AddBuff ID: %d",AtcTarget->getAliveID(),buff.buffId);
-				if (buff.typelimit&&buff.typelimit!=pAlive->role->roletype)//判断buf的限定种族
+				if (buff.getTargetType()&&buff.getTargetType()!=pAlive->role->roletype)//判断buf的限定种族
 					continue;
 				AtcbufManege->AddBuff(buff);
-			}else if (buff.pTarget == hitTargetType && tAlive)				//受击目标
+			}else if (buff.getBuffTarget() == hitTargetType && tAlive)				//受击目标
 			{
 				BuffManage* HitbufManege = tAlive->getBuffManage();
-				if (buff.typelimit&&buff.typelimit!=tAlive->role->roletype)
+				if (buff.getTargetType()&&buff.getTargetType()!=tAlive->role->roletype)
 					continue;
 				//CCLOG("\nHitTargetID = %d ,AddBuff ID: %d",HitTarget->getAliveID(),buff.buffId);
 				HitbufManege->AddBuff(buff);
 			}else{
-				CCLOG("[ ERROR ] buff.target can find bufid:%d ,aliveid:%d",buff.buffId,pAlive->getAliveID());
+				CCLOG("[ ERROR ] buff.target can find bufid:%d ,aliveid:%d",buff.getBuffID(),pAlive->getAliveID());
 			}
 		}
 	}

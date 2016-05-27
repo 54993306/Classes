@@ -22,7 +22,7 @@
 #include "Battle/BattleMacro.h"
 #include "model/BattleData.h"
 #include "Battle/SkillEffect.h"
-#include "Battle/RoleBuff.h"
+#include "Battle/RoleBuffData.h"
 
 using namespace cocos2d;
 using namespace std;
@@ -39,7 +39,7 @@ public:
 	void ExcuteNextEffect();					//重置武将下执行下一个效果状态
 	bool canSummonAlive();						//是否可以召唤武将
 	void clearHitAlive();
-	CEffect* getCurrEffect();						//得到武将当前效果
+	SkillEffect* getCurrEffect();						//得到武将当前效果
 	CSkill* getCurrSkill();							//得到武将当前效果
 	bool NextEffect();							//判断第二个效果是否释放
 	int getSkillType();
@@ -57,10 +57,10 @@ public:
 	vector<WarAlive*> HittingAlive;				//受击目标中被击中对象				(用于做buff和受击目标死亡结算处理)
 	CC_PROPERTY(BuffManage*,m_BuffManage,BuffManage);
 	CC_SYNTHESIZE(ActObject*,m_ActObject,ActObject);
-	CC_SYNTHESIZE(MoveObject*,m_MoveObj,MoveObject);			//设置移动对象
+	CC_SYNTHESIZE(MoveObject*,m_MoveObj,MoveObject);	//设置移动对象
 	CC_SYNTHESIZE(unsigned int,m_AliveID,AliveID);
 	CC_SYNTHESIZE(int,m_Model,Model);
-	CC_SYNTHESIZE(bool,m_Enemy,Enemy);				//怪物
+	CC_SYNTHESIZE(bool,m_Enemy,Enemy);					//怪物
 	CC_PROPERTY(bool,m_NorAtk,NorAtk);					//普通攻击状态
 	CC_SYNTHESIZE(bool,m_SpecialAtk,SpeAtk);			//特殊攻击
 	CC_SYNTHESIZE(bool,m_CritSkill,CriAtk);				//必杀技

@@ -11,7 +11,7 @@ using namespace std;
 struct CSkill
 {
 	CSkill();
-	vector<vector<CEffect>>EffectList;
+	vector<vector<SkillEffect>>EffectList;
 	int		id;					//英雄技能ID(唯一)
 	int		skillId;			//技能ID
 	int		skillType;			//技能类型( ROLESKILLTYPE )

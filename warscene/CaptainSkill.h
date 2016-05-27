@@ -28,9 +28,9 @@ public:
 	bool AttributeJudge(WarAlive* alive,int type,int rate);
 	CCArray* PositionJudgeArrCap(CCArray* arr,int type);
 	bool PositionJudge(bool Enemy,int grid,int type);
-	CCArray* getTargetArrCap(CEffect&effect,CCArray*targetArr,CCArray*arr);			//得到执行队长技效果的目标数组并执行效果
-	void ExecuteArrCap(CEffect&effect,CCArray* arr);
-	void AliveExecute(CEffect&effect,WarAlive*alive);
+	CCArray* getTargetArrCap(SkillEffect&effect,CCArray*targetArr,CCArray*arr);			//得到执行队长技效果的目标数组并执行效果
+	void ExecuteArrCap(SkillEffect&effect,CCArray* arr);
+	void AliveExecute(SkillEffect&effect,WarAlive*alive);
 	void AddArr(CCArray* target,CCArray*arr);
 private:
 
