@@ -109,7 +109,7 @@ public:
 	CCDictionary* PlaySkillInfo(WarAlive* alive);
 	int CaptainGuard(WarAlive* alive);
 	void getSelfArea(CCArray* pArray,WarAlive* pAlive);
-	void getAreaByAlive(CCArray* pAreaArray,WarAlive*pAlive);
+	void getAreaByAlive(vector<int>& pAreaVector,WarAlive*pAlive);
 	void sortAreaByAlive(CCArray* pAreaArray,WarAlive* pAlive);
 private:
 	WarManager* m_Manage;

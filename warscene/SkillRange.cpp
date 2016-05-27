@@ -44,10 +44,10 @@ void SkillRange::getSelfArea( CCArray* pArray,WarAlive* pAlive )
 		pArray->addObject(CCInteger::create(i));						//最优先攻击相同格子怪物
 }
 
-void SkillRange::getAreaByAlive( CCArray* pAreaArray,WarAlive*pAlive )
+void SkillRange::getAreaByAlive( vector<int>& pAreaVector,WarAlive*pAlive )
 {
 	vector<int> tCountGrid = getAliveAtkGrid(pAlive);
-	vector<int>tAttackArea;												//可以直接使用ccarray而不用一个vector来进行中介,可array本身就是一个中介
+	//可以直接使用ccarray而不用一个vector来进行中介,可array本身就是一个中介
 	for (auto tGrid:tCountGrid)											//还是应该从最上层的方面来处理,用武将身上的vector来收寄这些攻击范围的格子
 	{
 		AreaCountInfo CountInfo;
@@ -60,15 +60,15 @@ void SkillRange::getAreaByAlive( CCArray* pAreaArray,WarAlive*pAlive )
 			CountInfo.range = pAlive->getCurrEffect()->range;
 		}
 #endif
-		getAtkGrid(CountInfo,tAttackArea);	
+		getAtkGrid(CountInfo,pAreaVector);	
 	}
-	RemoveVectorRepeat(tAttackArea);
+	RemoveVectorRepeat(pAreaVector);
 }
 
 void SkillRange::sortAreaByAlive( CCArray* pAreaArray,WarAlive* pAlive )
 {
 	vector<int>tAttackArea;
-	getAreaByAlive(pAreaArray,pAlive);
+	getAreaByAlive(tAttackArea,pAlive);
 
 	if (pAlive->getEnemy() || (!pAlive->getEnemy()&&pAlive->getNegate()))		//怪物从小往大,英雄由大往小(未反向情况)
 	{
