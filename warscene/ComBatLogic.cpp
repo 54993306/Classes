@@ -334,7 +334,7 @@ void CombatLogic::ExcuteAI(float delta)
 		}
 	}
 }
-//@@
+//@@这整一个方法都是由一个入口开始的对武将的处理啊,都是调用的武将的属性
 void CombatLogic::HeroExcuteAI( WarAlive* alive )
 {
 	int ActionCode = alive->getActObject()->getCurrActionCode();
@@ -352,6 +352,8 @@ void CombatLogic::HeroExcuteAI( WarAlive* alive )
 	}else{		
 		//@@这些逻辑，应该都封装在武将的内部，单个武将去单独处理自身的情况
 		if (IsAutoMoveType(alive) || ActionCode == Walk_Index)//自动移动类,或已经开始执行AI状态
+			return;
+		if (alive->getCallType() != CommonType)				//只有可收控制的武将才有后续的处理(其他类型武将没有MoveObject)
 			return;
 		if (!alive->getCaptain()&&alive->getGridIndex()!=alive->getMoveObject()->getgrid())//武将当前是否在固定位置,如果不在则移动回固定位置(执行AI完毕状态)
 		{			

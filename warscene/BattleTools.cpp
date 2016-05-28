@@ -1,6 +1,7 @@
 #include "BattleTools.h"
 #include "ConstNum.h"
 #include "Battle/BattleRole.h"
+#include "Battle/TempData.h"
 #include "common/CGameSound.h"
 bool RowUp_InBoundary( int originRow,int aimRow )
 {

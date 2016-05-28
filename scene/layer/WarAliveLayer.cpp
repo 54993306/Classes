@@ -156,22 +156,6 @@ void WarAliveLayer::initActObjectPosition( ActObject* aliveOb,int grid )
 	}
 }
 
-void WarAliveLayer::creatMoveObject( WarAlive* alive )
-{
-	if (!alive->getEnemy()&&!alive->getCaptain())
-	{
-		MoveObject* Moveobj = MoveObject::create();
-		Moveobj->setAlive(alive);
-		Moveobj->setActObject(alive->getActObject());
-		Moveobj->setgrid(alive->getGridIndex());
-		alive->setMoveObject(Moveobj);
-		alive->getActObject()->setMoveObject(Moveobj);
-	}else{
-		alive->setAliveStat(INVINCIBLE);
-		alive->getActObject()->TurnStateTo(Start_Index);
-	}
-}
-
 void WarAliveLayer::AddActToGrid(ActObject* aliveOb,int grid)
 {
 	WarAlive* alive = aliveOb->getAlive();
@@ -183,11 +167,7 @@ void WarAliveLayer::AddActToGrid(ActObject* aliveOb,int grid)
 	if(aliveOb->getParent() == nullptr)
 	{
 		m_AliveNode->addChild(aliveOb);
-		if (alive->getMoveObject())
-		{
-			alive->getMoveObject()->initMoveSprite();
-			m_MoveNode->addChild(alive->getMoveObject());
-		}
+		aliveOb->initMoveObject(m_MoveNode);
 	}
 }
 //绘制战场武将
@@ -200,15 +180,7 @@ void WarAliveLayer::initActobject(WarAlive* alive,int createType)
 	}
 	ActObject* aliveOb = ActObject::create();							//创建显示的对象
 	aliveOb->setAlive(alive);											//显示对象与逻辑对象绑定
-	aliveOb->setEnemy(alive->getEnemy());
-	aliveOb->setModel(alive->getModel());
-	aliveOb->setHp(nullptr); 
-	aliveOb->getBody()->setScale(alive->getZoom());
-	alive->setActObject(aliveOb);										//逻辑对象与显示对象绑定
-	if (alive->getCloaking())											//潜行怪物处理
-		((CCArmature*)aliveOb->getArmature())->setOpacity(125);
 	AliveObEffect(aliveOb,createType);
-	creatMoveObject(alive);
 	AddActToGrid(aliveOb,alive->getGridIndex());
 }
 void WarAliveLayer::addEvent(){ this->setTouchEnabled(true); }
@@ -259,7 +231,7 @@ void WarAliveLayer::aliveEntranceBattle(CCObject* ob)
 {
 	WarAlive* alive = (WarAlive*)ob;
 	initActobject(alive);
-	TouchAlive(alive);
+	initTouchAlive(alive);
 	m_TouchAliveBtn = true;
 }
 
@@ -276,7 +248,6 @@ void WarAliveLayer::initMoveActObject( ActObject* aliveOb )
 		m_MoveActObject->setoffs(aliveOb->getoffs());		//武将原来相对于格子的偏移量
 		m_MoveActObject->getBody()->setScale(aliveOb->getBody()->getScale());
 	}
-	//m_MoveActObject->TurnStateTo(Stand_Index);
 	if (aliveOb->getAlive()->getGridIndex())
 	{
 		if(aliveOb->getMoveObject())
@@ -302,7 +273,7 @@ void WarAliveLayer::lucencyActObject(bool lucency)
 	}
 }
 
-void WarAliveLayer::TouchAlive(WarAlive* alive)
+void WarAliveLayer::initTouchAlive(WarAlive* alive)
 {
 	m_TouchAlive = alive;
 	ActObject* aliveOb = alive->getActObject();										//指针复制，复制被触摸武将
@@ -329,7 +300,7 @@ bool WarAliveLayer::touchInAlive( int grid,CCPoint& p )
 				continue;
 			CCPoint upoint = mo->getParent()->convertToWorldSpace(mo->getPosition());	//转化为世界坐标进行偏移量处理
 			m_TouchOffs = upoint - p;													//加减号被重载了,出触摸偏移量
-			TouchAlive(i);
+			initTouchAlive(i);
 			return true;
 		}
 	}
@@ -348,13 +319,19 @@ bool WarAliveLayer::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
 	return touchInAlive(grid,pTouch->getLocation());
 }
 
+int WarAliveLayer::getTouchGrid( CCTouch* pTouch )
+{
+	CCPoint p = convertToNodeSpace(pTouch->getLocation())+m_TouchOffs;
+	return m_map->getGridIndex(p-m_MoveActObject->getoffs());								//移动目标所站的实际格子要减去偏移量
+}
+
 void WarAliveLayer::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)
 {
 	if (!m_MoveActObject->isVisible())
 		return;
 	CCPoint p = convertToNodeSpace(pTouch->getLocation())+m_TouchOffs;
+	int grid = getTouchGrid(pTouch);
 	m_MoveActObject->setPosition(p);
-	int grid = m_map->getGridIndex(p-m_MoveActObject->getoffs());								//移动目标所站的实际格子要减去偏移量
 	if (grid != INVALID_GRID&&m_grid != grid)//在移动到另外一个格子的情况下才计算
 	{
 		m_grid = grid;
@@ -381,19 +358,19 @@ void WarAliveLayer::ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent)
 {
 	m_MoveActObject->setVisible(false);
 	NOTIFICATION->postNotification(B_CancelCostArea,nullptr);
-	CCPoint p = convertToNodeSpace(pTouch->getLocation())+m_TouchOffs-m_MoveActObject->getoffs();		//触摸点传递下来
 	lucencyActObject(false);
-	MoveAliveToGrid(m_TouchAlive,m_map->getGridIndex(p));
+	m_grid = getTouchGrid(pTouch);
+	MoveAliveToGrid();
 }
 
-bool WarAliveLayer::guideJudge( int grid,bool nextStep )
+bool WarAliveLayer::guideJudge( bool nextStep/*= false*/ )
 {
 	if (DataCenter::sharedData()->getCombatGuideMg()->IsGuide())					//引导判断
 	{
 		CombatGuideStep* step = DataCenter::sharedData()->getCombatGuideMg()->getCurrStep();
 		if (step->getType()==AliveMove_Type || step->getType() == CallAalive_Type)
 		{
-			if (grid != step->getFinishgrid())
+			if (m_grid != step->getFinishgrid())
 				return true;								//固定格子才算完成(在移动区域内即算完成)
 			if (nextStep)
 				DataCenter::sharedData()->getCombatGuideMg()->NextStep();
@@ -402,16 +379,16 @@ bool WarAliveLayer::guideJudge( int grid,bool nextStep )
 	return false;
 }
 //@@
-bool WarAliveLayer::WorldBossJudge( WarAlive* alive,int grid )
+bool WarAliveLayer::WorldBossJudge()
 {
-	if (!DataCenter::sharedData()->getWar()->getNormal() && grid < 92)		//精英关卡创建武将只能右半屏
+	if (!DataCenter::sharedData()->getWar()->getNormal() && m_grid < 92)		//精英关卡创建武将只能右半屏
 		return true;
 	if (DataCenter::sharedData()->getWar()->getWorldBoss())
 	{
-		if (alive->getMoveObject()->getgrid() > 108 && grid < 108)				//写死的格子数
+		if (m_TouchAlive->getMoveObject()->getgrid() > 108 && m_grid < 108)				//写死的格子数
 		{
 			return true;
-		}else if (alive->getMoveObject()->getgrid() < 80 && grid > 80)
+		}else if (m_TouchAlive->getMoveObject()->getgrid() < 80 && m_grid > 80)
 		{
 			return true;
 		}
@@ -419,40 +396,51 @@ bool WarAliveLayer::WorldBossJudge( WarAlive* alive,int grid )
 	return false;
 }
 //@@
-bool WarAliveLayer::absentInMoveArea( int grid )
+bool WarAliveLayer::absentInMoveArea()
 {
 	vector<int>* canMove = m_Manage->getMoveVec();
-	if (std::find(canMove->begin(),canMove->end(),grid) == canMove->end())
+	if (std::find(canMove->begin(),canMove->end(),m_grid) == canMove->end())
 		return true;						//点不在可移动范围内
 	return false;
 }
-//@@
-void WarAliveLayer::MoveAliveToGrid( WarAlive* alive,int grid )
+
+bool WarAliveLayer::unCommonAlive()
 {
-	if (!alive->getMove() || 
-		!alive->getActObject() || 
-		!alive->getMoveObject()	||
-		grid==alive->getMoveObject()->getgrid())
-		return;
-	alive->getActObject()->setVisible(true);
-	alive->getActObject()->getHp()->showHp(nullptr);
-	if (absentInMoveArea(grid))
-		return;
-	if (WorldBossJudge(alive,grid))
-		return ;
-	if (guideJudge(grid,false))
-		return;
-	if(alive->getCallType() != CommonType
-	   || aliveMoveJudge(alive,grid)	)								//当前位置是否可以放置英雄
+	if (m_TouchAlive->getCallType() != CommonType && !guideJudge(false))
 	{
-		alive->getMoveObject()->setgrid(grid);
-		alive->getActObject()->setMoveState(Walk_Index);
+		m_TouchAlive->setMoveGrid(m_grid);
+		m_TouchAlive->getActObject()->setMoveState(Walk_Index);
+		guideJudge(true);
+		return true;
+	}
+	return false;
+}
+//@@
+void WarAliveLayer::MoveAliveToGrid()
+{
+	if (unCommonAlive())
+		return;
+	if (!m_TouchAlive->getMove() || 
+		!m_TouchAlive->getActObject() || 
+		!m_TouchAlive->getMoveObject()	||
+		m_grid==m_TouchAlive->getMoveObject()->getgrid())
+		return;
+	m_TouchAlive->getActObject()->setVisible(true);
+	m_TouchAlive->getActObject()->getHp()->showHp(nullptr);
+	if (absentInMoveArea())
+		return;
+	if (WorldBossJudge())
+		return ;
+	if (guideJudge())
+		return;
+	if(aliveMoveJudge())								//当前位置是否可以放置英雄
+	{
+		m_TouchAlive->getActObject()->setActMoveGrid(m_grid);
 	}else{
 		return;	
 	}
-	if (guideJudge(grid,true))
-		return;
-	alive->setAIState(false);
+	guideJudge(true);
+	m_TouchAlive->setAIState(false);
 }
 //@@边界判断
 bool WarAliveLayer::borderJudge( WarAlive* pAlive,vector<int>& pVector )
@@ -503,8 +491,7 @@ void WarAliveLayer::moveSwappingAlives( vector<WarAlive*>& pVector,int pOffs )
 	for (auto tAlive:pVector)
 	{
 		int tGrid = tAlive->getMoveObject()->getgrid() + pOffs;
-		tAlive->getMoveObject()->setgrid(tGrid);
-		tAlive->getActObject()->setMoveState(Walk_Index);
+		tAlive->getActObject()->setActMoveGrid(tGrid);
 	}
 }
 
@@ -545,13 +532,13 @@ vector<WarAlive*> WarAliveLayer::getAliveInArea( vector<int>& pAreas )
 	return tAreaAlives;
 }
 //交换的规则,可以进行多种拓展,有可能每个武将不一样,但是控制会乱
-bool WarAliveLayer::swappingRule( WarAlive* pMoveAlive,vector<int>& pDestination)
+bool WarAliveLayer::swappingRule(vector<int>& pDestination)
 {
 	vector<WarAlive*> tAreaAlives = getAliveInArea(pDestination);
-	int tOffs = pMoveAlive->getMoveObject()->getgrid()-pDestination.at(0);
+	int tOffs = m_TouchAlive->getMoveObject()->getgrid()-m_grid;
 	for (auto tSwappingAlive:tAreaAlives)
 	{
-		if (tSwappingAlive == pMoveAlive)
+		if (tSwappingAlive == m_TouchAlive)
 			continue;
 		int tSwappingGrid = tSwappingAlive->getMoveObject()->getgrid()+tOffs;
 		vector<int> tAliveDes = getDestinations(tSwappingAlive,tSwappingGrid);
@@ -560,7 +547,7 @@ bool WarAliveLayer::swappingRule( WarAlive* pMoveAlive,vector<int>& pDestination
 			for (auto atGrid : tAliveDes)
 			{
 				WarAlive* atAlive = getAliveByMoveGrid(atGrid);
-				if (atAlive && atAlive != pMoveAlive && atAlive != tSwappingAlive)
+				if (atAlive && atAlive != m_TouchAlive && atAlive != tSwappingAlive)
 					return false;
 			}
 		}else{
@@ -571,14 +558,14 @@ bool WarAliveLayer::swappingRule( WarAlive* pMoveAlive,vector<int>& pDestination
 	return true;
 }
 //@@判断武将是否可以移动的方法
-bool WarAliveLayer::aliveMoveJudge(WarAlive* pMoveAlive,int pGrid)
+bool WarAliveLayer::aliveMoveJudge()
 {
-	vector<int> tDestinations = getDestinations(pMoveAlive,pGrid);		
+	vector<int> tDestinations = getDestinations(m_TouchAlive,m_grid);		
 	if (!tDestinations.size())
 		return false;				//没有目标位置(超出边界)
-	if (pMoveAlive->getBattle())
+	if (m_TouchAlive->getBattle())
 	{
-		if (!swappingRule(pMoveAlive,tDestinations))
+		if (!swappingRule(tDestinations))
 			return false;	
 	}else{
 		if (!callAliveJudge(tDestinations))
@@ -594,19 +581,11 @@ WarAlive* WarAliveLayer::getAliveByMoveGrid( int grid )
 	CCARRAY_FOREACH(arr,obj)
 	{
 		MoveObject* mo = (MoveObject*)obj;
-		if (mo->getAlive()->getCallType() != CommonType)
-			continue;
 		for (auto i:mo->grids)
 		{
 			if (i!=grid)
 				continue;
-			if (mo->getAlive()->getHp()<=0  || 
-				!mo->getAlive()->getBattle() )
-			{
-				return nullptr;
-			}else{
-				return mo->getAlive();
-			}
+			return mo->getMoveAlive();
 		}
 	}
 	return nullptr;

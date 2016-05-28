@@ -332,7 +332,7 @@ void CombatGuideLayer::creaAliveByVector( vector<WarAlive*>VecAlive,CombatGuideS
 				continue;
 			DataCenter::sharedData()->getWar()->initAlive(alive);
 			m_AliveLayer->initActobject(alive);
-			m_AliveLayer->MoveAliveToGrid(alive,compel.grid);
+			alive->getActObject()->setActMoveGrid(compel.grid);
 			break;
 		}
 	}
@@ -357,7 +357,8 @@ void CombatGuideLayer::resetAlive( CombatGuideStep* step )
 		if (alive->getHp()<=0||!alive->getBattle()||!alive->getActObject())
 			continue;
 		CCPoint p = m_mapData->getPoint(INVALID_GRID);
-		alive->getMoveObject()->setPosition(p);
+		if (alive->getMoveObject())
+			alive->getMoveObject()->setPosition(p);										//可重构点,这些操作都应该封装在武将的内部执行的
 		alive->getActObject()->setPosition(p);											//在视野外进行死亡处理
 		if (!alive->getEnemy()&&alive->getCriAtk())
 			NOTIFICATION->postNotification(B_CritEnd,alive);

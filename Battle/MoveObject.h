@@ -15,23 +15,23 @@
  *
 *************************************************************/
 #include "cocos2d.h"
-
-using namespace cocos2d;
-using namespace std;
 class WarAlive;
-class ActObject;
-
-class MoveObject : public CCNode
+class MoveObject : public cocos2d::CCNode
 {
 public:
 	MoveObject();
 	void initMoveSprite();
 	CREATE_FUNC(MoveObject);
-	CC_SYNTHESIZE(ActObject*,m_Actobject,ActObject);
-	CC_PROPERTY(WarAlive*,m_Alive,Alive);
+	CC_SYNTHESIZE(WarAlive*,m_Alive,MoveAlive);
 	CC_PROPERTY(int,m_grid,grid);
-	vector<int> grids;
+	void setRowCol(int pRow,int pCol);
+	void setOffs(float pOffsX,float pOffsY);
+	std::vector<int> grids;
 private:
+	int m_Row;
+	int m_Col;
+	float m_OffsX;
+	float m_OffsY;
 };
 
 #endif

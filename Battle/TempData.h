@@ -25,8 +25,9 @@
 
 using namespace std;
 
-struct TempSkill
+class TempSkill
 {
+public:
 	TempSkill();
 	vector<vector<SkillEffect>>EffectList;
 	int		id;					//英雄技能ID(唯一)
@@ -46,8 +47,9 @@ struct TempSkill
 	void readData(const protos::common::Skill &skill);
 };
 
-struct TempRole
+class TempRole
 {
+public:
 	TempRole();
 	TempSkill skill1;				//普通攻击     主帅特殊攻击 主帅被动技
 	TempSkill skill2;				//特殊攻击
@@ -90,8 +92,9 @@ struct TempRole
 	string name;				//名称
 };
 //怪物
-struct TempMonster :public TempRole
+class TempMonster :public TempRole
 { 
+public:
 	TempMonster();
 	int mId;					//关卡怪物ID
 	int monsterId;				//怪物ID(标识ID)
@@ -103,8 +106,9 @@ struct TempMonster :public TempRole
 	void readData(const protos::common::Monster &monster);
 };
 //英雄
-struct TempHero :public TempRole
+class TempHero :public TempRole
 {
+public:
 	void readData(const protos::common::Hero &hero);
 };
 #endif

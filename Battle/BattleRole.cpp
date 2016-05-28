@@ -2,7 +2,7 @@
 #include "model/BuffManage.h"
 #include "warscene/ConstNum.h"
 #include "scene/alive/ActObject.h"
-
+#include "Battle/TempData.h"
 WarAlive::WarAlive()
 :m_Enemy(false),m_Hp(0),m_MaxHp(0),m_GridIndex(INVALID_GRID),m_MoveGrid(0),m_AtkDelay(0)
 ,m_AtkNum(0),m_Move(true),m_CritSkill(false),role(nullptr),m_Hrt(0),m_HrtPe(0),m_AIState(false)
@@ -14,6 +14,7 @@ WarAlive::WarAlive()
 ,m_CritTime(0),m_FatherID(0),m_Captain(false),m_CritEffect(false),m_DieState(false)
 ,m_TouchGrid(0),m_TouchState(false),m_MoveObj(nullptr),m_CallType(0),m_CallAliveNum(0)
 ,m_Delaytime(0),m_AliveState(COMMONSTATE),m_AliveType(AliveType::Common),m_StateDelay(0)	
+,m_Model(0),m_AliveID(0),m_MstType(0)
 {
 	setBuffManage(nullptr);
 }

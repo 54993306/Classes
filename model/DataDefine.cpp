@@ -1,11 +1,5 @@
 ﻿#include "DataDefine.h"
-#include "model/BuffManage.h"
-#include "warscene/ConstNum.h"
-#include "scene/alive/ActObject.h"
-#include "common/CommonFunction.h"
 #include "roleImg/RoleUpdate.h"
-#include "Battle/MoveObject.h"
-#include "Battle/BattleMessage.h"
 
 BaseObject::BaseObject()
 	:m_AliveID(0)

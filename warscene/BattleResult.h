@@ -2,8 +2,6 @@
 #define __BATTLERESULT__
 
 #include "AppUI.h"
-//#include "model/BattleData.h"
-#include "Battle/TempData.h"
 /************************************************************************/
 //                                                                      
 //

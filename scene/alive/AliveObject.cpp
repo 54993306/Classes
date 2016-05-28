@@ -12,7 +12,6 @@
 #include "Battle/BattleRole.h"
 #include "scene/layer/WarAliveLayer.h"
 #include "model/WarManager.h"
-//#include "model/BattleData.h"
 #include "Battle/TempData.h"
 #include "common/CGameSound.h"
 #include "common/ShaderDataHelper.h"
@@ -43,8 +42,7 @@ AliveObject::~AliveObject()
 bool AliveObject::init()
 {
 	setBody(nullptr);
-	if (m_Body)return true;
-	return false;
+	return true;
 }
 
 void AliveObject::setBody(CCSprite* body)

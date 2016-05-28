@@ -1,8 +1,6 @@
 ﻿#ifndef _ATKEXP_H_
 #define _ATKEXP_H_
 #include "AppUI.h"
-//#include "model/BattleData.h"
-#include "Battle/TempData.h"
 #include <spine/spine-cocos2dx.h>
 
 class EffectInfo;

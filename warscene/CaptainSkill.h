@@ -10,10 +10,9 @@
 #ifndef _CAPTAINSKILL_
 #define _CAPTAINSKILL_
 #include "AppUI.h"
-//#include "model/BattleData.h"
-#include "Battle/TempData.h"
 class WarAlive;
-
+class TempSkill;
+class SkillEffect;
 class CaptainSkill : public CCObject
 {
 public:

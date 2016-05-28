@@ -4,6 +4,7 @@
 #include "Battle/BattleRole.h"
 #include "model/DataCenter.h"
 #include "Battle/BattleMessage.h"
+#include "Battle/TempData.h"
 
 SkillTips::SkillTips()
 	:m_ui(nullptr)

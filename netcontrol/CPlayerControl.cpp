@@ -7,7 +7,6 @@
 #include "scene/loadWar.h"
 #include "scene/WarScene.h"
 #include "GMessage.h"
-//#include "model/BattleData.h"
 #include "Battle/TempData.h"
 #include "task/TaskControl.h"
 #include "common/RollLabel.h"

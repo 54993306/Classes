@@ -5,6 +5,7 @@
 #include "scene/alive/AliveDefine.h"
 #include "warscene/ConstNum.h"
 #include "Battle/BattleMessage.h"
+#include "Battle/TempData.h"
 using namespace cocos2d;
 using namespace cocos2d::extension;
 #define BUFFMAX (8)

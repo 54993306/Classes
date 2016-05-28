@@ -59,7 +59,7 @@ public:
 	CC_SYNTHESIZE(int,m_Model,Model);					//角色模型ID( 子类重写 )
 	CC_SYNTHESIZE(string,m_ActionKey,ActionKey);		//武将当前动作
 	CC_SYNTHESIZE(int,m_DropItem,DropItem);				//掉落物品类型
-	CC_SYNTHESIZE(CCNode*,m_Armature,Armature);			//动画对象	( 子类实现 )
+	CC_SYNTHESIZE(CCNodeRGBA*,m_Armature,Armature);		//动画对象	( 子类实现 )
 	CC_SYNTHESIZE(SkeletonAnimation*,m_Skeleton,Skeleton);//动画对象	( 子类实现 )
 	CC_SYNTHESIZE(int,m_AtkEffect,AtkEffect);			//攻击特效id
 	CC_SYNTHESIZE(int,m_PlayerEffect,PlayerEffect);		//播放空效果

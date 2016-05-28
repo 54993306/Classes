@@ -17,6 +17,7 @@
 #include "common/ShaderDataHelper.h"
 #include "Battle/BattleMessage.h"
 #include "warscene/BattleTools.h"
+#include "Battle/MoveObject.h"
 //#include <spine/AnimationState.h>
 ActObject::ActObject()
 	:m_MapData(nullptr),m_armatureEventData(nullptr), m_lastFrame(-1),m_Reset(false)
@@ -39,6 +40,20 @@ void ActObject::setAlive( WarAlive* var )
 {
 	AliveObject::setAlive(var);
 	initStateManage(); 
+	if (!m_Alive->getAliveID())
+		return;															//挂在层显示拖动的目标(可以单独抽出一个方法来)
+	m_Alive->setActObject(this);										//逻辑对象与显示对象绑定
+	setEnemy(var->getEnemy());
+	setModel(m_Alive->getModel());
+	setHp(nullptr);
+	getBody()->setScale(m_Alive->getZoom());
+	if (m_Alive->getCloaking())											//潜行怪物处理
+		getArmature()->setOpacity(125);
+	if (m_Enemy)
+	{
+		m_Alive->setAliveStat(INVINCIBLE);
+		TurnStateTo(Start_Index);
+	}
 }
 
 void ActObject::initStateManage()
@@ -519,4 +534,29 @@ void ActObject::walkDirection( CCPoint& p )
 			this->setRoleDirection(Ditection_Left);
 		}
 	}
+}
+
+void ActObject::initMoveObject( CCNode* pMoveParent )
+{
+	if (m_Alive->getEnemy()	||
+		m_Alive->getCaptain()||
+		m_Alive->getCallType() != CommonType)
+		return;
+	MoveObject* tMoveObj = MoveObject::create();
+	tMoveObj->setRowCol(m_Alive->role->row,m_Alive->role->col);
+	tMoveObj->setMoveAlive(m_Alive);
+	tMoveObj->setOffs(getoffs().x,getoffs().y);
+	tMoveObj->initMoveSprite();
+	tMoveObj->setgrid(m_Alive->getGridIndex());
+	m_Alive->setMoveGrid(m_Alive->getGridIndex());
+	m_Alive->setMoveObject(tMoveObj);
+	setMoveObject(tMoveObj);
+	pMoveParent->addChild(tMoveObj);
+}
+
+void ActObject::setActMoveGrid( int pGird )
+{
+	getMoveObject()->setgrid(pGird);
+	m_Alive->setMoveGrid(pGird);
+	setMoveState(Walk_Index);
 }

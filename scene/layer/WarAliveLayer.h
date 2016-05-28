@@ -55,44 +55,44 @@ public:
 	virtual void ccTouchCancelled(CCTouch *pTouch, CCEvent *pEvent);
 	virtual void ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent); 
 public:
-	bool WorldBossJudge(WarAlive* alive,int grid);			//需要重构的方法,应该抽象为关卡对武将移位的影响策略
-	
+	bool WorldBossJudge();			//需要重构的方法,应该抽象为关卡对武将移位的影响策略
+	int getTouchGrid(CCTouch* pTouch);
 	void initActobject(WarAlive* alive,int createType = 0);
 	CCArray* getAlivesOb(int AliveType = AliveType_All);
 	void AddActToGrid(ActObject* alive,int grid);
-	void MoveAliveToGrid(WarAlive* alive,int grid);
+	void MoveAliveToGrid();
 	void AliveObEffect(ActObject* alive,int createType = DefaultCreat);
 	float AliceMoveExcute(WarAlive* alive,int Action = 2/*Walk_Index*/);
 	void LayerShake(CCObject* ob);
 	void aliveEntranceBattle(CCObject* ob);
-	void TouchAlive(WarAlive* alive);
+	void initTouchAlive(WarAlive* alive);
 	WarAlive* getAliveByMoveGrid(int grid);
 	CC_SYNTHESIZE(CCLayerColor*,m_LayerColor,LayerColor);
 	CC_SYNTHESIZE(CCNode*,m_AliveNode,AliveNode);			//挂载武将节点
 	CC_SYNTHESIZE(CCNode*,m_MoveNode,MoveNode);				//挂载移动节点
 	/*************************************************************************/
+	bool unCommonAlive();
 	void clearAlivesPauseMark();
 	void heroWinAction();
 	void createBatchMonster(int batchNumber);
-	bool guideJudge(int grid,bool nextStep);
+	bool guideJudge(bool nextStep = false);
 	void monsterSoleSprite(ActObject* aliveOb);
 	void createMoveTarget();
 	void createLayerColor();
 	void createActObjects();
 	void initActObjectOffs(ActObject* aliveOb,int grid);
 	void initActObjectPosition(ActObject* aliveOb,int grid);
-	void creatMoveObject(WarAlive* alive);
 	void initMoveActObject(ActObject* aliveOb);
 	void lucencyActObject(bool lucency);												//对其他武将执行透明操作
 	bool touchInAlive(int grid , CCPoint& p);
-	bool aliveMoveJudge(WarAlive* pMoveAlive,int pGrid);
+	bool aliveMoveJudge();
 	vector<int> getDestinations(WarAlive* pAlive,int pGrid);
 	vector<WarAlive*> getAliveInArea(vector<int>& pAreas);
-	bool absentInMoveArea(int pGrid);
+	bool absentInMoveArea();
 	bool borderJudge(WarAlive* pAlive,vector<int>& pVector);
 	void moveSwappingAlives(vector<WarAlive*>& pVector,int pOffs);
 	bool callAliveJudge(vector<int>& pDestinations);
-	bool swappingRule(WarAlive* pMoveAlive,vector<int>& pDestinations);
+	bool swappingRule(vector<int>& pDestinations);
 	bool vectorIntersection(vector<int>& pVector,vector<int>& ptVector);
 protected:
 	WarAlive*		m_TouchAlive;		//被触摸的武将id

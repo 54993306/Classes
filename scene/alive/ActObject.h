@@ -70,6 +70,8 @@ public:
 	void walkDirection(CCPoint& p);
 	void roleMoveSpeed();
 	float getMoveTime();
+	void initMoveObject(CCNode* pMoveParent);
+	void setActMoveGrid(int pGird);
 private:
 	void actionEvent(int pFremIndex);
 	void dieActionEnd();

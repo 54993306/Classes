@@ -2,8 +2,7 @@
 #define _BUFF_MANAGER_H_
 #include "AppUI.h"
 #include <map>
-//#include "BattleData.h"
-#include "Battle/TempData.h"
+
 /************************************************************* 
  *
  *
@@ -19,6 +18,8 @@
  *************************************************************/
 using namespace std;
 class WarAlive;
+class RoleBuffData;
+class BuffInfo;
 typedef map<unsigned int,BuffInfo*> BuffMap;	
 typedef map<int,vector<CCNode*>>	BuffEffectMapList;	
 

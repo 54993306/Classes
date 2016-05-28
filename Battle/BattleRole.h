@@ -20,8 +20,6 @@
 /******************* 战场武将数据 ********************/
 #include "cocos2d.h"
 #include "Battle/BattleMacro.h"
-//#include "model/BattleData.h"
-#include "Battle/TempData.h"
 #include "Battle/SkillEffect.h"
 #include "Battle/RoleBuffData.h"
   
@@ -30,6 +28,8 @@ using namespace std;
 class BuffManage;
 class ActObject;
 class MoveObject;
+class TempRole;
+class TempSkill;
 class WarAlive:public cocos2d::CCObject					//定义数据的顺序结构是为了方便查看数据
 {
 public:

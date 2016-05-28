@@ -37,7 +37,7 @@ enum SceneType
 	SkipLoginScene,			//登陆界面
 	skipSelectHero,
 };
-struct TempRole;
+class TempRole;
 class WarManager;
 class LoadSpineData;
 class LoadWar : public CScene

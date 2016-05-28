@@ -10,7 +10,7 @@
 #include "model/MapManager.h"
 #include "common/CommonFunction.h"
 #include "Battle/BattleRole.h"
-
+#include "Battle/TempData.h"
 using namespace cocos2d;
 
 terData::terData(){}
@@ -238,11 +238,11 @@ terRound* TerrainManager::TerrainAI(WarAlive* alive)
 			round->m_music = ter->getAliveMusic();								//地形伤害音效
 			AttributeDispose(alive,ter);										//地形影响属性处理
 			int ranNum = CCRANDOM_0_1()*100;
-			if (ranNum < ter->m_Buff.getTriggerRate())										//添加地形buf
-			{
-				BuffManage* bfmg = alive->getBuffManage();							
-				//bfmg->AddBuff(ter->buff);
-			}else{	CCLOG("Terrain Buf Add Fail terId = %d,ranNum=%d,useRate=%d",ter->getTerrainID(),ranNum,ter->m_Buff.getTriggerRate());	}
+			//if (ranNum < ter->m_Buff.getTriggerRate())										//添加地形buf
+			//{
+			//	BuffManage* bfmg = alive->getBuffManage();							
+			//	//bfmg->AddBuff(ter->buff);
+			//}else{	CCLOG("Terrain Buf Add Fail terId = %d,ranNum=%d,useRate=%d",ter->getTerrainID(),ranNum,ter->m_Buff.getTriggerRate());	}
 			return round;
 		}else{ return nullptr; }
 	}else{ return nullptr; }

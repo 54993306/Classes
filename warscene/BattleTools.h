@@ -16,7 +16,7 @@
  *************************************************************/
 
 class WarAlive;
-struct TempSkill;
+class TempSkill;
 class SkillEffect;
 
 

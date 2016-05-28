@@ -19,7 +19,7 @@ struct GameFinishData
 	int roundNum;
 };
 
-struct TempMonster;
+class TempMonster;
 class BufExp;
 class MoveRule;
 class WarScene; 
