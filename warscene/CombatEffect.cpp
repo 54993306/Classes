@@ -285,7 +285,7 @@ void CombatEffect::PlayerSkill(WarAlive* alive)
 		SkillEffect->setUserData(alive);
 
 		SkillEffect->addChild(_armaturePlayerSkill);
-		if (!alive->getNegate())
+		if (!alive->getOpposite())
 			offs_x = CCDirector::sharedDirector()->getWinSize().width - offs_x;
 		int move_x = p1.x-offs_x;					//目标点和显示点之间偏移量
 		int newX = p.x-move_x;						//父节点如何移动才能显示目标点

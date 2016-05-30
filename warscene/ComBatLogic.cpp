@@ -335,40 +335,46 @@ void CombatLogic::ExcuteAI(float delta)
 	}
 }
 //@@这整一个方法都是由一个入口开始的对武将的处理啊,都是调用的武将的属性
-void CombatLogic::HeroExcuteAI( WarAlive* alive )
+void CombatLogic::HeroExcuteAI( WarAlive* pAlive )
 {
-	int ActionCode = alive->getActObject()->getCurrActionCode();
-	CCDictionary* AttackInfo = m_SkillRange->PlaySkillInfo(alive);		//生命周期只有一帧
+	int ActionCode = pAlive->getActObject()->getCurrActionCode();
+	CCDictionary* AttackInfo = m_SkillRange->PlaySkillInfo(pAlive);		//生命周期只有一帧
 	CCArray* Alives = (CCArray*)AttackInfo->objectForKey(Hit_Alive);		//受击目标	
-	if (Alives->count()||alive->getCriAtk())
+	if (Alives->count()||pAlive->getCriAtk())
 	{
 		if (ActionCode == Walk_Index)
 		{
-			alive->getActObject()->setMoveState(0);
-			alive->getActObject()->TurnStateTo(Stand_Index);
-			alive->setAIState(false);
+			pAlive->getActObject()->setMoveState(0);
+			pAlive->getActObject()->TurnStateTo(Stand_Index);
+			pAlive->setAIState(false);
 		}
-		AliveExcuteAI(alive,AttackInfo);
+		AliveExcuteAI(pAlive,AttackInfo);
 	}else{		
 		//@@这些逻辑，应该都封装在武将的内部，单个武将去单独处理自身的情况
-		if (IsAutoMoveType(alive) || ActionCode == Walk_Index)//自动移动类,或已经开始执行AI状态
+		if (IsAutoMoveType(pAlive) || ActionCode == Walk_Index)//自动移动类,或已经开始执行AI状态
 			return;
-		if (alive->getCallType() != CommonType)				//只有可收控制的武将才有后续的处理(其他类型武将没有MoveObject)
+		if (pAlive->getCallType() != CommonType)				//只有可收控制的武将才有后续的处理(其他类型武将没有MoveObject)
 			return;
-		if (!alive->getCaptain()&&alive->getGridIndex()!=alive->getMoveObject()->getgrid())//武将当前是否在固定位置,如果不在则移动回固定位置(执行AI完毕状态)
+		if (!pAlive->getCaptain()&&pAlive->getGridIndex()!=pAlive->getMoveObject()->getgrid())//武将当前是否在固定位置,如果不在则移动回固定位置(执行AI完毕状态)
 		{			
-			alive->setAIState(false);
-			alive->setMoveGrid(alive->getMoveObject()->getgrid());							//@@武将有一个回到初始位置的方法
-			alive->getActObject()->setMoveState(Walk_Index);
+			pAlive->setAIState(false);
+			pAlive->setMoveGrid(pAlive->getMoveObject()->getgrid());							//@@武将有一个回到初始位置的方法
+			pAlive->getActObject()->setMoveState(Walk_Index);
 		}else{
-			int grid = m_SkillRange->GuardMoveArea(alive);								//@@有警戒区域的武将处理
-			alive->setAIState(true);
+			int grid = INVALID_GRID;
+			if (pAlive->getCaptain())
+			{
+				grid = m_SkillRange->CaptainGuard(pAlive);
+			}else{
+				grid = m_SkillRange->aliveGuard(pAlive);
+			}
+			pAlive->setAIState(true);
 			if(grid)
 			{
-				alive->setMoveGrid(grid);
-				alive->getActObject()->setMoveState(Walk_Index);
+				pAlive->setMoveGrid(grid);
+				pAlive->getActObject()->setMoveState(Walk_Index);
 			}else{
-				alive->setAIState(false);
+				pAlive->setAIState(false);
 			}	
 		}
 	}
@@ -522,7 +528,7 @@ void CombatLogic::attackEffect( WarAlive*alive )
 void CombatLogic::attackDirection( WarAlive*alive )
 {
 	ActObject* pActObject = alive->getActObject();
-	if (!alive->getCaptain()&& alive->getNegate())									//反向攻击处理
+	if (!alive->getCaptain()&& alive->getOpposite())									//反向攻击处理
 	{
 		if (alive->getEnemy())
 		{
@@ -548,7 +554,7 @@ void CombatLogic::AliveExcuteAI(WarAlive* alive,CCDictionary*pDic)
 	{
 		WarAlive* pAlive = (WarAlive*)obj;
 		if (pAlive->getHp()<=0)continue;
-		alive->AtkAlive.push_back(pAlive);
+		alive->m_AreaTargets.push_back(pAlive);
 	}
 }
 
@@ -675,8 +681,8 @@ bool CombatLogic::autoSkillAlive( WarAlive* alive )
 void CombatLogic::attackTime( WarAlive* alive,float dt )
 {
 	int ActionCode = alive->getActObject()->getCurrActionCode();
-	if (ActionCode == Stand_Index || 
-		ActionCode == Hit_Index || 
+	if (ActionCode == Stand_Index	|| 
+		ActionCode == Hit_Index		|| 
 		ActionCode == Walk_Index)//怪物的技能释放是由攻击次数和时间确定的
 		alive->setAtktime(dt);
 	if (!alive->getCriAtk()&&alive->getEnemy())
@@ -686,8 +692,10 @@ void CombatLogic::attackTime( WarAlive* alive,float dt )
 //武将进行逻辑处理前状态结算
 bool CombatLogic::StateDispose( WarAlive* alive,float dt )
 {
-	if (alive->getCallType() == NotAttack ||								//石头类武将不做攻击判断处理
-		alive->getDieState() || 
+	if (alive->getCallType() == NotAttack	||								//石头类武将不做攻击判断处理
+		alive->getAliveStat() == UNATK		||
+		alive->getAliveStat() == INVINCIBLE	||							//超出边界的武将不再进行技能处理
+		alive->getDieState()				|| 
 		alive->getHp()<=0)
 		return true;
 	if (delayEntrance(alive,dt))
@@ -808,13 +816,6 @@ void CombatLogic::ActObjectRemove( CCObject* ob )
 	if (alive->getEnemy())
 	{
 		monsterRemove(alive);
-	}else{
-		if (!alive->getCaptain())
-			return;
-		m_CurrBatchNum = 1000;
-		m_Run = false;
-		m_Assist->ActStandExcute(m_AliveLayer->getAlivesOb());
-		combatResult(nullptr);		//战斗失败
 	}
 }
 
@@ -843,9 +844,16 @@ void CombatLogic::AliveDieDispose( CCObject* ob )
 	{
 		monsterDieDispose(alive);
 	}else{
-		if (alive->role->isCall || alive->getCaptain())											//喽啰死亡不进行初始化处理
+		if (alive->role->isCall || alive->getCaptain())										//喽啰死亡不进行初始化处理
 			return;
-		m_UILayer->AliveBattleDispose(alive);//武将下阵	
+		if (alive->getCaptain())
+		{
+			m_Run = false;
+			m_Assist->ActStandExcute(m_AliveLayer->getAlivesOb());
+			combatResult(nullptr);															//战斗失败
+		}else{
+			m_UILayer->AliveBattleDispose(alive);											//武将下阵	
+		}
 	}
 }
 

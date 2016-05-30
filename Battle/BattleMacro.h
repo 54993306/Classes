@@ -94,4 +94,5 @@ enum struct AliveType
 	WorldBoss,				// ¿ΩÁboss
 };
 
+
 #endif

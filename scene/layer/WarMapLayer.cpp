@@ -161,15 +161,12 @@ void WarMapLayer::DrawAtkArea(WarAlive* alive)
 	vector<int>VecGrid;
 	if (alive->role->alert && !alive->getCriAtk())
 	{
-		VecGrid = m_SkillRange->getAliveGuard(alive);
+		m_SkillRange->initAliveGuard(alive,VecGrid);
 	}else{
-		CCArray* arr = m_SkillRange->UnderAttackArea(alive);
-		CCObject* obj = nullptr;
-		CCARRAY_FOREACH(arr,obj)
-		{
-			int grid = ((CCInteger*)obj)->getValue();
-			VecGrid.push_back(grid);
-		}
+		vector<int> tVector;
+		m_SkillRange->initSkillArea(alive,tVector);
+		for (auto tGrid:tVector)
+			VecGrid.push_back(tGrid);
 	}
 	for (int grid:VecGrid) 
 	{
@@ -181,7 +178,7 @@ void WarMapLayer::DrawAtkArea(WarAlive* alive)
 		WarAlive* t_alive = m_Manage->getAliveByGrid(grid);
 		if (t_alive&&t_alive->getEnemy() != alive->getEnemy())
 		{
-			if (alive->getNegate())
+			if (alive->getOpposite())
 				m_BackArea = true;
 			else
 				m_FrontArea = true;
@@ -237,21 +234,20 @@ void WarMapLayer::DrawMoveAtkArea(CCObject* ob)
 	if (!m_BackArea)
 	{
 		m_BackArea = true;
-		alive->setNegate(true);
+		alive->setOpposite(true);
 		bool ReverseArea = false;
 		alive->setTouchState(true);
-		CCArray* arr = m_SkillRange->UnderAttackArea(alive);
-		CCObject* pobj = nullptr;
-		CCARRAY_FOREACH(arr,pobj)
+		vector<int> tVector;
+		m_SkillRange->initSkillArea(alive,tVector);
+		for (auto tGrid:tVector)
 		{
-			int grid = ((CCInteger*)pobj)->getValue();
-			WarAlive* pAlive = m_Manage->getAliveByGrid(grid);
+			WarAlive* pAlive = m_Manage->getAliveByGrid(tGrid);
 			if (pAlive&&pAlive->getEnemy() != alive->getEnemy())
 				ReverseArea = true;
 		}
 		if (ReverseArea)
 			DrawMoveAtkArea(alive);	
-		alive->setNegate(false);
+		alive->setOpposite(false);
 		alive->setTouchState(false);
 	}
 	m_BackArea = false;
@@ -261,7 +257,7 @@ void WarMapLayer::DrawAtkEffect(CCObject* ob)
 {
 	ActObject* act = (ActObject*)ob;
 	WarAlive* alive = act->getAlive();
-	for (auto i:alive->AtkGrid)
+	for (auto i:alive->m_SkillArea)
 	{
 		CCSprite* sp = (CCSprite*)m_DisPlayArea->getChildByTag(i+map_Bg);
 		EffectObject* Effect = EffectObject::create(ToString(act->getPlayerEffect()));
@@ -282,7 +278,7 @@ void WarMapLayer::DrawAtkEffect(CCObject* ob)
 void WarMapLayer::CancelCombatArea(CCObject* ob)
 {
 	WarAlive* alive = (WarAlive*)ob;
-	for (auto tGrid : alive->AtkGrid)
+	for (auto tGrid : alive->m_SkillArea)
 	{
 		CCSprite* sp = (CCSprite*)m_DisPlayArea->getChildByTag(tGrid+map_Bg);
 		sp->setDisplayFrame(CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(AtksImg));
@@ -293,7 +289,7 @@ void WarMapLayer::CancelCombatArea(CCObject* ob)
 void WarMapLayer::CombatArea(CCObject* ob)
 {
 	WarAlive* alive = (WarAlive*)ob;
-	for (auto i:alive->AtkGrid)
+	for (auto i:alive->m_SkillArea)
 	{
 		CCSprite* sp = (CCSprite*)m_DisPlayArea->getChildByTag(i+map_Bg);
 		sp->setDisplayFrame(CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(AtksImg));
@@ -316,9 +312,9 @@ void WarMapLayer::SkillBtnDrawSkillArea(CCObject* ob)
 		return;
 	}
 	touchAreaCancel(nullptr);
-	alive->setNegate(true);
+	alive->setOpposite(true);
 	DrawAtkArea(alive);		//判断后方是否有敌人
-	alive->setNegate(false);
+	alive->setOpposite(false);
 	if (m_BackArea)
 	{
 		m_BackArea = false;

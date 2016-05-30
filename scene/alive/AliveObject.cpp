@@ -198,7 +198,7 @@ void AliveObject::AtkEnd_Event()
 	if (!m_UpdateState)
 		return;
 	NOTIFICATION->postNotification(B_CancelDrawAttackArea,m_Alive);		//取消绘制攻击范围(针对性的取消绘制)
-	if (m_Alive->AtkAlive.size())
+	if (m_Alive->m_AreaTargets.size())
 	{
 		if (m_Alive->NextEffect())
 		{

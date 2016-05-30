@@ -3,18 +3,20 @@
 #include "warscene/ConstNum.h"
 #include "scene/alive/ActObject.h"
 #include "Battle/TempData.h"
+#include "Battle/SkillMacro.h"
+
 WarAlive::WarAlive()
-:m_Enemy(false),m_Hp(0),m_MaxHp(0),m_GridIndex(INVALID_GRID),m_MoveGrid(0),m_AtkDelay(0)
-,m_AtkNum(0),m_Move(true),m_CritSkill(false),role(nullptr),m_Hrt(0),m_HrtPe(0),m_AIState(false)
-,m_initCost(0),m_Batch(0),m_CostMax(0),m_AddCost(0),m_Atk(0),m_Def(0),m_Hit(0),m_NorAtk(true)
-,m_Doge(0),m_Crit(0),m_Zoom(0),m_Renew(0),m_EfGroup(1),m_EffectIndex(0),m_LastAlive(false)
-,m_Negate(false),m_ExecuteCap(false),m_TerType(0),m_TerTypeNum(0),m_cloaking(false)
-,m_SortieNum(0),m_ActObject(nullptr),m_BuffManage(nullptr),m_UILayout(0),m_Atktime(0)
-,m_AtkInterval(0),m_TimePercent(1),m_SpecialAtk(false),m_Battle(false),m_MoveSpeed(0)
-,m_CritTime(0),m_FatherID(0),m_Captain(false),m_CritEffect(false),m_DieState(false)
-,m_TouchGrid(0),m_TouchState(false),m_MoveObj(nullptr),m_CallType(0),m_CallAliveNum(0)
-,m_Delaytime(0),m_AliveState(COMMONSTATE),m_AliveType(AliveType::Common),m_StateDelay(0)	
-,m_Model(0),m_AliveID(0),m_MstType(0)
+	:m_Enemy(false),m_Hp(0),m_MaxHp(0),m_GridIndex(INVALID_GRID),m_MoveGrid(0),m_AtkDelay(0)
+	,m_AtkNum(0),m_Move(true),m_CritSkill(false),role(nullptr),m_Hrt(0),m_HrtPe(0),m_AIState(false)
+	,m_initCost(0),m_Batch(0),m_CostMax(0),m_AddCost(0),m_Atk(0),m_Def(0),m_Hit(0),m_NorAtk(true)
+	,m_Doge(0),m_Crit(0),m_Zoom(0),m_Renew(0),m_GroupIndex(0),m_EffectIndex(0),m_LastAlive(false)
+	,m_Opposite(false),m_ExecuteCap(false),m_TerType(0),m_TerTypeNum(0),m_cloaking(false)
+	,m_SortieNum(0),m_ActObject(nullptr),m_BuffManage(nullptr),m_UILayout(0),m_Atktime(0)
+	,m_AtkInterval(0),m_TimePercent(1),m_SpecialAtk(false),m_Battle(false),m_MoveSpeed(0)
+	,m_CritTime(0),m_FatherID(0),m_Captain(false),m_CritEffect(false),m_DieState(false)
+	,m_TouchGrid(0),m_TouchState(false),m_MoveObj(nullptr),m_CallType(0),m_CallAliveNum(0)
+	,m_Delaytime(0),m_AliveState(COMMONSTATE),m_AliveType(AliveType::Common),m_StateDelay(0)	
+	,m_Model(0),m_AliveID(0),m_MstType(0)
 {
 	setBuffManage(nullptr);
 }
@@ -25,12 +27,12 @@ WarAlive::~WarAlive()
 	m_BuffManage = nullptr;
 	m_ActObject = nullptr;
 	m_MoveObj = nullptr;
-	grids.clear();
+	m_StandGrids.clear();
 	moves.clear();
 	AtkArea.clear();
 	AliveS.clear();
-	AtkGrid.clear();
-	AtkAlive.clear();
+	m_SkillArea.clear();
+	m_AreaTargets.clear();
 }
 
 void WarAlive::setMoveGrid(int var)
@@ -160,15 +162,15 @@ void WarAlive::setGridIndex(int var)
 		m_Battle = false;
 	}else{
 		m_Battle =true;
-		grids.clear();
+		m_StandGrids.clear();
 		for (int i=0;i<role->row;i++)
 			for (int j =0;j<role->col;j++)
 			{
 				if (var+j*C_GRID_ROW+i>C_ENDGRID)
 					continue;
-				grids.push_back(var+j*C_GRID_ROW+i);
+				m_StandGrids.push_back(var+j*C_GRID_ROW+i);
 			}			
-			sort(grids.begin(),grids.end());
+			sort(m_StandGrids.begin(),m_StandGrids.end());
 	}
 }
 
@@ -214,18 +216,18 @@ void WarAlive::ResetAttackState()
 	setCriAtk(false);
 	setSpeAtk(false);
 	setEffIndex(0);
-	setEffectGroup(1);
+	setGroupIndex(0);
 	ExcuteNextEffect();
 }
 
 void WarAlive::ExcuteNextEffect()
 {
 	setSortieNum(0);																//当前效果攻击次数
-	setNegate(false);																//重置反向攻击
+	setOpposite(false);																//重置反向攻击
 	AtkArea.clear();																//清除随机固定格子(好像还是逻辑的)
 	AliveS.clear();																	//清除随机固定武将
-	AtkAlive.clear();
-	AtkGrid.clear();
+	m_AreaTargets.clear();
+	m_SkillArea.clear();
 	clearHitAlive();
 }
 
@@ -279,14 +281,14 @@ TempSkill* WarAlive::getCurrSkill()
 
 SkillEffect* WarAlive::getCurrEffect()
 {
-	if (getEffectGroup()<= getCurrSkill()->EffectList.size())
-		if ( getCurrSkill()->EffectList.at(getEffectGroup()-1).size()>getEffIndex())
-			return & getCurrSkill()->EffectList.at(getEffectGroup()-1).at(getEffIndex());
+	if (getGroupIndex() < getCurrSkill()->EffectList.size())
+		if ( getCurrSkill()->EffectList.at(getGroupIndex()).size()>getEffIndex())
+			return & getCurrSkill()->EffectList.at(getGroupIndex()).at(getEffIndex());
 		else
 			CCLOG("[ *ERROR ] EffIndex > EffectListSize  AliveID=%d mode=%d",getAliveID(),role->thumb);
 	else{
-		CCLOG("[ *ERROR ]Skill Effect Is NULL  AliveID=%d mode=%d EffectGroup=%d",getAliveID(),role->thumb,getEffectGroup());
-		setEffectGroup(1);
+		CCLOG("[ *ERROR ]Skill Effect Is NULL  AliveID=%d mode=%d EffectGroup=%d",getAliveID(),role->thumb,getGroupIndex());
+		setGroupIndex(0);
 	}	
 	return nullptr;
 	CCTextureCache::sharedTextureCache()->dumpCachedTextureInfo();
@@ -296,11 +298,11 @@ bool WarAlive::NextEffect()
 {
 	int effId = getEffIndex() + 1;
 	int ranNum = CCRANDOM_0_1()*100;								//0到100的数
-	if (getEffectGroup() > getCurrSkill()->EffectList.size())
+	if (getGroupIndex() >= getCurrSkill()->EffectList.size())
 		return false;
-	if (getCurrSkill()->skillId&&effId < getCurrSkill()->EffectList.at(getEffectGroup()-1).size())			//判断是否为最后的一个特效
+	if (getCurrSkill()->skillId&&effId < getCurrSkill()->EffectList.at(getGroupIndex()-1).size())			//判断是否为最后的一个特效
 	{
-		if (getCurrSkill()->EffectList.at(getEffectGroup()-1).at(effId).userRate > ranNum)
+		if (getCurrSkill()->EffectList.at(getGroupIndex()).at(effId).userRate > ranNum)
 		{
 			setEffIndex(effId);
 			return true;
@@ -334,6 +336,53 @@ bool WarAlive::captainCallNumberJudge()
 		}else{
 			setCallAliveNum(getCallAliveNum() - 1);
 		}
+	}
+	return false;
+}
+
+bool WarAlive::hasAliveByTargets( WarAlive* pAlive )
+{
+	bool tHasAlive = false;
+	for (auto tAlive:m_AreaTargets)
+	{
+		if (tAlive->getAliveID() == pAlive->getAliveID())
+		{
+			tHasAlive = true;
+			break;
+		}
+	}
+	return tHasAlive;
+}
+
+bool WarAlive::pierceJudge()
+{
+	if (getCurrEffect()->mode == frontAreaVia&&m_AreaTargets.size())//贯穿与非贯穿类处理
+	{
+		WarAlive* alive = m_AreaTargets.at(0);
+		if (!alive->getCloaking())									//潜行类怪物处理
+			return true;
+		m_AreaTargets.clear();
+	}
+	return false;
+}
+
+void WarAlive::cloakingTarget()
+{
+	if (!getCriAtk()&& m_AreaTargets.size())						//判断受击目标是否为潜行类怪物							
+	{
+		for (auto tAlive:m_AreaTargets)
+		{
+			if ( !tAlive->getCloaking() )
+				return;
+		}
+		m_AreaTargets.clear();										//非主动技能状态无法攻击全部潜行怪物		
+	}
+}
+
+bool WarAlive::canOpposite()
+{
+
+		return true;
 	}
 	return false;
 }

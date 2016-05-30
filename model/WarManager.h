@@ -77,6 +77,7 @@ public:
 	void updateAlive();
 	vector<WarAlive*>* getVecHeros(){return &m_Heros;}
 	vector<WarAlive*>* getVecMonsters(){return &m_Monsters;}
+	vector<WarAlive*>* getSkillTargets(WarAlive* pAlive);
 	bool isSpine(int id);
 	SpData* getSpineData(std::string Name);
 	MapSkeletonData& getSpineMap(){return m_MapSpineData;}

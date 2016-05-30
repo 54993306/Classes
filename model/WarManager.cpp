@@ -22,7 +22,7 @@
 #include "warscene/ArmatureEventDataMgr.h"
 #include "warscene/ParseFileData.h"
 #include "warscene/BattleTools.h"
-
+#include "Battle/SkillMacro.h"
 WarManager::WarManager()
 	:m_SceneTarpID(0),m_efdata(nullptr),m_terData(nullptr),m_armatureEventDataMgr(nullptr)
 	,m_StageID(-1),m_Batch(-1),m_Logic(nullptr),m_iLastStageId(0),m_StageType(0),m_BuffData(nullptr)
@@ -203,7 +203,7 @@ void WarManager::initBatchData( int batch )
 
 void WarManager::initAlive(WarAlive* alive)
 {
-	alive->grids.clear();
+	alive->m_StandGrids.clear();
 	if (alive->getEnemy())
 	{
 		alive->setGridIndex(alive->role->grid);
@@ -335,9 +335,9 @@ WarAlive* WarManager::getAliveByGrid(int grid)
 			else
 				continue;
 		}
-		for (int i=0; i < alive->grids.size();i++)
+		for (int i=0; i < alive->m_StandGrids.size();i++)
 		{
-			if (alive->grids.at(i) == grid)
+			if (alive->m_StandGrids.at(i) == grid)
 				return alive;
 		}
 	}
@@ -422,8 +422,8 @@ WarAlive* WarManager::getNewCallAlive(WarAlive* Father,int CallId)
 			{
 				CallAliveByFixRange(Father,child);
 			}else{
-				int ran = CCRANDOM_0_1()*(Father->grids.size()-1);
-				int grid = MoveRule::create()->getCurrRandomGrid(Father->grids.at(ran));	//得到当前武将格子的附近范围格子
+				int ran = CCRANDOM_0_1()*(Father->m_StandGrids.size()-1);
+				int grid = MoveRule::create()->getCurrRandomGrid(Father->m_StandGrids.at(ran));	//得到当前武将格子的附近范围格子
 				child->setGridIndex(grid);
 			}
 			child->setMstType(child->role->MstType);
@@ -578,4 +578,15 @@ void WarManager::initCommonData()
 	CScene* scene = GETSCENE(LoadWar);
 	LayerManager::instance()->closeAll();
 	CSceneManager::sharedSceneManager()->replaceScene(scene);
+}
+
+vector<WarAlive*>* WarManager::getSkillTargets(WarAlive* pAlive)
+{
+	if ((pAlive->getEnemy()&&pAlive->getCurrEffect()->pTarget == enemyTyep)	||
+		(!pAlive->getEnemy()&&pAlive->getCurrEffect()->pTarget != enemyTyep))
+	{
+		return getVecHeros();	
+	}else{
+		return getVecMonsters();
+	}
 }

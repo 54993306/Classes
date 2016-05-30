@@ -40,21 +40,24 @@ public:
 	void ExcuteNextEffect();					//重置武将下执行下一个效果状态
 	bool canSummonAlive();						//是否可以召唤武将
 	void clearHitAlive();
-	SkillEffect* getCurrEffect();						//得到武将当前效果
-	TempSkill* getCurrSkill();							//得到武将当前效果
+	SkillEffect* getCurrEffect();				//得到武将当前效果
+	TempSkill* getCurrSkill();					//得到武将当前效果
 	bool NextEffect();							//判断第二个效果是否释放
 	int getSkillType();
 	int getEffectType();
 	bool captainCallNumberJudge();
+	bool hasAliveByTargets(WarAlive* pAlive);
+	bool pierceJudge();
+	void cloakingTarget();						//判断受击目标内是否全为隐身对象
 public:
-	TempRole* role;									//服务器角色信息
-	vector<int> grids;							//多格子站位
+	TempRole* role;								//服务器角色信息
+	vector<int> m_StandGrids;					//多格子站位
 	vector<int> moves;							//各方向移动范围
 	vector<int> TouchGrids;						//移动状态下武将多格子处理
 	vector<int> AtkArea;						//多个攻击格子
 	vector<WarAlive*> AliveS;					//多个攻击目标
-	vector<int>AtkGrid;							//存储武将当前攻击区域
-	vector<WarAlive*> AtkAlive;					//存储攻击区域内受击目标
+	vector<int>m_SkillArea;						//存储武将当前技能区域
+	vector<WarAlive*> m_AreaTargets;			//存储区域内目标
 	vector<WarAlive*> HittingAlive;				//受击目标中被击中对象				(用于做buff和受击目标死亡结算处理)
 	CC_PROPERTY(BuffManage*,m_BuffManage,BuffManage);
 	CC_SYNTHESIZE(ActObject*,m_ActObject,ActObject);
@@ -88,7 +91,7 @@ public:
 	CC_SYNTHESIZE(float,m_AddCost,AddCost);				//cost 秒变化率
 	CC_PROPERTY(int,m_AtkNum,AtkNum);					//记录攻击次数(3次释放特殊攻击)
 	CC_SYNTHESIZE(int,m_Batch,Batch);					//批次
-	CC_SYNTHESIZE(int,m_EfGroup,EffectGroup);			//效果组
+	CC_SYNTHESIZE(int,m_GroupIndex,GroupIndex);			//效果组
 	CC_SYNTHESIZE(int,m_EffectIndex,EffIndex);			//效果Index
 	CC_PROPERTY(int,m_Hp,Hp);							//血量
 	CC_SYNTHESIZE(unsigned int,m_MaxHp,MaxHp);			//血量Max
@@ -106,7 +109,7 @@ public:
 	CC_SYNTHESIZE(bool,m_Captain,Captain);				//是否为队长
 	CC_SYNTHESIZE(bool,m_CritEffect,CritEffect);		//必杀技播放过特效
 	CC_SYNTHESIZE(bool,m_ExecuteCap,ExecuteCap);		//队长技执行标记
-	CC_SYNTHESIZE(bool,m_Negate,Negate);				//标记是否转向攻击
+	CC_SYNTHESIZE(bool,m_Opposite,Opposite);			//标记是否转向攻击
 	CC_SYNTHESIZE(bool,m_Move,Move);					//是否可以移动
 	CC_SYNTHESIZE(bool,m_cloaking,Cloaking);			//隐身状态
 	CC_SYNTHESIZE(int,m_Hrt,Hrt);						//伤害减免效果(正加深,负减少)

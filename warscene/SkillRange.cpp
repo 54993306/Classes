@@ -11,24 +11,23 @@
 #include <functional>					//sort 的降序排序使用
 #include "scene/alive/AliveDefine.h"
 #include "warscene/BattleTools.h"
+#include "Battle/SkillMacro.h"
 using namespace cocos2d;
 SkillRange::SkillRange():m_Manage(nullptr){}
 AreaCountInfo::AreaCountInfo()
-:CountGrid(0),Enemy(false),type(0),range(1),attackDistance(0)
-,alive(nullptr),BackAtk(false),pTarget(enemyTyep){}
+	:CountGrid(0),Enemy(false),type(0),range(1),attackDistance(0)
+	,alive(nullptr),BackAtk(false),pTarget(enemyTyep){}
 
-void AreaCountInfo::initData(WarAlive* pAlive,int pGrid)
+void AreaCountInfo::initData(WarAlive* pAlive)
 {
-	CountGrid = pGrid;
 	alive = pAlive;
 	pTarget = pAlive->getCurrEffect()->pTarget;
 	Enemy = pAlive->getEnemy();
-	BackAtk = pAlive->getNegate();
+	BackAtk = pAlive->getOpposite();
 	type = pAlive->getCurrEffect()->mode;
 	range = pAlive->getCurrEffect()->range;
 	attackDistance = pAlive->getCurrEffect()->distance;
 }
-
 //目标格子、范围类型、范围大小、攻击距离(默认为0)
 bool SkillRange::init()
 {
@@ -36,362 +35,275 @@ bool SkillRange::init()
 	return true;
 }
 //武将当前站位区域
-void SkillRange::getSelfArea( CCArray* pArray,WarAlive* pAlive )
+void SkillRange::getSelfArea( WarAlive* pAlive )
 {
 	if (pAlive->getCurrEffect()->pTarget != enemyTyep)					//效果目标是敌方阵营
 		return;
-	for (auto i:pAlive->grids)
-		pArray->addObject(CCInteger::create(i));						//最优先攻击相同格子怪物
+	pAlive->m_SkillArea.assign(
+		pAlive->m_StandGrids.begin(),pAlive->m_StandGrids.end());		//最优先攻击相同格子怪物			
 }
 
-void SkillRange::getAreaByAlive( vector<int>& pAreaVector,WarAlive*pAlive )
+void SkillRange::initSkillEffectArea( WarAlive* pAlive,vector<int>& pVector )
 {
-	vector<int> tCountGrid = getAliveAtkGrid(pAlive);
-	//可以直接使用ccarray而不用一个vector来进行中介,可array本身就是一个中介
-	for (auto tGrid:tCountGrid)											//还是应该从最上层的方面来处理,用武将身上的vector来收寄这些攻击范围的格子
+	AreaCountInfo CountInfo;
+	CountInfo.initData(pAlive);
+#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32								
+	if (!pAlive->getEnemy())
 	{
-		AreaCountInfo CountInfo;
-		CountInfo.initData(pAlive,tGrid);
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32								//技能范围测试
-		if (!pAlive->getEnemy())
-		{
-			CountInfo.type = pAlive->getCurrEffect()->mode;
-			//CountInfo.type = EnemyArea;
-			CountInfo.range = pAlive->getCurrEffect()->range;
-		}
+		//CountInfo.type = EnemyArea;
+	}
 #endif
-		getAtkGrid(CountInfo,pAreaVector);	
-	}
-	RemoveVectorRepeat(pAreaVector);
-}
-
-void SkillRange::sortAreaByAlive( CCArray* pAreaArray,WarAlive* pAlive )
-{
-	vector<int>tAttackArea;
-	getAreaByAlive(tAttackArea,pAlive);
-
-	if (pAlive->getEnemy() || (!pAlive->getEnemy()&&pAlive->getNegate()))		//怪物从小往大,英雄由大往小(未反向情况)
+	vector<int> tAliveAttackJudgeGrid;
+	initValidGrids(pAlive,tAliveAttackJudgeGrid);
+	for (auto tGrid : tAliveAttackJudgeGrid)											
 	{
-		vector<int>::iterator iter = tAttackArea.begin();
-		for (;iter != tAttackArea.end();iter++)
-			if (*iter>=C_BEGINGRID && *iter<=C_ENDGRID)
-				pAreaArray->addObject(CCInteger::create(*iter));
-	}else{
-		vector<int>::reverse_iterator iter = tAttackArea.rbegin();
-		for (;iter != tAttackArea.rend();iter++)
-			if (*iter>=C_BEGINGRID && *iter<=C_ENDGRID)
-				pAreaArray->addObject(CCInteger::create(*iter));
+		CountInfo.CountGrid = tGrid;
+		initEffectTypeArea(CountInfo,pVector);	
 	}
+	RemoveVectorRepeat(pVector);											//包括了正向遍历和除去重复
+	if (!pAlive->getEnemy() && !pAlive->getOpposite())
+		sort(pVector.begin(),pVector.end(),greater<int>());					//我方武将正向攻击的情况(对格子进行反向排序)
 }
 //返回受击区域(可以使用先获取敌方目标的方式然后判断敌方目标格子是否在攻击范围内)
-CCArray* SkillRange::UnderAttackArea(WarAlive* pAlive)
+void SkillRange::initSkillArea( WarAlive* pAlive,vector<int>& pVector )	
 {
-	CCArray* tAreaArray = CCArray::create();
-	if (!pAlive->getCurrEffect() || !pAlive->getCurrEffect()->range)
+	getSelfArea(pAlive);
+	if ( !pAlive->getCurrEffect() )
 	{
-		tAreaArray->addObject(CCInteger::create(pAlive->getGridIndex()));
-		return tAreaArray;
+		pAlive->m_SkillArea.clear();
+		pVector.clear();
+		return;
 	}
-	getSelfArea(tAreaArray,pAlive);
-	sortAreaByAlive(tAreaArray,pAlive);
-	return tAreaArray;
+	if (!pAlive->getCurrEffect()->range)
+		return;
+	initSkillEffectArea(pAlive,pVector);
 }
 //返回受击范围内受击武将
-CCArray* SkillRange::UnderAttackAlive(WarAlive* self,CCArray* Area)
+CCArray* SkillRange::initAreaTargets(WarAlive* pAlive)
 {
-	CCArray* Alives = CCArray::create();
-	SkillEffect* effect = self->getCurrEffect();
-	vector<WarAlive*>* VecAlive;
-	if ((self->getEnemy()&&effect->pTarget == enemyTyep)||(!self->getEnemy()&&effect->pTarget != enemyTyep))
+	return CCArray::create();
+	vector<WarAlive*>* VecAlive = m_Manage->getSkillTargets(pAlive);	//不直接使用格子去寻找是为了减少遍历的次数																
+	for (auto tGrid : pAlive->m_SkillArea)								//格子是排序好的,要使用格子来进行遍历(必须,不同阵营获取目标顺序不同)
 	{
-		VecAlive = m_Manage->getVecHeros();	
-	}else{
-		VecAlive = m_Manage->getVecMonsters();
-	}																	//格子是排序好的,要使用格子来进行遍历
-	CCObject* obj = nullptr;
-	CCARRAY_FOREACH(Area,obj)
-	{
-		CCInteger* grid = (CCInteger*)obj;
-		if (effect->mode == frontAreaVia&&Alives->count())
+		if ( pAlive->pierceJudge() )
+			break;
+		for (WarAlive* tAlive: *VecAlive)
 		{
-			WarAlive* alive = (WarAlive*)Alives->objectAtIndex(0);
-			if (!alive->getCloaking())									//潜行类怪物处理
-				break;
-			else
-				Alives->removeAllObjects();
-		}
-		for (WarAlive* pAlive: *VecAlive)
-		{
-			if ( Alives->containsObject(pAlive))
+			if ( pAlive->hasAliveByTargets(tAlive) )
 				continue;												//受击数组已存在该武将
-			if (grid->getValue() >= C_CAPTAINGRID&&self->getEnemy())	//我方主帅特殊处理
+			if (tGrid < C_CAPTAINGRID)									//我方不能对主帅加血和造成影响
 			{
-				WarAlive* alive = m_Manage->getAliveByGrid(C_CAPTAINGRID);
-				if (alive)Alives->addObject(alive);
-				break;
-			}else{
-				for (int i=0;i<pAlive->grids.size();i++)
+				for (int i=0;i<tAlive->m_StandGrids.size();i++)
 				{
-					if (pAlive->grids.at(i) == grid->getValue())
+					if (tAlive->m_StandGrids.at(i) == tGrid)
 					{
-						if (pAlive->getAliveStat() == INVINCIBLE || pAlive->getAliveStat() == UNHIT)
+						if (tAlive->getAliveStat() == INVINCIBLE || tAlive->getAliveStat() == UNHIT)
 							break;
-						Alives->addObject(pAlive);
+						pAlive->m_AreaTargets.push_back(tAlive);
 						break;
 					}
 				}
+			}else{
+				if (pAlive->getEnemy())
+					pAlive->m_AreaTargets.push_back( m_Manage->getAliveByGrid(C_CAPTAINGRID) );
+				break;
 			}
-		}		
-	}
-	if (!self->getCriAtk()&&Alives->count())							//判断受击目标是否为潜行类怪物							
-	{
-		CCObject* pObj = nullptr;
-		CCARRAY_FOREACH(Alives,pObj)
-		{
-			WarAlive* alive = (WarAlive*)pObj;
-			if (!alive->getCloaking())									//攻击范围内存在非潜行类怪物
-				return Alives;
 		}
-		Alives->removeAllObjects();
 	}
-	return Alives;
+	pAlive->cloakingTarget();
 }
 
 CCDictionary* SkillRange::PlaySkillInfo( WarAlive* alive )
 {
-	CCDictionary* pDic = CCDictionary::create();
-	CCArray* Area = CCArray::create();
-	CCArray* Alives = CCArray::create();
-	pDic->setObject(Alives,Hit_Alive);
-	pDic->setObject(Area,Atk_Area);
-	if (alive->getAliveStat() == UNATK	||
-		alive->getAliveStat() == INVINCIBLE)					//超出边界的武将不再进行技能处理
-		return pDic;
-	switch (alive->getSkillType())
-	{
-	case NorAtk:
-	case SpeAtk:
-	case CriAtk:
-		return UnderAttackInfo(alive);						//有受击目标类技能处理
-	case CallAtk: 
-		return pDic;										//无受击目标类型技能
-	case CapAtk:
-		break;
-	default:{CCLOG("[ *ERROR ] SkillRange::PlaySkillInfo Skill Type UnKnow");}break;
-	}
-	return pDic;
+	initAttackInfo(alive);
+	return CCDictionary::create();
 }
 
 //返回攻击区域受击武将信息
-CCDictionary* SkillRange::UnderAttackInfo(WarAlive* alive)
+void SkillRange::initAttackInfo(WarAlive* pAlive)
 {
-	CCDictionary* pDic = CCDictionary::create();
-	CCArray* Area = CCArray::create();
-	CCArray* Alives = CCArray::create();
-	Area = UnderAttackArea(alive);
-	if (!Area->count())
+	int tGroupIndex = 0;
+	for (;tGroupIndex < pAlive->getCurrSkill()->EffectList.size(); tGroupIndex++)
 	{
-		pDic->setObject(Alives,Hit_Alive);
-		pDic->setObject(Area,Atk_Area);
-		return pDic;
-	}
-	Alives = UnderAttackAlive(alive,Area);
-	if (!alive->getEnemy()&&!Alives->count()&&!alive->getCaptain())		//主帅的AI方式就是警戒区域为最后一排
-	{
-		alive->setNegate(true);
-		CCArray* NegArea = UnderAttackArea(alive);
-		Alives = UnderAttackAlive(alive,NegArea);
-		if (!Alives->count())
+		pAlive->setGroupIndex(tGroupIndex);
+		initSkillArea(pAlive,pAlive->m_SkillArea);
+		if (!pAlive->m_SkillArea.size())
+			break;
+		initAreaTargets(pAlive);
+		if (pAlive->m_AreaTargets.size())
+			return;
+		if (!pAlive->getEnemy()				&&	//敌方无法反向攻击
+			!pAlive->getCaptain() )				//主帅的AI方式就是警戒区域为最后一排
 		{
-			alive->setNegate(false);
-		}else{
-			Area = NegArea;
+			pAlive->setOpposite(true);
+			initSkillArea(pAlive,pAlive->m_SkillArea);
+			initAreaTargets(pAlive);
+			if (pAlive->m_AreaTargets.size())
+			{
+				return;
+			}else{
+				pAlive->setOpposite(false);
+			}
 		}
 	}
-	if (!Alives->count())
-	{
-		CCDictionary* pAttackInfo = NextGroupAtkInfo(alive);
-		if (pAttackInfo)
-			return pAttackInfo;
-	}
-	pDic->setObject(Alives,Hit_Alive);
-	pDic->setObject(Area,Atk_Area);
-	return pDic;
-}
-//判断武将当前状态是否存在第二组效果、第二组技能效果中是否存在受击目标
-CCDictionary* SkillRange::NextGroupAtkInfo( WarAlive* alive )
-{
-	if (alive->getEffectGroup()!=1)
-		return nullptr;
-	if (alive->getCurrSkill()->EffectList.size()<=1)											//判断是否存在多效果组
-		return nullptr;
-	alive->setEffectGroup(2);
-	CCDictionary* AttackInfo = UnderAttackInfo(alive);
-	if (!AttackInfo)return nullptr;
-	CCArray* Alives = (CCArray*)AttackInfo->objectForKey(Hit_Alive);		//受击目标
-	if (Alives->count())
-		return AttackInfo;
-	alive->setEffectGroup(1);
-	return nullptr;
+	pAlive->setGroupIndex(0);					//都没有打中目标,默认显示第一个效果组
 }
 //主帅警戒区域处理,先判断所有位置效果组1，再判断所有位置效果组2
-int SkillRange::CaptainGuard( WarAlive* alive )
+int SkillRange::CaptainGuard( WarAlive* pAlive )
 {
-	int currgrid = alive->getGridIndex();
-	for (int i=1;i<3;i++)
+	int currgrid = pAlive->getGridIndex();
+	int tGroupIndex = 0;
+	for (;tGroupIndex < pAlive->getCurrSkill()->EffectList.size(); tGroupIndex++)	//效果优先而不是位置优先,先判断一个效果的所有位置再判断下一个效果
 	{
-		if (alive->getCurrSkill()->EffectList.size()<i)											//判断是否存在多效果组
-			return INVALID_GRID;
-		alive->setEffectGroup(i);
-		for (int j=C_CAPTAINGRID;j<=C_ENDGRID;j++)
+		pAlive->setGroupIndex(tGroupIndex);
+		for (int tGrid=C_CAPTAINGRID; tGrid<=C_ENDGRID; tGrid++)
 		{
-			int row = j%C_GRID_ROW;												//最小格子的站位
-			if (row+alive->role->row>C_GRID_ROW)								//武将所占格子,不能超出地图外
+			int tStandRow = tGrid%C_GRID_ROW + pAlive->role->row;		
+			if (tStandRow > C_GRID_ROW)												//武将所占格子,不能超出地图外
 				continue;														
-			alive->setGridIndex(j);
-			CCArray*Area = UnderAttackArea(alive);
-			if (!Area->count())
+			pAlive->setGridIndex(tGrid);
+			initSkillArea(pAlive,pAlive->m_SkillArea);
+			if ( !pAlive->m_SkillArea.size() )
 				continue;
-			CCArray* Alives = UnderAttackAlive(alive,Area);
-			if (Alives->count())
+			initAreaTargets(pAlive);	
+			if (pAlive->m_AreaTargets.size())
 			{
-				alive->setGridIndex(currgrid);
-				return j;
+				pAlive->setGridIndex(currgrid);
+				return tGrid;
 			}
 		}
 	}
-	alive->setEffectGroup(1);
-	alive->setGridIndex(currgrid);
+	pAlive->setGroupIndex(0);
+	pAlive->setGridIndex(currgrid);
 	return INVALID_GRID;
+}
+//武将警戒区域处理(多格子武将警戒区域处理)
+int SkillRange::aliveGuard( WarAlive* alive )
+{
+	vector<int> Vecguard;
+	initAliveGuard(alive,Vecguard);
+	for (auto i:Vecguard)
+	{
+		for (WarAlive* pAlive:*m_Manage->getVecMonsters())
+		{
+			vector<int>::reverse_iterator iter= pAlive->m_StandGrids.rbegin();
+			for (;iter != pAlive->m_StandGrids.rend();iter++)			//我方对怪物应该从最大的格子开始进行判断
+			{
+				if ( i != *iter )										//当前警戒区域范围内存在敌方目标
+					continue;
+				int tMoveGrid = i;
+				int tRow = i%C_GRID_ROW;
+				if ( tRow+alive->role->row > C_GRID_ROW )				//我方武将占3行,地方怪物在row=3的位置，超出地图范围了
+					tMoveGrid = i-((alive->role->row+tRow)-C_GRID_ROW);	//把超出的部分减掉
+				if ( tMoveGrid < C_BEGINGRID || tMoveGrid > C_ENDGRID )
+					break;
+				return tMoveGrid;
+			}
+		}
+	}
+	return INVALID_GRID;												//没有警戒区域自动不处理
 }
 
-//武将警戒区域处理(多格子武将警戒区域处理)
-int SkillRange::GuardMoveArea( WarAlive* alive )
+void SkillRange::initAliveCurrGrids( WarAlive* pAlive,vector<int>& pVector )
 {
-	if (alive->getCaptain())
+	if (pAlive->getTouchState())
 	{
-		return CaptainGuard(alive);
+		pVector.assign(pAlive->TouchGrids.begin(),pAlive->TouchGrids.end());
 	}else{
-		if (!alive->role->alert)						//无警戒区域类型武将不进行处理
-			return INVALID_GRID;
-		//我方多格子武将警戒区域要做特殊处理
-		vector<int> Vecguard = getAliveGuard(alive);
-		sort(Vecguard.begin(),Vecguard.end(),greater<int>());//警戒区域优先判断后方与上方区域是否有人
-		vector<WarAlive*>* AliveVec = m_Manage->getVecMonsters();
-		for (auto i:Vecguard)
+		pVector.assign(pAlive->m_StandGrids.begin(),pAlive->m_StandGrids.end());
+	}
+}
+
+void SkillRange::guradUpAndDown( WarAlive* pAlive,vector<int>& pGuards )
+{
+	vector<int>tGrids;
+	initAliveCurrGrids(pAlive,tGrids);
+	for (auto tGrid:tGrids)
+	{
+		int aliveCol = tGrid / C_GRID_ROW;
+		int aliveRow = tGrid % C_GRID_ROW;
+		for (int i=aliveRow-1;i<=aliveRow+1;i++)
 		{
-			for (WarAlive* pAlive:*AliveVec)
-			{
-				for (auto j:pAlive->grids)
-				{
-					if ( i != j )											//当前警戒区域范围内存在敌方目标
-						continue;
-					int movegrid = i;
-					int row = i%C_GRID_ROW;
-					if ( row+alive->role->row > C_GRID_ROW )		//我方武将占3行,地方怪物在row=3的位置，超出地图范围了
-						movegrid = i-((alive->role->row+row)-C_GRID_ROW);	//把超出的部分减掉
-					if (C_BEGINGRID>movegrid||movegrid>C_ENDGRID)
-						return INVALID_GRID;
-					return movegrid;
-				}
-			}
+			if (i>=C_GRID_ROW||i<0)continue;
+			pGuards.push_back(aliveCol*C_GRID_ROW+i);						
 		}
 	}
-	return INVALID_GRID;
+}
+
+void SkillRange::guardFront( WarAlive* pAlive,vector<int>& pGuards )
+{
+	vector<int>tGrids;
+	initAliveCurrGrids(pAlive,tGrids);
+	for (auto tGrid:tGrids)
+	{
+		for (int i=1;i<=pAlive->role->alertRange;i++)		//从2开始的原因是因为1是外层的圈(现在外层的圈去掉了从1开始)
+			pGuards.push_back(tGrid - i*C_GRID_ROW);
+	}
+}
+
+void SkillRange::guradBack( WarAlive* pAlive,vector<int>& pGuards )
+{
+	vector<int>tGrids;
+	initAliveCurrGrids(pAlive,tGrids);
+	for (auto tGrid:tGrids)
+	{
+		for (int i=1;i<=pAlive->role->alertRange;i++)		//从2开始的原因是因为1是外层的圈(现在外层的圈去掉了从1开始)
+			pGuards.push_back(tGrid + i*C_GRID_ROW);
+	}
+}
+
+void SkillRange::guradFrontAndBack( WarAlive* pAlive,vector<int>& pGuards )
+{
+	vector<int>tGrids;
+	initAliveCurrGrids(pAlive,tGrids);
+	for (auto tGrid:tGrids)
+	{
+		for (int i=1;i<=pAlive->role->alertRange;i++)		//从2开始的原因是因为1是外层的圈(现在外层的圈去掉了从1开始)
+		{
+			pGuards.push_back(tGrid - i*C_GRID_ROW);
+			pGuards.push_back(tGrid + i*C_GRID_ROW);
+		}
+	}
 }
 //警戒区域可以参照之前5方向移动方式进行处理
-vector<int> SkillRange::getAliveGuard( WarAlive* alive )
+void SkillRange::initAliveGuard( WarAlive* pAlive,vector<int>& pGuards )
 {
-	vector<int>grids;
-	if (alive->getTouchState())
+	switch (pAlive->role->alert)
 	{
-		if (alive->TouchGrids.size())
+	case GuardFront:
 		{
-			grids = alive->TouchGrids;
-		}else{
-			grids.push_back(alive->getTouchGrid());
-		}
-	}else{
-		if (alive->grids.size()>1)
+			guardFront(pAlive,pGuards);
+		}break;
+	case GuardBack:
 		{
-			grids = alive->grids;
-		}else{
-			grids.push_back(alive->getGridIndex());
+			guradBack(pAlive,pGuards);
+		}break;
+	case GuardFrontAndBack:
+		{
+			guradFrontAndBack(pAlive,pGuards);
+		}break;
+	case GuardUpDown:
+		{
+			guradUpAndDown(pAlive,pGuards);							//没有长度的限制
+		}break;
+	default:
+		{
+			if (pAlive->role->alert)
+				CCLOG("[ *ERROR ] SkillRange::initAliveGuard Type = %d",pAlive->role->alert);
+			return;
 		}
 	}
-	vector<int> VecGuard;
-	for (auto j:grids)
-	{
-		int aliveCol = j / C_GRID_ROW;
-		int aliveRow = j % C_GRID_ROW;
-		switch (alive->role->alert)
-		{
-		case GuardFront:
-		case GuardBack:
-		case GuardFrontAndBack:
-			{
-				//int minRow = aliveRow - 1;						//周边范围的警戒区域暂时取消
-				//int maxRow = aliveRow + 1;
-				//int minCol = aliveCol - 1;
-				//int maxCol = aliveCol + 1;
-				//minRow = max(0,minRow);
-				//maxRow = min(3,maxRow);
-				//minCol = max(16,minCol);
-				//maxCol = min(31,maxCol);
-				//for (int i=maxRow;i>=minRow;i--)
-				//{
-				//	for (int j=maxCol;j>=minCol;j--)
-				//		VecGuard.push_back(j*C_GRID_ROW+i);
-				//}
-				for (int i=1;i<=alive->role->alertRange;i++)		//从2开始的原因是因为1是外层的圈(现在外层的圈去掉了从1开始)
-				{
-					switch (alive->role->alert)
-					{
-					case GuardFront:
-						{
-							VecGuard.push_back(j - i*C_GRID_ROW);
-						}break;
-					case GuardBack:
-						{
-							VecGuard.push_back(j + i*C_GRID_ROW);
-						}break;
-					case GuardFrontAndBack:
-						{
-							VecGuard.push_back(j - i*C_GRID_ROW);
-							VecGuard.push_back(j + i*C_GRID_ROW);
-						}break;
-					default:
-						break;
-					}
-				}
-			}break;
-		case GuardUpDown:
-			{
-				for (int i=aliveRow-1;i<=aliveRow+1;i++)
-				{
-					if (i>=C_GRID_ROW||i<0)continue;
-					VecGuard.push_back(aliveCol*C_GRID_ROW+i);						
-				}
-			}
-			break;
-		default:
-			break;
-		}
-	}
-	sort(VecGuard.begin(),VecGuard.end());
-	VecGuard.erase(unique(VecGuard.begin(),VecGuard.end()),VecGuard.end());
-	return VecGuard;
+	RemoveVectorRepeat(pGuards);
+	sort(pGuards.begin(),pGuards.end(),greater<int>());				//警戒区域优先判断后方与上方区域是否有人
 }
 //前后方区域处理,找出最前或最后的位置
 int SkillRange::FrontOrBackAreaDispose(bool Enemy,int pTarget,bool back/*false*/)
 {
-	CCObject* obj = nullptr;
-	int pgrid = -1;
+	int pgrid = INVALID_GRID;
 	if ((Enemy&&pTarget == ustarget)||( !Enemy&&pTarget == enemyTyep))			/*敌方自己，我方敌人*/
 	{
-		if (back)pgrid = 1000;
-		vector<WarAlive*>*Vec = m_Manage->getVecMonsters();
-		for (auto i:*Vec)
+		if ( back )pgrid = C_ENDGRID;
+		for (auto i:* m_Manage->getVecMonsters())
 		{
 			if (back)
 			{
@@ -400,11 +312,11 @@ int SkillRange::FrontOrBackAreaDispose(bool Enemy,int pTarget,bool back/*false*/
 				pgrid = max(pgrid,i->getGridIndex());//前方区域,找出最大的位置
 			}
 		}
-	}else if ((Enemy&&pTarget == enemyTyep) || ( !Enemy&&pTarget == ustarget))	/*敌方敌人，我方自己*/
+	} 
+	if ((Enemy&&pTarget == enemyTyep) || ( !Enemy&&pTarget == ustarget))		/*敌方敌人，我方自己*/
 	{
-		if(!back)pgrid = 1000;
-		vector<WarAlive*>*Vec = m_Manage->getVecHeros();
-		for (auto i:*Vec)
+		if( !back)pgrid = C_ENDGRID;
+		for (auto i : *m_Manage->getVecHeros())
 		{
 			if (i->getCaptain())continue;			//boss不算在内
 			if (back)
@@ -415,27 +327,22 @@ int SkillRange::FrontOrBackAreaDispose(bool Enemy,int pTarget,bool back/*false*/
 			}
 
 		}
-	}else{
-		CCLOG("[ ERROR ] SkillRange::FrontAreaDispose 1 target =%d",pTarget);
 	}
-	if (pgrid<0)CCLOG("[ ERROR ] SkillRange::FrontAreaDispose 2");
 	return pgrid;
 }
 //中心区域处理
 int SkillRange::CenterAreaDispose(bool Enemy,int pTarget)
 {
-	int grid = -1;
+	int grid = INVALID_GRID;
 	CCObject* obj = nullptr;
 	if ((Enemy&&ustarget == pTarget) || ( !Enemy&&enemyTyep == pTarget))
 	{
-		CCArray*arr = m_Manage->getMonsts(true);	//默认排序好的
-		WarAlive*alive = (WarAlive*)arr->objectAtIndex(arr->count()/2);
-		return alive->getGridIndex();
+		vector<WarAlive*>* tMonsts = m_Manage->getVecMonsters();
+		return tMonsts->at(tMonsts->size()/2)->getGridIndex();
 	}else if ((Enemy&&enemyTyep == pTarget) || (!Enemy&&ustarget == pTarget))
 	{
-		CCArray*arr = m_Manage->getHeros(true);
-		WarAlive* alive = (WarAlive*)arr->objectAtIndex(arr->count()/2);
-		return alive->getGridIndex();
+		vector<WarAlive*>* tHeros = m_Manage->getVecHeros();
+		return tHeros->at(tHeros->size()/2)->getGridIndex();
 	}else{
 		CCArray*arr = m_Manage->getAlives(true);
 		WarAlive* alive = (WarAlive*)arr->objectAtIndex(arr->count()/2);
@@ -625,7 +532,7 @@ void SortAliveHp(vector<WarAlive*>* VecAlive,int left,int right)
 		while ( i < j ) 
 		{
 			while (	i < j  && 
-					(float)VecAlive->at(j)->getHp()/VecAlive->at(j)->getMaxHp() > pe )
+				(float)VecAlive->at(j)->getHp()/VecAlive->at(j)->getMaxHp() > pe )
 				j--;
 			if ( i < j )
 			{
@@ -633,7 +540,7 @@ void SortAliveHp(vector<WarAlive*>* VecAlive,int left,int right)
 				i++;
 			}
 			while ( i < j  &&
-					(float)VecAlive->at(j)->getHp()/VecAlive->at(j)->getMaxHp() <= pe )
+				(float)VecAlive->at(j)->getHp()/VecAlive->at(j)->getMaxHp() <= pe )
 				i++;
 			if( i < j )
 			{
@@ -684,10 +591,9 @@ vector<int> SkillRange::lowestAlive(int type /*=allType*/,int num /*=1*/,bool un
 	return Vec;
 }
 //得到武将有效攻击范围判断格子(多格武将),武将站位格子排序从大到小
-vector<int> SkillRange::getAliveAtkGrid( WarAlive* alive )
+void SkillRange::initValidGrids( WarAlive* alive,vector<int>& pValids )
 {
 	int aliveGrid = 0;
-	vector<int>VecAtkGrid;
 	vector<int> CountGrid;
 	SkillEffect* effect = alive->getCurrEffect();
 	if (alive->getTouchState())								//单格子武将触摸状态下处理(此处应进行移动状态下攻击格子特殊处理)
@@ -695,36 +601,33 @@ vector<int> SkillRange::getAliveAtkGrid( WarAlive* alive )
 		aliveGrid = alive->getTouchGrid();
 		CountGrid = alive->TouchGrids;
 	}else{
-		CountGrid = alive->grids;
+		CountGrid = alive->m_StandGrids;
 		aliveGrid = alive->getGridIndex();
 	}
 	if (alive->role->row==1&&alive->role->col==1)
 	{
-		VecAtkGrid.push_back(aliveGrid);
-		return VecAtkGrid;
+		pValids.push_back(aliveGrid);
 	}else if (effect->mode == lengthwaysArea || roundArea == effect->mode)
 	{
-		VecAtkGrid = alive->grids;
-		return VecAtkGrid;
+		pValids = alive->m_StandGrids;
 	}
 	if (!CountGrid.size())
 	{
-		VecAtkGrid.push_back(INVALID_GRID);
-		return VecAtkGrid;
+		pValids.push_back(INVALID_GRID);
 	}
-	if (alive->getEnemy()|| (!alive->getEnemy()&&alive->getNegate()))//武将反向攻击
+	if (alive->getEnemy()|| (!alive->getEnemy()&&alive->getOpposite()))//武将反向攻击
 	{
 		for (int i=0;i<alive->role->row;i++)							//获取向后攻击的判断格子(我方武将反向)
-			VecAtkGrid.push_back(CountGrid.at(CountGrid.size()-i-1));
+			pValids.push_back(CountGrid.at(CountGrid.size()-i-1));
 	}else{
 		for (int i=0;i<alive->role->row;i++)							//获取向后攻击的判断格子(我方武将反向)
-			VecAtkGrid.push_back(CountGrid.at(i));
+			pValids.push_back(CountGrid.at(i));
 	}
-	return VecAtkGrid;
 }
 
-void SkillRange::getAtkGrid(AreaCountInfo& CountInfo,vector<int>&VecAtkGrid)
+void SkillRange::initEffectTypeArea(AreaCountInfo& CountInfo,vector<int>&pVector)
 {
+	WarAlive* tAlive = CountInfo.alive;
 	int aliveCol = CountInfo.CountGrid / C_GRID_ROW;
 	int aliveRow = CountInfo.CountGrid % C_GRID_ROW;
 	int skilltype = CountInfo.type;							//技能类型
@@ -748,10 +651,10 @@ void SkillRange::getAtkGrid(AreaCountInfo& CountInfo,vector<int>&VecAtkGrid)
 				!CountInfo.Enemy && CountInfo.BackAtk)
 			{
 				for(int i=aliveCol+1;i<=aliveCol+range;i++)
-					VecAtkGrid.push_back(i*C_GRID_ROW+aliveRow);
+					pVector.push_back(i*C_GRID_ROW+aliveRow);
 			}else{
 				for (int i=aliveCol-1;i>=aliveCol-range;i--)
-					VecAtkGrid.push_back(i*C_GRID_ROW+aliveRow);
+					pVector.push_back(i*C_GRID_ROW+aliveRow);
 			}
 		}break;
 	case roundArea:	//周边范围							2
@@ -767,7 +670,7 @@ void SkillRange::getAtkGrid(AreaCountInfo& CountInfo,vector<int>&VecAtkGrid)
 			for (int i=maxRow;i>=minRow;i--)
 			{
 				for (int j=maxCol;j>=minCol;j--)
-					VecAtkGrid.push_back(j*C_GRID_ROW+i);
+					pVector.push_back(j*C_GRID_ROW+i);
 			}
 		}break;
 	case lengthwaysArea:			//纵向三格子			3
@@ -779,14 +682,14 @@ void SkillRange::getAtkGrid(AreaCountInfo& CountInfo,vector<int>&VecAtkGrid)
 				{
 					if (i>=C_GRID_ROW||i<0)continue;
 					for (int j=aliveCol+1;j<=aliveCol+range;j++)
-						VecAtkGrid.push_back(j*C_GRID_ROW+i);						
+						pVector.push_back(j*C_GRID_ROW+i);						
 				}
 			}else{
 				for (int i=aliveRow-1;i<=aliveRow+1;i++)
 				{
 					if (i>=C_GRID_ROW||i<0)continue;
 					for (int j=aliveCol-1;j>=aliveCol-range;j--)
-						VecAtkGrid.push_back(j*C_GRID_ROW+i);
+						pVector.push_back(j*C_GRID_ROW+i);
 				}
 			}
 		}break;
@@ -802,11 +705,11 @@ void SkillRange::getAtkGrid(AreaCountInfo& CountInfo,vector<int>&VecAtkGrid)
 				center_col = aliveCol-(range+1);
 			}
 			for (int i=center_col - range;i<=center_col + range;i++)
-				VecAtkGrid.push_back(i*C_GRID_ROW+center_row);
+				pVector.push_back(i*C_GRID_ROW+center_row);
 			for (int j=center_row - range;j<=center_row + range;j++)
 			{
 				if (j>=C_GRID_ROW||j<0)continue;
-				VecAtkGrid.push_back(center_col*C_GRID_ROW+j);
+				pVector.push_back(center_col*C_GRID_ROW+j);
 			}
 		}break;
 	case slantArea:				//前方两边				5
@@ -817,23 +720,23 @@ void SkillRange::getAtkGrid(AreaCountInfo& CountInfo,vector<int>&VecAtkGrid)
 				for (int i=aliveCol+1;i<=aliveCol+range;i++)
 				{
 					if (aliveRow-1<0)continue;
-					VecAtkGrid.push_back(i*C_GRID_ROW+aliveRow-1);
+					pVector.push_back(i*C_GRID_ROW+aliveRow-1);
 				}
 				for (int i=aliveCol+1;i<=aliveCol+range;i++)
 				{
 					if (aliveRow+1>=C_GRID_ROW)continue;
-					VecAtkGrid.push_back(i*C_GRID_ROW+aliveRow+1);
+					pVector.push_back(i*C_GRID_ROW+aliveRow+1);
 				}
 			}else{
 				for (int i=aliveCol-1;i>=aliveCol-range;i--)
 				{
 					if (aliveRow-1<0)continue;
-					VecAtkGrid.push_back(i*C_GRID_ROW+aliveRow-1);
+					pVector.push_back(i*C_GRID_ROW+aliveRow-1);
 				}					
 				for (int i=aliveCol-1;i>=aliveCol-range;i--)
 				{
 					if (aliveRow+1>=C_GRID_ROW)continue;
-					VecAtkGrid.push_back(i*C_GRID_ROW+aliveRow+1);
+					pVector.push_back(i*C_GRID_ROW+aliveRow+1);
 				}
 			}
 		}break;
@@ -852,7 +755,7 @@ void SkillRange::getAtkGrid(AreaCountInfo& CountInfo,vector<int>&VecAtkGrid)
 				for (int j=maxCol;j>=minCol;j--)
 				{
 					if (j*C_GRID_ROW+i != CountInfo.CountGrid)
-						VecAtkGrid.push_back(j*C_GRID_ROW+i);
+						pVector.push_back(j*C_GRID_ROW+i);
 				}
 			}
 		}break;								
@@ -867,19 +770,19 @@ void SkillRange::getAtkGrid(AreaCountInfo& CountInfo,vector<int>&VecAtkGrid)
 					if (vec->size() > 1 && i->getCaptain())
 					{
 						continue;
-						VecAtkGrid.push_back(i->getGridIndex());
+						pVector.push_back(i->getGridIndex());
 					}
 				}
 			}else{
 				vector<WarAlive*>* vec = m_Manage->getVecMonsters();
 				for(auto i:*vec)
-					VecAtkGrid.push_back(i->getGridIndex());				
+					pVector.push_back(i->getGridIndex());				
 			}
 		}break;
 	case allArea: 
 		{
 			for (int i = C_BEGINGRID; i<C_GRID_ROW*C_GRID_COL ; i++ )
-				VecAtkGrid.push_back(i);
+				pVector.push_back(i);
 		} break;
 	case tTypeArea:			//T型区域处理				11
 		{	
@@ -887,115 +790,115 @@ void SkillRange::getAtkGrid(AreaCountInfo& CountInfo,vector<int>&VecAtkGrid)
 				!CountInfo.Enemy && CountInfo.BackAtk)
 			{
 				for (int i=aliveCol+1;i<=aliveCol+range;i++)
-					VecAtkGrid.push_back(i*C_GRID_ROW+aliveRow);
+					pVector.push_back(i*C_GRID_ROW+aliveRow);
 				for (int j=aliveCol+2;j<aliveCol+2+range;j++)
 				{
 					for (int k=aliveRow-1;k<=aliveRow+1;k++)
 					{
 						if (k>=C_GRID_ROW||k<0)continue;
-						VecAtkGrid.push_back(j*C_GRID_ROW+k);
+						pVector.push_back(j*C_GRID_ROW+k);
 					}
 
 				}
 			}else{
 				for (int i=aliveCol-1;i>=aliveCol-range;i--)
-					VecAtkGrid.push_back(i*C_GRID_ROW+aliveRow);
+					pVector.push_back(i*C_GRID_ROW+aliveRow);
 				for (int j=aliveCol-2;j>aliveCol-2-range;j--)
 				{
 					for (int k=aliveRow-1;k<=aliveRow+1;k++)
 					{
 						if (k>=C_GRID_ROW||k<0)continue;
-						VecAtkGrid.push_back(j*C_GRID_ROW+k);
+						pVector.push_back(j*C_GRID_ROW+k);
 					}
 				}
 			}
 		}break;
 	case frontOne://前方单体								101
 		{
-			VecAtkGrid.push_back(FrontOrBackAreaDispose(CountInfo.Enemy,CountInfo.pTarget));
+			pVector.push_back( FrontOrBackAreaDispose(CountInfo.Enemy,CountInfo.pTarget) );
 		}break;
 	case centerOne://中间单体							102
 		{
-			VecAtkGrid.push_back(CenterAreaDispose(CountInfo.Enemy,CountInfo.pTarget));
+			pVector.push_back( CenterAreaDispose(CountInfo.Enemy,CountInfo.pTarget) );
 		}break;
 	case backOne:	//后方单体							103
 		{
-			VecAtkGrid.push_back(FrontOrBackAreaDispose(CountInfo.Enemy,CountInfo.pTarget,true));
+			pVector.push_back( FrontOrBackAreaDispose(CountInfo.Enemy,CountInfo.pTarget,true) );
 		}break;
 	case frontArea://前方分散范围						104
 		{
 			int grid = FrontOrBackAreaDispose(CountInfo.Enemy,CountInfo.pTarget);
-			VecAtkGrid = DisperseDispose(grid,range);
+			pVector = DisperseDispose(grid,range);
 		}break;
 	case centerArea://中间分散范围						105
 		{
 			int grid = CenterAreaDispose(CountInfo.Enemy,CountInfo.pTarget);
-			VecAtkGrid = DisperseDispose(grid,range);
+			pVector = DisperseDispose(grid,range);
 		}break;
 	case backArea://后方分散范围							106
 		{
 			int grid = FrontOrBackAreaDispose(CountInfo.Enemy,CountInfo.pTarget,true);
-			VecAtkGrid = DisperseDispose(grid,range);
+			pVector = DisperseDispose(grid,range);
 		}break;
 	case frontRowArea:		//前军n排					107
 		{
 			int grid = FrontOrBackAreaDispose(CountInfo.Enemy,CountInfo.pTarget);
-			VecAtkGrid =  RowType(CountInfo.Enemy,CountInfo.pTarget,grid/C_GRID_ROW,FrontArea,range);
+			pVector =  RowType(CountInfo.Enemy,CountInfo.pTarget,grid/C_GRID_ROW,FrontArea,range);
 		}break;
 	case centerRowArea:		//中军n排					108
 		{
 			int grid = CenterAreaDispose(CountInfo.Enemy,CountInfo.pTarget);
-			VecAtkGrid = RowType(CountInfo.Enemy,CountInfo.pTarget,grid/C_GRID_ROW,CentenArea,range);
+			pVector = RowType(CountInfo.Enemy,CountInfo.pTarget,grid/C_GRID_ROW,CentenArea,range);
 		}break;
 	case backRowArea:		//后军n排					109
 		{
 			int grid = FrontOrBackAreaDispose(CountInfo.Enemy,CountInfo.pTarget,true);
-			VecAtkGrid = RowType(CountInfo.Enemy,CountInfo.pTarget,grid/C_GRID_ROW,BackArea,range);
+			pVector = RowType(CountInfo.Enemy,CountInfo.pTarget,grid/C_GRID_ROW,BackArea,range);
 		}break;
 	case anyFixGrid:		//随机固定格子				110
 		{
-			if (!CountInfo.alive->AtkArea.size())
+			if (!tAlive->AtkArea.size())
 				FixGrid(CountInfo);
-			VecAtkGrid = CountInfo.alive->AtkArea;		//为什么这里还需要复制传出去？
+			pVector = tAlive->AtkArea;		//为什么这里还需要复制传出去？
 		}
 	case anyFixGridArea:	//随机格子区域				111
 		{
-			if (!CountInfo.alive->AtkArea.size())
+			if (!tAlive->AtkArea.size())
 				FixGrid(CountInfo,true);
-			VecAtkGrid = CountInfo.alive->AtkArea;
+			pVector = tAlive->AtkArea;
 		}break;
 	case anyFixAlive:		//任意武将目标(range个)		112
 		{
-			if (!CountInfo.alive->AliveS.size())
+			if (!tAlive->AliveS.size())
 				FixAlive(CountInfo);
-			if (CountInfo.alive->AliveS.size())			//仍然是把存储固定武将的格子取出来传了出去，为什么？
+			if (tAlive->AliveS.size())			//仍然是把存储固定武将的格子取出来传了出去，为什么？
 			{
-				for (int i=0;i<CountInfo.alive->AliveS.size();i++)
-					VecAtkGrid.push_back(CountInfo.alive->AliveS.at(i)->getGridIndex());
+				for (int i=0;i<tAlive->AliveS.size();i++)
+					pVector.push_back(tAlive->AliveS.at(i)->getGridIndex());
 			}
 		}break;
 	case anyFixAliveArea:	//任意武将区域				113
 		{
-			if (!CountInfo.alive->AliveS.size())
+			if (!tAlive->AliveS.size())
 				FixAlive(CountInfo);
-			if (!CountInfo.alive->AliveS.size())
+			if (!tAlive->AliveS.size())
 				break;
-			for (int i=0;i<CountInfo.alive->AliveS.size();i++)
+			for (int i=0;i<tAlive->AliveS.size();i++)
 			{
-				vector<int>Vec = DisperseDispose(CountInfo.alive->AliveS.at(i)->getGridIndex());
+				vector<int>Vec = DisperseDispose(tAlive->AliveS.at(i)->getGridIndex());
 				vector<int>::iterator iter = Vec.begin();
 				for (;iter != Vec.end();iter ++)
-					VecAtkGrid.push_back(*iter);
+					pVector.push_back(*iter);
 			}
 		}break;
 	case allTypeLowestHp://血量最少单位					114
 		{
 			if ((CountInfo.Enemy&&CountInfo.pTarget==ustarget) || (!CountInfo.Enemy&&CountInfo.pTarget==enemyTyep))
 			{
-				VecAtkGrid = lowestAlive(enemyTyep,range);
+				pVector = lowestAlive(enemyTyep,range);
 			}else if ((!CountInfo.Enemy&&CountInfo.pTarget==ustarget) || (CountInfo.Enemy&&CountInfo.pTarget==enemyTyep))
 			{
-				VecAtkGrid = lowestAlive(ustarget,range);
+				pVector = lowestAlive(ustarget,range);
 			}else{
 				CCLOG("[ ERROR ] SkillRange::getAtkGrid Type allTypeLowestHp");
 			}
@@ -1007,15 +910,15 @@ void SkillRange::getAtkGrid(AreaCountInfo& CountInfo,vector<int>&VecAtkGrid)
 				int col = CountInfo.attackDistance+C_BEGINGRID/C_GRID_ROW;
 				for (int i=col;i<col+range;i++)
 				{
-					VecAtkGrid.push_back(i*C_GRID_ROW+1);
-					VecAtkGrid.push_back(i*C_GRID_ROW+2);
+					pVector.push_back(i*C_GRID_ROW+1);
+					pVector.push_back(i*C_GRID_ROW+2);
 				}
 			}else{
 				int col = C_ENDGRID/C_GRID_ROW - CountInfo.attackDistance;
 				for (int i=col;i>col-range;i--)
 				{
-					VecAtkGrid.push_back(i*C_GRID_ROW+1);
-					VecAtkGrid.push_back(i*C_GRID_ROW+2);
+					pVector.push_back(i*C_GRID_ROW+1);
+					pVector.push_back(i*C_GRID_ROW+2);
 				}
 			}
 		}break;
@@ -1027,14 +930,14 @@ void SkillRange::getAtkGrid(AreaCountInfo& CountInfo,vector<int>&VecAtkGrid)
 				for (int i=col;i<col+range;i++)
 				{
 					for (int j=0;j<4;j++)
-						VecAtkGrid.push_back(i*C_GRID_ROW+j);
+						pVector.push_back(i*C_GRID_ROW+j);
 				}
 			}else{
 				int col = C_ENDGRID/C_GRID_ROW - CountInfo.attackDistance;
 				for (int i=col;i>col-range;i--)
 				{
 					for (int j=0;j<4;j++)
-						VecAtkGrid.push_back(i*C_GRID_ROW+j);
+						pVector.push_back(i*C_GRID_ROW+j);
 				}
 			}
 		}break;
@@ -1042,17 +945,17 @@ void SkillRange::getAtkGrid(AreaCountInfo& CountInfo,vector<int>&VecAtkGrid)
 		{
 			if ((CountInfo.Enemy&&CountInfo.pTarget==ustarget) || (!CountInfo.Enemy&&CountInfo.pTarget==enemyTyep))
 			{
-				VecAtkGrid = lowestAlive(enemyTyep,range,true);
+				pVector = lowestAlive(enemyTyep,range,true);
 			}else if ((!CountInfo.Enemy&&CountInfo.pTarget==ustarget) || (CountInfo.Enemy&&CountInfo.pTarget==enemyTyep))
 			{
-				VecAtkGrid = lowestAlive(ustarget,range,true);
+				pVector = lowestAlive(ustarget,range,true);
 			}else{
 				CCLOG("[ ERROR ] SkillRange::getAtkGrid Type allTypeLowestHp");
 			}
-			for (vector<int>::iterator iter = VecAtkGrid.begin();iter != VecAtkGrid.end();)
+			for (vector<int>::iterator iter = pVector.begin();iter != pVector.end();)
 			{
 				if (*iter >= C_CAPTAINGRID)
-					iter = VecAtkGrid.erase(iter);
+					iter = pVector.erase(iter);
 				else
 					iter++;
 			}
@@ -1071,15 +974,15 @@ void SkillRange::getAtkGrid(AreaCountInfo& CountInfo,vector<int>&VecAtkGrid)
 			{
 				for (int i=aliveCol-1;i>=aliveCol-range;i--)
 				{
-					VecAtkGrid.push_back(i*C_GRID_ROW+cpair.first);
-					VecAtkGrid.push_back(i*C_GRID_ROW+cpair.second);
+					pVector.push_back(i*C_GRID_ROW+cpair.first);
+					pVector.push_back(i*C_GRID_ROW+cpair.second);
 				}		
 			}else{
 				int col = C_ENDGRID/C_GRID_ROW;
 				for (int i=aliveCol+1;i<=aliveCol+range;i++)
 				{
-					VecAtkGrid.push_back(i*C_GRID_ROW+cpair.first);
-					VecAtkGrid.push_back(i*C_GRID_ROW+cpair.second);
+					pVector.push_back(i*C_GRID_ROW+cpair.first);
+					pVector.push_back(i*C_GRID_ROW+cpair.second);
 				}
 			}
 		}break;

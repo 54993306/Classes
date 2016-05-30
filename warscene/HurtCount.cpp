@@ -24,17 +24,17 @@ BattleResult* HurtCount::AttackExcute(WarAlive* alive)
 {
 	BattleResult* Result = BattleResult::create();
 	Result->setAlive(alive);
-	if (alive->getNegate())													//为了做击退处理
+	if (alive->getOpposite())													//为了做击退处理
 	{
-		vector<WarAlive*>::reverse_iterator iter = alive->AtkAlive.rbegin();//迭代器反向遍历(用下标效率是最高的)
-		for (;iter != alive->AtkAlive.rend();iter++)
+		vector<WarAlive*>::reverse_iterator iter = alive->m_AreaTargets.rbegin();//迭代器反向遍历(用下标效率是最高的)
+		for (;iter != alive->m_AreaTargets.rend();iter++)
 		{
 			WarAlive* HitAlive = *iter;
 			HurtExcute(Result,alive,HitAlive);
 		}
 	}else{
-		vector<WarAlive*>::iterator iter = alive->AtkAlive.begin();
-		for (;iter != alive->AtkAlive.end();iter ++)
+		vector<WarAlive*>::iterator iter = alive->m_AreaTargets.begin();
+		for (;iter != alive->m_AreaTargets.end();iter ++)
 		{
 			WarAlive* HitAlive = *iter;
 			HurtExcute(Result,alive,HitAlive);
@@ -57,7 +57,7 @@ int HurtCount::ChangeLocation(WarAlive* AtcAlive , WarAlive* HitAlive)
 	if (effect->batter != AtcAlive->getSortieNum())
 		return HitAlive->getGridIndex();									//连击的最后一次才做击退
 	bool enemy = AtcAlive->getEnemy();
-	if (AtcAlive->getNegate())
+	if (AtcAlive->getOpposite())
 		enemy = !enemy;
 	int grid = MoveRule::create()->FrontBack(HitAlive,effect->repel,enemy);
 	if (grid != INVALID_GRID)

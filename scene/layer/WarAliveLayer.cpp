@@ -420,25 +420,19 @@ void WarAliveLayer::MoveAliveToGrid()
 {
 	if (unCommonAlive())
 		return;
-	if (!m_TouchAlive->getMove() || 
-		!m_TouchAlive->getActObject() || 
+	if (!m_TouchAlive->getMove()		|| 
+		!m_TouchAlive->getActObject()	|| 
 		!m_TouchAlive->getMoveObject()	||
 		m_grid==m_TouchAlive->getMoveObject()->getgrid())
 		return;
 	m_TouchAlive->getActObject()->setVisible(true);
 	m_TouchAlive->getActObject()->getHp()->showHp(nullptr);
-	if (absentInMoveArea())
+	if (absentInMoveArea()	||
+		WorldBossJudge()	||
+		guideJudge()		||
+	   !aliveMoveJudge())		//当前位置是否可以放置英雄
 		return;
-	if (WorldBossJudge())
-		return ;
-	if (guideJudge())
-		return;
-	if(aliveMoveJudge())								//当前位置是否可以放置英雄
-	{
-		m_TouchAlive->getActObject()->setActMoveGrid(m_grid);
-	}else{
-		return;	
-	}
+	m_TouchAlive->getActObject()->setActMoveGrid(m_grid);
 	guideJudge(true);
 	m_TouchAlive->setAIState(false);
 }
