@@ -81,15 +81,9 @@ void WarAliveLayer::createLayerColor()
 
 void WarAliveLayer::createActObjects()
 {
-	CCArray* arr = m_Manage->getAlives(true);
-	CCObject* obj =nullptr;
-	CCARRAY_FOREACH(arr,obj)
-	{
-		WarAlive* alive = (WarAlive*)obj;
-		if (!alive->getEnemy() && !alive->getCaptain())
-			continue;
-		initActobject(alive);
-	}
+	for (auto tMonster : *m_Manage->getVecMonsters())
+		initActobject(tMonster);
+	initActobject(m_Manage->getAliveByGrid(C_CAPTAINSTAND));
 }
 
 void WarAliveLayer::AliveObEffect(ActObject* aliveOb,int createType/*=DefaultCreat*/)

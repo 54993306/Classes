@@ -162,12 +162,6 @@ SkillEffect* getSummonEffect( TempSkill* skill )
 	return nullptr;
 }
 
-void RemoveVectorRepeat( vector<int>& Vec )
-{
-	sort(Vec.begin(),Vec.end());
-	Vec.erase(unique(Vec.begin(),Vec.end()),Vec.end());
-}
-
 void PlaySound_Event( int id )
 {
 	char str[60] = {0};
@@ -178,4 +172,71 @@ void PlaySound_Event( int id )
 #endif
 	PlayEffectSound(str);				//播放效果音效
 }
+//对武将血量百分比进行排序
+void SortAliveHp(vector<WarAlive*>* VecAlive,int left,int right)
+{
+	if ( left < right )
+	{
+		int i = left;
+		int j = right;
+		WarAlive* alive = VecAlive->at(i);
+		float pe = (float)alive->getHp()/alive->getMaxHp();
+		while ( i < j ) 
+		{
+			while (	i < j  && 
+				(float)VecAlive->at(j)->getHp()/VecAlive->at(j)->getMaxHp() > pe )
+				j--;
+			if ( i < j )
+			{
+				VecAlive->at(i) = VecAlive->at(j);
+				i++;
+			}
+			while ( i < j  &&
+				(float)VecAlive->at(j)->getHp()/VecAlive->at(j)->getMaxHp() <= pe )
+				i++;
+			if( i < j )
+			{
+				VecAlive->at(j) = VecAlive->at(i);
+				j--;
+			}
+		}
+		VecAlive->at(i) = alive;
+		SortAliveHp(VecAlive,left,i-1);
+		SortAliveHp(VecAlive,i+1,right);
+	}
+}
+//SortAliveHp(VecAlive,0,VecAlive->size()-1);			//快速排序得出血量百分比由小到大的数组
 
+void VectorRemoveRepeat( vector<int>& pVector )
+{
+	sort(pVector.begin(),pVector.end());
+	pVector.erase(unique(pVector.begin(),pVector.end()),pVector.end());
+}
+//升序
+bool sortAliveGrid(const WarAlive*apAlive,const WarAlive*bpAlive)	
+{ 
+	return  apAlive->getGridIndex() < bpAlive->getGridIndex(); 
+}
+
+void VectorRemoveRepeat( vector<WarAlive*> &pVector )
+{
+	vector<WarAlive*>::iterator pos;
+	pos = unique(pVector.begin(),pVector.end());		//得到重复元素开始的位置
+	pVector.erase(pos,pVector.end());
+	sort(pVector.begin(),pVector.end(),sortAliveGrid);
+}
+
+bool sortAliveHp(const WarAlive* apAlive,const WarAlive* bpAlive)
+{
+	float atHpPerent = (float)apAlive->getHp()/apAlive->getMaxHp();
+	float btHpPerent = (float)bpAlive->getHp()/bpAlive->getMaxHp();
+	return atHpPerent < btHpPerent;
+}
+
+void VectorSortAliveHp( vector<WarAlive*> &pVector )
+{
+	vector<WarAlive*>::iterator pos;
+	pos = unique(pVector.begin(),pVector.end());		//得到重复元素开始的位置
+	pVector.erase(pos,pVector.end());
+	sort(pVector.begin(),pVector.end(),sortAliveHp);
+}

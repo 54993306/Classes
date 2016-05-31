@@ -52,7 +52,6 @@ public:
 public:
 	void addAlive(WarAlive* alive);
 	WarAlive* getAlive(unsigned int aliveID);
-	CCArray* getAlives(bool isAlive = false);
 	WarAlive* getAliveByGrid(int grid);
 	WarAlive* getCallAlive(WarAlive* pAlive,TempSkill* skill);
 	WarAlive* getAliveByType(AliveType type,bool Monster = true);
@@ -75,8 +74,9 @@ public:
 	CStage* getTollgete();
 	Members* getMembers();
 	void updateAlive();
-	vector<WarAlive*>* getVecHeros(){return &m_Heros;}
-	vector<WarAlive*>* getVecMonsters(){return &m_Monsters;}
+	vector<WarAlive*>* getVecHeros(bool pSort = false);
+	vector<WarAlive*>* getVecMonsters(bool pSort = false);
+	vector<WarAlive*>* getAliveRoles(bool pSort = false);
 	vector<WarAlive*>* getSkillTargets(WarAlive* pAlive);
 	bool isSpine(int id);
 	SpData* getSpineData(std::string Name);
@@ -98,7 +98,6 @@ public:
 	void clearBeforeData();
 public:
 	CC_SYNTHESIZE(int, m_iWorldBossRank, WorldBossRank);			//世界BOSS狂暴状态
-
 	CC_SYNTHESIZE_READONLY(CritSkillImage*,m_CritImage,CritImage)
 	CC_SYNTHESIZE(int,m_LoadImage,LoadImage);						//用于记录加载图片的id
 	CC_SYNTHESIZE(int,m_StageID,StageID);							//关卡ID
@@ -108,13 +107,13 @@ public:
 	CC_SYNTHESIZE(int, m_iLastStageId, LastStageId);				//上一次关卡信息(-1标记悬赏府)
 	CC_SYNTHESIZE(int, m_StageType, StageType);						//大关卡还是小关卡
 	CC_SYNTHESIZE(bool, m_bNormal, Normal);							//精英还是普通
-	CC_PROPERTY(bool, m_BossModel, WorldBoss);						//世界BOSS模型
+	CC_PROPERTY_CONSTREAD(bool, m_BossModel, WorldBoss);			//世界BOSS模型
 	CC_SYNTHESIZE(int, m_ChapterIndex, ChapterIndex);				//在打哪一章节
 	CC_SYNTHESIZE(int, m_ChapterCount, ChapterCount);				//章节个数
 	CC_SYNTHESIZE(int, m_iReliveNeedGoldNum, ReliveNeedGoldNum);	//续关需要的元宝数量
 	CC_SYNTHESIZE(int, m_BossHurtPe,BossHurtPe);					//世界boss伤害加成百分比
-	CC_PROPERTY(int, m_VerifyNum,VerifyNum);						//验证所有武将造成的伤害信息(验证伤害是否被恶意修改)
-	CC_PROPERTY(int, m_BossHurtCount,BossHurtCount);				//造成的总伤害
+	CC_PROPERTY_CONSTREAD(int, m_VerifyNum,VerifyNum);				//验证所有武将造成的伤害信息(验证伤害是否被恶意修改)
+	CC_PROPERTY_CONSTREAD(int, m_BossHurtCount,BossHurtCount);		//造成的总伤害
 	CC_SYNTHESIZE(bool, m_BattleOver, battleOver);					//战斗结束
 protected:
 	vector<int> m_CantMoveGrid;									//可移动格子存储
@@ -134,5 +133,6 @@ protected:
 	int m_SceneTarpID;											//场景效果类型记录
 	vector<WarAlive*> m_Heros;
 	vector<WarAlive*> m_Monsters;
+	vector<WarAlive*> m_AliveRoles;
 };
 #endif // !_WAR_MANAGER_H_

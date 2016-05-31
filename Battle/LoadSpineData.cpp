@@ -45,7 +45,7 @@ void LoadSpineData::LoadSpineAnimation()
 //  id + 类型  得到加载文件名   当前有3种，角色，角色特效，剧情spine
 void LoadSpineData::LoadVecRoleData()
 {
-	RemoveVectorRepeat(m_VecRole);
+	VectorRemoveRepeat(m_VecRole);
 	for (auto i : m_VecRole)
 		LoadRoleData(i);
 }
@@ -72,7 +72,7 @@ void LoadSpineData::initStoryData()
 		for (auto j:i.second)
 			if (j->getSpine()&&j->getRoleID())
 				m_VecStory.push_back(j->getRoleID());
-	RemoveVectorRepeat(m_VecStory);
+	VectorRemoveRepeat(m_VecStory);
 }
 
 void LoadSpineData::LoadVecStoryData()

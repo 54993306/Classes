@@ -41,14 +41,12 @@ void WarAlive::setMoveGrid(int var)
 		CCLOG("[ TIPS ] WarAlive::setMoveGrid");
 	m_MoveGrid = var;
 }
-int WarAlive::getMoveGrid(){ return m_MoveGrid; }
 
 void WarAlive::setBuffManage(BuffManage*)
 {
 	m_BuffManage = BuffManage::create();
 	m_BuffManage->retain();
 }
-BuffManage* WarAlive::getBuffManage() { return m_BuffManage; }
 
 void WarAlive::setAtkNum(int var)
 {
@@ -63,7 +61,6 @@ void WarAlive::setAtkNum(int var)
 		}
 	}
 }
-int WarAlive::getAtkNum(){return m_AtkNum;}
 
 void WarAlive::setHp(int hp)
 {
@@ -77,7 +74,6 @@ void WarAlive::setHp(int hp)
 			m_Hp = 0;
 	}
 }
-int WarAlive::getHp()	{ return m_Hp; }
 
 void WarAlive::setDef(int def)
 {
@@ -85,7 +81,6 @@ void WarAlive::setDef(int def)
 	if (m_Def<=0)
 		m_Def = 0;
 }
-int WarAlive::getDef()	{ return m_Def; }
 
 void WarAlive::setNorAtk(bool var)
 {
@@ -93,7 +88,6 @@ void WarAlive::setNorAtk(bool var)
 	if (!m_NorAtk)
 		m_Atktime = 0;
 }
-bool WarAlive::getNorAtk(){return m_NorAtk;}
 
 void WarAlive::setAtktime(float var)
 {
@@ -111,7 +105,6 @@ void WarAlive::setAtktime(float var)
 	sprintf(time, "%.2f / %.2f",m_Atktime,m_AtkInterval);
 	m_ActObject->setNickName(time);
 }
-float WarAlive::getAtktime(){ return m_Atktime; }
 //怪物释放必杀技时间
 void WarAlive::setCritTime(float var)
 {
@@ -126,19 +119,15 @@ void WarAlive::setCritTime(float var)
 		m_CritTime = 0;
 	}
 }
-float WarAlive::getCritTime(){return m_CritTime;}
 
 void WarAlive::setDelaytime(float var) { m_Delaytime -= var; }
-float WarAlive::getDelaytime(){return m_Delaytime;}
 
 void WarAlive::setAtkDelay(float var){m_AtkDelay = var;}
-float WarAlive::getAtkDelay(){return m_AtkDelay;}
 
 void WarAlive::setAliveStat(int var)
 {
 	m_AliveState = var;
 }
-int WarAlive::getAliveStat(){return m_AliveState;}
 
 void WarAlive::setStatDelay(float var)
 {
@@ -150,7 +139,6 @@ void WarAlive::setStatDelay(float var)
 		m_StateDelay = var;
 	}
 }
-float WarAlive::getStatDelay(){return m_StateDelay;}
 
 void WarAlive::setGridIndex(int var)
 {
@@ -174,8 +162,6 @@ void WarAlive::setGridIndex(int var)
 	}
 }
 
-int WarAlive::getGridIndex(){return m_GridIndex;}
-
 void WarAlive::setTouchGrid(int var)
 {
 	if (var == m_TouchGrid)
@@ -193,7 +179,6 @@ void WarAlive::setTouchGrid(int var)
 		TouchGrids.clear();
 	}
 }
-int WarAlive::getTouchGrid(){return m_TouchGrid;}
 
 void WarAlive::setCallType(int var)
 {
@@ -201,8 +186,6 @@ void WarAlive::setCallType(int var)
 		setCriAtk( true );							//只有必杀技是没有怪物也会释放的
 	m_CallType = var;
 }
-
-int WarAlive::getCallType(){return m_CallType;}
 
 void WarAlive::ResetAttackState()
 {
@@ -356,7 +339,7 @@ bool WarAlive::hasAliveByTargets( WarAlive* pAlive )
 
 bool WarAlive::pierceJudge()
 {
-	if (getCurrEffect()->mode == frontAreaVia&&m_AreaTargets.size())//贯穿与非贯穿类处理
+	if (getCurrEffect()->mode == ePuncture&&m_AreaTargets.size())//贯穿与非贯穿类处理
 	{
 		WarAlive* alive = m_AreaTargets.at(0);
 		if (!alive->getCloaking())									//潜行类怪物处理
@@ -379,10 +362,14 @@ void WarAlive::cloakingTarget()
 	}
 }
 
-bool WarAlive::canOpposite()
+bool WarAlive::standInGrid( int pGrid )
 {
-
+	if (pGrid >= C_CAPTAINGRID && getCaptain() )
 		return true;
+	for (auto tGrid : m_StandGrids)
+	{
+		if (tGrid == pGrid)
+			return true;
 	}
 	return false;
 }

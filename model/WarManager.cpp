@@ -73,6 +73,7 @@ void WarManager::BattleDataClear()
 	m_VecBossHurt.clear();
 	m_Heros.clear();
 	m_Monsters.clear();
+	m_AliveRoles.clear();
 	m_CantMoveGrid.clear();
 	m_AddCostGrid.clear();
 	CC_SAFE_RELEASE(m_efdata);
@@ -107,12 +108,9 @@ void WarManager::setWorldBoss(bool model)
 		m_VerifyNum = 0;
 	m_BossModel = model;
 }
-bool WarManager::getWorldBoss(){return m_BossModel;}
 
-int WarManager::getVerifyNum(){ return m_VerifyNum; }
 void WarManager::setVerifyNum(int num){ m_VerifyNum -= num; }
 
-int WarManager::getBossHurtCount(){return m_BossHurtCount;}
 void WarManager::setBossHurtCount(int hurt){ m_BossHurtCount += hurt;}
 
 void WarManager::addAlive(WarAlive* alive)
@@ -254,23 +252,6 @@ void WarManager::initAlive(WarAlive* alive)
 		alive->setHp(500000);		//第一次进来是满血状态
 	}
 #endif
-}
-
-CCArray* WarManager::getAlives(bool isAlive /*=false*/)
-{
-	if(m_members.empty()) return nullptr;
-	CCArray* arr = CCArray::create();
-	for(Members::iterator iter = m_members.begin(); iter != m_members.end();++iter)
-	{
-		if (isAlive)
-		{
-			if (iter->second->getHp() > 0)
-				arr->addObject(iter->second);
-		}else{ 
-			arr->addObject(iter->second); 
-		}
-	}
-	return arr;
 }
 //冒泡排序
 void WarManager::sortArrayByGridIndex(CCArray* arr)
@@ -492,21 +473,23 @@ void WarManager::initCallAlive(WarAlive* alive,WarAlive*pAlive)
 //每帧刷新一次武将信息
 void WarManager::updateAlive()
 {
-	m_Monsters.clear();
 	m_Heros.clear();
+	m_Monsters.clear();
+	m_AliveRoles.clear();
 	for(Members::iterator iter = m_members.begin(); iter != m_members.end();++iter)
 	{
-		WarAlive* alive = iter->second;
-		if (alive->getHp() <= 0||!alive->getBattle()||!alive->getActObject())
+		WarAlive* tAlive = iter->second;
+		if (tAlive->getHp() <= 0||!tAlive->getBattle()||!tAlive->getActObject())
 			continue;
-		if (alive->getEnemy())
+		if (tAlive->getEnemy())
 		{
-			if (alive->getGridIndex()<C_MOSTERATKGRID)
+			if (tAlive->getGridIndex()<C_MOSTERATKGRID)
 				continue;
-			m_Monsters.push_back(alive);
+			m_Monsters.push_back(tAlive);
 		}else{
-			m_Heros.push_back(alive);
-		}															
+			m_Heros.push_back(tAlive);
+		}	
+		m_AliveRoles.push_back(tAlive);
 	}
 }
 
@@ -582,11 +565,32 @@ void WarManager::initCommonData()
 
 vector<WarAlive*>* WarManager::getSkillTargets(WarAlive* pAlive)
 {
-	if ((pAlive->getEnemy()&&pAlive->getCurrEffect()->pTarget == enemyTyep)	||
-		(!pAlive->getEnemy()&&pAlive->getCurrEffect()->pTarget != enemyTyep))
-	{
-		return getVecHeros();	
-	}else{
-		return getVecMonsters();
-	}
+	bool tEnemy = pAlive->getEnemy();
+	bool tTarget = pAlive->getCurrEffect()->pTarget;
+	if ((tEnemy&&tTarget == eUsType) || ( !tEnemy&&tTarget == eEnemyType))			/*敌方自己，我方敌人*/
+		return getVecHeros(true);
+	if ((tEnemy&&tTarget == eEnemyType) || ( !tEnemy&&tTarget == eUsType))		/*敌方敌人，我方自己*/
+		return getVecMonsters(true);
+	return getAliveRoles(true);
+}
+
+vector<WarAlive*>* WarManager::getVecMonsters(bool pSort /*=false*/)
+{
+	if (pSort)
+		VectorRemoveRepeat(m_Monsters);
+	return &m_Monsters;
+}
+
+vector<WarAlive*>* WarManager::getVecHeros(bool pSort /*=false*/)
+{
+	if (pSort)
+		VectorRemoveRepeat(m_Heros);
+	return &m_Heros;
+}
+
+vector<WarAlive*>* WarManager::getAliveRoles( bool pSort /*= false*/ )
+{
+	if (pSort)
+		VectorRemoveRepeat(m_AliveRoles);
+	return &m_AliveRoles;
 }

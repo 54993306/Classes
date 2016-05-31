@@ -49,6 +49,7 @@ public:
 	bool hasAliveByTargets(WarAlive* pAlive);
 	bool pierceJudge();
 	void cloakingTarget();						//判断受击目标内是否全为隐身对象
+	bool standInGrid(int pGrid);
 public:
 	TempRole* role;								//服务器角色信息
 	vector<int> m_StandGrids;					//多格子站位
@@ -59,44 +60,44 @@ public:
 	vector<int>m_SkillArea;						//存储武将当前技能区域
 	vector<WarAlive*> m_AreaTargets;			//存储区域内目标
 	vector<WarAlive*> HittingAlive;				//受击目标中被击中对象				(用于做buff和受击目标死亡结算处理)
-	CC_PROPERTY(BuffManage*,m_BuffManage,BuffManage);
+	CC_PROPERTY_CONSTREAD(BuffManage*,m_BuffManage,BuffManage);
 	CC_SYNTHESIZE(ActObject*,m_ActObject,ActObject);
 	CC_SYNTHESIZE(MoveObject*,m_MoveObj,MoveObject);	//设置移动对象
 	CC_SYNTHESIZE(unsigned int,m_AliveID,AliveID);
 	CC_SYNTHESIZE(int,m_Model,Model);
 	CC_SYNTHESIZE(bool,m_Enemy,Enemy);					//怪物
-	CC_PROPERTY(bool,m_NorAtk,NorAtk);					//普通攻击状态
+	CC_PROPERTY_CONSTREAD(bool,m_NorAtk,NorAtk);		//普通攻击状态
 	CC_SYNTHESIZE(bool,m_SpecialAtk,SpeAtk);			//特殊攻击
 	CC_SYNTHESIZE(bool,m_CritSkill,CriAtk);				//必杀技
 	CC_SYNTHESIZE(int,m_MstType,MstType);				//怪物类型
-	CC_PROPERTY(int,m_CallType,CallType);				//武将召唤类型(我方武将均为召唤类型武将)
+	CC_PROPERTY_CONSTREAD(int,m_CallType,CallType);		//武将召唤类型(我方武将均为召唤类型武将)
 	CC_SYNTHESIZE(bool,m_AIState,AIState);				//武将是否在AI状态
 	CC_SYNTHESIZE(bool,m_DieState,DieState);			//武将是否在AI状态
-	CC_PROPERTY(int,m_GridIndex,GridIndex);				//位置
-	CC_PROPERTY(int,m_MoveGrid,MoveGrid);				//移动目标格子
+	CC_PROPERTY_CONSTREAD(int,m_GridIndex,GridIndex);	//位置
+	CC_PROPERTY_CONSTREAD(int,m_MoveGrid,MoveGrid);		//移动目标格子
 	CC_SYNTHESIZE(bool,m_TouchState,TouchState);		//武将当前为移动状态下
-	CC_PROPERTY(int,m_TouchGrid,TouchGrid);				//移动状态下当前位置
-	CC_SYNTHESIZE(float,m_MoveSpeed,MoveSpeed);				//移动速度(格/S)
+	CC_PROPERTY_CONSTREAD(int,m_TouchGrid,TouchGrid);	//移动状态下当前位置
+	CC_SYNTHESIZE(float,m_MoveSpeed,MoveSpeed);			//移动速度(格/S)
 	CC_SYNTHESIZE(int,m_UILayout,UiLayout);				//对应的UI控制面板ID
-	CC_PROPERTY(float,m_Delaytime,Delaytime);			//武将出现延迟时间
-	CC_PROPERTY(float,m_AtkDelay,AtkDelay);				//武将攻击延迟时间
-	CC_PROPERTY(float,m_StateDelay,StatDelay);			//武将状态延迟时间
-	CC_PROPERTY(int,m_AliveState,AliveStat);			//武将状态
-	CC_PROPERTY(float,m_Atktime,Atktime);				//攻击间隔时间
-	CC_PROPERTY(float,m_CritTime,CritTime);				//必杀技时间
+	CC_PROPERTY_CONSTREAD(float,m_Delaytime,Delaytime);	//武将出现延迟时间
+	CC_PROPERTY_CONSTREAD(float,m_AtkDelay,AtkDelay);	//武将攻击延迟时间
+	CC_PROPERTY_CONSTREAD(float,m_StateDelay,StatDelay);//武将状态延迟时间
+	CC_PROPERTY_CONSTREAD(int,m_AliveState,AliveStat);	//武将状态
+	CC_PROPERTY_CONSTREAD(float,m_Atktime,Atktime);		//攻击间隔时间
+	CC_PROPERTY_CONSTREAD(float,m_CritTime,CritTime);	//必杀技时间
 	CC_SYNTHESIZE(float,m_AtkInterval,AtkInterval);		//攻速(次/秒)
 	CC_SYNTHESIZE(float,m_TimePercent,TimePercent);		//攻速增减百分比
 	CC_SYNTHESIZE(int,m_initCost,InitCost);				//初始 cost
 	CC_SYNTHESIZE(int,m_CostMax,Costmax);				//cost Max
 	CC_SYNTHESIZE(float,m_AddCost,AddCost);				//cost 秒变化率
-	CC_PROPERTY(int,m_AtkNum,AtkNum);					//记录攻击次数(3次释放特殊攻击)
+	CC_PROPERTY_CONSTREAD(int,m_AtkNum,AtkNum);			//记录攻击次数(3次释放特殊攻击)
 	CC_SYNTHESIZE(int,m_Batch,Batch);					//批次
 	CC_SYNTHESIZE(int,m_GroupIndex,GroupIndex);			//效果组
 	CC_SYNTHESIZE(int,m_EffectIndex,EffIndex);			//效果Index
-	CC_PROPERTY(int,m_Hp,Hp);							//血量
+	CC_PROPERTY_CONSTREAD(int,m_Hp,Hp);					//血量
 	CC_SYNTHESIZE(unsigned int,m_MaxHp,MaxHp);			//血量Max
 	CC_SYNTHESIZE(int,m_Atk,Atk);						//攻击
-	CC_PROPERTY(int,m_Def,Def);							//防御
+	CC_PROPERTY_CONSTREAD(int,m_Def,Def);				//防御
 	CC_SYNTHESIZE(int,m_Hit,Hit);						//命中
 	CC_SYNTHESIZE(int,m_Doge,Doge);						//闪避
 	CC_SYNTHESIZE(int,m_Crit,Crit);						//暴击

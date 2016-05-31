@@ -31,7 +31,11 @@ void CallAliveByFixRange( WarAlive*father , WarAlive*child );
 
 SkillEffect* getSummonEffect(TempSkill* skill);
 
-void RemoveVectorRepeat(vector<int>& Vec);
+void VectorRemoveRepeat(vector<int>& Vec);
+
+void VectorRemoveRepeat(vector<WarAlive*> &pVector);
+
+void VectorSortAliveHp(vector<WarAlive*> &pVector);
 
 void PlaySound_Event(int id);
 #endif

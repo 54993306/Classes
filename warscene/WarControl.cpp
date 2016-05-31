@@ -99,8 +99,8 @@ void WarControl::OnClick(CCObject* ob)
 		}break;
 	case TEST_BattleData:																	//测试重置当前关卡
 		{
-			BattleServerData* data = DataCenter::sharedData()->getWar()->getBattleData();
-			int stageId = DataCenter::sharedData()->getWar()->getStageID();
+			BattleServerData* data = m_Manage->getBattleData();
+			int stageId = m_Manage->getStageID();
 			//CPlayerControl::getInstance().sendEnterStage(stageId,data->HeroList.at(0).id,data->HeroList.at(1).id,data->HeroList.at(2).id,data->HeroList.at(3).id,data->HeroList.at(4).id);
 		}break;
 	default:break;
@@ -274,7 +274,7 @@ void WarControl::initWorldBossAbove(WarAlive* boss)
 void WarControl::updateWorldBossDamage()
 {
 	WarAlive* boss = m_Manage->getAliveByType(AliveType::WorldBoss);
-	int num = DataCenter::sharedData()->getWar()->getBossHurtCount();
+	int num = m_Manage->getBossHurtCount();
 	m_pAllDamage->runAction(CCRollLabelAction::create(0.3f, atoi(m_pAllDamage->getString()), num, m_pAllDamage));
 	m_pAllDamage->runAction(CCSequence::createWithTwoActions(CCScaleTo::create(0.1f, 1.5f), CCScaleTo::create(0.05f, 1.0f)));
 }
@@ -622,7 +622,7 @@ CWidgetTouchModel WarControl::AliveButtonBeginClick(CCObject* ob,CCTouch* pTouch
 	}else{
 		if (alive->getHp()<=0)
 		{
-			DataCenter::sharedData()->getWar()->initAlive(alive);				//使用元宝重置时将我方主帅进行重新初始化再次添加到战斗中
+			m_Manage->initAlive(alive);											//使用元宝重置时将我方主帅进行重新初始化再次添加到战斗中
 			CaptainSkill::create()->ExecuteCaptainSkill();
 		}
 		if (cost < alive->role->useCost)
@@ -737,13 +737,12 @@ void WarControl::upContinuousNodeState(float dt)
 void WarControl::showMonsterTips(CCObject* ob)
 {
 	vector<int>Vec;
-	vector<WarAlive*>*VecAlive = DataCenter::sharedData()->getWar()->getVecMonsters();
-	for (auto alive:*VecAlive)
+	for (auto alive: *m_Manage->getVecMonsters())
 	{
 		if (alive->getGridIndex() < 52)continue;			//不再预警标记显示范围内
 		Vec.push_back(alive->getGridIndex() % C_GRID_ROW);
 	}
-	RemoveVectorRepeat(Vec);
+	VectorRemoveRepeat(Vec);
 	for (auto i:Vec)
 	{
 		EffectObject* ef = (EffectObject*)m_ControLayer->getChildByTag(CL_TipsEffect1 + i);

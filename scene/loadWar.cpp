@@ -196,10 +196,10 @@ void LoadWar::DataParse()
 	}
 	for (auto i:data->TrapList)
 		VecTerrain.push_back(i.terrainId);
-	RemoveVectorRepeat(VecRole);
-	RemoveVectorRepeat(VecEffect);
-	RemoveVectorRepeat(VecBuff);
-	RemoveVectorRepeat(VecTerrain);
+	VectorRemoveRepeat(VecRole);
+	VectorRemoveRepeat(VecEffect);
+	VectorRemoveRepeat(VecBuff);
+	VectorRemoveRepeat(VecTerrain);
 	m_WarResouse[ResourceType::Load_Role]		= VecRole;
 	m_WarResouse[ResourceType::Load_Effect]		= VecEffect;
 	m_WarResouse[ResourceType::Load_Buff]		= VecBuff;
@@ -385,7 +385,7 @@ void LoadWar::LoadEffect()
 			}
 		}else{ CCLOG("[ ERROE ]: LoadWar::loadWarResourse in load skil Effect id =%d",id); }
 	}
-	RemoveVectorRepeat(VecEffectID);
+	VectorRemoveRepeat(VecEffectID);
 	for(auto i:VecEffectID)
 	{
 		sprintf(plist_str,"skill/%d.plist",i);
