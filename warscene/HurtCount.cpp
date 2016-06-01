@@ -26,15 +26,15 @@ BattleResult* HurtCount::AttackExcute(WarAlive* alive)
 	Result->setAlive(alive);
 	if (alive->getOpposite())													//为了做击退处理
 	{
-		vector<WarAlive*>::reverse_iterator iter = alive->m_AreaTargets.rbegin();//迭代器反向遍历(用下标效率是最高的)
-		for (;iter != alive->m_AreaTargets.rend();iter++)
+		vector<WarAlive*>::reverse_iterator iter = alive->mAreaTargets.rbegin();//迭代器反向遍历(用下标效率是最高的)
+		for (;iter != alive->mAreaTargets.rend();iter++)
 		{
 			WarAlive* HitAlive = *iter;
 			HurtExcute(Result,alive,HitAlive);
 		}
 	}else{
-		vector<WarAlive*>::iterator iter = alive->m_AreaTargets.begin();
-		for (;iter != alive->m_AreaTargets.end();iter ++)
+		vector<WarAlive*>::iterator iter = alive->mAreaTargets.begin();
+		for (;iter != alive->mAreaTargets.end();iter ++)
 		{
 			WarAlive* HitAlive = *iter;
 			HurtExcute(Result,alive,HitAlive);

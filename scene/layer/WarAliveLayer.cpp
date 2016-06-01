@@ -81,8 +81,12 @@ void WarAliveLayer::createLayerColor()
 
 void WarAliveLayer::createActObjects()
 {
-	for (auto tMonster : *m_Manage->getVecMonsters())
-		initActobject(tMonster);
+	Members* map_Alive = m_Manage->getMembers();
+	for (auto tPair : *map_Alive)
+	{
+		if (tPair.second->getHp()>0 && tPair.second->getEnemy())
+			initActobject(tPair.second);
+	}
 	initActobject(m_Manage->getAliveByGrid(C_CAPTAINSTAND));
 }
 

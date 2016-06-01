@@ -27,12 +27,10 @@ WarAlive::~WarAlive()
 	m_BuffManage = nullptr;
 	m_ActObject = nullptr;
 	m_MoveObj = nullptr;
-	m_StandGrids.clear();
+	mStandGrids.clear();
 	moves.clear();
-	AtkArea.clear();
-	AliveS.clear();
-	m_SkillArea.clear();
-	m_AreaTargets.clear();
+	mSkillArea.clear();
+	mAreaTargets.clear();
 }
 
 void WarAlive::setMoveGrid(int var)
@@ -150,15 +148,15 @@ void WarAlive::setGridIndex(int var)
 		m_Battle = false;
 	}else{
 		m_Battle =true;
-		m_StandGrids.clear();
+		mStandGrids.clear();
 		for (int i=0;i<role->row;i++)
 			for (int j =0;j<role->col;j++)
 			{
 				if (var+j*C_GRID_ROW+i>C_ENDGRID)
 					continue;
-				m_StandGrids.push_back(var+j*C_GRID_ROW+i);
+				mStandGrids.push_back(var+j*C_GRID_ROW+i);
 			}			
-			sort(m_StandGrids.begin(),m_StandGrids.end());
+			sort(mStandGrids.begin(),mStandGrids.end());
 	}
 }
 
@@ -167,16 +165,16 @@ void WarAlive::setTouchGrid(int var)
 	if (var == m_TouchGrid)
 		return;
 	m_TouchGrid = var;
-	TouchGrids.clear();
+	mTouchGrids.clear();
 	for (int i=0;i<role->row;i++)
 		for (int j =0;j<role->col;j++)
-			TouchGrids.push_back(var+j*C_GRID_ROW+i);
-	sort(TouchGrids.begin(),TouchGrids.end());
-	int row = TouchGrids.at(0)%C_GRID_ROW;				//最小格子的站位
+			mTouchGrids.push_back(var+j*C_GRID_ROW+i);
+	sort(mTouchGrids.begin(),mTouchGrids.end());
+	int row = mTouchGrids.at(0)%C_GRID_ROW;				//最小格子的站位
 	if (row+role->row>C_GRID_ROW)						//武将所占格子,不能超出地图外
 	{
 		m_TouchGrid=INVALID_GRID;
-		TouchGrids.clear();
+		mTouchGrids.clear();
 	}
 }
 
@@ -207,10 +205,8 @@ void WarAlive::ExcuteNextEffect()
 {
 	setSortieNum(0);																//当前效果攻击次数
 	setOpposite(false);																//重置反向攻击
-	AtkArea.clear();																//清除随机固定格子(好像还是逻辑的)
-	AliveS.clear();																	//清除随机固定武将
-	m_AreaTargets.clear();
-	m_SkillArea.clear();
+	mAreaTargets.clear();
+	mSkillArea.clear();
 	clearHitAlive();
 }
 
@@ -326,7 +322,7 @@ bool WarAlive::captainCallNumberJudge()
 bool WarAlive::hasAliveByTargets( WarAlive* pAlive )
 {
 	bool tHasAlive = false;
-	for (auto tAlive:m_AreaTargets)
+	for (auto tAlive:mAreaTargets)
 	{
 		if (tAlive->getAliveID() == pAlive->getAliveID())
 		{
@@ -339,26 +335,26 @@ bool WarAlive::hasAliveByTargets( WarAlive* pAlive )
 
 bool WarAlive::pierceJudge()
 {
-	if (getCurrEffect()->mode == ePuncture&&m_AreaTargets.size())//贯穿与非贯穿类处理
+	if (getCurrEffect()->mode == ePuncture&&mAreaTargets.size())//贯穿与非贯穿类处理
 	{
-		WarAlive* alive = m_AreaTargets.at(0);
+		WarAlive* alive = mAreaTargets.at(0);
 		if (!alive->getCloaking())									//潜行类怪物处理
 			return true;
-		m_AreaTargets.clear();
+		mAreaTargets.clear();
 	}
 	return false;
 }
 
 void WarAlive::cloakingTarget()
 {
-	if (!getCriAtk()&& m_AreaTargets.size())						//判断受击目标是否为潜行类怪物							
+	if (!getCriAtk()&& mAreaTargets.size())						//判断受击目标是否为潜行类怪物							
 	{
-		for (auto tAlive:m_AreaTargets)
+		for (auto tAlive:mAreaTargets)
 		{
 			if ( !tAlive->getCloaking() )
 				return;
 		}
-		m_AreaTargets.clear();										//非主动技能状态无法攻击全部潜行怪物		
+		mAreaTargets.clear();										//非主动技能状态无法攻击全部潜行怪物		
 	}
 }
 
@@ -366,10 +362,23 @@ bool WarAlive::standInGrid( int pGrid )
 {
 	if (pGrid >= C_CAPTAINGRID && getCaptain() )
 		return true;
-	for (auto tGrid : m_StandGrids)
+	for (auto tGrid : mStandGrids)
 	{
 		if (tGrid == pGrid)
 			return true;
+	}
+	return false;
+}
+
+bool WarAlive::critJudge()
+{
+	if (!getCaptain()&&
+		getCriAtk()&&
+		!getCritEffect()&&
+		getCallType() != AutoSkill)
+	{
+		setCritEffect(true);
+		return true;
 	}
 	return false;
 }

@@ -21,6 +21,7 @@ struct GameFinishData
 
 class TempMonster;
 class BufExp;
+class GuardArea;
 class MoveRule;
 class WarScene; 
 class WarAlive;
@@ -84,14 +85,13 @@ public:
 	bool monsterFlee(WarAlive* alive);
 	void MonsterExcuteAI(WarAlive* alive,float dt); 
 	void HeroExcuteAI(WarAlive* alive);
-	void AliveExcuteAI(WarAlive* alive,CCDictionary*pDic);	
+	void AliveExcuteAI(WarAlive* alive);	
 	void BatterRecord(CCObject* ob);
 	void AliveCritEnd(WarAlive* alive);
 	void CritAtkEnd(CCObject* ob);
-	bool critJudge(WarAlive* alive);
-	void excuteCritEffect(WarAlive* alive,CCDictionary*pDic);
-	void monsterCritEffect(WarAlive* alive,CCArray* arr);
-	void heroCritEffect(WarAlive* alive,CCArray* arr);
+	void excuteCritEffect(WarAlive* alive);
+	void monsterCritEffect(WarAlive* alive);
+	void heroCritEffect(WarAlive* alive);
 	void attackEffect(WarAlive*alive);
 	void attackDirection(WarAlive*alive);
 	void critComboEffect();
@@ -143,6 +143,7 @@ private:
 	HurtCount* m_HurtCount;
 	WarMapLayer* m_MapLayer;
 	SkillRange* m_SkillRange;
+	GuardArea* mGuardArea;
 	StoryLayer* m_StoryLayer;
 	WarAliveLayer* m_AliveLayer;
 	TerrainLayer* m_TerrainLayer;

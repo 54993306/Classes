@@ -42,15 +42,18 @@
 #include "jni/CJniHelper.h"
 #include "Battle/MoveObject.h"
 #include "Battle/BattleRole.h"
-
+#include "Battle/GuardArea.h"
 CombatLogic::CombatLogic()
 	:m_time(0),m_Assist(nullptr),m_task(nullptr),m_CombatEffect(nullptr),m_bufExp(nullptr),m_terExp(nullptr),m_SkillRange(nullptr)
-	,m_BatchNum(0),m_CurrBatchNum(0),m_FiratBatch(true),m_Scene(nullptr),m_UILayer(nullptr)
+	,m_BatchNum(0),m_CurrBatchNum(0),m_FiratBatch(true),m_Scene(nullptr),m_UILayer(nullptr),mGuardArea(nullptr)
 	,m_MapLayer(nullptr),m_AliveLayer(nullptr),m_TerrainLayer(nullptr),m_StoryLayer(nullptr)
 	,m_GuideLayer(nullptr),m_Run(false),m_HurtCount(nullptr),m_MoveRule(nullptr),m_Manage(nullptr),m_MaxCost(0)
 	,m_CurrCost(0),m_speed(1),m_Alive(nullptr),m_bRecvFinish(false),m_fCurrentCostAdd(0),
 	m_iGameTimeCount(0), m_bCountDown(false),m_Record(true),m_RecordNum(0),m_PlayerNum(0)
-{}
+{
+	m_Manage = DataCenter::sharedData()->getWar();
+	m_MapData = DataCenter::sharedData()->getMap()->getCurrWarMap();
+}
 
 CombatLogic::~CombatLogic()
 {
@@ -66,6 +69,8 @@ CombatLogic::~CombatLogic()
 	m_CombatEffect = nullptr;
 	CC_SAFE_RELEASE(m_SkillRange);
 	m_SkillRange = nullptr;
+	CC_SAFE_RELEASE(mGuardArea);
+	mGuardArea = nullptr;
 	CC_SAFE_RELEASE(m_HurtCount);
 	m_HurtCount = nullptr;
 	CC_SAFE_RELEASE(m_MoveRule);
@@ -144,14 +149,14 @@ bool CombatLogic::init()
 	m_terExp->retain();
 	m_CombatEffect = CombatEffect::create();
 	m_CombatEffect->retain();
-	m_SkillRange = SkillRange::create();
+	m_SkillRange = SkillRange::create(m_Manage);
 	m_SkillRange->retain();
+	mGuardArea = GuardArea::create(m_Manage);
+	mGuardArea->retain();
 	m_MoveRule = MoveRule::create();
 	m_MoveRule->retain();
 	m_HurtCount = HurtCount::create();
 	m_HurtCount->retain();
-	m_Manage = DataCenter::sharedData()->getWar();
-	m_MapData = DataCenter::sharedData()->getMap()->getCurrWarMap();
 	return true;
 }
 
@@ -337,10 +342,9 @@ void CombatLogic::ExcuteAI(float delta)
 //@@这整一个方法都是由一个入口开始的对武将的处理啊,都是调用的武将的属性
 void CombatLogic::HeroExcuteAI( WarAlive* pAlive )
 {
-	int ActionCode = pAlive->getActObject()->getCurrActionCode();
-	CCDictionary* AttackInfo = m_SkillRange->PlaySkillInfo(pAlive);		//生命周期只有一帧
-	CCArray* Alives = (CCArray*)AttackInfo->objectForKey(Hit_Alive);		//受击目标	
-	if (Alives->count()||pAlive->getCriAtk())
+	int ActionCode = pAlive->getActObject()->getCurrActionCode();	
+	m_SkillRange->initAttackInfo(pAlive);
+	if (pAlive->mAreaTargets.size()||pAlive->getCriAtk())
 	{
 		if (ActionCode == Walk_Index)
 		{
@@ -348,7 +352,7 @@ void CombatLogic::HeroExcuteAI( WarAlive* pAlive )
 			pAlive->getActObject()->TurnStateTo(Stand_Index);
 			pAlive->setAIState(false);
 		}
-		AliveExcuteAI(pAlive,AttackInfo);
+		AliveExcuteAI(pAlive);
 	}else{		
 		//@@这些逻辑，应该都封装在武将的内部，单个武将去单独处理自身的情况
 		if (IsAutoMoveType(pAlive) || ActionCode == Walk_Index)//自动移动类,或已经开始执行AI状态
@@ -366,7 +370,7 @@ void CombatLogic::HeroExcuteAI( WarAlive* pAlive )
 			{
 				grid = m_SkillRange->CaptainGuard(pAlive);
 			}else{
-				grid = m_SkillRange->aliveGuard(pAlive);
+				grid = mGuardArea->getAliveGuard(pAlive);
 			}
 			pAlive->setAIState(true);
 			if(grid)
@@ -433,22 +437,21 @@ void CombatLogic::MonsterExcuteAI( WarAlive* alive,float dt )
 			alive->getActObject()->setMoveState(Walk_Index);
 		return ;
 	}
-	CCDictionary* AttackInfo = m_SkillRange->PlaySkillInfo(alive);			//生命周期只有一帧
-	CCArray* Alives = (CCArray*)AttackInfo->objectForKey(Hit_Alive);		//受击目标
-	if (Alives->count())
+	 m_SkillRange->initAttackInfo(alive);
+	if (alive->mAreaTargets.size())
 	{
 		if (ActionCode == Walk_Index)
 		{
 			alive->getActObject()->setMoveState(0);
 			alive->getActObject()->TurnStateTo(Stand_Index);
 		}
-		AliveExcuteAI(alive,AttackInfo);
+		AliveExcuteAI(alive);
 	}else{
 		if (alive->getSkillType() == CallAtk)
 		{
 			alive->getActObject()->setMoveState(0);
 			alive->getActObject()->TurnStateTo(Stand_Index);
-			AliveExcuteAI(alive,AttackInfo); 
+			AliveExcuteAI(alive); 
 		}else{
 			if (alive->getCriAtk())
 				alive->setCriAtk(false);			
@@ -458,56 +461,40 @@ void CombatLogic::MonsterExcuteAI( WarAlive* alive,float dt )
 	}
 }
 
-bool CombatLogic::critJudge( WarAlive* alive )
-{
-	if (!alive->getCaptain()&&
-		alive->getCriAtk()&&
-		!alive->getCritEffect()&&
-		alive->getCallType() != AutoSkill)
-	{
-		alive->setCritEffect(true);
-		return true;
-	}
-	return false;
-}
-
-void CombatLogic::monsterCritEffect( WarAlive* alive ,CCArray* arr)
+void CombatLogic::monsterCritEffect( WarAlive* alive)
 {
 	alive->getActObject()->TurnStateTo(Stand_Index);		
-	m_MapLayer->DrawWarningEffect(arr);						//格子预警
+	m_MapLayer->DrawWarningEffect(alive->mSkillArea);						//格子预警
 	m_CombatEffect->PlayerSkill(alive);
 }
 
-void CombatLogic::heroCritEffect( WarAlive* alive ,CCArray* arr)
+void CombatLogic::heroCritEffect( WarAlive* alive )
 {
 	ActObject* pActObject = alive->getActObject();
 	m_Run = false;
 	m_Alive = alive;
 	pActObject->setUserObject(CCBool::create(true));
 	pActObject->setZOrder(0);
-	CCObject* obj = nullptr;
-	CCArray* actArr = CCArray::create();
-	CCARRAY_FOREACH(arr,obj)
+	for (auto tAlive:alive->mAreaTargets)
 	{
-		WarAlive* pAlive = (WarAlive*)obj;
-		pAlive->getActObject()->setUserObject(CCBool::create(true));
-		pAlive->getActObject()->setZOrder(0);
-		pAlive->getActObject()->pauseSchedulerAndActions();
-		actArr->addObject(pAlive->getActObject());
+		tAlive->getActObject()->setUserObject(CCBool::create(true));
+		tAlive->getActObject()->setZOrder(0);
+		tAlive->getActObject()->pauseSchedulerAndActions();
+		tAlive->getActObject()->setMoveState(0);
+		tAlive->getActObject()->TurnStateTo(Stand_Index);
 	}
-	m_Assist->ActStandExcute(actArr);										//受击目标站立处理
 	m_AliveLayer->getLayerColor()->setVisible(true);
 	LGPause(m_AliveLayer);													//暂停刷新位置和zorder的值
 	m_CombatEffect->PlayerSkill(alive);
 }
 
-void CombatLogic::excuteCritEffect( WarAlive* alive ,CCDictionary*pDic)
+void CombatLogic::excuteCritEffect( WarAlive* alive)
 {
 	if (alive->getEnemy())
 	{
-		monsterCritEffect(alive,(CCArray*)pDic->objectForKey(Atk_Area));
+		monsterCritEffect(alive);
 	}else{
-		heroCritEffect(alive,(CCArray*)pDic->objectForKey(Hit_Alive));
+		heroCritEffect(alive);
 	}
 }
 
@@ -539,23 +526,15 @@ void CombatLogic::attackDirection( WarAlive*alive )
 	}
 }
 //@@
-void CombatLogic::AliveExcuteAI(WarAlive* alive,CCDictionary*pDic)
+void CombatLogic::AliveExcuteAI(WarAlive* alive)
 {
-	CCArray* Alives = (CCArray*)pDic->objectForKey(Hit_Alive);
-	if (critJudge(alive))
+	if (alive->critJudge())
 	{
-		excuteCritEffect(alive,pDic);
+		excuteCritEffect(alive);
 		return;
 	}
 	attackDirection(alive);
 	attackEffect(alive);
-	CCObject* obj = nullptr;
-	CCARRAY_FOREACH(Alives,obj)
-	{
-		WarAlive* pAlive = (WarAlive*)obj;
-		if (pAlive->getHp()<=0)continue;
-		alive->m_AreaTargets.push_back(pAlive);
-	}
 }
 
 void CombatLogic::BatterRecord( CCObject* ob )

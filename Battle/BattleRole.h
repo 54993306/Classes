@@ -50,15 +50,14 @@ public:
 	bool pierceJudge();
 	void cloakingTarget();						//判断受击目标内是否全为隐身对象
 	bool standInGrid(int pGrid);
+	bool critJudge();
 public:
 	TempRole* role;								//服务器角色信息
-	vector<int> m_StandGrids;					//多格子站位
+	vector<int> mStandGrids;					//多格子站位
 	vector<int> moves;							//各方向移动范围
-	vector<int> TouchGrids;						//移动状态下武将多格子处理
-	vector<int> AtkArea;						//多个攻击格子
-	vector<WarAlive*> AliveS;					//多个攻击目标
-	vector<int>m_SkillArea;						//存储武将当前技能区域
-	vector<WarAlive*> m_AreaTargets;			//存储区域内目标
+	vector<int> mTouchGrids;					//移动状态下武将多格子处理
+	vector<int>mSkillArea;						//存储武将当前技能区域
+	vector<WarAlive*> mAreaTargets;				//存储区域内目标
 	vector<WarAlive*> HittingAlive;				//受击目标中被击中对象				(用于做buff和受击目标死亡结算处理)
 	CC_PROPERTY_CONSTREAD(BuffManage*,m_BuffManage,BuffManage);
 	CC_SYNTHESIZE(ActObject*,m_ActObject,ActObject);

@@ -201,7 +201,7 @@ void WarManager::initBatchData( int batch )
 
 void WarManager::initAlive(WarAlive* alive)
 {
-	alive->m_StandGrids.clear();
+	alive->mStandGrids.clear();
 	if (alive->getEnemy())
 	{
 		alive->setGridIndex(alive->role->grid);
@@ -316,9 +316,9 @@ WarAlive* WarManager::getAliveByGrid(int grid)
 			else
 				continue;
 		}
-		for (int i=0; i < alive->m_StandGrids.size();i++)
+		for (int i=0; i < alive->mStandGrids.size();i++)
 		{
-			if (alive->m_StandGrids.at(i) == grid)
+			if (alive->mStandGrids.at(i) == grid)
 				return alive;
 		}
 	}
@@ -403,8 +403,8 @@ WarAlive* WarManager::getNewCallAlive(WarAlive* Father,int CallId)
 			{
 				CallAliveByFixRange(Father,child);
 			}else{
-				int ran = CCRANDOM_0_1()*(Father->m_StandGrids.size()-1);
-				int grid = MoveRule::create()->getCurrRandomGrid(Father->m_StandGrids.at(ran));	//得到当前武将格子的附近范围格子
+				int ran = CCRANDOM_0_1()*(Father->mStandGrids.size()-1);
+				int grid = MoveRule::create()->getCurrRandomGrid(Father->mStandGrids.at(ran));	//得到当前武将格子的附近范围格子
 				child->setGridIndex(grid);
 			}
 			child->setMstType(child->role->MstType);
@@ -552,6 +552,7 @@ void WarManager::initWordBossData( WarResponse*pServerData )
 void WarManager::initCommonData()
 {
 	initData();
+	updateAlive();
 	ReleaseSpineData();													//应该有更好的管理方法
 	ParseMoveGrid(m_StageID,m_CantMoveGrid);
 	ParseAddCostGrid(m_StageID,m_AddCostGrid);
@@ -565,12 +566,13 @@ void WarManager::initCommonData()
 
 vector<WarAlive*>* WarManager::getSkillTargets(WarAlive* pAlive)
 {
-	bool tEnemy = pAlive->getEnemy();
-	bool tTarget = pAlive->getCurrEffect()->pTarget;
-	if ((tEnemy&&tTarget == eUsType) || ( !tEnemy&&tTarget == eEnemyType))			/*敌方自己，我方敌人*/
-		return getVecHeros(true);
-	if ((tEnemy&&tTarget == eEnemyType) || ( !tEnemy&&tTarget == eUsType))		/*敌方敌人，我方自己*/
+	int tTarget = pAlive->getCurrEffect()->pTarget;
+	if ((pAlive->getEnemy()&&tTarget == eUsType)	|| 
+		(!pAlive->getEnemy()&&tTarget == eEnemyType) )			/*敌方自己，我方敌人*/
 		return getVecMonsters(true);
+	if ((pAlive->getEnemy()&&tTarget == eEnemyType) ||
+		(!pAlive->getEnemy()&&tTarget == eUsType))			/*敌方敌人，我方自己*/
+		return getVecHeros(true);
 	return getAliveRoles(true);
 }
 

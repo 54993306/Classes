@@ -101,7 +101,7 @@ public:
 	int batch;					//批次
 	float delay;				//延迟时间
 	bool isBoss;				//是否为boss
-	int move1;					//多方向移动怪物
+	int move1;					//多方向移动怪物				(应该要被删除掉的字段,怪物都是往前走,方向参数无意义,靠速度来控制怪物的移动即可,但是怪物还有一个相应的移动规则,不过也跟该字段无关了)
 	int  quality;				//英雄品质 1白色,2绿色,3蓝色,4紫色,5红色
 	void readData(const protos::common::Monster &monster);
 };

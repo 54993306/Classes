@@ -89,7 +89,7 @@ int MoveRule::MoveJudge(WarAlive* alive,int grid)
 
 int MoveRule::getMoveGrid(WarAlive* alive,int grid)
 {
-	if (alive->m_StandGrids.size()>1)							//在判断多个格子情况
+	if (alive->mStandGrids.size()>1)							//在判断多个格子情况
 	{
 		int us_grid = alive->getGridIndex();
 		int row = us_grid % C_GRID_ROW;				
@@ -101,9 +101,9 @@ int MoveRule::getMoveGrid(WarAlive* alive,int grid)
 
 		int c_Num = grid - alive->getGridIndex();		//标记格子变化量
 		bool canMove = true;
-		for (int j=1;j < alive->m_StandGrids.size(); j++)
+		for (int j=1;j < alive->mStandGrids.size(); j++)
 		{
-			int us_point = alive->m_StandGrids.at(j);
+			int us_point = alive->mStandGrids.at(j);
 			int us_row = us_point % C_GRID_ROW;				
 			int us_col = us_point / C_GRID_ROW;
 			if (us_row+c_row >= C_GRID_ROW || 

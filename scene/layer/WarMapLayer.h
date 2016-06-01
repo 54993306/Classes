@@ -45,7 +45,7 @@ class SkillRange;
 class MapBackgroundManage;
 class WarManager;
 class WarAlive;
-
+class GuardArea;
 class WarMapLayer:public CCNode
 {
 public:
@@ -71,7 +71,7 @@ public:
 	void CaptainHit(CCObject* ob);
 	CC_PROPERTY(CLayout*,m_MapLayer,Maplayer);
 	MapBackgroundManage* getBackgroundManage();
-	void DrawWarningEffect(CCArray* Grids);
+	void DrawWarningEffect(vector<int>& pVector);
 	void CostAreaTips(CCObject* ob);
 protected:
 	void createBackImage();
@@ -80,6 +80,7 @@ private:
 	CCSpriteBatchNode* m_DisPlayArea;		//可移动区域
 	CCNode* m_GridIndex;					//用于显示格子标记(测试用)
 	SkillRange* m_SkillRange;				//攻击区域计算
+	GuardArea* mGuardArea;					//武将警戒区域
 	MoveRule* m_move;						//移动区域计算
 	vector<int> m_VecGridIndex;				//存储敌方武将按钮显示的格子
 	WarManager* m_Manage;

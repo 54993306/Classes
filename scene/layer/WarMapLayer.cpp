@@ -18,6 +18,8 @@
 #include "warscene/ParseFileData.h"
 #include "tools/ShowTexttip.h"
 #include "Battle/BattleMessage.h"
+#include "Battle/GuardArea.h"
+#include "Battle/SkillMacro.h"
 #define AddMoveImg		"lv.png"
 #define CutMoveImg		"huang.png"
 #define AtksImg			"hong.png"
@@ -28,7 +30,7 @@
 #define Blue			"blue.png"
 
 WarMapLayer::WarMapLayer()
-	:m_MapLayer(nullptr),m_GridIndex(nullptr)
+	:m_MapLayer(nullptr),m_GridIndex(nullptr),mGuardArea(nullptr)
 	,m_SkillRange(nullptr),m_Manage(nullptr),m_BackgroundManage(nullptr)
 	,m_DisPlayArea(nullptr),m_BackArea(false),m_FrontArea(false)
 {}
@@ -43,6 +45,8 @@ WarMapLayer::~WarMapLayer()
 	m_DisPlayArea = nullptr;
 	CC_SAFE_RELEASE(m_GridIndex);
 	m_GridIndex = nullptr;
+	CC_SAFE_RELEASE(mGuardArea);
+	mGuardArea = nullptr;
 	m_Manage = nullptr;
 	CCSpriteFrameCache::sharedSpriteFrameCache()->removeSpriteFramesFromFile("warScene/movebg.plist");
 }
@@ -55,8 +59,11 @@ void WarMapLayer::onExit()
 bool WarMapLayer::init()
 {
 	bool res = CCNode::init();
-	m_SkillRange = SkillRange::create();
+	m_Manage = DataCenter::sharedData()->getWar();
+	m_SkillRange = SkillRange::create(m_Manage);
 	m_SkillRange->retain();
+	mGuardArea = GuardArea::create(m_Manage);
+	mGuardArea->retain();
 
 	CCSpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile("warScene/movebg.plist");
 	m_DisPlayArea = CCSpriteBatchNode::create("warScene/movebg.png");
@@ -68,7 +75,7 @@ bool WarMapLayer::init()
 	m_BackgroundManage = MapBackgroundManage::create();
 	if (m_BackgroundManage)
 		m_BackgroundManage->retain();
-	m_Manage = DataCenter::sharedData()->getWar();
+	
 	createBackImage();
 	return res;
 }
@@ -161,7 +168,7 @@ void WarMapLayer::DrawAtkArea(WarAlive* alive)
 	vector<int>VecGrid;
 	if (alive->role->alert && !alive->getCriAtk())
 	{
-		m_SkillRange->initAliveGuard(alive,VecGrid);
+		mGuardArea->initAliveGuard(alive,VecGrid);
 	}else{
 		vector<int> tVector;
 		m_SkillRange->initSkillArea(alive,tVector);
@@ -189,7 +196,7 @@ void WarMapLayer::DrawAtkArea(WarAlive* alive)
 			}
 		}
 	}
-	for (auto i : alive->TouchGrids)
+	for (auto i : alive->mTouchGrids)
 	{
 		CCSprite* sp = (CCSprite*)m_DisPlayArea->getChildByTag(i+map_Bg);
 		if (!sp)continue;
@@ -257,7 +264,7 @@ void WarMapLayer::DrawAtkEffect(CCObject* ob)
 {
 	ActObject* act = (ActObject*)ob;
 	WarAlive* alive = act->getAlive();
-	for (auto i:alive->m_SkillArea)
+	for (auto i:alive->mSkillArea)
 	{
 		CCSprite* sp = (CCSprite*)m_DisPlayArea->getChildByTag(i+map_Bg);
 		EffectObject* Effect = EffectObject::create(ToString(act->getPlayerEffect()));
@@ -278,7 +285,7 @@ void WarMapLayer::DrawAtkEffect(CCObject* ob)
 void WarMapLayer::CancelCombatArea(CCObject* ob)
 {
 	WarAlive* alive = (WarAlive*)ob;
-	for (auto tGrid : alive->m_SkillArea)
+	for (auto tGrid : alive->mSkillArea)
 	{
 		CCSprite* sp = (CCSprite*)m_DisPlayArea->getChildByTag(tGrid+map_Bg);
 		sp->setDisplayFrame(CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(AtksImg));
@@ -289,7 +296,7 @@ void WarMapLayer::CancelCombatArea(CCObject* ob)
 void WarMapLayer::CombatArea(CCObject* ob)
 {
 	WarAlive* alive = (WarAlive*)ob;
-	for (auto i:alive->m_SkillArea)
+	for (auto i:alive->mSkillArea)
 	{
 		CCSprite* sp = (CCSprite*)m_DisPlayArea->getChildByTag(i+map_Bg);
 		sp->setDisplayFrame(CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(AtksImg));
@@ -355,13 +362,11 @@ void WarMapLayer::setMaplayer(CLayout* var)
 
 CLayout* WarMapLayer::getMaplayer(){return m_MapLayer;}
 //敌方释放技能预警
-void WarMapLayer::DrawWarningEffect( CCArray* Grids )
+void WarMapLayer::DrawWarningEffect( vector<int>& pVector )
 {
-	CCObject* pObj;
-	CCARRAY_FOREACH(Grids, pObj)
+	for (auto tGrid:pVector)
 	{
-		CCInteger* pInt = (CCInteger*)pObj;
-		CCSprite* sp = (CCSprite*)m_DisPlayArea->getChildByTag(pInt->getValue() + map_Bg);
+		CCSprite* sp = (CCSprite*)m_DisPlayArea->getChildByTag(tGrid + map_Bg);
 		if(!sp)
 			continue;
 		CCSprite* pNewSp = CCSprite::createWithSpriteFrame(CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(AtksImg));
@@ -372,7 +377,7 @@ void WarMapLayer::DrawWarningEffect( CCArray* Grids )
 			CCRemoveSelf::create(),
 			nullptr
 			));
-	};
+	}
 }
 //显示脚底格子
 void WarMapLayer::CaptainHit( CCObject* ob )

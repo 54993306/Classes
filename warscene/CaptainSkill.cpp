@@ -263,7 +263,7 @@ CCArray* CaptainSkill::PositionJudgeArrCap(CCArray* arr,int type)
 //方位判定
 bool CaptainSkill::PositionJudge(bool Enemy,int grid,int type)
 {
-	SkillRange* skillrange = SkillRange::create();
+	//SkillRange* skillrange = SkillRange::create();
 	//switch (type)
 	//{
 	//case CapfrontOne:

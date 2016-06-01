@@ -15,6 +15,7 @@
  *
  *
  *************************************************************/
+#define eLoopNumberMax 200
 
 //技能施放区域类型
 enum SkillAreaType{
@@ -30,7 +31,7 @@ enum SkillAreaType{
 	eAllArea,							//全图						9
 	ePuncture,							//前方格子类型不贯穿			10
 	eTArea,								//T型区域					11
-	eMapDoubleLine,						//地图中两行					12(118)
+	
 	//与武将站位格子无关类攻击范围		(从100开始进行特殊化处理)		
 	RestArea = 100,
 	eFrontOne,						//前军单体					101
@@ -47,17 +48,10 @@ enum SkillAreaType{
 	eAnyAlive,						//随机固定武将				112
 	eAnyAliveDisperse,				//随机固定武将区域			113
 	eLowestHp,						//血量最低对象				114
-	eMapTwoLine,					//地图中间两行区域			115
-	eMapFourLine,					//地图四行区域				116		
-	TypeLowestHp,					//除主帅外血量最低对象		117
-};
-//警戒区域
-enum GuardType
-{
-	eFrontGuard =1,					//前方范围
-	eBackGuard,						//后方范围
-	eFrontAndBackGuard,				//前后范围
-	eUpDownGuard,					//警戒区域为上下范围
+	eMapCenterTwoLine,				//地图中间两行区域			115
+	eFrontFourGrid,					//地图四行区域				116		
+	LowestHpUnCaptain,				//除主帅外血量最低对象		117
+	eMapAnyDoubleLine,				//地图中任意两行				118
 };
 
 enum AreaMark
