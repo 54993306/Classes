@@ -28,6 +28,17 @@ void AreaCountInfo::excludeCaptain( )
 	}
 }
 
+void AreaCountInfo::excludeInvalid()
+{
+	vector<int>::iterator iter = mVector.begin();
+	for (;iter != mVector.end();)
+	{
+		if (*iter < C_BEGINGRID || *iter > C_ENDGRID)
+			iter = mVector.erase(iter);
+		else
+			iter++;
+	}
+}
 int AreaCountInfo::getRowByGrid( int pGrid )
 {
 	return pGrid % C_GRID_ROW;

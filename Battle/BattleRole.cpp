@@ -162,8 +162,6 @@ void WarAlive::setGridIndex(int var)
 
 void WarAlive::setTouchGrid(int var)
 {
-	if (var == m_TouchGrid)
-		return;
 	m_TouchGrid = var;
 	mTouchGrids.clear();
 	for (int i=0;i<role->row;i++)
@@ -279,7 +277,7 @@ bool WarAlive::NextEffect()
 	int ranNum = CCRANDOM_0_1()*100;								//0到100的数
 	if (getGroupIndex() >= getCurrSkill()->EffectList.size())
 		return false;
-	if (getCurrSkill()->skillId&&effId < getCurrSkill()->EffectList.at(getGroupIndex()-1).size())			//判断是否为最后的一个特效
+	if (getCurrSkill()->skillId&&effId < getCurrSkill()->EffectList.at(getGroupIndex()).size())			//判断是否为最后的一个特效
 	{
 		if (getCurrSkill()->EffectList.at(getGroupIndex()).at(effId).userRate > ranNum)
 		{

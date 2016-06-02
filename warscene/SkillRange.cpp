@@ -43,10 +43,6 @@ void SkillRange::initValidGrids( WarAlive* pAlive,vector<int>& pValids )
 	int aliveGrid = 0;
 	vector<int> CountGrid;
 	SkillEffect* effect = pAlive->getCurrEffect();
-	if (!pAlive->getEnemy() && !pAlive->getCaptain())
-	{
-		int i =0;
-	}
 	if (pAlive->getTouchState())								//单格子武将触摸状态下处理(此处应进行移动状态下攻击格子特殊处理)
 	{
 		aliveGrid = pAlive->getTouchGrid();
@@ -80,6 +76,7 @@ void SkillRange::initSkillEffectArea( WarAlive* pAlive,vector<int>& pVector )
 {
 	AreaCountInfo CountInfo(pVector,pAlive);
 	initEffectTypeArea(CountInfo);	
+	CountInfo.excludeInvalid();
 	VectorRemoveRepeat(pVector);											//包括了正向遍历和除去重复
 	if (!pAlive->getEnemy() && !pAlive->getOpposite())
 		sort(pVector.begin(),pVector.end(),greater<int>());					//我方武将正向攻击的情况(对格子进行反向排序)

@@ -33,6 +33,7 @@ public:
 	CC_SYNTHESIZE(int,mTargetType,TargetType);			//效果目标类型
 public:
 	void excludeCaptain();
+	void excludeInvalid();
 	int getRowByGrid(int pGrid);
 	int getColByInfo(int pGrod);
 	void addGrid(int pGrid);
