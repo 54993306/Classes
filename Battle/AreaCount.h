@@ -40,7 +40,7 @@ public:
 	bool hasGrid(int pGrid);
 	void DisperseDispose();
 	void RowType(int Type);											//行类型处理
-	void assignVector(std::vector<int>& pVector);
+	void inserVector(std::vector<int>& pVector);
 	const std::vector<int>& getVector()const {return mVector;}
 private:
 	std::vector<int>& mVector;		//成员不能为引用,引用必须要初始化(尽量不要让其他人访问这个数组集合,提供添加和删除的函数被外部对象调用)

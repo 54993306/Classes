@@ -247,7 +247,7 @@ void WarManager::initAlive(WarAlive* alive)
 	{
 
 	}else{		
-		alive->setAtk(500000);
+		//alive->setAtk(500000);
 		alive->setMaxHp(500000);
 		alive->setHp(500000);		//第一次进来是满血状态
 	}
@@ -571,7 +571,7 @@ vector<WarAlive*>* WarManager::getSkillTargets(WarAlive* pAlive)
 		(!pAlive->getEnemy()&&tTarget == eEnemyType) )			/*敌方自己，我方敌人*/
 		return getVecMonsters(true);
 	if ((pAlive->getEnemy()&&tTarget == eEnemyType) ||
-		(!pAlive->getEnemy()&&tTarget == eUsType))			/*敌方敌人，我方自己*/
+		(!pAlive->getEnemy()&&tTarget == eUsType))				/*敌方敌人，我方自己*/
 		return getVecHeros(true);
 	return getAliveRoles(true);
 }

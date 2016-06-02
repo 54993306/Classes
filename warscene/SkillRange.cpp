@@ -35,7 +35,7 @@ void SkillRange::getSelfArea( WarAlive* pAlive )
 	if (pAlive->getCurrEffect()->pTarget != eEnemyType)					//效果目标是敌方阵营
 		return;
 	pAlive->mSkillArea.assign(
-		pAlive->mStandGrids.begin(),pAlive->mStandGrids.end());		//最优先攻击相同格子怪物			
+		pAlive->mStandGrids.begin(),pAlive->mStandGrids.end());			//最优先攻击相同格子怪物			
 }
 //得到武将有效攻击范围判断格子(多格武将),武将站位格子排序从大到小
 void SkillRange::initValidGrids( WarAlive* pAlive,vector<int>& pValids )

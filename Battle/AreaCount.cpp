@@ -2,7 +2,7 @@
 #include "Battle/BattleRole.h"
 #include "warscene/ConstNum.h"
 #include "Battle/SkillMacro.h"
-
+using namespace cocos2d;
 AreaCountInfo::AreaCountInfo(vector<int>& pVector,WarAlive* pAlive)
 	:mGrid(0),mVector(pVector),mAlive(pAlive),mEnemy(false),mBackAttack(false)
 	,mAreaType(0),mAreaRange(0),mDistance(0),mTargetType(0)
@@ -14,6 +14,9 @@ AreaCountInfo::AreaCountInfo(vector<int>& pVector,WarAlive* pAlive)
 	setAreaType(mAlive->getCurrEffect()->mode);
 	setAreaRange(mAlive->getCurrEffect()->range);
 	setDistance(mAlive->getCurrEffect()->distance);
+#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+	setAreaType(10);
+#endif // cctar
 }
 
 void AreaCountInfo::excludeCaptain( )
@@ -70,9 +73,9 @@ bool AreaCountInfo::hasGrid( int pGrid )
 	return false;
 }
 
-void AreaCountInfo::assignVector( vector<int>& pVector )
+void AreaCountInfo::inserVector( vector<int>& pVector )
 {
-	mVector.assign(pVector.begin(),pVector.end());
+	mVector.insert(mVector.end(),pVector.begin(),pVector.end());
 }
 
 void AreaCountInfo::DisperseDispose()
@@ -106,7 +109,7 @@ void AreaCountInfo::DisperseDispose()
 			}
 		}
 	}
-	assignVector(tVector);
+	inserVector(tVector);
 }
 
 void AreaCountInfo::RowType( int Type )
@@ -162,5 +165,5 @@ void AreaCountInfo::RowType( int Type )
 			}
 		}
 	}
-	assignVector(tVector);
+	inserVector(tVector);
 }

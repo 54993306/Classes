@@ -94,15 +94,10 @@ void CombatEffect::SpineActionEvent( int trackIndex, spEvent* pEvent )
 	if (pEvent->intValue >= 200)			//音效从200号文件开始播放
 		PlaySound_Event(pEvent->intValue);
 }
-//有可能产生的拓展情况是，根据不同的连击调用不同的伤害公式，那就需要判断当前是哪个连击效果造成的伤害了
+//伤害(实际扣血) = 攻击力^2/( 攻击力+目标防御 )
 void CombatEffect::continuousHurt()
 {
-	float attackNum = CountAliveAtk();
-	hurtMonster(attackNum);
-}
-//伤害(实际扣血) = 攻击力^2/( 攻击力+目标防御 )
-void CombatEffect::hurtMonster(float Atk)
-{
+	float tAttackNum = CountAliveAtk();
 	vector<WarAlive*>* Vec = DataCenter::sharedData()->getWar()->getVecMonsters();
 	for (auto alive : *Vec)
 	{
@@ -112,7 +107,7 @@ void CombatEffect::hurtMonster(float Atk)
 		if (!actObject)
 			continue;
 		actObject->TurnStateTo(Hit_Index); 
-		int lostNum = pow(Atk,2)/(Atk+alive->getDef());
+		int lostNum = pow(tAttackNum,2)/(tAttackNum+alive->getDef());
 		if (lostNum <= 0)
 			lostNum = 1;
 		alive->setHp(alive->getHp()-lostNum);

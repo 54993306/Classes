@@ -59,7 +59,7 @@ int MoveRule::getMonsterMoveGrid(WarAlive* alive)
 		int row = index % C_GRID_ROW;
 		int col = index / C_GRID_ROW;
 		int Index = INVALID_GRID;
-		if (!alive->moves.at(TypeOne))
+		if (!alive->moves.at(0))
 			return INVALID_GRID;
 		for (int i = 1;i <= 1;i++)			//一个个区域逐个去进行判断，判断每一个区域的移动范围
 		{

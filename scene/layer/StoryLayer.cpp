@@ -71,7 +71,7 @@ bool StoryLayer::LoadFile(int storytype, StoryData* pStoryData)
 	}
 	vector<StoryStep*>* vec = pStoryData->getStory(StoryType(storytype));
 	if (! vec) return false;
-	m_VecStep.assign(vec->begin(),vec->end());
+	m_VecStep.assign(vec->begin(),vec->end());			//清空并复制
 	m_StoryStep = m_VecStep.at(m_index);
 	step();
 	return true;

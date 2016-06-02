@@ -20,7 +20,7 @@ GuardArea* GuardArea::create( WarManager* pManage )
 		return NULL; 
 	}
 }
-
+//警戒区域的变化情况值跟武将的位置变化有关系,而且是武将的移动对象格子变化。不用每次都去刷新处理
 int GuardArea::getAliveGuard( WarAlive* pAlive )
 {
 	vector<int> Vecguard;
@@ -37,7 +37,7 @@ int GuardArea::getAliveGuard( WarAlive* pAlive )
 				int tMoveGrid = i;
 				int tRow = i%C_GRID_ROW;
 				if ( tRow+pAlive->role->row > C_GRID_ROW )				//我方武将占3行,地方怪物在row=3的位置，超出地图范围了
-					tMoveGrid = i-((pAlive->role->row+tRow)-C_GRID_ROW);	//把超出的部分减掉
+					tMoveGrid = i-((pAlive->role->row+tRow)-C_GRID_ROW);//把超出的部分减掉
 				if ( tMoveGrid < C_BEGINGRID || tMoveGrid > C_ENDGRID )
 					break;
 				return tMoveGrid;

@@ -36,7 +36,6 @@ public:
 	void BatterSpine(int index);
 	void continuousHurt();													//计算连击伤害
 	float CountAliveAtk();
-	void hurtMonster(float Atk);
 	CC_SYNTHESIZE(int, m_PlayerNum, PlayerNum);
 private:
 	WarScene* m_Scene;

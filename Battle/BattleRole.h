@@ -22,7 +22,8 @@
 #include "Battle/BattleMacro.h"
 #include "Battle/SkillEffect.h"
 #include "Battle/RoleBuffData.h"
-  
+#include "Battle/BattleRoleMacro.h"
+
 using namespace cocos2d;
 using namespace std;
 class BuffManage;

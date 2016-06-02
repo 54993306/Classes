@@ -2,11 +2,11 @@
 #define _WAR_MANAGER_H_
 #include "AppUI.h"
 #include <map>
-//#include "model/BattleData.h"
+#include "Battle/BattleMacro.h"
 #include "Battle/TempData.h"
 #include "tollgate/Chapter.h"
 #include <spine/spine-cocos2dx.h>
-#include "Battle/BattleMacro.h"
+#include "Battle/BattleRoleMacro.h"
 #include "Battle/BattleTrap.h"
 #include "protos/boss_protocol.pb.h"
 #include "protos/stage_protocol.pb.h"
