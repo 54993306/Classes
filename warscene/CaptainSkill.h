@@ -11,8 +11,8 @@
 #define _CAPTAINSKILL_
 #include "AppUI.h"
 class WarAlive;
-class TempSkill;
-class SkillEffect;
+class RoleSkill;
+class skEffectData;
 class CaptainSkill : public CCObject
 {
 public:
@@ -23,13 +23,13 @@ public:
 	void ExecuteCaptainSkill();
 	CCArray* RaceJudgeCap(CCArray* arr,int type);
 	CCArray* RaceJudge(CCArray* arr,int type,bool exclude = false,bool And = false);
-	CCArray* AttributeJudgeArrCap(TempSkill& skill,CCArray* arr);
+	CCArray* AttributeJudgeArrCap(RoleSkill& skill,CCArray* arr);
 	bool AttributeJudge(WarAlive* alive,int type,int rate);
 	CCArray* PositionJudgeArrCap(CCArray* arr,int type);
 	bool PositionJudge(bool Enemy,int grid,int type);
-	CCArray* getTargetArrCap(SkillEffect&effect,CCArray*targetArr,CCArray*arr);			//得到执行队长技效果的目标数组并执行效果
-	void ExecuteArrCap(SkillEffect&effect,CCArray* arr);
-	void AliveExecute(SkillEffect&effect,WarAlive*alive);
+	CCArray* getTargetArrCap(const skEffectData*pEffect,CCArray*targetArr,CCArray*arr);			//得到执行队长技效果的目标数组并执行效果
+	void ExecuteArrCap(const skEffectData*pEffect,CCArray* arr);
+	void AliveExecute(const skEffectData*pEffect,WarAlive*alive);
 	void AddArr(CCArray* target,CCArray*arr);
 private:
 

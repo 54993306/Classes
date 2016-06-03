@@ -5,11 +5,11 @@
  *
  *		Data : 2016.4.12
  *	
- *		Name : BattleMacro
+ *		Name : CC_PROPERTY_CONSTREAD
  *
  *		Author : Lin_Xiancheng
  *
- *		Description : 定义常用宏
+ *		Description : get函数const类型,需要实现set函数
  *
  */
 
@@ -17,8 +17,6 @@
 protected: varType varName;\
 public: virtual varType get##funName(void) const { return varName; }\
 public: virtual void set##funName(varType var);
-
-
 
 
 #endif

@@ -23,12 +23,15 @@
 #include "warscene/ParseFileData.h"
 #include "warscene/BattleTools.h"
 #include "Battle/SkillMacro.h"
+#include <protos/stage_protocol.pb.h>
+#include <protos/boss_protocol.pb.h>
+
 WarManager::WarManager()
 	:m_SceneTarpID(0),m_efdata(nullptr),m_terData(nullptr),m_armatureEventDataMgr(nullptr)
 	,m_StageID(-1),m_Batch(-1),m_Logic(nullptr),m_iLastStageId(0),m_StageType(0),m_BuffData(nullptr)
-	,m_bNormal(true),m_ChapterCount(0),m_ChapterIndex(0),m_iReliveNeedGoldNum(0), m_BossModel(false)
+	,m_bNormal(true),m_ChapterCount(0),m_ChapterIndex(0), m_BossModel(false)
 	,m_VerifyNum(0),m_BossHurtCount(0),m_BossHurtPe(0),m_iWorldBossRank(0),m_StoryData(nullptr)
-	,m_BattleOver(false)
+	,m_BattleOver(false),m_FirstStage(true)
 {
 	int id[100] = {146,1464,1565,3014,3064,3514,10664,319,576,1096,1101,391,1102};
 	for (auto i:id)
@@ -59,6 +62,7 @@ void WarManager::BattleDataClear()
 		CC_SAFE_RELEASE(iter->second);
 		iter->second = nullptr;
 	}
+	m_FirstStage = true;
 	m_ServerData.HeroList.clear();
 	m_ServerData.MonsterList.clear();
 	m_BattleOver = true;
@@ -184,9 +188,9 @@ void WarManager::initBatchData( int batch )
 		WarAlive* alive = WarAlive::create();								//创建数据对象
 		if (m_ServerData.MonsterList.at(i).isBoss)							//大怪物提示
 			if (m_BossModel)
-				alive->setAliveType(AliveType::WorldBoss);					//世界boss
+				alive->setAliveType(E_ALIVETYPE::WorldBoss);					//世界boss
 			else
-				alive->setAliveType(AliveType::Boss);						//一般类型大boss
+				alive->setAliveType(E_ALIVETYPE::Boss);						//一般类型大boss
 		alive->role = &m_ServerData.MonsterList.at(i);
 		alive->setAliveID(C_BatchMonst+i+batch*100);
 		alive->setEnemy(true);
@@ -210,9 +214,9 @@ void WarManager::initAlive(WarAlive* alive)
 		{
 			alive->setCaptain(true);
 			alive->setGridIndex(C_CAPTAINSTAND);
-			SkillEffect* effect = getSummonEffect(&alive->role->skill3);
+			skEffectData* effect = alive->role->skActive.getSummonEffect();
 			if (effect)
-				alive->setCallAliveNum(effect->pro_Type);
+				alive->setCallAliveNum(effect->getImpactType());
 		}else{
 			alive->setGridIndex(INVALID_GRID);
 		}
@@ -223,7 +227,7 @@ void WarManager::initAlive(WarAlive* alive)
 	alive->setCallType(alive->role->CallType);
 	alive->setAtkInterval(alive->role->atkInterval);
 	alive->setMoveSpeed(alive->role->MoveSpeed);
-	if (alive->getAliveType() == AliveType::WorldBoss)
+	if (alive->getAliveType() == E_ALIVETYPE::WorldBoss)
 	{
 		alive->setMaxHp(alive->role->maxhp);
 	}else{
@@ -325,7 +329,7 @@ WarAlive* WarManager::getAliveByGrid(int grid)
 	return nullptr;
 }
 
-WarAlive* WarManager::getAliveByType( AliveType type,bool Monster/* = true*/ )
+WarAlive* WarManager::getAliveByType( E_ALIVETYPE type,bool Monster/* = true*/ )
 {
 	for(Members::iterator iter = m_members.begin(); iter != m_members.end();++iter)
 	{
@@ -350,14 +354,8 @@ bool WarManager::checkMonstOver()
 
 BattleServerData* WarManager::getBattleData() { 
 	return &m_ServerData; }
-vector<TempMonster*>* WarManager::getCallMonst() { 
-	return & m_CallRole; }
 ArmatureEventDataMgr* WarManager::getArmatureDataMgr() { 
 	return m_armatureEventDataMgr; }
-void WarManager::setTollgate(CStage& tag) { 
-	tollgateInfo = tag; }
-CStage* WarManager::getTollgete() { 
-	return& tollgateInfo; }
 Members* WarManager::getMembers() { 
 	return &m_members; }
 EffectData* WarManager::getEffData() { 
@@ -421,20 +419,20 @@ WarAlive* WarManager::getNewCallAlive(WarAlive* Father,int CallId)
 	return nullptr;
 }
 
-WarAlive* WarManager::getCallAlive(WarAlive* Father,TempSkill* skill)
+WarAlive* WarManager::getCallAlive(WarAlive* Father,RoleSkill* skill)
 {
 	WarAlive* alive = getAbsentCallAlive(Father);					
 	if (alive)
 		return alive;
 	if (Father->captainCallNumberJudge())
 		return nullptr;
-	SkillEffect* effect = getSummonEffect(skill);
+	skEffectData* effect = skill->getSummonEffect();
 	if (!effect)
 	{
 		CCLOG("[ *ERROR ] WarManager::getCallAlive Skill Effect NULL");
 		return nullptr;
 	}
-	return getNewCallAlive(Father,effect->pTarget);
+	return getNewCallAlive(Father,effect->getTargetType());
 }
 //pAlive为释放技能的武将,召唤出来的武将继承释放技能对象的百分比属性
 void WarManager::initCallAlive(WarAlive* alive,WarAlive*pAlive)
@@ -442,7 +440,7 @@ void WarManager::initCallAlive(WarAlive* alive,WarAlive*pAlive)
 	alive->setModel(alive->role->thumb);
 	alive->setZoom(alive->role->zoom*0.01f);
 	alive->setInitCost(alive->role->initCost);									//召唤消耗的cost(根技能消耗的相等)
-	if (pAlive->getAliveType() == AliveType::WorldBoss)
+	if (pAlive->getAliveType() == E_ALIVETYPE::WorldBoss)
 	{
 		alive->setAtkInterval(alive->role->atkInterval);
 		alive->setMoveSpeed(alive->role->MoveSpeed);
@@ -493,49 +491,47 @@ void WarManager::updateAlive()
 	}
 }
 
-void WarManager::clearBeforeData()
+void WarManager::clearOldData()
 {
 	srandNum();
 	DataCenter::sharedData()->getWar()->BattleDataClear();
 	DataCenter::sharedData()->getMap()->clearMap();
 }
 //初始化战斗数据
-void WarManager::initBattleData(BattleResponse*pServerData)
+void WarManager::initBattleData( protos::BattleResponse*pServerData)
 {
-	clearBeforeData();
+	clearOldData();
 	for (int i=0; i< pServerData->herolist_size(); i++)				//英雄		     
 	{
-		TempHero obj;
+		HeroRoleData obj;
 		obj.readData(pServerData->herolist(i));
 		m_ServerData.HeroList.push_back(obj);
 	}
 	for (int j=0; j< pServerData->monsterlist_size(); j++)			//怪物
 	{
-		TempMonster obj;
+		MonsterRoleData obj;
 		obj.readData(pServerData->monsterlist(j));
 		m_ServerData.MonsterList.push_back(obj);
 	}
-	pServerData->herolist();
 	setBatch(pServerData->batch());
 	setStageID(pServerData->stageid());
-	setReliveNeedGoldNum(pServerData->param());
 	DataCenter::sharedData()->getMap()->initMap(pServerData->stageid()); 
 	initCommonData();
 }
 
-void WarManager::initWordBossData( WarResponse*pServerData )
+void WarManager::initWordBossData( protos::WarResponse*pServerData )
 {
-	clearBeforeData();
+	clearOldData();
 	for (int i=0; i< pServerData->herolist_size(); i++)			//英雄       
 	{
-		TempHero obj;
+		HeroRoleData obj;
 		obj.readData(pServerData->herolist(i));
 		m_ServerData.HeroList.push_back(obj);
 	}
 	int bossID = 0;
 	for (int j=0; j< pServerData->monsters_size(); j++)			//怪物
 	{
-		TempMonster obj;
+		MonsterRoleData obj;
 		obj.readData(pServerData->monsters(j));
 		if (obj.isBoss)
 			bossID = obj.mId;
@@ -552,7 +548,6 @@ void WarManager::initWordBossData( WarResponse*pServerData )
 void WarManager::initCommonData()
 {
 	initData();
-	updateAlive();
 	ReleaseSpineData();													//应该有更好的管理方法
 	ParseMoveGrid(m_StageID,m_CantMoveGrid);
 	ParseAddCostGrid(m_StageID,m_AddCostGrid);
@@ -566,7 +561,7 @@ void WarManager::initCommonData()
 
 vector<WarAlive*>* WarManager::getSkillTargets(WarAlive* pAlive)
 {
-	int tTarget = pAlive->getCurrEffect()->pTarget;
+	int tTarget = pAlive->getCurrEffect()->getTargetType();
 	if ((pAlive->getEnemy()&&tTarget == eUsType)	|| 
 		(!pAlive->getEnemy()&&tTarget == eEnemyType) )			/*敌方自己，我方敌人*/
 		return getVecMonsters(true);

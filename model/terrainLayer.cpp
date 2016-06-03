@@ -19,7 +19,7 @@ void TerrainLayer::addTerrainToGrid(int terrainID,char grid)
 {
 	WarMapData* map = DataCenter::sharedData()->getMap()->getCurrWarMap();
 	const CCPoint& p = map->getPoint(grid);
-	EffectObject* eff = EffectObject::create(ToString(terrainID),EffectType::Repeat);
+	EffectObject* eff = EffectObject::create(ToString(terrainID),PLAYERTYPE::Repeat);
 	eff->setPosition(p);
 	eff->setScale(0.5f);
 	eff->setTag(grid);

@@ -7,7 +7,7 @@
 #include "scene/loadWar.h"
 #include "scene/WarScene.h"
 #include "GMessage.h"
-#include "Battle/TempData.h"
+#include "Battle/RoleBaseData.h"
 #include "task/TaskControl.h"
 #include "common/RollLabel.h"
 #include "guide/GuideManager.h"
@@ -18,6 +18,7 @@
 #include "warscene/ConstNum.h"
 #include "mainCity/mainScene.h"
 #include "roleImg/RoleUpdate.h"
+#include "Battle/BattleDataCenter.h"
 
 using namespace protos;
 using namespace protos::common;
@@ -366,15 +367,13 @@ void CPlayerControl::sendEnterStageForBoss( int hero1,int hero2, int hero3, int 
 
 void CPlayerControl::BossBattleInfo( Message * msg )
 {
-	WarResponse*batRes=(WarResponse*)msg;
-	DataCenter::sharedData()->getWar()->initWordBossData(batRes);
+	BattleData->initBattleData(msg,true);
 }
 
 //进入关卡战斗信息
 void CPlayerControl::battleInfo(Message * msg)
 {
-	BattleResponse *batRes = (BattleResponse *)msg;
-	DataCenter::sharedData()->getWar()->initBattleData(batRes);
+	BattleData->initBattleData(msg);
 }
 
 void CPlayerControl::sendChapterList(int type)

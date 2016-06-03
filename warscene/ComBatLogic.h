@@ -1,12 +1,18 @@
 ﻿#ifndef _COMBATLOGINC_
 #define _COMBATLOGINC_
-/************************************************************************/
-//                                                                      
-//						处理战斗流程逻辑维护任务数组
-//
-//
-//  [8/12/2015 Lxc]
-/************************************************************************/
+/************************************************************* 
+ *
+ *
+ *		Data : 2016.6.2
+ *	
+ *		Name : 
+ *
+ *		Author : Lin_Xiancheng
+ *
+ *		Description : 
+ *
+ *
+ *************************************************************/
 #include "AppUI.h"
 #include "google/protobuf/descriptor.h"
 #include "google/protobuf/message.h"
@@ -19,7 +25,7 @@ struct GameFinishData
 	int roundNum;
 };
 
-class TempMonster;
+class MonsterRoleData;
 class BufExp;
 class GuardArea;
 class MoveRule;

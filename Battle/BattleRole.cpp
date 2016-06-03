@@ -2,9 +2,9 @@
 #include "model/BuffManage.h"
 #include "warscene/ConstNum.h"
 #include "scene/alive/ActObject.h"
-#include "Battle/TempData.h"
+#include "Battle/RoleBaseData.h"
 #include "Battle/SkillMacro.h"
-
+#include "Battle/RoleSkill.h"
 WarAlive::WarAlive()
 	:m_Enemy(false),m_Hp(0),m_MaxHp(0),m_GridIndex(INVALID_GRID),m_MoveGrid(0),m_AtkDelay(0)
 	,m_AtkNum(0),m_Move(true),m_CritSkill(false),role(nullptr),m_Hrt(0),m_HrtPe(0),m_AIState(false)
@@ -15,7 +15,7 @@ WarAlive::WarAlive()
 	,m_AtkInterval(0),m_TimePercent(1),m_SpecialAtk(false),m_Battle(false),m_MoveSpeed(0)
 	,m_CritTime(0),m_FatherID(0),m_Captain(false),m_CritEffect(false),m_DieState(false)
 	,m_TouchGrid(0),m_TouchState(false),m_MoveObj(nullptr),m_CallType(0),m_CallAliveNum(0)
-	,m_Delaytime(0),m_AliveState(COMMONSTATE),m_AliveType(AliveType::Common),m_StateDelay(0)	
+	,m_Delaytime(0),m_AliveState(COMMONSTATE),m_AliveType(E_ALIVETYPE::Common),m_StateDelay(0)	
 	,m_Model(0),m_AliveID(0),m_MstType(0)
 {
 	setBuffManage(nullptr);
@@ -52,7 +52,7 @@ void WarAlive::setAtkNum(int var)
 	if (m_AtkNum >= 3)					//第四次攻击为特殊攻击
 	{
 		m_AtkNum = 0;
-		if (role->skill2.skillId)
+		if (role->skSpecial.getSkillID())
 		{
 			this->ResetAttackState();
 			this->setSpeAtk(true);
@@ -109,7 +109,7 @@ void WarAlive::setCritTime(float var)
 	m_CritTime += var;
 	if ( m_CritTime >= role->mCritTime)
 	{
-		if (role->skill3.skillId)
+		if (role->skActive.getSkillID())
 		{
 			this->ResetAttackState();
 			this->setCriAtk(true);
@@ -210,7 +210,7 @@ void WarAlive::ExcuteNextEffect()
 
 bool WarAlive::canSummonAlive()
 {
-	if (role->skill3.skillType ==CallAtk)
+	if (role->skActive.getSkillType() ==eCallAtk)
 	{
 		if (getCaptain() && getCallAliveNum() < 1)
 			return false;
@@ -231,36 +231,36 @@ void WarAlive::clearHitAlive()
 	HittingAlive.clear();
 }
 
-TempSkill* WarAlive::getCurrSkill()
+RoleSkill* WarAlive::getCurrSkill()
 {
 	if (getCriAtk())
 	{
-		if (role->skill3.skillId)
+		if (role->skActive.getSkillID())
 		{
-			return &role->skill3;
+			return &role->skActive;
 		}else{
 			CCLOG("[ *ERROR ] WarManager::getSkill CritSKILL IS NULL");
-			return &role->skill1;
+			return &role->skNormal;
 		}
 	}else if (getSpeAtk())
 	{
-		if (role->skill2.skillId)
+		if (role->skSpecial.getSkillID())
 		{
-			return &role->skill2;
+			return &role->skSpecial;
 		}else{
 			CCLOG("[ *ERROR ] WarManager::getSkill SpecialSKILL IS NULL");
-			return &role->skill1;
+			return &role->skNormal;
 		}
 	}else{
-		return &role->skill1;
+		return &role->skNormal;
 	}
 }
 
-SkillEffect* WarAlive::getCurrEffect()
+const skEffectData* WarAlive::getCurrEffect()
 {
-	if (getGroupIndex() < getCurrSkill()->EffectList.size())
-		if ( getCurrSkill()->EffectList.at(getGroupIndex()).size()>getEffIndex())
-			return & getCurrSkill()->EffectList.at(getGroupIndex()).at(getEffIndex());
+	if (getGroupIndex() < getCurrSkill()->getListSize())
+		if ( getCurrSkill()->getEffectSize(getGroupIndex())>getEffIndex())
+			return getCurrSkill()->getIndexEffect(getGroupIndex(),getEffIndex());
 		else
 			CCLOG("[ *ERROR ] EffIndex > EffectListSize  AliveID=%d mode=%d",getAliveID(),role->thumb);
 	else{
@@ -275,11 +275,11 @@ bool WarAlive::NextEffect()
 {
 	int effId = getEffIndex() + 1;
 	int ranNum = CCRANDOM_0_1()*100;								//0到100的数
-	if (getGroupIndex() >= getCurrSkill()->EffectList.size())
+	if (getGroupIndex() >= getCurrSkill()->getListSize)
 		return false;
-	if (getCurrSkill()->skillId&&effId < getCurrSkill()->EffectList.at(getGroupIndex()).size())			//判断是否为最后的一个特效
+	if (getCurrSkill()->getSkillID()&&effId < getCurrSkill()->getEffectSize(getGroupIndex()))			//判断是否为最后的一个特效
 	{
-		if (getCurrSkill()->EffectList.at(getGroupIndex()).at(effId).userRate > ranNum)
+		if (getCurrSkill()->getIndexEffect(getGroupIndex(),effId)->getuserRate() > ranNum)
 		{
 			setEffIndex(effId);
 			return true;
@@ -290,17 +290,7 @@ bool WarAlive::NextEffect()
 
 int WarAlive::getSkillType()
 {
-	return getCurrSkill()->skillType;
-}
-
-int WarAlive::getEffectType()
-{
-	if (getCurrEffect())
-		return getCurrEffect()->Efftype;
-	else{
-		CCLOG("[ *ERROR ] BattleRole::getEffectType ");
-		return 0;
-	}
+	return getCurrSkill()->getSkillType();
 }
 
 bool WarAlive::captainCallNumberJudge()
@@ -333,7 +323,7 @@ bool WarAlive::hasAliveByTargets( WarAlive* pAlive )
 
 bool WarAlive::pierceJudge()
 {
-	if (getCurrEffect()->mode == ePuncture&&mAreaTargets.size())//贯穿与非贯穿类处理
+	if (getCurrEffect()->getAreaType() == ePuncture&&mAreaTargets.size())//贯穿与非贯穿类处理
 	{
 		WarAlive* alive = mAreaTargets.at(0);
 		if (!alive->getCloaking())									//潜行类怪物处理

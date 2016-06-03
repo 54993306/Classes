@@ -12,7 +12,7 @@
 #include "Battle/BattleRole.h"
 #include "scene/layer/WarAliveLayer.h"
 #include "model/WarManager.h"
-#include "Battle/TempData.h"
+#include "Battle/RoleBaseData.h"
 #include "common/CGameSound.h"
 #include "common/ShaderDataHelper.h"
 #include "warscene/CHeroSoundData.h"
@@ -242,7 +242,7 @@ void AliveObject::playerNum( int num,int type )
 		return	;
 	}
 	m_HpObject->playChangeNumber(num,type);
-	if (m_Alive->getAliveType() == AliveType::WorldBoss)														//boss的情况处理应该在血量条的内部,自己进行。
+	if (m_Alive->getAliveType() == E_ALIVETYPE::WorldBoss)														//boss的情况处理应该在血量条的内部,自己进行。
 		NOTIFICATION->postNotification(B_WorldBoss_HurtUpdate,CCInteger::create(m_HpObject->getHpNumber()));	
 	if (type > gainType)
 		lostHpDispose();

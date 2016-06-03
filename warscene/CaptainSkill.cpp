@@ -32,10 +32,10 @@ void CaptainSkill::ExecuteCaptainSkill()
 {
 	WarAlive* alive  = DataCenter::sharedData()->getWar()->getAliveByGrid(C_CAPTAINGRID);
 	CCArray* arr = DataCenter::sharedData()->getWar()->getHeros(true);
-	if (!alive||!arr||alive->role->skill4.skillId == 0)
+	if (!alive||!arr||alive->role->skCaptain.getSkillID() == 0)
 		return;
-	TempSkill skill = alive->role->skill4;							//需同时满足种族限制且满足属性限制
-	CCArray* RaceArr = RaceJudgeCap(arr,skill.pTarget);			//种族限制判定
+	RoleSkill skill = alive->role->skCaptain;							//需同时满足种族限制且满足属性限制
+	CCArray* RaceArr = RaceJudgeCap(arr,skill.getTargetType());			//种族限制判定
 	if (!RaceArr||!RaceArr->count())
 		return;																//不满足种族限制条件
 	//CCArray* AttributeArr=AttributeJudgeArrCap(_CaptainSkill,RaceArr);	//属性限制判定(暂时取消)
@@ -43,11 +43,11 @@ void CaptainSkill::ExecuteCaptainSkill()
 	//	return;																//满足种族限制未满足属性限制
 	CCArray* AttributeArr = RaceArr;
 	CCArray* executeArr = CCArray::create();
-	for (int i=0;i<skill.EffectList.at(0).size();i++)							//触发队长技能效果
+	for (int i=0;i<skill.getEffectSize(0);i++)							//触发队长技能效果
 	{
-		if (!skill.EffectList.at(0).at(i).effectId)
+		if (!skill.getIndexEffect(0,i)->getEffectID())
 			continue;
-		CCArray* _arr = getTargetArrCap(skill.EffectList.at(0).at(i),AttributeArr,arr);			
+		CCArray* _arr = getTargetArrCap(skill.getIndexEffect(0,i),AttributeArr,arr);			
 		AddArr(executeArr,_arr);
 	}
 	CCObject* ob = nullptr;
@@ -58,7 +58,7 @@ void CaptainSkill::ExecuteCaptainSkill()
 	}
 }
 
-void CaptainSkill::AddArr(CCArray* targets,CCArray*arr)
+void CaptainSkill::AddArr(CCArray* pTargetArray,CCArray*arr)
 {
 	if (!arr)return;
 	CCObject* ob = nullptr;
@@ -68,7 +68,7 @@ void CaptainSkill::AddArr(CCArray* targets,CCArray*arr)
 	{
 		_add = true;
 		WarAlive* alive = (WarAlive*)ob;
-		CCARRAY_FOREACH(targets,obj)
+		CCARRAY_FOREACH(pTargetArray,obj)
 		{
 			WarAlive* _alive = (WarAlive*)obj;
 			if (alive == _alive)
@@ -78,7 +78,7 @@ void CaptainSkill::AddArr(CCArray* targets,CCArray*arr)
 			}
 		}
 		if (_add)
-			targets->addObject(ob);
+			pTargetArray->addObject(ob);
 	}
 }
 //种族判定通过数组
@@ -184,14 +184,14 @@ CCArray* CaptainSkill::RaceJudge(CCArray* arr,int type,bool exclude/*= false*/,b
 	return targetArr;
 }
 //属性判定通过数组
-CCArray* CaptainSkill::AttributeJudgeArrCap(TempSkill& skill,CCArray* arr)
+CCArray* CaptainSkill::AttributeJudgeArrCap(RoleSkill& skill,CCArray* arr)
 {
 	CCArray* _arr = CCArray::create();
 	CCObject* obj = nullptr;
 	CCARRAY_FOREACH(arr,obj)
 	{
 		WarAlive* alive = (WarAlive*)obj;
-		if (AttributeJudge(alive,skill.pro_type,skill.pro_rate))
+		if (AttributeJudge(alive,skill.getAffectType(),skill.getAffectRatio()))
 			_arr->addObject(obj);
 	}
 	return _arr;
@@ -308,10 +308,10 @@ bool CaptainSkill::PositionJudge(bool Enemy,int grid,int type)
 	return false;
 }
 //目标数组获得
-CCArray* CaptainSkill::getTargetArrCap(SkillEffect&effect,CCArray*targetArr,CCArray*AllArr)
+CCArray* CaptainSkill::getTargetArrCap(const skEffectData*pEffect,CCArray*targetArr,CCArray*AllArr)
 {
-	CCArray* arr = nullptr;
-	switch (effect.pTarget)
+	CCArray* tArray = nullptr;
+	switch (pEffect->getTargetType())
 	{
 	case Fire:
 	case Water:
@@ -325,28 +325,28 @@ CCArray* CaptainSkill::getTargetArrCap(SkillEffect&effect,CCArray*targetArr,CCAr
 	case AllAliveType:
 	case AnyType:
 		{
-			arr = RaceJudgeCap(AllArr,effect.pTarget);
-			ExecuteArrCap(effect , arr);							//从所有的我方阵营中选取目标数组
+			tArray = RaceJudgeCap(AllArr,pEffect->getTargetType());
+			ExecuteArrCap(pEffect , tArray);							//从所有的我方阵营中选取目标数组
 		}break;
 	case usAll:
 		{
-			arr = targetArr;
-			ExecuteArrCap(effect , arr);							//从满足释放条件的的目标中选取目标数组
+			tArray = targetArr;
+			ExecuteArrCap(pEffect , tArray);							//从满足释放条件的的目标中选取目标数组
 		}break;
 	case usFire:
 		{
-			arr = RaceJudgeCap(targetArr,Fire);
-			ExecuteArrCap(effect , arr);
+			tArray = RaceJudgeCap(targetArr,Fire);
+			ExecuteArrCap(pEffect , tArray);
 		}break;
 	case usWood:
 		{
-			arr = RaceJudgeCap(targetArr,Wood);
-			ExecuteArrCap(effect , arr);
+			tArray = RaceJudgeCap(targetArr,Wood);
+			ExecuteArrCap(pEffect , tArray);
 		}break;
 	case usWater:
 		{
-			arr = RaceJudgeCap(targetArr,Water);
-			ExecuteArrCap(effect , arr);
+			tArray = RaceJudgeCap(targetArr,Water);
+			ExecuteArrCap(pEffect , tArray);
 		}break;
 	case CapfrontOne:												//根据方位选取目标数组
 	case CapcenterOne:
@@ -358,67 +358,67 @@ CCArray* CaptainSkill::getTargetArrCap(SkillEffect&effect,CCArray*targetArr,CCAr
 	case CapbackRowArea:
 	case CapcenterRowArea:
 		{
-			arr = PositionJudgeArrCap(AllArr,effect.pTarget);
-			ExecuteArrCap(effect,arr);
+			tArray = PositionJudgeArrCap(AllArr,pEffect->getTargetType());
+			ExecuteArrCap(pEffect,tArray);
 		}
 	default:
 		break;
 	}
-	return arr;
+	return tArray;
 }
 //目标武将执行效果
-void CaptainSkill::ExecuteArrCap(SkillEffect&effect,CCArray* arr)
+void CaptainSkill::ExecuteArrCap(const skEffectData*pEffect,CCArray* pArray)
 {
-	if (!arr)
+	if (!pArray)
 	{
 		CCLOG("[ Tips ] CaptainSkill::ExecuteAliveCap");
 		return;
 	}
 	CCObject* obj = nullptr;
-	CCARRAY_FOREACH(arr,obj)
+	CCARRAY_FOREACH(pArray,obj)
 	{
 		WarAlive* alive = (WarAlive*)obj;
 		if (alive->getExecuteCap())continue;	//执行过主帅技
-		AliveExecute(effect,alive);
+		AliveExecute(pEffect,alive);
 	}
 }
 //队长技效果武将属性变化
-void CaptainSkill::AliveExecute(SkillEffect&effect,WarAlive*alive)
+void CaptainSkill::AliveExecute(const skEffectData*pEffect,WarAlive*pAlive)
 {
-	switch (effect.pro_Type)
+	switch (pEffect->getImpactType())
 	{
 	case DefRate:
 		{
-			alive->setDef(alive->getDef()+(alive->role->def * (effect.pro_Rate*0.01f-1)));
+			pAlive->setDef(pAlive->getDef()+(pAlive->role->def * (pEffect->getImpactRate()*0.01f-1)));
 		}break;
 	case AtkRate:
 		{
-			alive->setAtk(alive->getAtk()+(alive->role->atk * (effect.pro_Rate*0.01f-1)));
+			pAlive->setAtk(pAlive->getAtk()+(pAlive->role->atk * (pEffect->getImpactRate()*0.01f-1)));
 		}break;
 	case AgilityRate:
 		{
-			alive->setAtkInterval(alive->getAtkInterval()+(effect.pro_Rate*0.01f-1)*alive->role->atkInterval);
+			pAlive->setAtkInterval(pAlive->getAtkInterval()+(pEffect->getImpactRate()*0.01f-1)*pAlive->role->atkInterval);
 		}break;
 	case RenewRate:
 		{
-			alive->setRenew(alive->getRenew()+(alive->role->renew * (effect.pro_Rate*0.01f-1)));
+			pAlive->setRenew(pAlive->getRenew()+(pAlive->role->renew * (pEffect->getImpactRate()*0.01f-1)));
 		}break;
 	case DogeRate:
 		{
-			alive->setDoge(alive->getDoge() + (alive->role->dodge * (effect.pro_Rate*0.01f-1)));
+			pAlive->setDoge(pAlive->getDoge() + (pAlive->role->dodge * (pEffect->getImpactRate()*0.01f-1)));
 		}break;
 	case HitRate:
 		{
-			alive->setHit(alive->getHit() + (alive->role->hit * (effect.pro_Rate*0.01f-1)));
+			pAlive->setHit(pAlive->getHit() + (pAlive->role->hit * (pEffect->getImpactRate()*0.01f-1)));
 		}break;
 	case CritRate:
 		{
-			alive->setCrit(alive->getCrit() + (alive->role->crit * (effect.pro_Rate*0.01f-1)));
+			pAlive->setCrit(pAlive->getCrit() + (pAlive->role->crit * (pEffect->getImpactRate()*0.01f-1)));
 		}break;
 	case HpMaxRate:
 		{
-			alive->setMaxHp(alive->getMaxHp()+(alive->role->hp * (effect.pro_Rate*0.01f-1)));
-			alive->setHp(alive->getMaxHp());
+			pAlive->setMaxHp(pAlive->getMaxHp()+(pAlive->role->hp * (pEffect->getImpactRate()*0.01f-1)));
+			pAlive->setHp(pAlive->getMaxHp());
 		}break;
 	default:
 		break;

@@ -191,7 +191,7 @@ void WarMapLayer::DrawAtkArea(WarAlive* alive)
 				m_FrontArea = true;
 			if(alive->getCurrEffect())
 			{
-				if (alive->getCurrEffect()->mode == ePuncture)
+				if (alive->getCurrEffect()->getAreaType() == ePuncture)
 					break;//合并成一个方法,暴露出来的内容太多，每次需要修改effect结构的时候会多很多地方造成影响，不容易维护和拓展
 			}
 		}

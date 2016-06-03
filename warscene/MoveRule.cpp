@@ -42,7 +42,7 @@ int MoveRule::monsterMove(WarAlive* alive)
 		return INVALID_GRID;
 #endif
 	//怪物的移动处理是，哪个最先返回值不是INVALID_GRID就以哪个为标准，后面的不做处理了
-	if (alive->getAliveType() == AliveType::WorldBoss)
+	if (alive->getAliveType() == E_ALIVETYPE::WorldBoss)
 		return INVALID_GRID;
 	int index = alive->getGridIndex();
 	if (index/C_GRID_ROW >= C_GRID_COL-1)

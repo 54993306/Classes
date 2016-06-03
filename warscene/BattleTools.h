@@ -16,8 +16,8 @@
  *************************************************************/
 
 class WarAlive;
-class TempSkill;
-class SkillEffect;
+class RoleSkill;
+class skEffectData;
 
 
 bool RowUp_InBoundary(int originRow,int aimRow);
@@ -28,8 +28,6 @@ int getNewRow(int originRow ,int aimRow ,int aim_row);
 int getHeroNewCol(int originCol ,int aimCol ,int aim_col);
 int getMonsterNewCol(int originCol ,int aimCol ,int aim_col);
 void CallAliveByFixRange( WarAlive*father , WarAlive*child );
-
-SkillEffect* getSummonEffect(TempSkill* skill);
 
 void VectorRemoveRepeat(vector<int>& Vec);
 

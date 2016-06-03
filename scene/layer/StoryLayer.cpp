@@ -64,7 +64,7 @@ bool StoryLayer::LoadFile(int storytype, StoryData* pStoryData)
 	if(!pStoryData)
 	{
 #if CC_TARGET_PLATFORM != CC_PLATFORM_WIN32
-		if (DataCenter::sharedData()->getWar()->getTollgete()->star>=1)		//第一次打关卡才出现关卡剧情
+		if (!DataCenter::sharedData()->getWar()->getFirstStage())		//第一次打关卡才出现关卡剧情
 			return false;
 #endif	
 		pStoryData = DataCenter::sharedData()->getWar()->getStoryData();

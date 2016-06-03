@@ -181,7 +181,7 @@ void WarControl::initUIEffect()
 	for (int i=0;i<4;i++)
 	{
 		CCPoint p = DataCenter::sharedData()->getMap()->getCurrWarMap()->getPoint(i);
-		EffectObject* ef = EffectObject::create("10030",EffectType::Repeat);
+		EffectObject* ef = EffectObject::create("10030",PLAYERTYPE::Repeat);
 		ef->setTag(CL_TipsEffect1+i);
 		ef->setPosition(ccp(100,p.y));
 		ef->setVisible(false);
@@ -198,7 +198,7 @@ void WarControl::initUIEffect()
 //初始化界面上部分
 void WarControl::initUIAbove()
 {
-	WarAlive* boss = m_Manage->getAliveByType(AliveType::WorldBoss);
+	WarAlive* boss = m_Manage->getAliveByType(E_ALIVETYPE::WorldBoss);
 	if (boss)
 	{
 		m_ControLayer->findWidgetById("layer_up_boss")->setVisible(true);
@@ -273,7 +273,7 @@ void WarControl::initWorldBossAbove(WarAlive* boss)
 //update word boss damage
 void WarControl::updateWorldBossDamage()
 {
-	WarAlive* boss = m_Manage->getAliveByType(AliveType::WorldBoss);
+	WarAlive* boss = m_Manage->getAliveByType(E_ALIVETYPE::WorldBoss);
 	int num = m_Manage->getBossHurtCount();
 	m_pAllDamage->runAction(CCRollLabelAction::create(0.3f, atoi(m_pAllDamage->getString()), num, m_pAllDamage));
 	m_pAllDamage->runAction(CCSequence::createWithTwoActions(CCScaleTo::create(0.1f, 1.5f), CCScaleTo::create(0.05f, 1.0f)));
@@ -362,7 +362,7 @@ void WarControl::initCostBar()
 		CCSprite* pCircle1 = (CCSprite*)m_ControLayer->findWidgetById(CCString::createWithFormat("circle_%d", i)->getCString());
 		pCircle1->removeFromParentAndCleanup(true);
 	}
-	EffectObject* Eff = EffectObject::create("9051",EffectType::Repeat);						//火焰特效
+	EffectObject* Eff = EffectObject::create("9051",PLAYERTYPE::Repeat);						//火焰特效
 	Eff->setPosition(ccp(pCircle->getContentSize().width/2,pCircle->getContentSize().height/2));
 	pCircle->addChild(Eff);
 }
@@ -378,22 +378,22 @@ void WarControl::initAliveButton(CCNode* Layout,WarAlive* alive)
 	btn->setOnLongClickListener(this,ccw_longclick_selector(WarControl::AliveButtonLongClick));
 	btn->getSelectedImage()->setScale(0.95f);
 
-	EffectObject* CallAliveEffect = EffectObject::create("10028",EffectType::Repeat);			//call role effect
+	EffectObject* CallAliveEffect = EffectObject::create("10028",PLAYERTYPE::Repeat);			//call role effect
 	CallAliveEffect->setTag(CL_BtnCallEff);
 	CallAliveEffect->setPosition(ccpAdd(btn->getPosition(),ccp(0,50)));
 	Layout->addChild(CallAliveEffect);
 
-	EffectObject* AliveSkillEffect = EffectObject::create("10019",EffectType::Repeat);			//can use role skill effect
+	EffectObject* AliveSkillEffect = EffectObject::create("10019",PLAYERTYPE::Repeat);			//can use role skill effect
 	AliveSkillEffect->setTag(CL_BtnSkillEff);
 	AliveSkillEffect->setEffAnchorPoint(0.5f,0.2f);
 	AliveSkillEffect->setPosition(btn->getPosition());
 	Layout->addChild(AliveSkillEffect, -1);
 
-	SkillEffect* effect = getSummonEffect(&alive->role->skill3);									//这个方法是应该放在武将身上的
+	skEffectData* effect = alive->role->skActive.getSummonEffect();									//这个方法是应该放在武将身上的
 	if (!effect)
 		return;
-	initButtonBackImage(btn,effect->pro_Type);													//reason call number init back image
-	int CallNumber = effect->pro_Type>5?5:effect->pro_Type;										//guide chapter call number infinite
+	initButtonBackImage(btn,effect->getImpactType());													//reason call number init back image
+	int CallNumber = effect->getImpactType()>5?5:effect->getImpactType();										//guide chapter call number infinite
 	btn->setPosition(ccpAdd(btn->getPosition(),ccp(3.5f*CallNumber,0)));
 }
 //根据召唤数量初始化按钮背景图
@@ -455,8 +455,8 @@ void WarControl::initAliveButtons()
 			CLayout*BtnLay = (CLayout*)m_ControLayer->getChildByTag(CL_BtnLayout1);
 			BtnLay->setVisible(true);
 			CLabel* NeedCost = (CLabel*)BtnLay->getChildByTag(CL_NeedCost);
-			TempSkill skill = alive->role->skill3;
-			NeedCost->setString(ToString(skill.cost));									//初始化值为技能消耗cost
+			RoleSkill skill = alive->role->skActive;
+			NeedCost->setString(ToString(skill.getExpendCost()));									//初始化值为技能消耗cost
 			MoveLaout = (CLayout*)BtnLay->getChildByTag(CL_HeroNode);
 		}else{
 			alive->setUiLayout(CL_BtnLayout2+index);
@@ -536,13 +536,13 @@ void WarControl::updateAliveButtonEffect()
 			continue;
 		if (alive->getBattle()&&alive->getHp()>0)
 		{
-			TempSkill skill = alive->role->skill3;
-			if (m_iAimCost >= skill.cost && btn->isEnabled())
+			RoleSkill skill = alive->role->skActive;
+			if (m_iAimCost >= skill.getExpendCost() && btn->isEnabled())
 			{
 				if (alive->canSummonAlive())
 				{
 					MoveLaout->getChildByTag(CL_BtnCallEff)->setVisible(true);				
-				}else if(skill.skillId && skill.skillType != CallAtk){
+				}else if(skill.getSkillID() && skill.getSkillType() != eCallAtk){
 					MoveLaout->getChildByTag(CL_BtnSkillEff)->setVisible(true);
 				}	
 			}		
@@ -562,10 +562,10 @@ void WarControl::CallAliveEntranceBattle(WarAlive*alive)
 
 	CProgressBar* CdBar = (CProgressBar*)MoveLaout->getChildByTag(CL_HeroPro);
 	btn->setEnabled(false);
-	int cost = pAlive->role->skill3.cost;
+	int cost = pAlive->role->skActive.getExpendCost();
 	NOTIFICATION->postNotification(B_ChangeCostNumber,CCInteger::create(-cost));			//this in a call alive real log in battlefield
 	if (pAlive->canSummonAlive())														//is call full
-		CdBar->startProgressFromTo(0,100,pAlive->role->skill3.coldDown);
+		CdBar->startProgressFromTo(0,100,pAlive->role->skActive.getCooldown());
 }
 //role log in battlefield or leave
 void WarControl::AliveBattlefield( WarAlive* alive )
@@ -574,7 +574,7 @@ void WarControl::AliveBattlefield( WarAlive* alive )
 	CCNode* MoveLaout = (CLayout*)BtnLay->getChildByTag(CL_HeroNode);
 	CProgressBar* CdBar = (CProgressBar*)MoveLaout->getChildByTag(CL_HeroPro);
 	CLabel* NeedCost = (CLabel*)BtnLay->getChildByTag(CL_NeedCost);
-	TempSkill skill = alive->role->skill3;
+	RoleSkill skill = alive->role->skActive;
 	if (alive->getBattle())														
 	{
 		MoveLaout->runAction(CCMoveBy::create(0.2f,ccp(0,-30)));				//武将死亡
@@ -582,8 +582,8 @@ void WarControl::AliveBattlefield( WarAlive* alive )
 		NeedCost->setString(ToString(alive->role->useCost));					//上阵消耗cost
 	}else{																		
 		MoveLaout->runAction(CCMoveBy::create(0.2f,ccp(0,30)));					//武将上阵
-		CdBar->startProgressFromTo(0,100,skill.coldDown);						//技能CD
-		NeedCost->setString(ToString(skill.cost));								//初始化值为上阵消耗cost
+		CdBar->startProgressFromTo(0,100,skill.getCooldown());						//技能CD
+		NeedCost->setString(ToString(skill.getExpendCost()));								//初始化值为上阵消耗cost
 		NOTIFICATION->postNotification(B_ChangeCostNumber,CCInteger::create(-alive->role->useCost));
 	}
 	CButton* btn = (CButton*)MoveLaout->getChildByTag(CL_Btn);
@@ -608,8 +608,8 @@ CWidgetTouchModel WarControl::AliveButtonBeginClick(CCObject* ob,CCTouch* pTouch
 	int cost = m_Manage->getLogicObj()->getCurrCost();
 	if (alive->getBattle()&&alive->getHp()>0)
 	{
-		TempSkill skill = alive->role->skill3;
-		if (skill.skillType == CallAtk&&cost >= skill.cost)
+		RoleSkill skill = alive->role->skActive;
+		if (skill.getSkillType() == eCallAtk&&cost >= skill.getExpendCost())
 		{
 			WarAlive* pAlive = m_Manage->getCallAlive(alive,&skill);
 			if (!pAlive)
@@ -637,9 +637,9 @@ void WarControl::AliveButtonClick( CCObject* ob )
 {
 	CButton* btn = (CButton*)ob;	
 	WarAlive* alive = dynamic_cast<WarAlive*>(btn->getUserObject());			//根据点击的按钮来判断点了哪个人
-	TempSkill skill = alive->role->skill3;
-	if (  skill.skillType == CallAtk
-		||m_Manage->getLogicObj()->getCurrCost()<skill.cost 
+	RoleSkill skill = alive->role->skActive;
+	if (  skill.getSkillType() == eCallAtk
+		||m_Manage->getLogicObj()->getCurrCost()<skill.getExpendCost() 
 		||!alive->getBattle() )
 		return;
 	CCNode* MoveLaout = getMoveLayout(alive->getUiLayout()-CL_BtnLayout1);
@@ -652,7 +652,7 @@ void WarControl::AliveButtonClick( CCObject* ob )
 	CProgressBar* CdBar = (CProgressBar*)MoveLaout->getChildByTag(CL_HeroPro);
 	CdBar->setValue(0);
 	NOTIFICATION->postNotification(B_RecordContinuousSkill);
-	int tCutCost = skill.cost;
+	int tCutCost = skill.getExpendCost();
 	NOTIFICATION->postNotification(B_ChangeCostNumber,CCInteger::create(-tCutCost));
 	if (alive->getCaptain())
 		ResetButtonState(alive);
@@ -665,7 +665,7 @@ void WarControl::ResetButtonState( CCObject* ob )
 	WarAlive* alive = (WarAlive*)ob;
 	CCNode* MoveLaout = getMoveLayout(alive->getUiLayout() - CL_BtnLayout1);
 	CProgressBar* CdBar = (CProgressBar*)MoveLaout->getChildByTag(CL_HeroPro);
-	CdBar->startProgressFromTo(0,100,alive->role->skill3.coldDown);										//技能CD
+	CdBar->startProgressFromTo(0,100,alive->role->skActive.getCooldown());										//技能CD
 }
 
 bool WarControl::AliveButtonLongClick(CCObject* pSender, CCTouch* pTouch)

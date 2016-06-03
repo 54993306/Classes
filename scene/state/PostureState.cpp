@@ -15,11 +15,11 @@ bool PostureState::ExecuteNextState(StateManager* actor,StateMachine* self)
 		State* nextState = actor->getStateInstance(nextActionCode);		//根据id从状态管理器中拿到状态
 		if (nextState)
 		{
-			return actor->switchPostureState(self,actor,nextState);		//切换至下一个状态
+			return actor->switchPostureState(self,nextState);		//切换至下一个状态
 		}else{
 			CCLOG("[ *ERROR ] PostureState::ExecuteNextState");
 			nextState = actor->getStateInstance(Attack_Index);
-			actor->switchPostureState(self,actor,nextState);
+			actor->switchPostureState(self,nextState);
 			return false;
 		}
 	}else{

@@ -1,4 +1,5 @@
 #include "Battle/RoleBuffData.h"
+#include <protos/common/skill_common.pb.h>
 
 RoleBuffData::RoleBuffData()
 :m_BuffID(0),m_BuffType(0),m_BuffDes(""),m_ChangeNum(0),m_Precent(0)
@@ -6,20 +7,25 @@ RoleBuffData::RoleBuffData()
 ,m_BuffTarget(0),m_BuffLevel(0)
 {}
 
-void RoleBuffData::readData(const protos::common::Buff &buff)
+void RoleBuffData::readData(const protos::common::Buff* buff)
 {
-	this->setBuffID(buff.buffid());		
-	this->setBuffType(buff.type());
-	this->setChangeNum(buff.damage());	
-	this->setPrecent(buff.damage_rate());
-	this->setTriggerRate(buff.userate());
-	this->setIsDBuff(buff.debuf());
-	this->setBuffDuration(buff.duration());
-	this->setBuffTarget(buff.target());
-	this->setBuffLevel(buff.level());
-	this->setTargetType(buff.element());
-	this->setBuffDes(buff.name());	
+	this->setBuffID(buff->buffid());		
+	this->setBuffType(buff->type());
+	this->setChangeNum(buff->damage());	
+	this->setPrecent(buff->damage_rate());
+	this->setTriggerRate(buff->userate());
+	this->setIsDBuff(buff->debuf());
+	this->setBuffDuration(buff->duration());
+	this->setBuffTarget(buff->target());
+	this->setBuffLevel(buff->level());
+	this->setTargetType(buff->element());
+	this->setBuffDes(buff->name());	
 	//this->durative = buf.durative();	//来自atbType 属性影响类型，僵尸/道士/神将
+}
+//使用父类对象给子类对象赋值的标准写法
+void RoleBuffData::initData( RoleBuffData& pData )
+{
+	*this = pData;
 }
 
 BuffInfo::BuffInfo()
@@ -35,17 +41,3 @@ void BuffInfo::setExTime(float var)
 	m_Excute = true;
 }
 float BuffInfo::getExTime(){return m_ExTime;}
-
-void BuffInfo::initBuffInfo( RoleBuffData& pBuffData )
-{
-	setBuffID(pBuffData.getBuffID());
-	setBuffType(pBuffData.getBuffType());
-	setChangeNum(pBuffData.getChangeNum());
-	setPrecent(pBuffData.getPrecent());
-	setBuffDuration(pBuffData.getBuffDuration());
-	setTriggerRate(pBuffData.getTriggerRate());
-	setIsDBuff(pBuffData.getIsDBuff());
-	setBuffTarget(pBuffData.getBuffTarget());
-	setBuffDes(pBuffData.getBuffDes());
-	setBuffLevel(pBuffData.getBuffLevel());
-}

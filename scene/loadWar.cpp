@@ -9,7 +9,7 @@
 #include "warscene/EffectData.h"
 #include "warscene/CombatGuideManage.h"
 //#include "model/BattleData.h"
-#include "Battle/TempData.h"
+#include "Battle/RoleBaseData.h"
 #include "model/TerrainManager.h"
 #include "model/WarManager.h"
 #include "model/MapManager.h"
@@ -140,13 +140,13 @@ void LoadWar::updateTips(float fdetal)
 	m_tip->setVisible(false);
 }
 //技能解析,通过技能得到加载数据
-void LoadWar::SkillParse( TempRole& role,vector<int>&VecEffect,vector<int>&VecBuff )
+void LoadWar::SkillParse( RoleBaseData& role,vector<int>&VecEffect,vector<int>&VecBuff )
 {
-	vector<TempSkill*> VSkill;
-	VSkill.push_back(&role.skill1);
-	VSkill.push_back(&role.skill2);
-	VSkill.push_back(&role.skill3);
-	VSkill.push_back(&role.skill4);
+	vector<RoleSkill*> VSkill;
+	VSkill.push_back(&role.skNormal);
+	VSkill.push_back(&role.skSpecial);
+	VSkill.push_back(&role.skActive);
+	VSkill.push_back(&role.skCaptain);
 	for (auto i:VSkill)
 		for (auto j:i->EffectList)
 			for (auto k:j)
@@ -416,6 +416,7 @@ void LoadWar::LoadEffect()
 //地形和地形在人物身上特效
 void LoadWar::LoadTerrain()
 {
+	return;
 	terData* data = m_Manage->getTerData();
 	char plist_str[60] = {0};
 	for (auto id: m_WarResouse.find(ResourceType::Load_Terrain)->second)

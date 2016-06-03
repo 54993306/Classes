@@ -447,7 +447,7 @@ void CombatLogic::MonsterExcuteAI( WarAlive* alive,float dt )
 		}
 		AliveExcuteAI(alive);
 	}else{
-		if (alive->getSkillType() == CallAtk)
+		if (alive->getSkillType() == eCallAtk)
 		{
 			alive->getActObject()->setMoveState(0);
 			alive->getActObject()->TurnStateTo(Stand_Index);
@@ -501,11 +501,11 @@ void CombatLogic::excuteCritEffect( WarAlive* alive)
 void CombatLogic::attackEffect( WarAlive*alive )
 {
 	ActObject* pActObject = alive->getActObject();
-	SkillEffect* effect = alive->getCurrEffect();						//开始播放攻击音效攻击特效的时机可以由策划配置
-	EffectInfo* info = m_Manage->getEffData()->getEffectInfo(effect->effectId);
+	const skEffectData* effect = alive->getCurrEffect();						//开始播放攻击音效攻击特效的时机可以由策划配置
+	EffectInfo* info = m_Manage->getEffData()->getEffectInfo(effect->getEffectID());
 	if (!info)
 	{
-		CCLOG("[ ERROR ] CombatLoginc::AliveExcuteAI EffectInfo NULL %d",effect->effectId);
+		CCLOG("[ ERROR ] CombatLoginc::AliveExcuteAI EffectInfo NULL %d",effect->getEffectID());
 		info = m_Manage->getEffData()->getEffectInfo(10000021);
 	}
 	pActObject->setAtkEffect(info->getusEft());
@@ -585,14 +585,14 @@ void CombatLogic::CritAtkEnd(CCObject* ob)
 void CombatLogic::doLostHp(CCObject* ob)
 {
 	WarAlive* alive = (WarAlive*)ob;
-	SkillEffect* effect = alive->getCurrEffect();
-	if(!effect || alive->getSortieNum() >= effect->batter )										//当掉血帧多于实际逻辑值，少于实际逻辑值情况处理
+	const skEffectData* effect = alive->getCurrEffect();
+	if(!effect || alive->getSortieNum() >= effect->getBatter() )										//当掉血帧多于实际逻辑值，少于实际逻辑值情况处理
 		return;	
 	switch (alive->getSkillType())
 	{
-	case NorAtk:
-	case SpeAtk:
-	case CriAtk:
+	case eNorAtk:
+	case eSpeAtk:
+	case eCriAtk:
 		{
 			alive->setSortieNum(alive->getSortieNum()+1);								//表示执行了一次攻击逻辑
 			BattleResult* Result = m_HurtCount->AttackExcute(alive);					//实际进行伤害计算的地方，不应由动作来控制的，动作可以控制播放。
@@ -601,7 +601,7 @@ void CombatLogic::doLostHp(CCObject* ob)
 			if (!Result->m_HitTargets.empty())
 				m_CombatEffect->BattleEffect(Result);
 		}break;
-	case CallAtk:
+	case eCallAtk:
 		{
 			alive->setSortieNum(alive->getSortieNum()+1);								//一次性可召唤多个武将
 			WarAlive* pAlive = m_Manage->getCallAlive(alive,alive->getCurrSkill());	//得到被召唤的武将
@@ -612,10 +612,10 @@ void CombatLogic::doLostHp(CCObject* ob)
 			}		
 			m_AliveLayer->initActobject(pAlive,SceneTrap);
 		}break;
-	case CapAtk:break;
+	case eCapAtk:break;
 	default:break;
 	}
-	if( alive->getSortieNum() >= effect->batter )
+	if( alive->getSortieNum() >= effect->getBatter() )
 	{
 		m_HurtCount->BuffHandleLogic(alive);									//伤害计算完成才能添加新的BUFF
 		alive->clearHitAlive();
@@ -626,7 +626,7 @@ bool CombatLogic::delayEntrance( WarAlive* alive,float dt )
 {
 	if (alive->getBattle())
 		return false;
-	if (((TempMonster*)alive->role)->delay)
+	if (((MonsterRoleData*)alive->role)->delay)
 	{
 		if (alive->getDelaytime()<=0)
 		{
@@ -740,9 +740,9 @@ bool CombatLogic::AttackJudge( WarAlive* alive )
 
 void CombatLogic::displayBatchWarning()
 {
-	if (m_Manage->getAliveByType(AliveType::Boss))
+	if (m_Manage->getAliveByType(E_ALIVETYPE::Boss))
 	{
-		WarAlive* boss = m_Manage->getAliveByType(AliveType::Boss);
+		WarAlive* boss = m_Manage->getAliveByType(E_ALIVETYPE::Boss);
 		m_Assist->DisplayBossWarning(m_UILayer,boss->getModel());							//第一波就出现超大boss的情况	
 		m_AliveLayer->removeMessage();														//释放掉触摸消息
 	}else if(m_BatchNum == m_CurrBatchNum)
@@ -932,7 +932,7 @@ void CombatLogic::beginStageFloorEffect()
 	int grids[4] = {78,89,102,117};
 	for (int i=0;i<4;i++)
 	{
-		EffectObject*ef  = EffectObject::create("121",EffectType::Delay); 
+		EffectObject*ef  = EffectObject::create("121",PLAYERTYPE::Delay); 
 		ef->setMusic(525);
 		ef->setShake(true);
 		ef->setDelaytime(i*0.35f);

@@ -80,7 +80,7 @@ void WarAssist::DisplayBossWarning(CCObject* ob,int model/* = 0*/)
 	m_ui->addChild(pShadow, 2);
 
 	//闪电
-	EffectObject* pLighting = EffectObject::create("warning",EffectType::Repeat);
+	EffectObject* pLighting = EffectObject::create("warning",PLAYERTYPE::Repeat);
 	pLighting->setPosition(VCENTER);
 	pLighting->setScaleX(2);
 	pLighting->setEffAnchorPoint(0.5,0.5);

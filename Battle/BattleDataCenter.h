@@ -1,52 +1,68 @@
-/** 
- *
- *		Data : 2016.4.13
- *	
- *		Name : BattleDataCenter
- *
- *		Author : Lin_Xiancheng
- *
- *		Description : 管理所有战斗数据,包括地图，人物，关卡配置，剧情，技能效果等内容。
- *
- */
 
 #ifndef __BATTLEDATACENTER__
 #define __BATTLEDATACENTER__
+/************************************************************* 
+*
+*
+*		Data : 2016.6.2
+*	
+*		Name : 
+*
+*		Author : Lin_Xiancheng
+*
+*		Description : Manage battle role data
+*
+*
+*************************************************************/
+namespace google {
+	namespace protobuf{
+		class Message;
+	}
+}
 
-
-
-#include <string>
-#include "cocos2d.h"
-#include "protos/protocol.h"
-
-
+namespace protos{
+	namespace common{
+		class Monster;
+		class Hero;
+	}
+}
+class MonsterRoleData;
+class HeroRoleData;
+using namespace std;
+#include <vector>
 class BattleDataCenter
 {
 public:
-	static BattleDataCenter* ShareBattleDataControl();
-
+	static BattleDataCenter* ShareBattleDataCenter();
+	void releaseRoleData();
 public:
-	void BattleDataInit(BattleResponse *Response);
-
-
-
+	void initBattleData( const google::protobuf::Message *pResponse,bool pWorldBoss = false );
+	void initWordBossStage( const google::protobuf::Message *pResponse );
+	void initNormalStage( const google::protobuf::Message *pResponse );
+	const  vector<HeroRoleData*>&  getHeroVector()const	;
+	const vector<MonsterRoleData*>& getMonsterVector()const;
 private:
+	void initMonsterData(const protos::common::Monster* pData);
+	void initHeroData(const protos::common::Hero* pData);
+private:
+	vector<HeroRoleData*> mHeroVec;
+	vector<MonsterRoleData*>mMonsterVec;
 	BattleDataCenter();
-	static BattleDataCenter* m_DataControl;
+	static BattleDataCenter* mDataControl;
 	class SingletonDestroy
 	{
 	public :
 		~SingletonDestroy(){
-			if (m_DataControl != NULL )
+			if (mDataControl != nullptr )
 			{
-				delete m_DataControl;
-				m_DataControl = NULL ;
+				delete mDataControl;
+				mDataControl = nullptr ;
 			}
 		}
 	};
-	static SingletonDestroy m_Destroy;
+	static SingletonDestroy mDestroy;
 };
 
-#define BattleData BattleDataCenter::ShareBattleDataControl()
+#define BattleData BattleDataCenter::ShareBattleDataCenter()
 
 #endif

@@ -43,7 +43,7 @@ bool WarFailLayer::init(){
 	this->addChild(m_ui);
 
 	//ÕÂ½ÚÐÅÏ¢
-	CCString* pChapter = CCString::createWithFormat("tollgate/chapter_%d.png", DataCenter::sharedData()->getWar()->getChapter().id);
+	CCString* pChapter = CCString::createWithFormat("tollgate/chapter_%d.png", 101/*DataCenter::sharedData()->getWar()->getChapter().id*/);
 	CCSprite* pTitle = CCSprite::create(pChapter->getCString());
 	if(!pTitle)
 	{

@@ -1,6 +1,6 @@
 ﻿#include "SkillRange.h"
 #include "model/DataCenter.h"
-#include "Battle/TempData.h"
+#include "Battle/RoleBaseData.h"
 #include "common/CommonFunction.h"
 #include "tools/commonDef.h"
 #include "Battle/BattleRole.h"
@@ -32,7 +32,7 @@ SkillRange* SkillRange::create( WarManager* pManage )
 //武将当前站位区域
 void SkillRange::getSelfArea( WarAlive* pAlive )
 {
-	if (pAlive->getCurrEffect()->pTarget != eEnemyType)					//效果目标是敌方阵营
+	if (pAlive->getCurrEffect()->getTargetType() != eEnemyType)					//效果目标是敌方阵营
 		return;
 	pAlive->mSkillArea.assign(
 		pAlive->mStandGrids.begin(),pAlive->mStandGrids.end());			//最优先攻击相同格子怪物			
@@ -42,7 +42,7 @@ void SkillRange::initValidGrids( WarAlive* pAlive,vector<int>& pValids )
 {
 	int aliveGrid = 0;
 	vector<int> CountGrid;
-	SkillEffect* effect = pAlive->getCurrEffect();
+	const skEffectData* effect = pAlive->getCurrEffect();
 	if (pAlive->getTouchState())								//单格子武将触摸状态下处理(此处应进行移动状态下攻击格子特殊处理)
 	{
 		aliveGrid = pAlive->getTouchGrid();
@@ -54,15 +54,11 @@ void SkillRange::initValidGrids( WarAlive* pAlive,vector<int>& pValids )
 	if (pAlive->role->row==1&&pAlive->role->col==1)
 	{
 		pValids.push_back(aliveGrid);
-	}else if (effect->mode == eVertical || eNearby == effect->mode)
+	}else if (effect->getAreaType() == eVertical || eNearby == effect->getAreaType())
 	{
 		pValids = pAlive->mStandGrids;
 	}
-	if (!CountGrid.size())
-	{
-		pValids.push_back(INVALID_GRID);
-	}
-	if (pAlive->getEnemy()|| (!pAlive->getEnemy()&&pAlive->getOpposite()))//武将反向攻击
+	if (pAlive->getEnemy() || pAlive->getOpposite())					//武将反向攻击
 	{
 		for (int i=0;i<pAlive->role->row;i++)							//获取向后攻击的判断格子(我方武将反向)
 			pValids.push_back(CountGrid.at(CountGrid.size()-i-1));
@@ -91,7 +87,7 @@ void SkillRange::initSkillArea( WarAlive* pAlive,vector<int>& pVector )
 		return;
 	}
 	getSelfArea(pAlive);
-	if (!pAlive->getCurrEffect()->range)
+	if (!pAlive->getCurrEffect()->getAreaSize())
 		return;
 	initSkillEffectArea(pAlive,pVector);
 }
@@ -121,7 +117,7 @@ void SkillRange::initAreaTargets(WarAlive* pAlive)
 void SkillRange::initAttackInfo(WarAlive* pAlive)
 {
 	int tGroupIndex = 0;
-	for (;tGroupIndex < pAlive->getCurrSkill()->EffectList.size(); tGroupIndex++)
+	for (;tGroupIndex < pAlive->getCurrSkill()->getListSize(); tGroupIndex++)
 	{
 		pAlive->setGroupIndex(tGroupIndex);
 		initSkillArea(pAlive,pAlive->mSkillArea);
@@ -148,7 +144,7 @@ int SkillRange::CaptainGuard( WarAlive* pAlive )
 {
 	int currgrid = pAlive->getGridIndex();
 	int tGroupIndex = 0;
-	for (;tGroupIndex < pAlive->getCurrSkill()->EffectList.size(); tGroupIndex++)	//效果优先而不是位置优先,先判断一个效果的所有位置再判断下一个效果
+	for (;tGroupIndex < pAlive->getCurrSkill()->getListSize(); tGroupIndex++)	//效果优先而不是位置优先,先判断一个效果的所有位置再判断下一个效果
 	{
 		pAlive->setGroupIndex(tGroupIndex);
 		for (int tGrid=C_CAPTAINGRID; tGrid<=C_ENDGRID; tGrid++)
@@ -171,24 +167,6 @@ int SkillRange::CaptainGuard( WarAlive* pAlive )
 	pAlive->setGroupIndex(0);
 	pAlive->setGridIndex(currgrid);
 	return INVALID_GRID;
-}
-//血量最低单位
-void SkillRange::lowestAlive(AreaCountInfo& pInfo)
-{
-	vector<WarAlive*>* tAlives = mManage->getSkillTargets(pInfo.getAlive());
-	VectorSortAliveHp(*tAlives);
-	if (pInfo.getAreaRange() >= tAlives->size())
-	{
-		for(auto i:*tAlives)
-			pInfo.addGrid(i->getGridIndex());
-	}else{
-		for (auto i:*tAlives)
-		{
-			pInfo.addGrid(i->getGridIndex());
-			if (pInfo.getVector().size() >= pInfo.getAreaRange())
-				break;
-		}
-	}
 }
 //武将前方格子					1，前方不惯穿	  10
 void SkillRange::FrontArea( AreaCountInfo& pInfo )
@@ -530,6 +508,24 @@ void SkillRange::MapDoubleLine( AreaCountInfo& pInfo )
 		{
 			pInfo.addGrid(i*C_GRID_ROW+cpair.first);
 			pInfo.addGrid(i*C_GRID_ROW+cpair.second);
+		}
+	}
+}
+//血量最低单位
+void SkillRange::lowestAlive(AreaCountInfo& pInfo)
+{
+	vector<WarAlive*>* tAlives = mManage->getSkillTargets(pInfo.getAlive());
+	VectorSortAliveHp(*tAlives);
+	if (pInfo.getAreaRange() >= tAlives->size())
+	{
+		for(auto i:*tAlives)
+			pInfo.addGrid(i->getGridIndex());
+	}else{
+		for (auto i:*tAlives)
+		{
+			pInfo.addGrid(i->getGridIndex());
+			if (pInfo.getVector().size() >= pInfo.getAreaRange())
+				break;
 		}
 	}
 }

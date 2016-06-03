@@ -223,7 +223,7 @@ void CWorldBoss::showWorldBossEffect(int iBossId)
 	PlayBackgroundMusic(BGM_Boss1,true);
 
 	//警告闪电
-	EffectObject* eff = EffectObject::create("warning",EffectType::Repeat);
+	EffectObject* eff = EffectObject::create("warning",PLAYERTYPE::Repeat);
 	eff->setPosition(VCENTER);
 	eff->setEffAnchorPoint(0.5,0.5);
 	eff->setZOrder(2);

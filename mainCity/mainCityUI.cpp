@@ -681,11 +681,11 @@ void CMainCityUI::showNoticeTip(CGameTips * ct)
 
 void CMainCityUI::runTollgatepreviewCallBack()
 {
-	CStage* stage = DataCenter::sharedData()->getWar()->getTollgete(); 
-	CPlayerControl::getInstance().sendStageInfo(stage->id);
-	CTollgatePreview *preview = CTollgatePreview::create();
-	LayerManager::instance()->push(preview);
-	preview->setStage(stage->id, stage->name.c_str());
+	//CStage* stage = DataCenter::sharedData()->getWar()->getTollgete(); 
+	//CPlayerControl::getInstance().sendStageInfo(stage->id);
+	//CTollgatePreview *preview = CTollgatePreview::create();
+	//LayerManager::instance()->push(preview);
+	//preview->setStage(stage->id, stage->name.c_str());
 }
 
 void CMainCityUI::setShowHeadPart(bool isSHow)

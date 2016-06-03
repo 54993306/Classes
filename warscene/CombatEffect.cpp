@@ -177,12 +177,12 @@ void CombatEffect::BattleEffect(BattleResult* Result)
 {
 	WarAlive*alive = Result->getAlive();
 	ActObject* aliveOb = alive->getActObject();
-	SkillEffect* efInfo = alive->getCurrEffect();									//状态性的数据	
-	EffectInfo* effectinfo = DataCenter::sharedData()->getWar()->getEffData()->getEffectInfo(efInfo->effectId);	
+	const skEffectData* efInfo = alive->getCurrEffect();									//状态性的数据	
+	EffectInfo* effectinfo = DataCenter::sharedData()->getWar()->getEffData()->getEffectInfo(efInfo->getEffectID());	
 	if (!effectinfo)
 	{
 		effectinfo = DataCenter::sharedData()->getWar()->getEffData()->getEffectInfo(10000021);
-		CCLOG("[ ERROR ] CombatEffect::BattleEffect EffectInfo NULL %d",efInfo->effectId);
+		CCLOG("[ ERROR ] CombatEffect::BattleEffect EffectInfo NULL %d",efInfo->getEffectID());
 	}
 	if (Result->getusNum()&&Result->getusType())
 		aliveOb->playerNum(Result->getusNum(),Result->getusType());						//攻击武将播放血量变化(吸血类效果有时应该差时而非同步播放)
@@ -229,8 +229,8 @@ void CombatEffect::AttackNull(BattleResult* Result)
 {
 	WarAlive*alive = Result->getAlive();
 	ActObject* aliveOb = alive->getActObject();
-	SkillEffect* efInfo = alive->getCurrEffect();
-	EffectInfo* effectinfo = DataCenter::sharedData()->getWar()->getEffData()->getEffectInfo(efInfo->effectId);
+	const skEffectData* efInfo = alive->getCurrEffect();
+	EffectInfo* effectinfo = DataCenter::sharedData()->getWar()->getEffData()->getEffectInfo(efInfo->getEffectID());
 	if (!effectinfo)
 	{
 		CCLOG("[ *ERROR ] CombatEffect::AttackNull");
@@ -311,7 +311,7 @@ void CombatEffect::SkillEfHandleForEnemy( CCObject* ob )
 
 	//获取技能文本
 	WarManager* warManager = DataCenter::sharedData()->getWar();
-	const SkillCfg* pSkillCfg = DataCenter::sharedData()->getSkill()->getCfg(((WarAlive*)SkillEffect->getUserData())->getCurrSkill()->skillId);
+	const SkillCfg* pSkillCfg = DataCenter::sharedData()->getSkill()->getCfg(((WarAlive*)SkillEffect->getUserData())->getCurrSkill()->getSkillID());
 	std::string text = pSkillCfg->name;
 	CCSprite* pSprite = CCSprite::create(CCString::createWithFormat("warScene/playerSkill/%d.png", pSkillCfg->id)->getCString());
 	if(!pSprite)

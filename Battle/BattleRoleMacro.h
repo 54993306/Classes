@@ -14,7 +14,7 @@
 #ifndef __BATTLEROLEMACRO__
 #define __BATTLEROLEMACRO__
 
-enum AttributeType
+enum E_ATTRIBUTETYPE
 {
 	atb_normal = 0,
 	atb_attak ,			//1		攻击
@@ -36,7 +36,7 @@ enum AttributeType
 	atb_hp_recover,		//31	血量回复
 };
 
-enum CALL_Type			//定义武将召唤类型类型,不同类型武将处理不同
+enum E_CALLTYPE				//定义武将召唤类型类型,不同类型武将处理不同
 {
 	CommonType = 0,			//普通类型武将
 	AutoMoveType,			//自动移动类型武将
@@ -47,14 +47,14 @@ enum CALL_Type			//定义武将召唤类型类型,不同类型武将处理不同
 	UNAddHP,				//不可被加血类型武将
 	OnlyOnce,				//只攻击一次类型
 };
-enum MST_TYPE				//怪物类型
+enum E_MONSTERTYPE			//怪物类型
 {
 	MST_COMMON = 0,			//普通类型怪物
 	MST_HIDE,				//潜行类怪物
 	MST_TIME,				//时间召唤类武将
 	MST_SKILL,				//出场即释放技能类
 };
-enum ALIVESTATE
+enum E_ALIVESTATE
 {
 	COMMONSTATE = 0,		//正常状态
 	UNHIT,					//不可受击状态
@@ -63,22 +63,14 @@ enum ALIVESTATE
 };
 
 
-enum HeroType
+enum E_HEROTYPE
 {
-	FireType = 1,	//火属性武将
-	WaterType,		//水属性武将
-	WoodType,		//木属性武将
+	FireType = 1,			//火属性武将
+	WaterType,				//水属性武将
+	WoodType,				//木属性武将
 };
-//技能类型(1 普通攻击，2 特殊攻击，3 必杀技，4 召唤技，5 队长技)没有必要分skill1-skill7了,不过已经是分了才加的这个类型
-enum ROLESKILLTYPE
-{
-	NorAtk = 1,
-	SpeAtk,
-	CriAtk,
-	CallAtk,
-	CapAtk, 
-};
-enum struct AliveType
+
+enum struct E_ALIVETYPE
 {
 	Common,					//普通型武将
 	Elite,					//精英型武将

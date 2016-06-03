@@ -795,9 +795,11 @@ void CTollgateLayer::onBattle(CCObject* pSender)
 	int zorder = btn->getZOrder();
 	if (stage&&stage->isOpen)
 	{
-		DataCenter::sharedData()->getWar()->setChapter(m_chapterList[m_isStory][m_selectChapterIndex-1]);
+		//DataCenter::sharedData()->getWar()->setChapter(m_chapterList[m_isStory][m_selectChapterIndex-1]);
 		DataCenter::sharedData()->getWar()->setLastStageId(stage->id); 
-		DataCenter::sharedData()->getWar()->setTollgate(*stage); 
+		if (stage->star>=1)
+			DataCenter::sharedData()->getWar()->setFirstStage(false);
+		//DataCenter::sharedData()->getWar()->setTollgate(*stage); 
 		DataCenter::sharedData()->getWar()->setStageType(zorder);
 		DataCenter::sharedData()->getWar()->setNormal(m_isStory);
 		DataCenter::sharedData()->getWar()->setChapterIndex(m_selectChapterIndex);

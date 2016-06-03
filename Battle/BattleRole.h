@@ -20,7 +20,7 @@
 /******************* 战场武将数据 ********************/
 #include "cocos2d.h"
 #include "Battle/BattleMacro.h"
-#include "Battle/SkillEffect.h"
+#include "Battle/skEffectData.h"
 #include "Battle/RoleBuffData.h"
 #include "Battle/BattleRoleMacro.h"
 
@@ -29,8 +29,8 @@ using namespace std;
 class BuffManage;
 class ActObject;
 class MoveObject;
-class TempRole;
-class TempSkill;
+class RoleBaseData;
+class RoleSkill;
 class WarAlive:public cocos2d::CCObject					//定义数据的顺序结构是为了方便查看数据
 {
 public:
@@ -41,11 +41,10 @@ public:
 	void ExcuteNextEffect();					//重置武将下执行下一个效果状态
 	bool canSummonAlive();						//是否可以召唤武将
 	void clearHitAlive();
-	SkillEffect* getCurrEffect();				//得到武将当前效果
-	TempSkill* getCurrSkill();					//得到武将当前效果
+	const skEffectData* getCurrEffect();		//得到武将当前效果
+	RoleSkill* getCurrSkill();					//得到武将当前效果
 	bool NextEffect();							//判断第二个效果是否释放
 	int getSkillType();
-	int getEffectType();
 	bool captainCallNumberJudge();
 	bool hasAliveByTargets(WarAlive* pAlive);
 	bool pierceJudge();
@@ -53,7 +52,7 @@ public:
 	bool standInGrid(int pGrid);
 	bool critJudge();
 public:
-	TempRole* role;								//服务器角色信息
+	RoleBaseData* role;							//服务器角色信息
 	vector<int> mStandGrids;					//多格子站位
 	vector<int> moves;							//各方向移动范围
 	vector<int> mTouchGrids;					//移动状态下武将多格子处理
@@ -101,7 +100,7 @@ public:
 	CC_SYNTHESIZE(int,m_Hit,Hit);						//命中
 	CC_SYNTHESIZE(int,m_Doge,Doge);						//闪避
 	CC_SYNTHESIZE(int,m_Crit,Crit);						//暴击
-	CC_SYNTHESIZE(AliveType,m_AliveType,AliveType);		//角色品质等级
+	CC_SYNTHESIZE(E_ALIVETYPE,m_AliveType,AliveType);	//角色品质等级
 	CC_SYNTHESIZE(unsigned int,m_Renew,Renew);			//回复
 	CC_SYNTHESIZE(bool,m_Battle,Battle);				//上阵状态
 	CC_SYNTHESIZE(int,m_SortieNum,SortieNum);			//当前回造成伤害次数

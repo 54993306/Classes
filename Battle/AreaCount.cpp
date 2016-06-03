@@ -8,14 +8,15 @@ AreaCountInfo::AreaCountInfo(vector<int>& pVector,WarAlive* pAlive)
 	,mAreaType(0),mAreaRange(0),mDistance(0),mTargetType(0)
 {
 	setAlive(mAlive);
-	setTargetType(mAlive->getCurrEffect()->pTarget);
+	setTargetType(mAlive->getCurrEffect()->getTargetType());
 	setEnemy(mAlive->getEnemy());
 	setBackAttack(mAlive->getOpposite());
-	setAreaType(mAlive->getCurrEffect()->mode);
-	setAreaRange(mAlive->getCurrEffect()->range);
-	setDistance(mAlive->getCurrEffect()->distance);
+	setAreaType(mAlive->getCurrEffect()->getAreaType());
+	setAreaRange(mAlive->getCurrEffect()->getAreaSize());
+	setDistance(mAlive->getCurrEffect()->getSpaceRange());
 #if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
-	setAreaType(10);
+	//setAreaRange(1);
+	//setAreaType(eVertical);
 #endif // cctar
 }
 

@@ -5,7 +5,7 @@
 #include "scene/alive/AliveDefine.h"
 #include "warscene/ConstNum.h"
 #include "Battle/BattleMessage.h"
-#include "Battle/TempData.h"
+#include "Battle/RoleBaseData.h"
 using namespace cocos2d;
 using namespace cocos2d::extension;
 #define BUFFMAX (8)
@@ -72,11 +72,11 @@ void BuffManage::AddBuff(RoleBuffData& buf)
 	}
 	if (AddBuffLogic(buf))
 		return;
-	BuffInfo* buffinfo = BuffInfo::create();
-	buffinfo->initBuffInfo(buf);
-	buffinfo->retain();									//clear方法里面safa release的作用就是在这了
-	ExcuteBuff(buffinfo);								//执行buff逻辑
-	m_BuffMap[buffinfo->getBuffID()] = buffinfo;			//map添加信息的方法	
+	BuffInfo* tBuffinfo = BuffInfo::create();
+	tBuffinfo->initData(buf);
+	tBuffinfo->retain();									//clear方法里面safa release的作用就是在这了
+	ExcuteBuff(tBuffinfo);								//执行buff逻辑
+	m_BuffMap[tBuffinfo->getBuffID()] = tBuffinfo;			//map添加信息的方法	
 	if (m_alive->getHp()<=0)
 		m_alive->getActObject()->AliveDie();
 	CCLOG("[ Tips ] BuffManage::AddBuff succeed bufID = %d",buf.getBuffID());
@@ -209,7 +209,7 @@ void BuffManage::ExcuteBuff(BuffInfo*bfinfo, bool handel /*= true*/)
 		return;
 	switch (bfinfo->getBuffType())
 	{
-	case CLEBF:
+	case BUFFTYPE::CLEBF:
 		{
 			if (!bfinfo->getHandle()&&handel)
 			{
@@ -217,11 +217,11 @@ void BuffManage::ExcuteBuff(BuffInfo*bfinfo, bool handel /*= true*/)
 				clearDbuf();
 			}			
 		}break;
-	case CURRHP:
-	case FIRING:
-	case BLEED:
+	case BUFFTYPE::CURRHP:
+	case BUFFTYPE::FIRING:
+	case BUFFTYPE::BLEED:
 		{
-			if (m_alive->getAliveType() == AliveType::WorldBoss)
+			if (m_alive->getAliveType() == E_ALIVETYPE::WorldBoss)
 				return;			//世界boss免疫buff效果
 			int num = bufCurrHpHandle(bfinfo,handel);							/*1当前血量*/		
 			if (!num)break;
@@ -233,28 +233,28 @@ void BuffManage::ExcuteBuff(BuffInfo*bfinfo, bool handel /*= true*/)
 				m_alive->getActObject()->playerNum(num,gainType);
 			}
 		}break;
-	case ATK:{
+	case BUFFTYPE::ATK:{
 		bufAtkHandle(bfinfo,handel);							/*2、攻击*/
 			 }break;
-	case DEF:{
+	case BUFFTYPE::DEF:{
 		bufDefHandle(bfinfo,handel);							/*3、防御*/
 			 }break;
-	case CRI:{
+	case BUFFTYPE::CRI:{
 		bufCritHandle(bfinfo,handel);							/*4、暴击*/
 			 }break;
-	case DOGE:{
+	case BUFFTYPE::DOGE:{
 		bufDogeHandle(bfinfo,handel);							/*5、闪避*/
 			  }break;
-	case HIT:{
+	case BUFFTYPE::HIT:{
 		bufHitHandle(bfinfo,handel);							/*6、命中*/
 			 }break;	
-	case MOVESPEED:{
+	case BUFFTYPE::MOVESPEED:{
 		bufMSpeedHandle(bfinfo,handel);							/*7、移动速度*/
 				   }break;
-	case ATKSPEED:{
+	case BUFFTYPE::ATKSPEED:{
 		bufAtkSpeedHandle(bfinfo,handel);						/*8、攻击速度*/
 				  }break;
-	case CONTROL_ONE:											/*100、定身*/
+	case BUFFTYPE::CONTROL_ONE:											/*100、定身*/
 		{
 			if (handel)
 			{
@@ -264,10 +264,10 @@ void BuffManage::ExcuteBuff(BuffInfo*bfinfo, bool handel /*= true*/)
 				m_alive->setMove(true);
 			}
 		}break;
-	case HRT:{
+	case BUFFTYPE::HRT:{
 		bufHrtHandle(bfinfo,handel);							/*1000、伤害*/		
 			 }break;
-	case HPMAX:{
+	case BUFFTYPE::HPMAX:{
 		bufMaxHpHandle(bfinfo,handel);							/*1001、最大血量*/
 			   }break;
 	default:

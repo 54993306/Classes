@@ -5,7 +5,7 @@
 #include "model/MapManager.h"
 #include "warscene/ConstNum.h"
 #include "scene/alive/ActObject.h"
-#include "Battle/TempData.h"
+#include "Battle/RoleBaseData.h"
 MoveObject::MoveObject()
 :m_grid(0),m_Alive(nullptr),m_Row(1),m_Col(1),m_OffsX(0),m_OffsY(0)
 {}

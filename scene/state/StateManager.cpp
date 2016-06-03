@@ -36,7 +36,7 @@ StateVector StateManager::getTransitionVec(StateMachine* self,int stateCode )
 	return self->getTransition()->getCurrentStateTransitionVec(stateCode);		
 }
 //如果当前状态可以切换至设置状态则切换为设置状态
-bool StateManager::switchPostureState(StateMachine* self,StateManager* actor,State* targetState)
+bool StateManager::switchPostureState(StateMachine* self,State* targetState)
 {
 	if( self->getCurrentPostureState()->canTransition( self , targetState ) )
 	{

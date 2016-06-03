@@ -81,7 +81,7 @@ public:
 	virtual void initState(StateMachine* self){};									//初始化
 	bool isInTransitionVec(StateMachine* self,int currentState,int targetState );	//判断当前状态是否可以切换至目标状态
 	StateVector getTransitionVec(StateMachine* self,int stateCode );				//根据状态机得到可过渡状态vector
-	bool switchPostureState(StateMachine* self,StateManager* actor,State* targetState);//当前状态切换至目标状态
+	bool switchPostureState(StateMachine* self,State* targetState);//当前状态切换至目标状态
 	virtual bool init(){return true;}
 protected:
 	void registerState(State* state);												//注册状态

@@ -1,7 +1,7 @@
 #include "BattleTools.h"
 #include "ConstNum.h"
 #include "Battle/BattleRole.h"
-#include "Battle/TempData.h"
+#include "Battle/RoleBaseData.h"
 #include "common/CGameSound.h"
 bool RowUp_InBoundary( int originRow,int aimRow )
 {
@@ -151,15 +151,6 @@ void CallAliveByFixRange( WarAlive*father , WarAlive*child )
 		CCLOG("[ *ERROR ] BattleTools::CallAliveByFixRange");			//Êý¾Ý´íÎóÁË	
 #endif
 	}
-}
-
-SkillEffect* getSummonEffect( TempSkill* skill )
-{
-	if (skill->skillType == CallAtk)
-		if (skill->EffectList.size())
-			if (skill->EffectList.at(0).size())
-				return &skill->EffectList.at(0).at(0);
-	return nullptr;
 }
 
 void PlaySound_Event( int id )

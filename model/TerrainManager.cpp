@@ -10,7 +10,7 @@
 #include "model/MapManager.h"
 #include "common/CommonFunction.h"
 #include "Battle/BattleRole.h"
-#include "Battle/TempData.h"
+#include "Battle/RoleBaseData.h"
 using namespace cocos2d;
 
 terData::terData(){}

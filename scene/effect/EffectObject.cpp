@@ -8,13 +8,13 @@
 #include "Battle/BattleMessage.h"
 
 EffectObject::EffectObject()
-	:m_effect(nullptr),m_TotalTime(0),m_Playtime(0),m_Type(EffectType::once),m_Music(0)
+	:m_effect(nullptr),m_TotalTime(0),m_Playtime(0),m_Type(PLAYERTYPE::once),m_Music(0)
 	,m_model(""),m_skewing(false),m_bIsNullEffect(false),m_Delaytime(0),m_LoopNum(1)
 	,m_DurationTime(0),m_Shake(false),m_LoopInterval(0)
 {}
 EffectObject::~EffectObject(){}
 
-EffectObject* EffectObject::create(const char* model,EffectType type /*=EffectType::once*/)
+EffectObject* EffectObject::create(const char* model,PLAYERTYPE type /*=EffectType::once*/)
 {
 	EffectObject* pRet = new EffectObject();
 	if( pRet && pRet->init() )
@@ -75,30 +75,30 @@ void EffectObject::play()
 	CCAnimate* animate = CCAnimate::create(Animation);
 	switch (m_Type)
 	{
-	case EffectType::once:
+	case PLAYERTYPE::once:
 		{
 			this->scheduleUpdate();
-			animate->setTag((int)EffectType::Repeat);
+			animate->setTag((int)PLAYERTYPE::Repeat);
 			m_effect->runAction(animate);
 			if (m_Music)
 				playeEffectMusic(m_Music);
 			m_TotalTime = Animation->getDuration();
 		}break;
-	case EffectType::Repeat:
+	case PLAYERTYPE::Repeat:
 		{
 			CCAction* Action = CCRepeatForever::create(animate);
-			Action->setTag((int)EffectType::Repeat);
+			Action->setTag((int)PLAYERTYPE::Repeat);
 			m_effect->runAction(Action);
 		}break;
-	case EffectType::RepeatNum:
+	case PLAYERTYPE::RepeatNum:
 		{
 			this->scheduleUpdate();
 			CCAction* Action = CCRepeat::create(animate,m_LoopNum);
-			Action->setTag((int)EffectType::Repeat);
+			Action->setTag((int)PLAYERTYPE::Repeat);
 			m_effect->runAction(Action);
 			m_TotalTime = Animation->getDuration()*m_LoopNum;
 		}break;
-	case EffectType::Delay:
+	case PLAYERTYPE::Delay:
 		{
 			CCDelayTime* delay = CCDelayTime::create(m_Delaytime);
 			CCAction* seq = nullptr;
@@ -113,14 +113,14 @@ void EffectObject::play()
 				CCSequence* pSeq = CCSequence::create(animate,Interval,nullptr);
 				seq = CCSequence::create(delay,CCRepeat::create(pSeq,m_LoopNum),CCRemoveSelf::create(),nullptr);
 			}
-			seq->setTag((int)EffectType::Repeat);
+			seq->setTag((int)PLAYERTYPE::Repeat);
 			m_effect->runAction(seq);
 			m_TotalTime = Animation->getDuration()*m_LoopNum+m_Delaytime;
 		}break;
-	case EffectType::Duration:
+	case PLAYERTYPE::Duration:
 		{
 			CCAction* Action = CCRepeatForever::create(animate);
-			Action->setTag((int)EffectType::Repeat);
+			Action->setTag((int)PLAYERTYPE::Repeat);
 			m_effect->runAction(Action);
 			m_TotalTime = m_DurationTime;
 			this->scheduleUpdate();
@@ -134,7 +134,7 @@ void EffectObject::update(float dt)
 {
 	m_Playtime += dt;
 	if (this->isActionDone() || m_bIsNullEffect ||
-		(m_Type == EffectType::Duration && m_Playtime >= m_DurationTime))
+		(m_Type == PLAYERTYPE::Duration && m_Playtime >= m_DurationTime))
 	{
 		m_effect->stopAllActions();
 		this->unscheduleAllSelectors();
@@ -151,9 +151,9 @@ bool EffectObject::isActionDone()
 			CCLOG("ERROR:EffectObject::isDone()  m_effect IS NULL");
 			return true;
 		}
-		if (m_Type == EffectType::Repeat)
+		if (m_Type == PLAYERTYPE::Repeat)
 			return done;
-		CCAction* Action = m_effect->getActionByTag((int)EffectType::Repeat);
+		CCAction* Action = m_effect->getActionByTag((int)PLAYERTYPE::Repeat);
 		if(!Action || Action->isDone())		//CCAction的isDone方法被它的不同子类重写过
 		{
 			done = true;

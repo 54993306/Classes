@@ -52,7 +52,7 @@ void BufExp::AddBuffExcute( CCObject* ob )
 				ef->setScale(scaleNum);
 				if (effect->getup_Loop())						//定身类的效果需要持续显示
 				{
-					ef->setEffectType(EffectType::Repeat);
+					ef->setEffectType(PLAYERTYPE::Repeat);
 					VecEffect.push_back(ef);
 				}
 				ef->setPosition(ccp(0,30));
@@ -65,7 +65,7 @@ void BufExp::AddBuffExcute( CCObject* ob )
 				ef->setScale(scaleNum);
 				if (effect->getdown_Loop())						//定身类的效果需要持续显示
 				{
-					ef->setEffectType(EffectType::Repeat);
+					ef->setEffectType(PLAYERTYPE::Repeat);
 					VecEffect.push_back(ef);
 				}
 				ef->setPosition(ccp(0,30));
@@ -98,7 +98,7 @@ CCSprite* BufExp::CreateSmallIcon( BuffInfo* info,vector<CCNode*>&Vec )
 		Vec.push_back(smallIcon);
 		return smallIcon;
 	}else{
-		if (info->getBuffType() > CURRHP )
+		if ((BUFFTYPE)info->getBuffType() > BUFFTYPE::CURRHP )
 			CCLOG("[ ERROR ] BufExp::CreateSmallIcon Lost Small Icon type=%d",info->getBuffType());
 	}
 	return NULL;
@@ -125,7 +125,7 @@ void BufExp::CreateBigIcon( BuffInfo* info,CCSprite* body )
 			bigIcon->runAction(CCSequence::create(dely,spa,CCRemoveSelf::create(),NULL));
 			body->addChild(bigIcon,100-m_interval*10);
 		}else{
-			if (info->getBuffType() > CURRHP )
+			if ((BUFFTYPE)info->getBuffType() > BUFFTYPE::CURRHP )
 				CCLOG("[ ERROR ] BufExp::CreateBigIcon Lost Big Icon type=%d",info->getBuffType());
 		}
 	}else{
@@ -141,7 +141,7 @@ void BufExp::CreateBigIcon( BuffInfo* info,CCSprite* body )
 			bigIcon->runAction(CCSequence::create(dely,spa,CCRemoveSelf::create(),NULL));
 			body->addChild(bigIcon,100-m_interval*10);
 		}else{
-			if (info->getBuffType() > CURRHP )
+			if ((BUFFTYPE)info->getBuffType() > BUFFTYPE::CURRHP )
 				CCLOG("[ ERROR ] BufExp::CreateBigIcon Lost Big Icon type=%d",info->getBuffType());
 		}
 	}

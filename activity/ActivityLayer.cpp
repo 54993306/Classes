@@ -87,7 +87,7 @@ void CActivityLayer::onEnter()
 	AnimationManager::sharedAction()->ParseAnimation("loading");
 
 	//loading贴图
-	EffectObject* pLoadEffect = EffectObject::create("loading",EffectType::Repeat);
+	EffectObject* pLoadEffect = EffectObject::create("loading",PLAYERTYPE::Repeat);
 	pLoadEffect->setPosition(dynamic_cast<CCNode*>(m_ui->findWidgetById("loading"))->getPosition());
 	pLoadEffect->setEffAnchorPoint(0.5f,0.5f);
 	pLoadEffect->setScale(0.6f);
