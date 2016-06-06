@@ -43,6 +43,9 @@
 #include "Battle/MoveObject.h"
 #include "Battle/BattleRole.h"
 #include "Battle/GuardArea.h"
+#include "Battle/RoleSkill.h"
+#include "Battle/RoleBaseData.h"
+//#include "Battle/skEffectData.h"
 CombatLogic::CombatLogic()
 	:m_time(0),m_Assist(nullptr),m_task(nullptr),m_CombatEffect(nullptr),m_bufExp(nullptr),m_terExp(nullptr),m_SkillRange(nullptr)
 	,m_BatchNum(0),m_CurrBatchNum(0),m_FiratBatch(true),m_Scene(nullptr),m_UILayer(nullptr),mGuardArea(nullptr)
@@ -117,7 +120,7 @@ void CombatLogic::onEnter()
 void CombatLogic::initCost()
 {
 	CCObject* obj = nullptr;
-	CCArray* arr = m_Manage->getHeros(true);
+	CCArray* arr = m_Manage->getAlivesByCamp(false,true);
 	CCARRAY_FOREACH(arr,obj)
 	{
 		WarAlive* alive = (WarAlive*)obj;
@@ -549,7 +552,7 @@ void CombatLogic::AliveCritEnd( WarAlive* alive )
 	{
 		alive->getActObject()->setMoveState(Walk_Index);	
 		alive->getActObject()->setUpdateState(true);
-		if (alive->role->alert)
+		if (alive->getBaseData()->getAlertType())
 			alive->setAIState(true);
 	}
 }
@@ -612,7 +615,6 @@ void CombatLogic::doLostHp(CCObject* ob)
 			}		
 			m_AliveLayer->initActobject(pAlive,SceneTrap);
 		}break;
-	case eCapAtk:break;
 	default:break;
 	}
 	if( alive->getSortieNum() >= effect->getBatter() )
@@ -626,11 +628,11 @@ bool CombatLogic::delayEntrance( WarAlive* alive,float dt )
 {
 	if (alive->getBattle())
 		return false;
-	if (((MonsterRoleData*)alive->role)->delay)
+	if (((MonsterData*)alive->getBaseData())->getDelayTime())
 	{
 		if (alive->getDelaytime()<=0)
 		{
-			alive->setGridIndex(alive->role->grid);
+			alive->setGridIndex(alive->getBaseData()->getInitGrid());
 			m_AliveLayer->AliveObEffect(alive->getActObject());
 			m_AliveLayer->AddActToGrid(alive->getActObject(),alive->getGridIndex());
 		}else{
@@ -644,12 +646,12 @@ bool CombatLogic::delayEntrance( WarAlive* alive,float dt )
 //
 bool CombatLogic::autoSkillAlive( WarAlive* alive )
 {
-	if ((alive->role->CallType == AutoSkill || alive->role->MstType == MST_SKILL)&&!alive->getCriAtk())						//进入战场就释放技能(陨石类)
+	if ((alive->getBaseData()->getCallType() == AutoSkill || alive->getBaseData()->getMonsterType() == MST_SKILL)&&!alive->getCriAtk())						//进入战场就释放技能(陨石类)
 	{
 		if (alive->getAliveStat()==COMMONSTATE)
 		{
-			if (alive->role->MstType == MST_SKILL)
-				alive->role->MstType = MST_COMMON;
+			if (alive->getBaseData()->getMonsterType() == MST_SKILL)
+				alive->getBaseData()->setMonsterType(MST_COMMON);
 			alive->setCriAtk( true );
 			return true;
 		}
@@ -740,9 +742,9 @@ bool CombatLogic::AttackJudge( WarAlive* alive )
 
 void CombatLogic::displayBatchWarning()
 {
-	if (m_Manage->getAliveByType(E_ALIVETYPE::Boss))
+	if (m_Manage->getAliveByType(E_ALIVETYPE::eBoss))
 	{
-		WarAlive* boss = m_Manage->getAliveByType(E_ALIVETYPE::Boss);
+		WarAlive* boss = m_Manage->getAliveByType(E_ALIVETYPE::eBoss);
 		m_Assist->DisplayBossWarning(m_UILayer,boss->getModel());							//第一波就出现超大boss的情况	
 		m_AliveLayer->removeMessage();														//释放掉触摸消息
 	}else if(m_BatchNum == m_CurrBatchNum)
@@ -779,7 +781,7 @@ void CombatLogic::monsterRemove( WarAlive* alive )
 	if (m_BatchNum > m_CurrBatchNum)										//可能会出现的一个bug，两个人同时死亡的间隔太近，会多次调用这个方法。应该从逻辑处进行最后一个死亡武将的判定而不应该从这里进行处理
 	{
 		srandNum();															//设置随机种子
-		m_Manage->initBatchData(m_CurrBatchNum+1);							//初始化批次武将数据(必须马上初始化数据,但是绘制可以延迟,否则多个武将连续死亡会直接战斗胜利出现)
+		m_Manage->initMonsterByBatch(m_CurrBatchNum+1);							//初始化批次武将数据(必须马上初始化数据,但是绘制可以延迟,否则多个武将连续死亡会直接战斗胜利出现)
 		this->scheduleOnce(schedule_selector(CombatLogic::NextBatch),1);	//打下一批次延时时间
 	}else{
 		m_Run = false;
@@ -823,7 +825,7 @@ void CombatLogic::AliveDieDispose( CCObject* ob )
 	{
 		monsterDieDispose(alive);
 	}else{
-		if (alive->role->isCall || alive->getCaptain())										//喽啰死亡不进行初始化处理
+		if (alive->getBaseData()->getCallRole() || alive->getCaptain())								//喽啰死亡不进行初始化处理
 			return;
 		if (alive->getCaptain())
 		{
@@ -841,10 +843,10 @@ void CombatLogic::battleWin()
 	PlayBackgroundMusic(SFX_Win,false);	
 	WarAlive* alive = m_Manage->getAliveByGrid(C_CAPTAINGRID);	
 	int hp = alive->getHp();
-	if (hp>alive->role->hp)
-		hp = alive->role->hp;
+	if (hp>alive->getBaseData()->getRoleHp())
+		hp = alive->getBaseData()->getRoleHp();
 	m_finishData.res = true;
-	m_finishData.roundNum = alive->role->hp;							//这个验证并没有什么意义
+	m_finishData.roundNum = alive->getBaseData()->getRoleHp();							//这个验证并没有什么意义
 	scheduleForRequestFinish();
 	this->runAction(
 		CCRepeatForever::create(CCSequence::createWithTwoActions(

@@ -50,7 +50,6 @@ ROLE::ROLE()
 	,CallID(0)
 	,alert(0)
 	,alertRange(0)
-	,CallType(0)			//武将类型
 	,MstType(0)				//怪物类型
 	,maxhp(0)				//世界boss专有属性
 {}
@@ -116,7 +115,6 @@ void CMonster::readData(const protos::common::Monster &monster)
 	this->roletype = monster.monstertype();
 	this->thumb = monster.thumb();
 	this->zoom = monster.zoom();
-	this->CallType = monster.foe();
 	this->hasitem = monster.hasitem();
 	this->dodge = monster.dodge();
 	this->enemy = true;

@@ -2,7 +2,7 @@
 #include "tools/ToolDefine.h"
 #include "model/DataCenter.h"
 #include "model/WarManager.h"
-#include "ConstNum.h"
+#include "warscene/ConstNum.h"
 //解析可移动格子文件
 void ParseMoveGrid( int stageid,vector<int> & vec )
 {

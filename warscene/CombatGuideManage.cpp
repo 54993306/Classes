@@ -3,7 +3,7 @@
 #include "CombatGuideLayer.h"
 #include "scene/WarScene.h"
 #include "scene/layer/WarAliveLayer.h"
-#include "ConstNum.h"
+#include "warscene/ConstNum.h"
 #include "common/CGameSound.h"
 
 CombatGuideManage::CombatGuideManage()

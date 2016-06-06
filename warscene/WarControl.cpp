@@ -35,6 +35,10 @@
 #include "Battle/BattleMessage.h"
 #include "common/CSpecialProgress.h"
 
+#include "Battle/RoleSkill.h"
+#include "Battle/skEffectData.h"
+#include "Battle/BattleRole.h"
+#include "Battle/RoleBaseData.h"
 WarControl::WarControl()
 	:m_ControLayer(nullptr),m_boxNum(0),m_goldNum(0),m_iAimCost(0),m_pBossBar1(nullptr)
 	,m_interval(0),m_openEye(false),m_WindResume(false),m_pCostChange(nullptr),m_LayerColor(nullptr)
@@ -99,9 +103,6 @@ void WarControl::OnClick(CCObject* ob)
 		}break;
 	case TEST_BattleData:																	//测试重置当前关卡
 		{
-			BattleServerData* data = m_Manage->getBattleData();
-			int stageId = m_Manage->getStageID();
-			//CPlayerControl::getInstance().sendEnterStage(stageId,data->HeroList.at(0).id,data->HeroList.at(1).id,data->HeroList.at(2).id,data->HeroList.at(3).id,data->HeroList.at(4).id);
 		}break;
 	default:break;
 	}
@@ -198,7 +199,7 @@ void WarControl::initUIEffect()
 //初始化界面上部分
 void WarControl::initUIAbove()
 {
-	WarAlive* boss = m_Manage->getAliveByType(E_ALIVETYPE::WorldBoss);
+	WarAlive* boss = m_Manage->getAliveByType(E_ALIVETYPE::eWorldBoss);
 	if (boss)
 	{
 		m_ControLayer->findWidgetById("layer_up_boss")->setVisible(true);
@@ -273,7 +274,7 @@ void WarControl::initWorldBossAbove(WarAlive* boss)
 //update word boss damage
 void WarControl::updateWorldBossDamage()
 {
-	WarAlive* boss = m_Manage->getAliveByType(E_ALIVETYPE::WorldBoss);
+	WarAlive* boss = m_Manage->getAliveByType(E_ALIVETYPE::eWorldBoss);
 	int num = m_Manage->getBossHurtCount();
 	m_pAllDamage->runAction(CCRollLabelAction::create(0.3f, atoi(m_pAllDamage->getString()), num, m_pAllDamage));
 	m_pAllDamage->runAction(CCSequence::createWithTwoActions(CCScaleTo::create(0.1f, 1.5f), CCScaleTo::create(0.05f, 1.0f)));
@@ -315,7 +316,7 @@ void WarControl::updateWorldBossBloodBar( CCObject* ob )
 //初始化costBar相关效果
 void WarControl::initCostBar()
 {
-	CCArray* arr = m_Manage->getHeros(true);
+	CCArray* arr = m_Manage->getAlivesByCamp(false,true);
 	CCObject* obj = nullptr;
 	int costNum = 0;
 	int costMax = 0;
@@ -389,11 +390,11 @@ void WarControl::initAliveButton(CCNode* Layout,WarAlive* alive)
 	AliveSkillEffect->setPosition(btn->getPosition());
 	Layout->addChild(AliveSkillEffect, -1);
 
-	skEffectData* effect = alive->role->skActive.getSummonEffect();									//这个方法是应该放在武将身上的
+	const skEffectData* effect = alive->getBaseData()->getActiveSkill()->getSummonEffect();		//这个方法是应该放在武将身上的
 	if (!effect)
 		return;
-	initButtonBackImage(btn,effect->getImpactType());													//reason call number init back image
-	int CallNumber = effect->getImpactType()>5?5:effect->getImpactType();										//guide chapter call number infinite
+	initButtonBackImage(btn,effect->getImpactType());											//reason call number init back image
+	int CallNumber = effect->getImpactType()>5?5:effect->getImpactType();						//guide chapter call number infinite
 	btn->setPosition(ccpAdd(btn->getPosition(),ccp(3.5f*CallNumber,0)));
 }
 //根据召唤数量初始化按钮背景图
@@ -442,7 +443,7 @@ void WarControl::AliveBarFullCallBack(CCObject* ob)
 //初始化我方武将UI列表
 void WarControl::initAliveButtons()
 {
-	CCArray* arr = m_Manage->getHeros(true);
+	CCArray* arr = m_Manage->getAlivesByCamp(false,true);
 	CCObject* obj = nullptr;
 	int index = 0;
 	CCARRAY_FOREACH(arr,obj)
@@ -455,15 +456,15 @@ void WarControl::initAliveButtons()
 			CLayout*BtnLay = (CLayout*)m_ControLayer->getChildByTag(CL_BtnLayout1);
 			BtnLay->setVisible(true);
 			CLabel* NeedCost = (CLabel*)BtnLay->getChildByTag(CL_NeedCost);
-			RoleSkill skill = alive->role->skActive;
-			NeedCost->setString(ToString(skill.getExpendCost()));									//初始化值为技能消耗cost
+			const RoleSkill* skill = alive->getBaseData()->getActiveSkill();
+			NeedCost->setString(ToString(skill->getExpendCost()));									//初始化值为技能消耗cost
 			MoveLaout = (CLayout*)BtnLay->getChildByTag(CL_HeroNode);
 		}else{
 			alive->setUiLayout(CL_BtnLayout2+index);
 			CLayout* BtnLay = (CLayout*)m_ControLayer->getChildByTag(CL_BtnLayout2+index);
 			BtnLay->setVisible(true);
 			CLabel* NeedCost = (CLabel*)BtnLay->getChildByTag(CL_NeedCost);
-			NeedCost->setString(ToString(alive->role->useCost));						//初始化值为上阵消耗cost
+			NeedCost->setString(ToString(alive->getBaseData()->getExpendCost()));						//初始化值为上阵消耗cost
 			MoveLaout = (CLayout*)BtnLay->getChildByTag(CL_HeroNode);
 			MoveLaout->setPosition(ccpAdd(MoveLaout->getPosition(),ccp(0,-30)));
 			index++;
@@ -536,18 +537,18 @@ void WarControl::updateAliveButtonEffect()
 			continue;
 		if (alive->getBattle()&&alive->getHp()>0)
 		{
-			RoleSkill skill = alive->role->skActive;
-			if (m_iAimCost >= skill.getExpendCost() && btn->isEnabled())
+			const RoleSkill* skill = alive->getBaseData()->getActiveSkill();
+			if (m_iAimCost >= skill->getExpendCost() && btn->isEnabled())
 			{
 				if (alive->canSummonAlive())
 				{
 					MoveLaout->getChildByTag(CL_BtnCallEff)->setVisible(true);				
-				}else if(skill.getSkillID() && skill.getSkillType() != eCallAtk){
+				}else if(skill->getSkillID() && skill->getSkillType() != eCallAtk){
 					MoveLaout->getChildByTag(CL_BtnSkillEff)->setVisible(true);
 				}	
 			}		
 		}else{			
-			if(m_iAimCost >= alive->role->useCost && btn->isEnabled())
+			if(m_iAimCost >= alive->getBaseData()->getExpendCost() && btn->isEnabled())
 				MoveLaout->getChildByTag(CL_BtnCallEff)->setVisible(true);		
 		}
 	}
@@ -562,10 +563,10 @@ void WarControl::CallAliveEntranceBattle(WarAlive*alive)
 
 	CProgressBar* CdBar = (CProgressBar*)MoveLaout->getChildByTag(CL_HeroPro);
 	btn->setEnabled(false);
-	int cost = pAlive->role->skActive.getExpendCost();
+	int cost = pAlive->getBaseData()->getActiveSkill()->getExpendCost();
 	NOTIFICATION->postNotification(B_ChangeCostNumber,CCInteger::create(-cost));			//this in a call alive real log in battlefield
 	if (pAlive->canSummonAlive())														//is call full
-		CdBar->startProgressFromTo(0,100,pAlive->role->skActive.getCooldown());
+		CdBar->startProgressFromTo(0,100,pAlive->getBaseData()->getActiveSkill()->getCooldown());
 }
 //role log in battlefield or leave
 void WarControl::AliveBattlefield( WarAlive* alive )
@@ -574,17 +575,17 @@ void WarControl::AliveBattlefield( WarAlive* alive )
 	CCNode* MoveLaout = (CLayout*)BtnLay->getChildByTag(CL_HeroNode);
 	CProgressBar* CdBar = (CProgressBar*)MoveLaout->getChildByTag(CL_HeroPro);
 	CLabel* NeedCost = (CLabel*)BtnLay->getChildByTag(CL_NeedCost);
-	RoleSkill skill = alive->role->skActive;
+	const RoleSkill* skill = alive->getBaseData()->getActiveSkill();
 	if (alive->getBattle())														
 	{
 		MoveLaout->runAction(CCMoveBy::create(0.2f,ccp(0,-30)));				//武将死亡
-		CdBar->startProgressFromTo(0,100,alive->role->coldDown);				//复活时间
-		NeedCost->setString(ToString(alive->role->useCost));					//上阵消耗cost
+		CdBar->startProgressFromTo(0,100,alive->getBaseData()->getColdDown());				//复活时间
+		NeedCost->setString(ToString(alive->getBaseData()->getExpendCost()));					//上阵消耗cost
 	}else{																		
 		MoveLaout->runAction(CCMoveBy::create(0.2f,ccp(0,30)));					//武将上阵
-		CdBar->startProgressFromTo(0,100,skill.getCooldown());						//技能CD
-		NeedCost->setString(ToString(skill.getExpendCost()));								//初始化值为上阵消耗cost
-		NOTIFICATION->postNotification(B_ChangeCostNumber,CCInteger::create(-alive->role->useCost));
+		CdBar->startProgressFromTo(0,100,skill->getCooldown());						//技能CD
+		NeedCost->setString(ToString(skill->getExpendCost()));								//初始化值为上阵消耗cost
+		NOTIFICATION->postNotification(B_ChangeCostNumber,CCInteger::create(-alive->getBaseData()->getExpendCost()));
 	}
 	CButton* btn = (CButton*)MoveLaout->getChildByTag(CL_Btn);
 	btn->setEnabled(false);
@@ -593,7 +594,7 @@ void WarControl::AliveBattlefield( WarAlive* alive )
 void WarControl::AliveBattleDispose(CCObject* ob)
 {
 	WarAlive* alive = (WarAlive*)ob;
-	if (alive->role->isCall)
+	if (alive->getBaseData()->getCallRole())
 	{
 		CallAliveEntranceBattle(alive);
 	}else{
@@ -608,10 +609,10 @@ CWidgetTouchModel WarControl::AliveButtonBeginClick(CCObject* ob,CCTouch* pTouch
 	int cost = m_Manage->getLogicObj()->getCurrCost();
 	if (alive->getBattle()&&alive->getHp()>0)
 	{
-		RoleSkill skill = alive->role->skActive;
-		if (skill.getSkillType() == eCallAtk&&cost >= skill.getExpendCost())
+		const RoleSkill* skill = alive->getBaseData()->getActiveSkill();
+		if (skill->getSkillType() == eCallAtk&&cost >= skill->getExpendCost())
 		{
-			WarAlive* pAlive = m_Manage->getCallAlive(alive,&skill);
+			WarAlive* pAlive = m_Manage->getCallAlive(alive,skill);
 			if (!pAlive)
 				return eWidgetTouchTransient;
 			CaptainSkill::create()->ExecuteCaptainSkill();
@@ -622,10 +623,10 @@ CWidgetTouchModel WarControl::AliveButtonBeginClick(CCObject* ob,CCTouch* pTouch
 	}else{
 		if (alive->getHp()<=0)
 		{
-			m_Manage->initAlive(alive);											//使用元宝重置时将我方主帅进行重新初始化再次添加到战斗中
+			alive->initAliveData();
 			CaptainSkill::create()->ExecuteCaptainSkill();
 		}
-		if (cost < alive->role->useCost)
+		if (cost < alive->getBaseData()->getExpendCost())
 			return eWidgetTouchTransient;
 		NOTIFICATION->postNotification(B_EntranceBattle,alive);
 		showMonsterTips(nullptr);
@@ -637,9 +638,9 @@ void WarControl::AliveButtonClick( CCObject* ob )
 {
 	CButton* btn = (CButton*)ob;	
 	WarAlive* alive = dynamic_cast<WarAlive*>(btn->getUserObject());			//根据点击的按钮来判断点了哪个人
-	RoleSkill skill = alive->role->skActive;
-	if (  skill.getSkillType() == eCallAtk
-		||m_Manage->getLogicObj()->getCurrCost()<skill.getExpendCost() 
+	const RoleSkill* skill = alive->getBaseData()->getActiveSkill();
+	if (  skill->getSkillType() == eCallAtk
+		||m_Manage->getLogicObj()->getCurrCost()<skill->getExpendCost() 
 		||!alive->getBattle() )
 		return;
 	CCNode* MoveLaout = getMoveLayout(alive->getUiLayout()-CL_BtnLayout1);
@@ -652,7 +653,7 @@ void WarControl::AliveButtonClick( CCObject* ob )
 	CProgressBar* CdBar = (CProgressBar*)MoveLaout->getChildByTag(CL_HeroPro);
 	CdBar->setValue(0);
 	NOTIFICATION->postNotification(B_RecordContinuousSkill);
-	int tCutCost = skill.getExpendCost();
+	int tCutCost = skill->getExpendCost();
 	NOTIFICATION->postNotification(B_ChangeCostNumber,CCInteger::create(-tCutCost));
 	if (alive->getCaptain())
 		ResetButtonState(alive);
@@ -665,7 +666,7 @@ void WarControl::ResetButtonState( CCObject* ob )
 	WarAlive* alive = (WarAlive*)ob;
 	CCNode* MoveLaout = getMoveLayout(alive->getUiLayout() - CL_BtnLayout1);
 	CProgressBar* CdBar = (CProgressBar*)MoveLaout->getChildByTag(CL_HeroPro);
-	CdBar->startProgressFromTo(0,100,alive->role->skActive.getCooldown());										//技能CD
+	CdBar->startProgressFromTo(0,100,alive->getBaseData()->getActiveSkill()->getCooldown());										//技能CD
 }
 
 bool WarControl::AliveButtonLongClick(CCObject* pSender, CCTouch* pTouch)
@@ -758,10 +759,10 @@ void WarControl::SkillMask( CCObject* ob )
 	WarAlive* alive = (WarAlive*)ob;
 	if (alive->getEnemy())
 		return;
-	if (alive->role->roletype == FireType)
+	if (alive->getBaseData()->getRoleType() == FireType)
 	{
 		m_LayerColor->setColor(ccc3(206,17,0));
-	}else if (alive->role->roletype == WaterType)
+	}else if (alive->getBaseData()->getRoleType() == WaterType)
 	{
 		m_LayerColor->setColor(ccc3(30,69,218));
 	}else{

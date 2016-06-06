@@ -28,9 +28,9 @@ void MapEffectData::settype(int var)
 		sprintf(path,"map/mapEffect/AnimationEffect/%d.plist",m_EffectID);
 		CCSpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile(path);					//导入plist文件
 		if (var == JPG_Effect)
-			AnimationManager::sharedAction()->ParseAnimation(ToString(m_EffectID),EF_JPG);
+			AnimationManager::sharedAction()->ParseAnimation(ToString(m_EffectID),eEffectJPG);
 		else
-			AnimationManager::sharedAction()->ParseAnimation(ToString(m_EffectID),EF_PNG);
+			AnimationManager::sharedAction()->ParseAnimation(ToString(m_EffectID),eEffectPNG);
 		CCLOG("[ *TIPS ] MapEffectData:: MapEffectData addSpriteFramesWithFile %d",m_EffectID);
 	}
 	m_type = var;

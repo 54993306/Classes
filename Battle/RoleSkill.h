@@ -21,6 +21,22 @@ namespace protos{
 		class Effect;
 	}
 }
+
+enum E_EFFECTGROUP
+{
+	eFristGroup		=1,
+	eSecondGroup	=2,
+};
+//技能类型(1 普通攻击，2 特殊攻击，3 必杀技，4 召唤技，5 队长技)
+enum E_SKILLTYPE
+{
+	eNorAtk		=1,
+	eSpeAtk		=2,
+	eCriAtk		=3,
+	eCallAtk	=4,
+	eCapAtk		=5, 
+};
+
 class skEffectData;
 class RoleSkill : public cocos2d::CCObject
 {
@@ -49,23 +65,10 @@ public:
 	const skEffectData* getFirstEffect() const;
 	const skEffectData* getSecondEffect() const;
 	const skEffectData* getSummonEffect() const;
+	const std::vector<std::vector<skEffectData*>>& getEffectVector()const;
 private:
 	void initEffectData(const protos::common::Skill* pSkillData);
 	std::vector<std::vector<skEffectData*>>mEffectList;
 };
-enum E_EFFECTGROUP
-{
-	eFristGroup		=1,
-	eSecondGroup	=2,
-};
 
-//技能类型(1 普通攻击，2 特殊攻击，3 必杀技，4 召唤技，5 队长技)
-enum E_SKILLTYPE
-{
-	eNorAtk		=1,
-	eSpeAtk		=2,
-	eCriAtk		=3,
-	eCallAtk	=4,
-	eCapAtk		=5, 
-};
 #endif

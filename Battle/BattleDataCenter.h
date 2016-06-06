@@ -26,8 +26,8 @@ namespace protos{
 		class Hero;
 	}
 }
-class MonsterRoleData;
-class HeroRoleData;
+class MonsterData;
+class HeroData;
 using namespace std;
 #include <vector>
 class BattleDataCenter
@@ -39,14 +39,16 @@ public:
 	void initBattleData( const google::protobuf::Message *pResponse,bool pWorldBoss = false );
 	void initWordBossStage( const google::protobuf::Message *pResponse );
 	void initNormalStage( const google::protobuf::Message *pResponse );
-	const  vector<HeroRoleData*>&  getHeroVector()const	;
-	const vector<MonsterRoleData*>& getMonsterVector()const;
+	const  vector<HeroData*>&  getHeroVector()const	;
+	const vector<MonsterData*>& getMonsterVector()const;
+	const vector<MonsterData*>& getCallRoleVector();
 private:
 	void initMonsterData(const protos::common::Monster* pData);
 	void initHeroData(const protos::common::Hero* pData);
 private:
-	vector<HeroRoleData*> mHeroVec;
-	vector<MonsterRoleData*>mMonsterVec;
+	vector<HeroData*> mHeroVec;
+	vector<MonsterData*>mMonsterVec;
+	vector<MonsterData*>mCallRole;
 	BattleDataCenter();
 	static BattleDataCenter* mDataControl;
 	class SingletonDestroy

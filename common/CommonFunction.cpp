@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <string>
 #include <typeinfo>
-#include "warscene/ConstNum.h"
 #include "model/DataCenter.h"
 #include "GMessage.h"
 #include "common/CGameSound.h"

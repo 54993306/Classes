@@ -55,7 +55,8 @@ CCSprite* AliveObject::getBody() { return m_Body; }
 
 void AliveObject::testLabel()
 {
-	CCLabelTTF* AliveID = CCLabelTTF::create(ToString(C_ALIVE_OB+m_Alive->getAliveID()),"arial",20);
+	int tageNumber = 3000;
+	CCLabelTTF* AliveID = CCLabelTTF::create(ToString(tageNumber+m_Alive->getAliveID()),"arial",20);
 	AliveID->setColor(ccc3(255,0,0));
 	AliveID->setPosition(ccp(0,60));
 	CCLabelTTF* AliveMode = CCLabelTTF::create(ToString(m_Model),"arial",20);
@@ -80,13 +81,13 @@ HPObject* AliveObject::getHp() { return m_HpObject; }
 
 void AliveObject::initTypeIconPath(char* pPath)
 {
-	const HeroInfoData *c_data = DataCenter::sharedData()->getHeroInfo()->getCfg(m_Alive->role->thumb);
+	const HeroInfoData *c_data = DataCenter::sharedData()->getHeroInfo()->getCfg(m_Alive->getBaseData()->getRoleModel());
 	if(c_data)
 	{
-		sprintf(pPath,"common/type_%d_%d.png", m_Alive->role->roletype, c_data->iType2);
+		sprintf(pPath,"common/type_%d_%d.png", m_Alive->getBaseData()->getRoleType(), c_data->iType2);
 	}else{
 		sprintf(pPath,"common/type_1_1.png");
-		CCLOG("[ *ERROR ] AliveObject::initAliveTypeIcon %d",m_Alive->role->thumb);
+		CCLOG("[ *ERROR ] AliveObject::initAliveTypeIcon %d",m_Alive->getBaseData()->getRoleModel());
 	}
 }
 
@@ -242,7 +243,7 @@ void AliveObject::playerNum( int num,int type )
 		return	;
 	}
 	m_HpObject->playChangeNumber(num,type);
-	if (m_Alive->getAliveType() == E_ALIVETYPE::WorldBoss)														//boss的情况处理应该在血量条的内部,自己进行。
+	if (m_Alive->getAliveType() == E_ALIVETYPE::eWorldBoss)														//boss的情况处理应该在血量条的内部,自己进行。
 		NOTIFICATION->postNotification(B_WorldBoss_HurtUpdate,CCInteger::create(m_HpObject->getHpNumber()));	
 	if (type > gainType)
 		lostHpDispose();

@@ -4,7 +4,7 @@
 #include "common/CommonFunction.h"
 #include "scene/layer/WarAliveLayer.h"
 #include "BufExp.h"
-#include "ConstNum.h"
+#include "warscene/ConstNum.h"
 #include "WarAssist.h"
 #include "tools/CCShake.h"
 #include "warscene/EffectData.h"
@@ -28,7 +28,9 @@
 #include "warscene/BattleTools.h"
 #include "warscene/HurtCount.h"
 #include "Battle/BattleMessage.h"
-
+#include "Battle/RoleBaseData.h"
+#include "Battle/RoleSkill.h"
+#include "Battle/skEffectData.h"
 CombatEffect::CombatEffect()
 :m_Scene(nullptr),_armaturePlayerSkill(nullptr),_playerSkillData(nullptr),m_PlayerNum(0)
 {}
@@ -77,7 +79,7 @@ void CombatEffect::SpineActionEvent( int trackIndex, spEvent* pEvent )
 		}break;
 	case EventType::Die:
 		{
-			CCArray* monsters = DataCenter::sharedData()->getWar()->getMonsts(false,false);
+			CCArray* monsters = DataCenter::sharedData()->getWar()->getAlivesByCamp(true,false,false);
 			CCObject* mObj = nullptr;
 			CCARRAY_FOREACH(monsters,mObj)
 			{
@@ -118,14 +120,14 @@ void CombatEffect::continuousHurt()
 float CombatEffect::CountAliveAtk()
 {
 	float attackNum = 0;
-	CCArray* heros = DataCenter::sharedData()->getWar()->getHeros(false,false);
+	CCArray* heros = DataCenter::sharedData()->getWar()->getAlivesByCamp(false,false,false);
 	CCObject* obj = nullptr;
 	CCARRAY_FOREACH(heros,obj)
 	{
 		WarAlive* alive = (WarAlive*)obj;
-		if (alive->role->isCall)
+		if (alive->getBaseData()->getCallRole())
 			continue;
-		const HeroInfoData *c_data = DataCenter::sharedData()->getHeroInfo()->getCfg(alive->role->thumb);
+		const HeroInfoData *c_data = DataCenter::sharedData()->getHeroInfo()->getCfg(alive->getBaseData()->getRoleModel());
 		if (!c_data)
 		{
 			CCLOG("[ *ERROR ] CombatEffect::CountAliveAtk heroDesc.csv MoveID=%d");

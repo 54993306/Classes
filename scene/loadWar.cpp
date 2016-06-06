@@ -8,7 +8,6 @@
 #include "common/CommonFunction.h"
 #include "warscene/EffectData.h"
 #include "warscene/CombatGuideManage.h"
-//#include "model/BattleData.h"
 #include "Battle/RoleBaseData.h"
 #include "model/TerrainManager.h"
 #include "model/WarManager.h"
@@ -17,6 +16,11 @@
 #include "common/CGameSound.h"
 #include "Battle/LoadSpineData.h"
 #include "warscene/BattleTools.h"
+/******************************************/
+#include "Battle/RoleBaseData.h"
+#include "Battle/RoleSkill.h"
+#include "Battle/skEffectData.h"
+#include "Battle/BattleDataCenter.h"
 using namespace CocosDenshion;
 
 LoadWar::LoadWar():m_tip(nullptr),m_currNum(0),m_publicNum(0), m_totalNum(0)
@@ -140,22 +144,22 @@ void LoadWar::updateTips(float fdetal)
 	m_tip->setVisible(false);
 }
 //技能解析,通过技能得到加载数据
-void LoadWar::SkillParse( RoleBaseData& role,vector<int>&VecEffect,vector<int>&VecBuff )
+void LoadWar::SkillParse( const RoleBaseData* pRole,vector<int>&VecEffect,vector<int>&VecBuff )
 {
-	vector<RoleSkill*> VSkill;
-	VSkill.push_back(&role.skNormal);
-	VSkill.push_back(&role.skSpecial);
-	VSkill.push_back(&role.skActive);
-	VSkill.push_back(&role.skCaptain);
-	for (auto i:VSkill)
-		for (auto j:i->EffectList)
-			for (auto k:j)
+	vector< const RoleSkill*> VSkill;
+	VSkill.push_back(pRole->getNormalSkill());
+	VSkill.push_back(pRole->getSpecialSkill());
+	VSkill.push_back(pRole->getActiveSkill());
+	VSkill.push_back(pRole->getCaptainSkill());
+	for ( const RoleSkill* tSkill:VSkill)
+		for (vector<skEffectData*> tVecEffect:tSkill->getEffectVector())
+			for (skEffectData* tEffectData:tVecEffect)
 			{
-				VecEffect.push_back(k.effectId);		//for (auto l:k.buffList){}		
+				VecEffect.push_back(tEffectData->getEffectID());		//for (auto l:k.buffList){}		需要引入头文件
 				BuffData* Buffdata = m_Manage->getBuffData();
-				for (auto p:k.buffList)
+				for (auto p:tEffectData->getBuffVector())
 				{
-					BuffEffect* effect = Buffdata->getBuffEffect(p.getBuffType(),p.getIsDBuff());
+					BuffEffect* effect = Buffdata->getBuffEffect(p->getBuffType(),p->getIsDBuff());
 					if (!effect)
 						continue;
 					VecBuff.push_back(effect->getEffect_up());
@@ -166,44 +170,40 @@ void LoadWar::SkillParse( RoleBaseData& role,vector<int>&VecEffect,vector<int>&V
 //数据解析
 void LoadWar::DataParse()
 {
-	BattleServerData* data = m_Manage->getBattleData();
+	const vector<HeroData*>tHeroVec = BattleData->getHeroVector();
+	const vector<MonsterData*>tMonsterVec = BattleData->getMonsterVector();
 	vector<int> VecRole;
 	vector<int> VecEffect;
 	vector<int> VecBuff;
-	vector<int> VecTerrain;
-	for (auto i: data->HeroList)
+	for (HeroData* tMonster: tHeroVec)
 	{
-		if (m_Manage->isSpine(i.thumb))
+		if (m_Manage->isSpine(tMonster->getRoleModel()))
 		{
-			m_LoadSpine->AddRoleSpineID(i.thumb);
+			m_LoadSpine->AddRoleSpineID(tMonster->getRoleModel());
 		}else{
-			VecRole.push_back(i.thumb);
+			VecRole.push_back(tMonster->getRoleModel());
 		}
-		SkillParse(i,VecEffect,VecBuff);	
+		SkillParse(tMonster,VecEffect,VecBuff);	
 	}
 	m_LoadSpine->AddRoleSpineID(146);
 	m_LoadSpine->AddRoleSpineID(9999);
 	VecRole.push_back(516);
-	for (auto i: data->MonsterList)
+	for (MonsterData* tMonster: tMonsterVec)
 	{
-		if (m_Manage->isSpine(i.thumb))
+		if (m_Manage->isSpine(tMonster->getRoleModel()))
 		{
-			m_LoadSpine->AddRoleSpineID(i.thumb);
+			m_LoadSpine->AddRoleSpineID(tMonster->getRoleModel());
 		}else{
-			VecRole.push_back(i.thumb);
+			VecRole.push_back(tMonster->getRoleModel());
 		}
-		SkillParse(i,VecEffect,VecBuff);	
+		SkillParse(tMonster,VecEffect,VecBuff);	
 	}
-	for (auto i:data->TrapList)
-		VecTerrain.push_back(i.terrainId);
 	VectorRemoveRepeat(VecRole);
 	VectorRemoveRepeat(VecEffect);
 	VectorRemoveRepeat(VecBuff);
-	VectorRemoveRepeat(VecTerrain);
 	m_WarResouse[ResourceType::Load_Role]		= VecRole;
 	m_WarResouse[ResourceType::Load_Effect]		= VecEffect;
 	m_WarResouse[ResourceType::Load_Buff]		= VecBuff;
-	m_WarResouse[ResourceType::Load_Terrain]	= VecTerrain;
 }
 //公共资源、地图特效技能特效一起加载、骨骼动画和骨骼动画效果一起加载
 void LoadWar::ResourceDispose(float delta)
@@ -560,7 +560,7 @@ void LoadWar::ProgressEnd()
 			CCSpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile(res.FilePath.c_str());//将plist文件加载进入缓存
 			CCLOG("ProgressEnd addSpriteFramesWithFile mode1 %s ",res.FileName.c_str());
 			if(res.Loadtype == LoadType::Load_FrameAnimation)
-				AnimationManager::sharedAction()->ParseAnimation(res.FileName.c_str(),RoleType);
+				AnimationManager::sharedAction()->ParseAnimation(res.FileName.c_str(),eFrameRole);
 			else if(res.Loadtype == LoadType::Load_Effect)
 				AnimationManager::sharedAction()->ParseAnimation(res.FileName.c_str());
 		}

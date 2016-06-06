@@ -7,7 +7,7 @@
 #include "Battle/RoleSkill.h"
 WarAlive::WarAlive()
 	:m_Enemy(false),m_Hp(0),m_MaxHp(0),m_GridIndex(INVALID_GRID),m_MoveGrid(0),m_AtkDelay(0)
-	,m_AtkNum(0),m_Move(true),m_CritSkill(false),role(nullptr),m_Hrt(0),m_HrtPe(0),m_AIState(false)
+	,m_AtkNum(0),m_Move(true),m_CritSkill(false),m_Hrt(0),m_HrtPe(0),m_AIState(false)
 	,m_initCost(0),m_Batch(0),m_CostMax(0),m_AddCost(0),m_Atk(0),m_Def(0),m_Hit(0),m_NorAtk(true)
 	,m_Doge(0),m_Crit(0),m_Zoom(0),m_Renew(0),m_GroupIndex(0),m_EffectIndex(0),m_LastAlive(false)
 	,m_Opposite(false),m_ExecuteCap(false),m_TerType(0),m_TerTypeNum(0),m_cloaking(false)
@@ -15,8 +15,8 @@ WarAlive::WarAlive()
 	,m_AtkInterval(0),m_TimePercent(1),m_SpecialAtk(false),m_Battle(false),m_MoveSpeed(0)
 	,m_CritTime(0),m_FatherID(0),m_Captain(false),m_CritEffect(false),m_DieState(false)
 	,m_TouchGrid(0),m_TouchState(false),m_MoveObj(nullptr),m_CallType(0),m_CallAliveNum(0)
-	,m_Delaytime(0),m_AliveState(COMMONSTATE),m_AliveType(E_ALIVETYPE::Common),m_StateDelay(0)	
-	,m_Model(0),m_AliveID(0),m_MstType(0)
+	,m_Delaytime(0),m_AliveState(COMMONSTATE),m_AliveType(E_ALIVETYPE::eCommon),m_StateDelay(0)	
+	,m_Model(0),m_AliveID(0),m_MstType(0),mBaseData(nullptr)
 {
 	setBuffManage(nullptr);
 }
@@ -28,9 +28,96 @@ WarAlive::~WarAlive()
 	m_ActObject = nullptr;
 	m_MoveObj = nullptr;
 	mStandGrids.clear();
-	moves.clear();
 	mSkillArea.clear();
 	mAreaTargets.clear();
+}
+
+void WarAlive::initAliveByFather( WarAlive*pFather )
+{
+	this->setModel(getBaseData()->getRoleModel());
+	this->setZoom(this->getBaseData()->getRoleZoom()*0.01f);
+	this->setInitCost(this->getBaseData()->getInitCost());									//召唤消耗的cost(根技能消耗的相等)
+	if (pFather->getAliveType() == E_ALIVETYPE::eWorldBoss)
+	{
+		this->setAtkInterval(this->getBaseData()->getAttackSpeed());
+		this->setMoveSpeed(this->getBaseData()->getMoveSpeed());
+		this->setMaxHp(this->getBaseData()->getRoleHp());
+		this->setHp(this->getBaseData()->getRoleHp());					//第一次进来是满血状态
+		this->setAddCost(this->getBaseData()->getCostSpeed());
+		this->setAtk(this->getBaseData()->getRoleAttack());
+		this->setCrit(this->getBaseData()->getRoleCrit());
+		this->setDef(this->getBaseData()->getRoleDefense());
+		this->setHit(this->getBaseData()->getRoleHit());
+		this->setRenew(this->getBaseData()->getRoleRegain());
+		this->setDoge(this->getBaseData()->getRoleDodge());				//数值型是召唤它武将的百分比
+	}else{
+		this->setAtkInterval((this->getBaseData()->getAttackSpeed()*0.01f)*pFather->getBaseData()->getAttackSpeed());
+		this->setMoveSpeed((this->getBaseData()->getMoveSpeed()*0.01f)*pFather->getBaseData()->getMoveSpeed());
+		this->setMaxHp((this->getBaseData()->getRoleHp()*0.01f)*pFather->getBaseData()->getRoleHp());
+		this->setHp((this->getBaseData()->getRoleHp()*0.01f)*pFather->getBaseData()->getRoleHp());							//第一次进来是满血状态		
+		this->setAddCost((this->getBaseData()->getCostSpeed()*0.01f)*pFather->getBaseData()->getCostSpeed());
+		this->setAtk((this->getBaseData()->getRoleAttack()*0.01f)*pFather->getBaseData()->getRoleAttack());
+		this->setCrit((this->getBaseData()->getRoleCrit()*0.01f)*pFather->getBaseData()->getRoleCrit());
+		this->setDef((this->getBaseData()->getRoleDefense()*0.01f)*pFather->getBaseData()->getRoleDefense());
+		this->setHit((this->getBaseData()->getRoleHit()*0.01f)*pFather->getBaseData()->getRoleHit());
+		this->setRenew((this->getBaseData()->getRoleRegain()*0.01f)*pFather->getBaseData()->getRoleRegain());
+		this->setDoge((this->getBaseData()->getRoleDodge()*0.01f)*pFather->getBaseData()->getRoleDodge());				//数值型是召唤它武将的百分比
+	}
+}
+
+void WarAlive::initAliveData()
+{
+	mStandGrids.clear();
+	if (getEnemy())															//把指针转化成相应的类型对特殊的敌方进行相应的初始化
+	{
+		setGridIndex(getBaseData()->getInitGrid());
+	}else{
+		if (getBaseData()->getCaptain())									//队长进来则为上阵状态(服务器用于区分队长的标志)
+		{
+			setCaptain(true);
+			setGridIndex(C_CAPTAINSTAND);
+			const skEffectData* effect = getBaseData()->getActiveSkill()->getSummonEffect();
+			if (effect)
+				setCallAliveNum(effect->getImpactType());
+		}else{
+			setGridIndex(INVALID_GRID);
+		}
+	}
+	setExecuteCap(false);
+	setDieState(false);
+	setModel(getBaseData()->getRoleModel());
+	this->setCallType(getBaseData()->getCallType());
+	this->setAtkInterval(getBaseData()->getAttackSpeed());
+	this->setMoveSpeed(getBaseData()->getMoveSpeed());
+	if (this->getAliveType() == E_ALIVETYPE::eWorldBoss)
+	{
+		this->setMaxHp(getBaseData()->getMaxHp());
+	}else{
+		this->setMaxHp(getBaseData()->getRoleHp());
+	}
+	this->setDelaytime(getBaseData()->getDelayTime());
+	this->setHp(getBaseData()->getRoleHp());									//第一次进来是满血状态
+	this->setCostmax(getBaseData()->getMaxCost());
+	this->setInitCost(getBaseData()->getInitCost());			
+	this->setAddCost(getBaseData()->getCostSpeed());
+	this->setAtk(getBaseData()->getRoleAttack());
+	this->setCrit(getBaseData()->getRoleCrit());
+	this->setDef(getBaseData()->getRoleDefense());
+	this->setHit(getBaseData()->getRoleHit());
+	this->setRenew(getBaseData()->getRoleRegain());
+	this->setDoge(getBaseData()->getRoleDodge());
+	this->setZoom(getBaseData()->getRoleZoom()*0.01f);
+	this->setMove(true); 
+#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+	if (this->getEnemy())
+	{
+
+	}else{		
+		//alive->setAtk(500000);
+		this->setMaxHp(500000);
+		this->setHp(500000);		//第一次进来是满血状态
+	}
+#endif
 }
 
 void WarAlive::setMoveGrid(int var)
@@ -52,7 +139,7 @@ void WarAlive::setAtkNum(int var)
 	if (m_AtkNum >= 3)					//第四次攻击为特殊攻击
 	{
 		m_AtkNum = 0;
-		if (role->skSpecial.getSkillID())
+		if (getBaseData()->hasSpecialSkill())
 		{
 			this->ResetAttackState();
 			this->setSpeAtk(true);
@@ -107,9 +194,9 @@ void WarAlive::setAtktime(float var)
 void WarAlive::setCritTime(float var)
 {
 	m_CritTime += var;
-	if ( m_CritTime >= role->mCritTime)
+	if ( m_CritTime >= getBaseData()->getCritTime())
 	{
-		if (role->skActive.getSkillID())
+		if (getBaseData()->hasActiveSkill())
 		{
 			this->ResetAttackState();
 			this->setCriAtk(true);
@@ -149,8 +236,8 @@ void WarAlive::setGridIndex(int var)
 	}else{
 		m_Battle =true;
 		mStandGrids.clear();
-		for (int i=0;i<role->row;i++)
-			for (int j =0;j<role->col;j++)
+		for (int i=0;i<getBaseData()->getRoleRow();i++)
+			for (int j =0;j<getBaseData()->getRoleCol();j++)
 			{
 				if (var+j*C_GRID_ROW+i>C_ENDGRID)
 					continue;
@@ -164,12 +251,12 @@ void WarAlive::setTouchGrid(int var)
 {
 	m_TouchGrid = var;
 	mTouchGrids.clear();
-	for (int i=0;i<role->row;i++)
-		for (int j =0;j<role->col;j++)
+	for (int i=0;i<getBaseData()->getRoleRow();i++)
+		for (int j =0;j<getBaseData()->getRoleCol();j++)
 			mTouchGrids.push_back(var+j*C_GRID_ROW+i);
 	sort(mTouchGrids.begin(),mTouchGrids.end());
 	int row = mTouchGrids.at(0)%C_GRID_ROW;				//最小格子的站位
-	if (row+role->row>C_GRID_ROW)						//武将所占格子,不能超出地图外
+	if (row+getBaseData()->getRoleRow()>C_GRID_ROW)						//武将所占格子,不能超出地图外
 	{
 		m_TouchGrid=INVALID_GRID;
 		mTouchGrids.clear();
@@ -210,7 +297,7 @@ void WarAlive::ExcuteNextEffect()
 
 bool WarAlive::canSummonAlive()
 {
-	if (role->skActive.getSkillType() ==eCallAtk)
+	if (getBaseData()->getActiveSkillType() ==eCallAtk)
 	{
 		if (getCaptain() && getCallAliveNum() < 1)
 			return false;
@@ -231,28 +318,28 @@ void WarAlive::clearHitAlive()
 	HittingAlive.clear();
 }
 
-RoleSkill* WarAlive::getCurrSkill()
+const RoleSkill* WarAlive::getCurrSkill()
 {
 	if (getCriAtk())
 	{
-		if (role->skActive.getSkillID())
+		if (getBaseData()->hasActiveSkill())
 		{
-			return &role->skActive;
+			return getBaseData()->getActiveSkill();
 		}else{
 			CCLOG("[ *ERROR ] WarManager::getSkill CritSKILL IS NULL");
-			return &role->skNormal;
+			return getBaseData()->getNormalSkill();
 		}
 	}else if (getSpeAtk())
 	{
-		if (role->skSpecial.getSkillID())
+		if (getBaseData()->hasSpecialSkill())
 		{
-			return &role->skSpecial;
+			return getBaseData()->getSpecialSkill();
 		}else{
 			CCLOG("[ *ERROR ] WarManager::getSkill SpecialSKILL IS NULL");
-			return &role->skNormal;
+			return getBaseData()->getNormalSkill();
 		}
 	}else{
-		return &role->skNormal;
+		return getBaseData()->getNormalSkill();
 	}
 }
 
@@ -262,9 +349,9 @@ const skEffectData* WarAlive::getCurrEffect()
 		if ( getCurrSkill()->getEffectSize(getGroupIndex())>getEffIndex())
 			return getCurrSkill()->getIndexEffect(getGroupIndex(),getEffIndex());
 		else
-			CCLOG("[ *ERROR ] EffIndex > EffectListSize  AliveID=%d mode=%d",getAliveID(),role->thumb);
+			CCLOG("[ *ERROR ] EffIndex > EffectListSize  AliveID=%d mode=%d",getAliveID(),getBaseData()->getRoleModel());
 	else{
-		CCLOG("[ *ERROR ]Skill Effect Is NULL  AliveID=%d mode=%d EffectGroup=%d",getAliveID(),role->thumb,getGroupIndex());
+		CCLOG("[ *ERROR ]Skill Effect Is NULL  AliveID=%d mode=%d EffectGroup=%d",getAliveID(),getBaseData()->getRoleModel(),getGroupIndex());
 		setGroupIndex(0);
 	}	
 	return nullptr;
@@ -275,7 +362,7 @@ bool WarAlive::NextEffect()
 {
 	int effId = getEffIndex() + 1;
 	int ranNum = CCRANDOM_0_1()*100;								//0到100的数
-	if (getGroupIndex() >= getCurrSkill()->getListSize)
+	if (getGroupIndex() >= getCurrSkill()->getListSize())
 		return false;
 	if (getCurrSkill()->getSkillID()&&effId < getCurrSkill()->getEffectSize(getGroupIndex()))			//判断是否为最后的一个特效
 	{

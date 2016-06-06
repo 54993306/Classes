@@ -180,7 +180,7 @@ void LoadScene::load2( float fdetal )
 		CCLOG("load mode %s ,\n",res.FileName.c_str());
 		if(res.Loadtype == LoadType::Load_FrameAnimation)
 		{
-			AnimationManager::sharedAction()->ParseAnimation(res.FileName.c_str(),RoleType);
+			AnimationManager::sharedAction()->ParseAnimation(res.FileName.c_str(),eFrameRole);
 		}
 		else if(res.Loadtype == LoadType::Load_Effect)
 		{

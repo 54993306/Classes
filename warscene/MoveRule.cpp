@@ -1,5 +1,5 @@
 ﻿#include "MoveRule.h"
-#include "ConstNum.h"
+#include "warscene/ConstNum.h"
 #include "model/DataCenter.h"
 #include "Battle/BattleRole.h"
 #include "model/WarManager.h"
@@ -42,7 +42,7 @@ int MoveRule::monsterMove(WarAlive* alive)
 		return INVALID_GRID;
 #endif
 	//怪物的移动处理是，哪个最先返回值不是INVALID_GRID就以哪个为标准，后面的不做处理了
-	if (alive->getAliveType() == E_ALIVETYPE::WorldBoss)
+	if (alive->getAliveType() == E_ALIVETYPE::eWorldBoss)
 		return INVALID_GRID;
 	int index = alive->getGridIndex();
 	if (index/C_GRID_ROW >= C_GRID_COL-1)
@@ -59,7 +59,7 @@ int MoveRule::getMonsterMoveGrid(WarAlive* alive)
 		int row = index % C_GRID_ROW;
 		int col = index / C_GRID_ROW;
 		int Index = INVALID_GRID;
-		if (!alive->moves.at(0))
+		if (!alive->getMove())
 			return INVALID_GRID;
 		for (int i = 1;i <= 1;i++)			//一个个区域逐个去进行判断，判断每一个区域的移动范围
 		{
@@ -209,7 +209,7 @@ int MoveRule::getCurrRandomGrid(int grid,bool hasAlive/*=false*/)
 		}else{
 			if (!DataCenter::sharedData()->getWar()->getAliveByGrid(pGrid))			//得到当前格子为无人格子
 			{
-				CCArray* arr = DataCenter::sharedData()->getWar()->getHeros(true);
+				CCArray* arr = DataCenter::sharedData()->getWar()->getAlivesByCamp(false,true);
 				CCObject* obj = nullptr;
 				bool pMoveGrid = false;
 				CCARRAY_FOREACH(arr,obj)

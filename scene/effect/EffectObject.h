@@ -41,7 +41,7 @@ public:
 	CC_SYNTHESIZE(float,m_DurationTime,DurationTime);		//播放总时间
 	CC_SYNTHESIZE(float,m_Playtime,Playtime);				//已播放时间
 	CC_SYNTHESIZE(float,m_Delaytime,Delaytime);				//延迟播放时间
-	CC_SYNTHESIZE(PLAYERTYPE,m_Type,PLAYERTYPE);			//特效类型
+	CC_SYNTHESIZE(PLAYERTYPE,m_Type,PlayerType);			//特效类型
 	CC_SYNTHESIZE(int,m_Music,Music);						//特效类型
 	CC_SYNTHESIZE(int,m_LoopNum,LoopNum);					//循环次数
 	CC_SYNTHESIZE(float,m_LoopInterval,LoopInterval);		//循环间隔

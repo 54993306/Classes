@@ -1,5 +1,6 @@
 #include "Battle/GuardArea.h"
 #include "Battle/BattleRole.h"
+#include "Battle/RoleBaseData.h"
 #include "warscene/ConstNum.h"
 #include "warscene/BattleTools.h"
 #include "model/WarManager.h"
@@ -36,8 +37,8 @@ int GuardArea::getAliveGuard( WarAlive* pAlive )
 					continue;
 				int tMoveGrid = i;
 				int tRow = i%C_GRID_ROW;
-				if ( tRow+pAlive->role->row > C_GRID_ROW )				//我方武将占3行,地方怪物在row=3的位置，超出地图范围了
-					tMoveGrid = i-((pAlive->role->row+tRow)-C_GRID_ROW);//把超出的部分减掉
+				if ( tRow+pAlive->getBaseData()->getRoleRow() > C_GRID_ROW )				//我方武将占3行,地方怪物在row=3的位置，超出地图范围了
+					tMoveGrid = i-((pAlive->getBaseData()->getRoleRow()+tRow)-C_GRID_ROW);//把超出的部分减掉
 				if ( tMoveGrid < C_BEGINGRID || tMoveGrid > C_ENDGRID )
 					break;
 				return tMoveGrid;
@@ -49,7 +50,7 @@ int GuardArea::getAliveGuard( WarAlive* pAlive )
 
 void GuardArea::initAliveGuard( WarAlive* pAlive,vector<int>& pGuards )
 {
-	switch (pAlive->role->alert)
+	switch (pAlive->getBaseData()->getAlertType())
 	{
 	case eFrontGuard:
 		{
@@ -69,8 +70,8 @@ void GuardArea::initAliveGuard( WarAlive* pAlive,vector<int>& pGuards )
 		}break;
 	default:
 		{
-			if (pAlive->role->alert)
-				CCLOG("[ *ERROR ] SkillRange::initAliveGuard Type = %d",pAlive->role->alert);
+			if (pAlive->getBaseData()->getAlertType())
+				CCLOG("[ *ERROR ] SkillRange::initAliveGuard Type = %d",pAlive->getBaseData()->getAlertType());
 			return;
 		}
 	}
@@ -110,7 +111,7 @@ void GuardArea::guardFront( WarAlive* pAlive,vector<int>& pGuards )
 	initAliveCurrGrids(pAlive,tGrids);
 	for (auto tGrid:tGrids)
 	{
-		for (int i=1;i<=pAlive->role->alertRange;i++)		//从2开始的原因是因为1是外层的圈(现在外层的圈去掉了从1开始)
+		for (int i=1;i<=pAlive->getBaseData()->getAlertRange();i++)		//从2开始的原因是因为1是外层的圈(现在外层的圈去掉了从1开始)
 			pGuards.push_back(tGrid - i*C_GRID_ROW);
 	}
 }
@@ -121,7 +122,7 @@ void GuardArea::guradBack( WarAlive* pAlive,vector<int>& pGuards )
 	initAliveCurrGrids(pAlive,tGrids);
 	for (auto tGrid:tGrids)
 	{
-		for (int i=1;i<=pAlive->role->alertRange;i++)		//从2开始的原因是因为1是外层的圈(现在外层的圈去掉了从1开始)
+		for (int i=1;i<=pAlive->getBaseData()->getAlertRange();i++)		//从2开始的原因是因为1是外层的圈(现在外层的圈去掉了从1开始)
 			pGuards.push_back(tGrid + i*C_GRID_ROW);
 	}
 }
@@ -132,7 +133,7 @@ void GuardArea::guradFrontAndBack( WarAlive* pAlive,vector<int>& pGuards )
 	initAliveCurrGrids(pAlive,tGrids);
 	for (auto tGrid:tGrids)
 	{
-		for (int i=1;i<=pAlive->role->alertRange;i++)		//从2开始的原因是因为1是外层的圈(现在外层的圈去掉了从1开始)
+		for (int i=1;i<=pAlive->getBaseData()->getAlertRange();i++)		//从2开始的原因是因为1是外层的圈(现在外层的圈去掉了从1开始)
 		{
 			pGuards.push_back(tGrid - i*C_GRID_ROW);
 			pGuards.push_back(tGrid + i*C_GRID_ROW);

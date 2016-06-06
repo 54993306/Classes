@@ -47,6 +47,7 @@ enum E_CALLTYPE				//定义武将召唤类型类型,不同类型武将处理不同
 	UNAddHP,				//不可被加血类型武将
 	OnlyOnce,				//只攻击一次类型
 };
+
 enum E_MONSTERTYPE			//怪物类型
 {
 	MST_COMMON = 0,			//普通类型怪物
@@ -54,6 +55,7 @@ enum E_MONSTERTYPE			//怪物类型
 	MST_TIME,				//时间召唤类武将
 	MST_SKILL,				//出场即释放技能类
 };
+
 enum E_ALIVESTATE
 {
 	COMMONSTATE = 0,		//正常状态
@@ -72,10 +74,10 @@ enum E_HEROTYPE
 
 enum struct E_ALIVETYPE
 {
-	Common,					//普通型武将
-	Elite,					//精英型武将
-	Boss,					//boss(我方主帅类)
-	WorldBoss,				//世界boss
+	eCommon,				//普通型武将
+	eElite,					//精英型武将
+	eBoss,					//boss(我方主帅类)
+	eWorldBoss,				//世界boss
 };
 
 #endif	//__BATTLEROLEMACRO__

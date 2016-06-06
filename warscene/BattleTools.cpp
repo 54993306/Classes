@@ -1,5 +1,5 @@
 #include "BattleTools.h"
-#include "ConstNum.h"
+#include "warscene/ConstNum.h"
 #include "Battle/BattleRole.h"
 #include "Battle/RoleBaseData.h"
 #include "common/CGameSound.h"
@@ -124,18 +124,18 @@ void CallAliveByFixRange( WarAlive*father , WarAlive*child )
 {
 	int originCol = father->getGridIndex() / C_GRID_ROW;
 	int originRow = father->getGridIndex() % C_GRID_ROW;
-	int aimCol = child->role->grid / C_GRID_ROW;
-	int aimRow = child->role->grid % C_GRID_ROW; 
+	int aimCol = child->getBaseData()->getInitGrid() / C_GRID_ROW;
+	int aimRow = child->getBaseData()->getInitGrid() % C_GRID_ROW; 
 
-	int row = getNewRow(originRow,aimRow,child->role->row);
+	int row = getNewRow(originRow,aimRow,child->getBaseData()->getRoleRow());
 	int col = 0;
 	if (father->getEnemy())
 	{
-		col = getMonsterNewCol(originCol,aimCol,child->role->col);
+		col = getMonsterNewCol(originCol,aimCol,child->getBaseData()->getRoleCol());
 	}else{
-		col = getHeroNewCol(originCol,aimCol,child->role->col);
+		col = getHeroNewCol(originCol,aimCol,child->getBaseData()->getRoleCol());
 	}
-	if (row >0 && child->role->col<30)			//怪物的 x 范围若是大于30则为数据错误			
+	if (row >0 && child->getBaseData()->getRoleCol()<30)			//怪物的 x 范围若是大于30则为数据错误			
 	{
 		child->setGridIndex(row+col*C_GRID_ROW);
 	}else{

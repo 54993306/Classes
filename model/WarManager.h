@@ -7,11 +7,8 @@
 /************************************************************************/
 #include "AppUI.h"
 #include "Battle/BattleMacro.h"
-#include "Battle/RoleBaseData.h"
-#include <spine/spine-cocos2dx.h>
 #include "Battle/BattleRoleMacro.h"
-#include "Battle/BattleTrap.h"
-
+#include <spine/spine-cocos2dx.h>
 
 class WarAlive;
 class EffectData;
@@ -24,24 +21,12 @@ class CombatLogic;
 class MoveObject;
 class BuffData;
 class StoryData;
+class RoleSkill;
 using namespace std;
 typedef map<unsigned int,WarAlive*> Members;	
-typedef map<unsigned int,unsigned int> Movemap;			//存储当前回合可移动位置
-typedef map<unsigned int,vector<MonsterRoleData>> BatchMonster;
 typedef std::pair<spSkeletonData*,spAtlas*> SpData;
 typedef map<std::string,SpData> MapSkeletonData;
 
-//战斗数据初始化
-struct BattleServerData 
-{
-	vector<MonsterRoleData> MonsterList;
-	vector<HeroRoleData> HeroList;
-	vector<BattleTrap> TrapList;			//后续确定做该动能暂不删除
-};
-namespace protos{
-	class BattleResponse;
-	class WarResponse;
-}
 class WarManager : public CCObject
 {
 public:
@@ -50,22 +35,18 @@ public:
 	bool init(){return true;}
 	CREATE_FUNC(WarManager);	
 public:
-	void initBattleData( protos::BattleResponse*batRes );
-	void initWordBossData( protos::WarResponse*batRes );
 	void addAlive(WarAlive* alive);
 	WarAlive* getAlive(unsigned int aliveID);
 	WarAlive* getAliveByGrid(int grid);
-	WarAlive* getCallAlive(WarAlive* pAlive,RoleSkill* skill);
+	WarAlive* getCallAlive(WarAlive* pAlive,const RoleSkill* skill);
 	WarAlive* getAliveByType(E_ALIVETYPE type,bool Monster = true);
 	WarAlive* getAbsentCallAlive(WarAlive* fatherAlive);
 	void BattleDataClear();
 	void ReleaseSpineData();
 	void initData();
 	bool checkMonstOver();
-	void initBatchData(int batch);
-	void initAlive(WarAlive* alive);
-	void initCallAlive(WarAlive* alive,WarAlive*cAlive);	//召唤类武将初始化
-	BattleServerData* getBattleData();						//得到战场数据
+	void initMonsterByBatch(int batch);
+	void initHeroData();
 	EffectData* getEffData();
 	BuffData* getBuffData();
 	StoryData* getStoryData();
@@ -78,18 +59,15 @@ public:
 	vector<WarAlive*>* getAliveRoles(bool pSort = false);
 	vector<WarAlive*>* getSkillTargets(WarAlive* pAlive);
 	bool isSpine(int id);
-	SpData* getSpineData(std::string Name);
+	SpData* getSpineData(string Name);
 	MapSkeletonData& getSpineMap(){return m_MapSpineData;}
 	vector<int>* getBossHurtVec(){return &m_VecBossHurt;}
 	vector<int>* getMoveVec(){return &m_CantMoveGrid;}
 	vector<int>* getAddcostVec(){return &m_AddCostGrid;}
 	/*************************************************/
 	void sortArrayByGridIndex(CCArray* arr);
-	CCArray* getHeros(bool isAlive = false,bool sort = true);
-	CCArray* getMonsts(bool isAlive = false,bool sort = true);
-	CCArray* getAlivesByCamp(bool enemy,bool isAlive,bool sort);
+	CCArray* getAlivesByCamp(bool enemy = true,bool isAlive = false,bool sort = true);
 	WarAlive* getNewCallAlive(WarAlive* Father,int CallId);
-	BattleServerData* getServerData(){return &m_ServerData;}
 	void initCommonData();
 	void clearOldData();
 public:
@@ -116,8 +94,6 @@ protected:
 	MapSkeletonData m_MapSpineData;								//
 	vector<int> m_SpineID;										//记录spine的ID
 	Members m_members;											//战场上活着的英雄
-	BattleServerData m_ServerData;								//存储战场信息
-	vector<MonsterRoleData*> m_CallRole;								//存储召唤类型武将
 	EffectData* m_efdata;
 	BuffData* m_BuffData;
 	StoryData* m_StoryData;

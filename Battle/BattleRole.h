@@ -42,7 +42,7 @@ public:
 	bool canSummonAlive();						//是否可以召唤武将
 	void clearHitAlive();
 	const skEffectData* getCurrEffect();		//得到武将当前效果
-	RoleSkill* getCurrSkill();					//得到武将当前效果
+	const RoleSkill* getCurrSkill();			//得到武将当前效果
 	bool NextEffect();							//判断第二个效果是否释放
 	int getSkillType();
 	bool captainCallNumberJudge();
@@ -51,10 +51,11 @@ public:
 	void cloakingTarget();						//判断受击目标内是否全为隐身对象
 	bool standInGrid(int pGrid);
 	bool critJudge();
+	void initAliveData();
+	void initAliveByFather(WarAlive*pFather);
 public:
-	RoleBaseData* role;							//服务器角色信息
+	CC_SYNTHESIZE(RoleBaseData*,mBaseData,BaseData);
 	vector<int> mStandGrids;					//多格子站位
-	vector<int> moves;							//各方向移动范围
 	vector<int> mTouchGrids;					//移动状态下武将多格子处理
 	vector<int>mSkillArea;						//存储武将当前技能区域
 	vector<WarAlive*> mAreaTargets;				//存储区域内目标

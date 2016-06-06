@@ -15,7 +15,7 @@
 #include "scene/effect/EffectObject.h"
 #include "scene/WarScene.h"
 #include "cctk/scenemanager.h"
-#include "ConstNum.h"
+#include "warscene/ConstNum.h"
 #include "scene/alive/HPObject.h"
 #include "model/WarManager.h"
 #include "warscene/ComBatLogic.h"

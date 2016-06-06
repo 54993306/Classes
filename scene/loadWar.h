@@ -64,7 +64,7 @@ public:
 
 	void CocosBoneCallBack(float dt);
 	void TextureThread(const char* url, const char* model, LoadType type = LoadType::Load_Effect);		//异步加载处理
-	void SkillParse(RoleBaseData& skill,vector<int>&VecEffect,vector<int>&VecBuff);
+	void SkillParse(const RoleBaseData* pRole,vector<int>&VecEffect,vector<int>&VecBuff);
 	void LoadBeingAnimation();
 	void ProgressEnd();
 	void LoadCocosEffect();

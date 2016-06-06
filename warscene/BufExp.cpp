@@ -52,7 +52,7 @@ void BufExp::AddBuffExcute( CCObject* ob )
 				ef->setScale(scaleNum);
 				if (effect->getup_Loop())						//定身类的效果需要持续显示
 				{
-					ef->setEffectType(PLAYERTYPE::Repeat);
+					ef->setPlayerType(PLAYERTYPE::Repeat);
 					VecEffect.push_back(ef);
 				}
 				ef->setPosition(ccp(0,30));
@@ -65,7 +65,7 @@ void BufExp::AddBuffExcute( CCObject* ob )
 				ef->setScale(scaleNum);
 				if (effect->getdown_Loop())						//定身类的效果需要持续显示
 				{
-					ef->setEffectType(PLAYERTYPE::Repeat);
+					ef->setPlayerType(PLAYERTYPE::Repeat);
 					VecEffect.push_back(ef);
 				}
 				ef->setPosition(ccp(0,30));

@@ -27,6 +27,7 @@
 #include "Battle/BattleMessage.h"
 #include "Battle/MoveObject.h"
 #include "Battle/BattleRole.h"
+#include "Battle/RoleBaseData.h"
 WarAliveLayer::WarAliveLayer()
 	:m_TouchAlive(nullptr),m_grid(0),m_AliveNode(0)
 	,m_MoveActObject(nullptr),m_TouchAliveBtn(false),m_Manage(nullptr)
@@ -96,7 +97,7 @@ void WarAliveLayer::AliveObEffect(ActObject* aliveOb,int createType/*=DefaultCre
 	{
 	case DefaultCreat:
 		{
-			aliveOb->setDropItem(aliveOb->getAlive()->role->hasitem);	
+			aliveOb->setDropItem(aliveOb->getAlive()->getBaseData()->getRoleDrop());	
 		}break;
 	case SceneTrap:
 		{
@@ -104,7 +105,7 @@ void WarAliveLayer::AliveObEffect(ActObject* aliveOb,int createType/*=DefaultCre
 			eff->setEffAnchorPoint(0.5f,0.5f);
 			eff->setPosition(ccp(0,GRID_HEIGHT*1.0f));
 			aliveOb->addChild(eff);
-			aliveOb->setDropItem(aliveOb->getAlive()->role->hasitem);
+			aliveOb->setDropItem(aliveOb->getAlive()->getBaseData()->getRoleDrop());
 			PlayEffectSound(SFX_517);
 		}break;
 	}
@@ -116,8 +117,8 @@ void WarAliveLayer::monsterSoleSprite( ActObject* aliveOb )
 	if (!alive->getEnemy())
 		return;
 	CCSprite* ef = nullptr;
-	for (int i=0;i<alive->role->row;i++)
-		for (int j =0;j<alive->role->col;j++)
+	for (int i=0;i<alive->getBaseData()->getRoleRow();i++)
+		for (int j =0;j<alive->getBaseData()->getRoleCol();j++)
 		{
 			ef = CCSprite::create("warScene/fanglandingwei.png");
 			ef->setPosition(ccp(-aliveOb->getoffs().x+(j*(GRID_WIDTH+C_GRIDOFFSET_X)),-aliveOb->getoffs().y-(i*(GRID_HEIGHT+C_GRIDOFFSET_Y))));
@@ -128,17 +129,17 @@ void WarAliveLayer::monsterSoleSprite( ActObject* aliveOb )
 void WarAliveLayer::initActObjectOffs(ActObject* aliveOb,int grid)
 {
 	WarAlive* alive = aliveOb->getAlive();
-	if (alive->role->row>1)
+	if (alive->getBaseData()->getRoleRow()>1)
 	{
-		if (alive->role->row>2)
+		if (alive->getBaseData()->getRoleRow()>2)
 		{
-			aliveOb->setPosition(ccpAdd(aliveOb->getPosition(),ccp(0,-GRID_HEIGHT/1.5f*alive->role->row)));	
+			aliveOb->setPosition(ccpAdd(aliveOb->getPosition(),ccp(0,-GRID_HEIGHT/1.5f*alive->getBaseData()->getRoleRow())));	
 		}else{
-			aliveOb->setPosition(ccpAdd(aliveOb->getPosition(),ccp(0,-GRID_HEIGHT/3*alive->role->row)));
+			aliveOb->setPosition(ccpAdd(aliveOb->getPosition(),ccp(0,-GRID_HEIGHT/3*alive->getBaseData()->getRoleRow())));
 		}
 	}
-	if (alive->role->col>1&&!alive->getCaptain())
-		aliveOb->setPosition(ccpAdd(aliveOb->getPosition(),ccp(GRID_WIDTH/4*alive->role->col,0)));
+	if (alive->getBaseData()->getRoleCol()>1&&!alive->getCaptain())
+		aliveOb->setPosition(ccpAdd(aliveOb->getPosition(),ccp(GRID_WIDTH/4*alive->getBaseData()->getRoleCol(),0)));
 	aliveOb->setoffs(aliveOb->getPosition()-m_map->getPoint(grid));		//算出武将偏移实际站位格子的偏移量
 }
 
@@ -441,7 +442,7 @@ bool WarAliveLayer::borderJudge( WarAlive* pAlive,vector<int>& pVector )
 		if (i>=C_CAPTAINGRID||i<C_GRID_ROW+C_BEGINGRID)		//我方武将边缘处理
 			return true;
 	int row = pVector.at(0)%C_GRID_ROW;						//最小格子的站位
-	if (row+pAlive->role->row>C_GRID_ROW)					//武将所占格子,不能超出地图外
+	if (row+pAlive->getBaseData()->getRoleRow()>C_GRID_ROW)					//武将所占格子,不能超出地图外
 		return true;
 	return false;
 }
@@ -449,8 +450,8 @@ bool WarAliveLayer::borderJudge( WarAlive* pAlive,vector<int>& pVector )
 vector<int> WarAliveLayer::getDestinations( WarAlive* pAlive,int pGrid )	//这个方法可以抽象出来放到武将的身上。很多地方都调用了这个方法。到某个位置后武将所站的区域点
 {
 	vector<int> tDestinations ;
-	for (int i=0;i<pAlive->role->row;i++)
-		for (int j =0;j<pAlive->role->col;j++)
+	for (int i=0;i<pAlive->getBaseData()->getRoleRow();i++)
+		for (int j =0;j<pAlive->getBaseData()->getRoleCol();j++)
 			tDestinations.push_back(pGrid+j*C_GRID_ROW+i);
 	sort(tDestinations.begin(),tDestinations.end());
 	if (borderJudge(pAlive,tDestinations))					//做边界判断
@@ -638,7 +639,7 @@ void WarAliveLayer::heroWinAction()
 
 void WarAliveLayer::createBatchMonster( int batchNumber )
 {
-	CCArray* arr =m_Manage->getMonsts(true);
+	CCArray* arr =m_Manage->getAlivesByCamp(true,true);
 	CCObject* obj = nullptr;
 	CCARRAY_FOREACH(arr,obj)
 	{

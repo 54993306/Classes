@@ -25,7 +25,7 @@ struct GameFinishData
 	int roundNum;
 };
 
-class MonsterRoleData;
+class MonsterData;
 class BufExp;
 class GuardArea;
 class MoveRule;

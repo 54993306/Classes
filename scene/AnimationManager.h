@@ -12,12 +12,12 @@
 /************************************************************************/
 using namespace std;
 USING_NS_CC;
-enum ModelType
+enum E_ModelType
 {
-	EF_Skill,				//特效
-	EF_PNG,					//png特效
-	EF_JPG,					//Jpg特效
-	RoleType				//角色
+	eEffectSkill,				//特效
+	eEffectPNG,					//png特效
+	eEffectJPG,					//Jpg特效
+	eFrameRole					//角色
 };
 
 //在CCAnimation动画类之上封装动画类
@@ -58,7 +58,7 @@ public:
 	static AnimationManager* sharedAction();
 	CCAnimation* getAnimation(const char* name,const char* action=nullptr);			//根据名称(人物则加动作名)动画
 	void parseRoleAction(const char* name);											//解析角色动画
-	void ParseAnimation(const char* name,int type = EF_Skill);						//解析动画(统一接口)
+	void ParseAnimation(const char* name,int type = eEffectSkill);						//解析动画(统一接口)
 	ActionModel* getAction(const char* name);		
 	CCRect getAliveRect(const char* name);											//根据动画名称得到动画区域大小
 	void clearAnimationManage();

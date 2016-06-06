@@ -20,6 +20,7 @@
 #include "Battle/BattleMessage.h"
 #include "Battle/GuardArea.h"
 #include "Battle/SkillMacro.h"
+#include "Battle/RoleBaseData.h"
 #define AddMoveImg		"lv.png"
 #define CutMoveImg		"huang.png"
 #define AtksImg			"hong.png"
@@ -166,7 +167,7 @@ void WarMapLayer::DrawAtkArea(WarAlive* alive)
 {
 	alive->setTouchState(true);
 	vector<int>VecGrid;
-	if (alive->role->alert && !alive->getCriAtk())
+	if (alive->getBaseData()->getAlertType() && !alive->getCriAtk())
 	{
 		mGuardArea->initAliveGuard(alive,VecGrid);
 	}else{

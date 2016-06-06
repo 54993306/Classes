@@ -114,3 +114,8 @@ const skEffectData* RoleSkill::getSummonEffect() const
 				return mEffectList.at(0).at(0);
 	return nullptr;
 }
+
+const std::vector<std::vector<skEffectData*>>& RoleSkill::getEffectVector() const
+{
+	return mEffectList;
+}

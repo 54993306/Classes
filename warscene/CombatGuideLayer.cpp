@@ -330,7 +330,7 @@ void CombatGuideLayer::creaAliveByVector( vector<WarAlive*>VecAlive,CombatGuideS
 		{
 			if (alive->getModel() != compel.model)
 				continue;
-			DataCenter::sharedData()->getWar()->initAlive(alive);
+			alive->initAliveData();
 			m_AliveLayer->initActobject(alive);
 			alive->getActObject()->setActMoveGrid(compel.grid);
 			break;
@@ -345,7 +345,7 @@ void CombatGuideLayer::resetAlive( CombatGuideStep* step )
 	m_AliveLayer->removeMessage();														//释放掉触摸消息
 	CCMoveTo* mt = CCMoveTo::create(0.2f,ccp(MAP_MINX(DataCenter::sharedData()->getMap()->getCurrWarMap()),0));	//飞到最右侧
 	m_Scene->getMoveLayer()->runAction(mt);
-	CCArray* arr = DataCenter::sharedData()->getWar()->getHeros();
+	CCArray* arr = DataCenter::sharedData()->getWar()->getAlivesByCamp(false);
 	CCObject* obj = nullptr;
 	vector<WarAlive*>VecAlive;
 	CCARRAY_FOREACH(arr,obj)

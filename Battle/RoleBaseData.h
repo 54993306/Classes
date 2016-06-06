@@ -19,7 +19,6 @@
 #define __TempData__
 
 #include "cocos2d.h"
-#include "Battle/RoleSkill.h"
 
 namespace protos{
 	namespace common{
@@ -27,82 +26,79 @@ namespace protos{
 		class Monster;
 	}
 }
-
-enum struct E_ROLESKILLTYPE
-{
-	eSkillNormal		=1,
-	eSKillSpecial		=2,
-	eSkillActive		=3,
-	eSkillCaptain		=4,
-};
+class RoleSkill;
 class RoleBaseData : public cocos2d::CCObject
 {
 public:
 	RoleBaseData();
-	~RoleBaseData();
-	RoleSkill skNormal;				//普通攻击
-	RoleSkill skSpecial;			//特殊攻击
-	RoleSkill skActive;				//必杀技能(必杀技有召唤的技能类型)
-	RoleSkill skCaptain;			//主帅技能 			
-	int thumb;					//模型id
-	bool enemy;					//是否为怪物
-	int alert;					//警戒区域类型
-	int alertRange;				//警戒区域范围
-	float MoveSpeed;			//武将移动速度(格/S)
-	int coldDown;				//死亡重新上阵CD
-	int initCost;				//初始cost
-	int useCost;				//上阵消耗cost
-	int addCost;				//cost恢复速度(1/s)
-	int maxCost;				//cost上限
-	float atkInterval;			//攻击速度 (秒/次)
-	int roletype;				//武将属性(火1,水2,木3)
-	int row;					//武将所占行数
-	int col;					//武将所占列数
-	int maxhp;					//最大血量值(世界boss专用)
-	int	hp;						//血量
-	int	atk;					//攻击
-	int	def;					//防御
-	int	crit;					//暴击
-	int hit;					//命中
-	int dodge;					//闪避
-	int dex;					//敏捷
-	int renew;					//回复
-	bool battle;				//武将是否为上阵状态(战斗中标记队长)
-	int zoom;					//缩放比
+	~RoleBaseData();		
+	CC_SYNTHESIZE(int,mServerID,ServerID);							//服务器角色ID
+	CC_SYNTHESIZE(int,mRoleModel,RoleModel);						//模型id
+	CC_SYNTHESIZE(int,mRoleType,RoleType);							//武将属性(火1,水2,木3)
+	CC_SYNTHESIZE(int,mRoleRow,RoleRow);							//武将所占行数
+	CC_SYNTHESIZE(int,mRoleCol,RoleCol);							//武将所占列数
+	CC_SYNTHESIZE(int,mRoleHp,RoleHp);								//血量
+	CC_SYNTHESIZE(int,mRoleAttack,RoleAttack);						//攻击
+	CC_SYNTHESIZE(int,mRoleDefense,RoleDefense);					//防御
+	CC_SYNTHESIZE(int,mRoleCrit,RoleCrit);							//暴击
+	CC_SYNTHESIZE(int,mRoleHit,RoleHit);							//命中
+	CC_SYNTHESIZE(int,mRoleDodge,RoleDodge);						//闪避
+	CC_SYNTHESIZE(int,mRoleAgility,RoleAgility);					//敏捷
+	CC_SYNTHESIZE(int,mRoleRegain,RoleRegain);						//恢复
+	CC_SYNTHESIZE(int,mRoleZoom,RoleZoom);							//缩放
+	CC_SYNTHESIZE(float,mMoveSpeed,MoveSpeed);						//移动速度(格/S)
+	CC_SYNTHESIZE(float,mAttackSpeed,AttackSpeed);					//攻击速度(秒/次)
+	CC_SYNTHESIZE(int,mCallType,CallType);							//召唤类型(Control)
+	CC_SYNTHESIZE(int,mCallID,CallID);								//召唤的武将ID
+	CC_SYNTHESIZE(float,mDelayTime,DelayTime);						//出现延迟时间
 
-	int grid;					//武将站位
-	bool isCall;				//是否为召唤类武将(敌方怪物都可能,在怪物列表中读取)
-	int	CallID;					//召唤武将ID
-	float mCritTime;			//怪物释放必杀技时间
-	int MstType;				//怪物类型
-	int CallType;				//召唤类型(Control)
-	int hasitem;				//掉落物品类型1、蓝2、金3、彩4、道具5、金币
+	CC_SYNTHESIZE(int,mAlertType,AlertType);						//警戒类型
+	CC_SYNTHESIZE(int,mAlertRange,AlertRange);						//警戒范围
+	CC_SYNTHESIZE(int,mColdDown,ColdDown);							//上阵CD
+	CC_SYNTHESIZE(int,mInitCost,InitCost);							//上阵携带cost			（可直接计算出来，不需要再单独携带）
+	CC_SYNTHESIZE(int,mExpendCost,ExpendCost);						//上阵消耗cost
+	CC_SYNTHESIZE(int,mCostSpeed,CostSpeed);						//cost恢复速度(1/s)
+	CC_SYNTHESIZE(int,mMaxCost,MaxCost);							//cost上限
+	CC_SYNTHESIZE(bool,mCaptain,Captain);							//武将是否为上阵状态(战斗中标记队长)
+
+	CC_SYNTHESIZE(int,mMonsterType,MonsterType);					//怪物类型
+	CC_SYNTHESIZE(int,mMaxHp,MaxHp);								//最大血量值(世界boss专用
+	CC_SYNTHESIZE(bool,mCallRole,CallRole);							//是否为召唤类武将(敌方怪物都可能,在怪物列表中读取)
+	CC_SYNTHESIZE(int,mInitGrid,InitGrid);							//武将初始位置
+	CC_SYNTHESIZE(int,mRoleDrop,RoleDrop);							//掉落物品类型1、蓝2、金3、彩4、道具5、金币
+	CC_SYNTHESIZE(float,mCritTime,CritTime);						//怪物释放必杀技时间
 public:
-	const RoleSkill* getSkillByType(E_ROLESKILLTYPE pType)const;
+	const RoleSkill* getNormalSkill()const;
+	const RoleSkill* getSpecialSkill()const;
+	const RoleSkill* getActiveSkill()const;
+	const RoleSkill* getCaptainSkill()const;
+	bool hasSpecialSkill()const;
+	bool hasActiveSkill()const;
+	bool hasCaptainSkill()const;
+	int getActiveSkillType()const;
 protected:
-
+	RoleSkill* mNormalSkill;										//普通攻击
+	RoleSkill* mSpecialSkill;										//特殊攻击
+	RoleSkill* mActiveSkill;										//必杀技能(必杀技有召唤的技能类型)
+	RoleSkill* mCaptainSkill;										//主帅技能 	
 };
-//google::protobuf::Message			都是继承与
 //怪物
-class MonsterRoleData :public RoleBaseData
+class MonsterData :public RoleBaseData
 { 
 public:
-	MonsterRoleData();
-	static MonsterRoleData* create();
-	int mId;					//关卡怪物ID
-	int monsterId;				//怪物ID(标识ID)
-	int batch;					//批次
-	float delay;				//延迟时间
-	bool isBoss;				//是否为boss
-	int move1;					//多方向移动怪物				(应该要被删除掉的字段,怪物都是往前走,方向参数无意义,靠速度来控制怪物的移动即可,但是怪物还有一个相应的移动规则,不过也跟该字段无关了)
-	int  quality;				//英雄品质 1白色,2绿色,3蓝色,4紫色,5红色
+	MonsterData();
+	static MonsterData* create();
+	CC_SYNTHESIZE(int,mMonsterID,MonsterID);						//怪物ID
+	CC_SYNTHESIZE(int,mBatchNumber,BatchNumber);					//批次
+	CC_SYNTHESIZE(bool,mBossMonster,BossMonster);					//是否为boss
+	CC_SYNTHESIZE(bool,mMoveState,MoveState);						//是否可以移动
 	void readData(const protos::common::Monster* monster);
 };
 //英雄
-class HeroRoleData :public RoleBaseData 
+class HeroData :public RoleBaseData 
 {
 public:
-	static HeroRoleData* create();
+	static HeroData* create();
 	void readData(const protos::common::Hero* hero);
 };
 #endif

@@ -12,6 +12,8 @@
 #include "warscene/BattleTools.h"
 #include "Battle/SkillMacro.h"
 #include "Battle/AreaCount.h"
+#include "Battle/RoleSkill.h"
+#include "Battle/skEffectData.h"
 using namespace cocos2d;
 SkillRange::SkillRange(WarManager* pManage)
 :mManage(pManage){}
@@ -51,7 +53,7 @@ void SkillRange::initValidGrids( WarAlive* pAlive,vector<int>& pValids )
 		CountGrid = pAlive->mStandGrids;
 		aliveGrid = pAlive->getGridIndex();
 	}
-	if (pAlive->role->row==1&&pAlive->role->col==1)
+	if (pAlive->getBaseData()->getRoleRow()==1&&pAlive->getBaseData()->getRoleCol()==1)
 	{
 		pValids.push_back(aliveGrid);
 	}else if (effect->getAreaType() == eVertical || eNearby == effect->getAreaType())
@@ -60,10 +62,10 @@ void SkillRange::initValidGrids( WarAlive* pAlive,vector<int>& pValids )
 	}
 	if (pAlive->getEnemy() || pAlive->getOpposite())					//武将反向攻击
 	{
-		for (int i=0;i<pAlive->role->row;i++)							//获取向后攻击的判断格子(我方武将反向)
+		for (int i=0;i<pAlive->getBaseData()->getRoleRow();i++)							//获取向后攻击的判断格子(我方武将反向)
 			pValids.push_back(CountGrid.at(CountGrid.size()-i-1));
 	}else{
-		for (int i=0;i<pAlive->role->row;i++)							//获取向后攻击的判断格子(我方武将反向)
+		for (int i=0;i<pAlive->getBaseData()->getRoleRow();i++)							//获取向后攻击的判断格子(我方武将反向)
 			pValids.push_back(CountGrid.at(i));
 	}
 }
@@ -149,7 +151,7 @@ int SkillRange::CaptainGuard( WarAlive* pAlive )
 		pAlive->setGroupIndex(tGroupIndex);
 		for (int tGrid=C_CAPTAINGRID; tGrid<=C_ENDGRID; tGrid++)
 		{
-			int tStandRow = tGrid%C_GRID_ROW + pAlive->role->row;		
+			int tStandRow = tGrid%C_GRID_ROW + pAlive->getBaseData()->getRoleRow();		
 			if (tStandRow > C_GRID_ROW)												//武将所占格子,不能超出地图外
 				continue;														
 			pAlive->setGridIndex(tGrid);

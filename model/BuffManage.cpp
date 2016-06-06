@@ -221,7 +221,7 @@ void BuffManage::ExcuteBuff(BuffInfo*bfinfo, bool handel /*= true*/)
 	case BUFFTYPE::FIRING:
 	case BUFFTYPE::BLEED:
 		{
-			if (m_alive->getAliveType() == E_ALIVETYPE::WorldBoss)
+			if (m_alive->getAliveType() == E_ALIVETYPE::eWorldBoss)
 				return;			//世界boss免疫buff效果
 			int num = bufCurrHpHandle(bfinfo,handel);							/*1当前血量*/		
 			if (!num)break;
@@ -291,7 +291,7 @@ int  BuffManage::bufCurrHpHandle(BuffInfo* bfinfo,bool handel)
 			m_alive->setHp(m_alive->getHp() + bfinfo->getChangeNum());
 		}
 		changeHPNum = bfinfo->getChangeNum();
-		CCLOG("bufType CURRHP= %d,changeNum = %d,aliveHP=%d",CURRHP,bfinfo->getChangeNum(),m_alive->getHp());
+		CCLOG("bufType CURRHP= %d,changeNum = %d,aliveHP=%d",BUFFTYPE::CURRHP,bfinfo->getChangeNum(),m_alive->getHp());
 	}
 	if (bfinfo->getPrecent())//影响武将血量百分比
 	{
@@ -303,7 +303,7 @@ int  BuffManage::bufCurrHpHandle(BuffInfo* bfinfo,bool handel)
 		}else{
 			m_alive->setHp(m_alive->getHp() + changeHPNum);
 		}
-		CCLOG("bufType CURRHP= %d,changePe = %d,aliveHP=%d",CURRHP,bfinfo->getPrecent(),m_alive->getHp());
+		CCLOG("bufType CURRHP= %d,changePe = %d,aliveHP=%d",BUFFTYPE::CURRHP,bfinfo->getPrecent(),m_alive->getHp());
 	}
 	if (!handel)CCLOG("/------------------------Remove----------------------------/");
 	CCLOG("buffId = %d,buffType=%d,changeNum=%d,changePe=%d",
@@ -323,12 +323,12 @@ void BuffManage::bufAtkHandle(BuffInfo* bfinfo,bool handel)
 		}else{
 			m_alive->setAtk(m_alive->getAtk() + bfinfo->getChangeNum());
 		}
-		CCLOG("bufType ATK= %d,changeNum = %d,aliveAtk = %d",ATK,bfinfo->getChangeNum(),m_alive->getAtk());
+		CCLOG("bufType ATK= %d,changeNum = %d,aliveAtk = %d",BUFFTYPE::ATK,bfinfo->getChangeNum(),m_alive->getAtk());
 	}
 	if (bfinfo->getPrecent())		//影响武将攻击百分比
 	{
 		CCLOG("aliveID = %d,afterAtk = %d",m_alive->getAliveID(),m_alive->getAtk());
-		float atkNum =  m_alive->role->atk;
+		float atkNum =  m_alive->getBaseData()->getRoleAttack();
 		float num = bfinfo->getPrecent() * 0.01f * atkNum;
 		if (bfinfo->getIsDBuff() == handel)
 		{
@@ -336,7 +336,7 @@ void BuffManage::bufAtkHandle(BuffInfo* bfinfo,bool handel)
 		}else{
 			m_alive->setAtk(m_alive->getAtk() + num);
 		}
-		CCLOG("bufType ATK= %d,changePe = %d,aliveAtk = %d",ATK,bfinfo->getPrecent(),m_alive->getAtk());
+		CCLOG("bufType ATK= %d,changePe = %d,aliveAtk = %d",BUFFTYPE::ATK,bfinfo->getPrecent(),m_alive->getAtk());
 	}
 	if (!handel)CCLOG("//------------------------Remove---------------------------");
 	CCLOG("Id = %d,Type= %d,changeNum= %d,changePe= %d",
@@ -359,12 +359,12 @@ void BuffManage::bufDefHandle(BuffInfo* bfinfo,bool handel)
 		}else{
 			m_alive->setDef(m_alive->getDef() + bfinfo->getChangeNum());
 		}
-		CCLOG("bufType DEF= %d,changeNum = %d,aliveDEF=%d",DEF,bfinfo->getChangeNum(),m_alive->getDef());
+		CCLOG("bufType DEF= %d,changeNum = %d,aliveDEF=%d",BUFFTYPE::DEF,bfinfo->getChangeNum(),m_alive->getDef());
 	}
 	if (bfinfo->getPrecent())//影响武将防御百分比
 	{
 		CCLOG("aliveID = %d,afterDEF = %d",m_alive->getAliveID(),m_alive->getDef());
-		float defNum = m_alive->role->def;
+		float defNum = m_alive->getBaseData()->getRoleDefense();
 		float num = bfinfo->getPrecent() * 0.01f * defNum;
 		if (bfinfo->getIsDBuff() == handel)
 		{
@@ -372,7 +372,7 @@ void BuffManage::bufDefHandle(BuffInfo* bfinfo,bool handel)
 		}else{
 			m_alive->setDef(m_alive->getDef() + num);
 		}
-		CCLOG("bufType DEF= %d,changePe = %d,aliveDEF=%d",DEF,bfinfo->getPrecent(),m_alive->getDef());
+		CCLOG("bufType DEF= %d,changePe = %d,aliveDEF=%d",BUFFTYPE::DEF,bfinfo->getPrecent(),m_alive->getDef());
 	}
 	if (!handel)CCLOG("//------------------------Remove----------------------------");
 	CCLOG("Id = %d,Type= %d,changeNum= %d,changePe= %d",
@@ -395,12 +395,12 @@ void BuffManage::bufCritHandle(BuffInfo* bfinfo,bool handel)
 		}else{
 			m_alive->setCrit(m_alive->getCrit() + bfinfo->getChangeNum());
 		}
-		CCLOG("bufType CRI= %d,changeNum = %d,aliveCRI=%d",CRI,bfinfo->getChangeNum(),m_alive->getCrit());
+		CCLOG("bufType CRI= %d,changeNum = %d,aliveCRI=%d",BUFFTYPE::CRI,bfinfo->getChangeNum(),m_alive->getCrit());
 	}
 	if (bfinfo->getPrecent())//影响武将暴击百分比
 	{
 		CCLOG("aliveID = %d,afterCRI = %d",m_alive->getAliveID(),m_alive->getCrit());
-		float critNum = m_alive->role->crit;
+		float critNum = m_alive->getBaseData()->getRoleCrit();
 		float num = bfinfo->getPrecent() * 0.01f * critNum;
 		if (bfinfo->getIsDBuff() == handel)
 		{
@@ -408,7 +408,7 @@ void BuffManage::bufCritHandle(BuffInfo* bfinfo,bool handel)
 		}else{
 			m_alive->setCrit(m_alive->getCrit() + num);
 		}
-		CCLOG("bufType CRI= %d,changePe = %d,aliveCRI=%d",CRI,bfinfo->getPrecent(),m_alive->getCrit());
+		CCLOG("bufType CRI= %d,changePe = %d,aliveCRI=%d",BUFFTYPE::CRI,bfinfo->getPrecent(),m_alive->getCrit());
 	}
 	if (!handel)CCLOG("//------------------------Remove----------------------------");
 	CCLOG("Id = %d,Type= %d,changeNum= %d,changePe= %d",
@@ -431,12 +431,12 @@ void BuffManage::bufDogeHandle( BuffInfo* bfinfo,bool handel )
 		}else{
 			m_alive->setDoge(m_alive->getDoge() + bfinfo->getChangeNum());
 		}
-		CCLOG("bufType Doge= %d,changeNum = %d,aliveDoge=%d",DOGE,bfinfo->getChangeNum(),m_alive->getDoge());
+		CCLOG("bufType Doge= %d,changeNum = %d,aliveDoge=%d",BUFFTYPE::DOGE,bfinfo->getChangeNum(),m_alive->getDoge());
 	}
 	if (bfinfo->getPrecent())//影响武将暴击百分比
 	{
 		CCLOG("aliveID = %d,afterDoge = %d",m_alive->getAliveID(),m_alive->getDoge());
-		float critNum = m_alive->role->dodge;
+		float critNum = m_alive->getBaseData()->getRoleDodge();
 		float num = bfinfo->getPrecent() * 0.01f * critNum;
 		if (bfinfo->getIsDBuff() == handel)
 		{
@@ -444,7 +444,7 @@ void BuffManage::bufDogeHandle( BuffInfo* bfinfo,bool handel )
 		}else{
 			m_alive->setDoge(m_alive->getDoge() + num);
 		}
-		CCLOG("bufType Doge= %d,changePe = %d,aliveDoge=%d",DOGE,bfinfo->getPrecent(),m_alive->getDoge());
+		CCLOG("bufType Doge= %d,changePe = %d,aliveDoge=%d",BUFFTYPE::DOGE,bfinfo->getPrecent(),m_alive->getDoge());
 	}
 	if (!handel)CCLOG("//------------------------Remove----------------------------");
 	CCLOG("Id = %d,Type= %d,changeNum= %d,changePe= %d",
@@ -467,12 +467,12 @@ void BuffManage::bufHitHandle(BuffInfo* bfinfo,bool handel)
 		}else{
 			m_alive->setHit(m_alive->getHit() + bfinfo->getChangeNum());
 		}
-		CCLOG("bufType HIT= %d,changeNum = %d,aliveHit=%d",HIT,bfinfo->getChangeNum(),m_alive->getHit());
+		CCLOG("bufType HIT= %d,changeNum = %d,aliveHit=%d",BUFFTYPE::HIT,bfinfo->getChangeNum(),m_alive->getHit());
 	}
 	if (bfinfo->getPrecent())//影响武将命中百分比
 	{
 		CCLOG("aliveID = %d,beforeHIT = %d",m_alive->getAliveID(),m_alive->getHit());
-		float hitNum = m_alive->role->hit;
+		float hitNum = m_alive->getBaseData()->getRoleHit();
 		float num = bfinfo->getPrecent() * 0.01f * hitNum;
 		if (bfinfo->getIsDBuff() == handel)
 		{
@@ -480,7 +480,7 @@ void BuffManage::bufHitHandle(BuffInfo* bfinfo,bool handel)
 		}else{
 			m_alive->setHit(m_alive->getHit() + num);
 		}
-		CCLOG("bufType HIT= %d,changePe = %d,aliveHit=%d",HIT,bfinfo->getPrecent(),m_alive->getHit());
+		CCLOG("bufType HIT= %d,changePe = %d,aliveHit=%d",BUFFTYPE::HIT,bfinfo->getPrecent(),m_alive->getHit());
 	}
 	if (!handel)CCLOG("//------------------------Remove----------------------------");
 	CCLOG("Id = %d,Type= %d,changeNum= %d,changePe= %d",
@@ -506,12 +506,12 @@ void BuffManage::bufMSpeedHandle( BuffInfo* bfinfo,bool handel )
 				speed = 0.2f;				//武将移动最快速度极限值处理
 			m_alive->setMoveSpeed(speed);
 		}
-		CCLOG("bufType MSpeed= %d,changeNum = %d,alive MSpeed=%f",MOVESPEED,bfinfo->getChangeNum(),m_alive->getMoveSpeed());
+		CCLOG("bufType MSpeed= %d,changeNum = %d,alive MSpeed=%f",BUFFTYPE::MOVESPEED,bfinfo->getChangeNum(),m_alive->getMoveSpeed());
 	}
 	if (bfinfo->getPrecent())//影响武将移动速度百分比
 	{
 		CCLOG("aliveID = %d,before MSpeed = %f",m_alive->getAliveID(),m_alive->getMoveSpeed());
-		float speed =m_alive->role->MoveSpeed;					//s/格
+		float speed =m_alive->getBaseData()->getMoveSpeed();					//s/格
 		float num = bfinfo->getPrecent() * 0.01f;
 		if (bfinfo->getIsDBuff() == handel)
 		{
@@ -525,7 +525,7 @@ void BuffManage::bufMSpeedHandle( BuffInfo* bfinfo,bool handel )
 				cSpeed = 0.2f;
 			m_alive->setMoveSpeed(cSpeed);
 		}
-		CCLOG("bufType MSpeed= %d,changePe = %d,alive MSpeed=%d",MOVESPEED,bfinfo->getPrecent(),m_alive->getMoveSpeed());
+		CCLOG("bufType MSpeed= %d,changePe = %d,alive MSpeed=%d",BUFFTYPE::MOVESPEED,bfinfo->getPrecent(),m_alive->getMoveSpeed());
 	}
 	if (!handel)CCLOG("//------------------------Remove----------------------------");
 	CCLOG("Id = %d,Type= %d,changeNum= %d,changePe= %d",
@@ -552,12 +552,12 @@ void BuffManage::bufAtkSpeedHandle( BuffInfo* bfinfo,bool handel )
 			CurrAgility += bfinfo->getChangeNum();
 		}
 		m_alive->setAtkInterval(2-(CurrAgility*0.2f/400));
-		CCLOG("bufType AtkSpeed= %d,changeNum = %d,alive AtkSpeed=%f",MOVESPEED,bfinfo->getChangeNum(),m_alive->getAtkInterval());
+		CCLOG("bufType AtkSpeed= %d,changeNum = %d,alive AtkSpeed=%f",BUFFTYPE::MOVESPEED,bfinfo->getChangeNum(),m_alive->getAtkInterval());
 	}
 	if (bfinfo->getPrecent())//影响武将移动速度百分比
 	{
 		CCLOG("aliveID = %d,before AtkSpeed = %f",m_alive->getAliveID(),m_alive->getAtkInterval());
-		float BeingAgility = ( 2-m_alive->role->atkInterval )*400/0.2f;		//增减的敏捷值
+		float BeingAgility = ( 2-m_alive->getBaseData()->getAttackSpeed() )*400/0.2f;		//增减的敏捷值
 		if (bfinfo->getIsDBuff() == handel)
 		{
 			CurrAgility -= bfinfo->getPrecent() *0.01f* BeingAgility;
@@ -565,7 +565,7 @@ void BuffManage::bufAtkSpeedHandle( BuffInfo* bfinfo,bool handel )
 			CurrAgility += bfinfo->getPrecent() *0.01f* BeingAgility;
 		}
 		m_alive->setAtkInterval(2-(CurrAgility*0.2f/400));
-		CCLOG("bufType AtkSpeed= %d,changePe = %d,alive AtkSpeed=%f",MOVESPEED,bfinfo->getPrecent(),m_alive->getAtkInterval());
+		CCLOG("bufType AtkSpeed= %d,changePe = %d,alive AtkSpeed=%f",BUFFTYPE::MOVESPEED,bfinfo->getPrecent(),m_alive->getAtkInterval());
 	}
 	if (!handel)CCLOG("//------------------------Remove----------------------------");
 	CCLOG("Id = %d,Type= %d,changeNum= %d,changePe= %d",
@@ -589,7 +589,7 @@ void BuffManage::bufHrtHandle(BuffInfo* bfinfo,bool handel)
 		}else{
 			m_alive->setHrt(m_alive->getHrt() + bfinfo->getChangeNum());
 		}
-		CCLOG("bufType HRT= %d,changeNum = %d,afterHurt=%d",HRT,bfinfo->getChangeNum(),m_alive->getHrt());
+		CCLOG("bufType HRT= %d,changeNum = %d,afterHurt=%d",BUFFTYPE::HRT,bfinfo->getChangeNum(),m_alive->getHrt());
 	}
 	if (bfinfo->getPrecent())
 	{
@@ -601,7 +601,7 @@ void BuffManage::bufHrtHandle(BuffInfo* bfinfo,bool handel)
 		}else{
 			m_alive->setHrtpe(m_alive->getHrtpe() + bfinfo->getPrecent());
 		}
-		CCLOG("bufType HRT= %d,changePE = %d,AfterHurtPe=%d",HRT,bfinfo->getPrecent(),m_alive->getHrtpe());
+		CCLOG("bufType HRT= %d,changePE = %d,AfterHurtPe=%d",BUFFTYPE::HRT,bfinfo->getPrecent(),m_alive->getHrtpe());
 	}
 	bfinfo->setHandle(true);//设置buf为处理过
 }
@@ -619,19 +619,19 @@ int BuffManage::bufMaxHpHandle(BuffInfo* bfinfo,bool handel)
 			m_alive->setMaxHp(m_alive->getMaxHp() + bfinfo->getChangeNum());
 		}
 		changeHPNum = bfinfo->getChangeNum();
-		CCLOG("bufType HPMAX= %d,changeNum = %d,aliveMaxHp=%d",HPMAX,bfinfo->getChangeNum(),m_alive->getMaxHp());
+		CCLOG("bufType HPMAX= %d,changeNum = %d,aliveMaxHp=%d",BUFFTYPE::HPMAX,bfinfo->getChangeNum(),m_alive->getMaxHp());
 	}
 	if (bfinfo->getPrecent())//影响武将血量百分比
 	{
 		CCLOG("aliveID = %d,afterHPMAX = %d",m_alive->getAliveID(),m_alive->getMaxHp());
-		changeHPNum = bfinfo->getPrecent() * 0.01f * m_alive->role->hp;
+		changeHPNum = bfinfo->getPrecent() * 0.01f * m_alive->getBaseData()->getRoleHp();
 		if (bfinfo->getIsDBuff() == handel)
 		{
 			m_alive->setMaxHp(m_alive->getMaxHp() - changeHPNum);			//扣血和加血统一显示一次即可
 		}else{
 			m_alive->setMaxHp(m_alive->getMaxHp() + changeHPNum);
 		}
-		CCLOG("bufType HPMAX= %d,changePe = %d,aliveHP=%d",HPMAX,bfinfo->getPrecent(),m_alive->getMaxHp());
+		CCLOG("bufType HPMAX= %d,changePe = %d,aliveHP=%d",BUFFTYPE::HPMAX,bfinfo->getPrecent(),m_alive->getMaxHp());
 	}
 	bfinfo->setHandle(true);
 	return changeHPNum;

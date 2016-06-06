@@ -1,7 +1,6 @@
 ﻿#include "HurtCount.h"
-#include "ConstNum.h"
+#include "warscene/ConstNum.h"
 #include "MoveRule.h"
-//#include "model/BattleData.h"
 #include "Battle/RoleBaseData.h"
 #include "model/BuffManage.h"
 #include "Battle/BattleRole.h"
@@ -51,7 +50,7 @@ int HurtCount::ChangeLocation(WarAlive* AtcAlive , WarAlive* HitAlive)
 #endif
 	if (HitAlive->getCallType() == FixedlyCantFlyType 
 		|| HitAlive->getCallType() == NotAttack||HitAlive->getCaptain()
-		|| HitAlive->getAliveType() == E_ALIVETYPE::WorldBoss)//不可被击飞类型武将
+		|| HitAlive->getAliveType() == E_ALIVETYPE::eWorldBoss)//不可被击飞类型武将
 		return HitAlive->getGridIndex();
 	const skEffectData* effect = AtcAlive->getCurrEffect();
 	if (effect->getBatter() != AtcAlive->getSortieNum())
@@ -59,7 +58,7 @@ int HurtCount::ChangeLocation(WarAlive* AtcAlive , WarAlive* HitAlive)
 	bool enemy = AtcAlive->getEnemy();
 	if (AtcAlive->getOpposite())
 		enemy = !enemy;
-	int grid = MoveRule::create()->FrontBack(HitAlive,effect->repel,enemy);
+	int grid = MoveRule::create()->FrontBack(HitAlive,effect->getRepel(),enemy);
 	if (grid != INVALID_GRID)
 	{
 		if (grid >= C_BEGINGRID && grid<C_CAPTAINGRID)						//击退范围做一个边界处理
@@ -119,7 +118,7 @@ void HurtCount::addHittingAlive( WarAlive* AtcTarget , WarAlive* HitTarget )
 
 void HurtCount::woldBossHurt( WarAlive* pAlive,float pHurt )
 {
-	if (pAlive->getAliveType() == E_ALIVETYPE::WorldBoss)							//世界boss受击
+	if (pAlive->getAliveType() == E_ALIVETYPE::eWorldBoss)							//世界boss受击
 	{
 		pHurt *= (1+m_Manage->getBossHurtPe()*0.01f);								//鼓舞效果
 		m_Manage->setBossHurtCount(pHurt);
@@ -325,13 +324,13 @@ void HurtCount::BuffHandleLogic(WarAlive* pAlive)
 			if (buff->getBuffTarget() == usTargetType)					//自己
 			{
 				//CCLOG("\nAtcTargetID = %d ,AddBuff ID: %d",AtcTarget->getAliveID(),buff.buffId);
-				if (buff->getTargetType()&&buff->getTargetType()!=pAlive->role->roletype)//判断buf的限定种族
+				if (buff->getTargetType()&&buff->getTargetType()!=pAlive->getBaseData()->getRoleType())//判断buf的限定种族
 					continue;
 				AtcbufManege->AddBuff(*buff);
 			}else if (buff->getBuffTarget() == hitTargetType && tAlive)				//受击目标
 			{
 				BuffManage* HitbufManege = tAlive->getBuffManage();
-				if (buff->getTargetType()&&buff->getTargetType()!=tAlive->role->roletype)
+				if (buff->getTargetType()&&buff->getTargetType()!=tAlive->getBaseData()->getRoleType())
 					continue;
 				//CCLOG("\nHitTargetID = %d ,AddBuff ID: %d",HitTarget->getAliveID(),buff.buffId);
 				HitbufManege->AddBuff(*buff);
@@ -346,8 +345,8 @@ float HurtCount::raceDispose(WarAlive* AtcTarget , WarAlive* HitTarget)
 {
 	return 1;
 	//火1>木3; 木3>水2; 水2>火1
-	int atkType = AtcTarget->role->roletype;
-	int hitType = HitTarget->role->roletype;
+	int atkType = AtcTarget->getBaseData()->getRoleType();
+	int hitType = HitTarget->getBaseData()->getRoleType();
 	if (atkType == hitType)
 	{
 		return 1.0f;

@@ -69,7 +69,6 @@ struct ROLE
 	int	CallID;					//召唤武将ID
 	float mCritTime;			//怪物释放必杀技时间
 	int MstType;				//怪物类型
-	int CallType;				//召唤类型(Control)
 	int hasitem;				//掉落物品类型1、蓝2、金3、彩4、道具5、金币
 	int	level;					//武将等级
 	string name;				//名称

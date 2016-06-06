@@ -41,6 +41,7 @@ void BattleDataCenter::releaseRoleData()
 		CC_SAFE_RELEASE(tData);
 	}
 	mMonsterVec.clear();
+	mCallRole.clear();
 }
 
 void BattleDataCenter::initBattleData( const google::protobuf::Message *pResponse,bool pWorldBoss /*=false*/ )
@@ -56,19 +57,19 @@ void BattleDataCenter::initBattleData( const google::protobuf::Message *pRespons
 	}
 }
 
-const  vector<HeroRoleData*>& BattleDataCenter::getHeroVector() const
+const  vector<HeroData*>& BattleDataCenter::getHeroVector() const
 {
 	return mHeroVec;
 }
 
-const vector<MonsterRoleData*>& BattleDataCenter::getMonsterVector() const
+const vector<MonsterData*>& BattleDataCenter::getMonsterVector() const
 {
 	return mMonsterVec;
 }
 
 void BattleDataCenter::initHeroData( const protos::common::Hero* pData )
 {
-	HeroRoleData* tHeroData = HeroRoleData::create();
+	HeroData* tHeroData = HeroData::create();
 	tHeroData->readData(pData);
 	tHeroData->retain();
 	mHeroVec.push_back(tHeroData);
@@ -76,10 +77,23 @@ void BattleDataCenter::initHeroData( const protos::common::Hero* pData )
 
 void BattleDataCenter::initMonsterData( const protos::common::Monster* pData )
 {
-	MonsterRoleData* tMonsterData = MonsterRoleData::create();
+	MonsterData* tMonsterData = MonsterData::create();
 	tMonsterData->readData(pData);
 	tMonsterData->retain();
 	mMonsterVec.push_back(tMonsterData);
+}
+
+const vector<MonsterData*>& BattleDataCenter::getCallRoleVector()
+{
+	if (mCallRole.empty())
+	{
+		for (auto tRole : mMonsterVec)
+		{
+			if (tRole->getCallRole())
+				mCallRole.push_back(tRole);
+		}
+	}		
+	return mCallRole;
 }
 
 void BattleDataCenter::initWordBossStage( const google::protobuf::Message *pResponse )
@@ -94,6 +108,12 @@ void BattleDataCenter::initWordBossStage( const google::protobuf::Message *pResp
 		if (tData->monsters(j).isboss())
 			tBossID = tData->monsters(j).id();
 	}
+	DataCenter::sharedData()->getWar()->setBatch(0);
+	DataCenter::sharedData()->getWar()->setStageID(tBossID);
+	DataCenter::sharedData()->getWar()->setBossHurtPe(tData->addhurt());
+	DataCenter::sharedData()->getWar()->setWorldBoss(true);
+	DataCenter::sharedData()->getMap()->initMap(tBossID);
+	DataCenter::sharedData()->getWar()->initCommonData();
 }
 
 void BattleDataCenter::initNormalStage( const google::protobuf::Message *pResponse )
@@ -103,4 +123,8 @@ void BattleDataCenter::initNormalStage( const google::protobuf::Message *pRespon
 		initHeroData(&tData->herolist(i));
 	for (int j=0; j< tData->monsterlist_size(); j++)			//¹ÖÎï
 		initMonsterData(&tData->monsterlist(j));
+	DataCenter::sharedData()->getWar()->setBatch(tData->batch());
+	DataCenter::sharedData()->getWar()->setStageID(tData->stageid());
+	DataCenter::sharedData()->getMap()->initMap(tData->stageid()); 
+	DataCenter::sharedData()->getWar()->initCommonData();
 }

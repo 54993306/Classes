@@ -5,7 +5,7 @@
 #include "model/DataCenter.h"
 #include "Battle/BattleMessage.h"
 #include "Battle/RoleBaseData.h"
-
+#include "Battle/RoleSkill.h"
 SkillTips::SkillTips()
 	:m_ui(nullptr)
 {}
@@ -68,10 +68,10 @@ void SkillTips::setSkillInfo(CCObject* target,WarAlive* alive)
 	CLabel *desc = (CLabel*)(m_ui->findWidgetById("desc"));
 	this->setVisible(true);
 	this->setPosition(ccpAdd(point,ccp(-326,-85)));
-	RoleSkill skill = alive->role->skActive;
+	const RoleSkill* skill = alive->getBaseData()->getActiveSkill();
 	if (level)
-		level->setString(ToString(skill.getSkillLevel()));
-	const SkillCfg *cfg = DataCenter::sharedData()->getSkill()->getCfg(skill.getSkillID());
+		level->setString(ToString(skill->getSkillLevel()));
+	const SkillCfg *cfg = DataCenter::sharedData()->getSkill()->getCfg(skill->getSkillID());
 	if (cfg)
 	{
 		desc->setString(cfg->desc.c_str());

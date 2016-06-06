@@ -5,6 +5,9 @@
 #include "model/WarManager.h"
 #include "model/MapManager.h"
 #include "warscene/ConstNum.h"
+#include "Battle/RoleSkill.h"
+#include "Battle/RoleBaseData.h"
+#include "Battle/skEffectData.h"
 CaptainSkill::CaptainSkill(){}
 
 CaptainSkill::~CaptainSkill(){}
@@ -31,11 +34,11 @@ bool CaptainSkill::init()
 void CaptainSkill::ExecuteCaptainSkill()
 {
 	WarAlive* alive  = DataCenter::sharedData()->getWar()->getAliveByGrid(C_CAPTAINGRID);
-	CCArray* arr = DataCenter::sharedData()->getWar()->getHeros(true);
-	if (!alive||!arr||alive->role->skCaptain.getSkillID() == 0)
+	CCArray* arr = DataCenter::sharedData()->getWar()->getAlivesByCamp(false,true);
+	if (!alive||!arr||alive->getBaseData()->hasCaptainSkill())
 		return;
-	RoleSkill skill = alive->role->skCaptain;							//需同时满足种族限制且满足属性限制
-	CCArray* RaceArr = RaceJudgeCap(arr,skill.getTargetType());			//种族限制判定
+	const RoleSkill* skill = alive->getBaseData()->getCaptainSkill();							//需同时满足种族限制且满足属性限制
+	CCArray* RaceArr = RaceJudgeCap(arr,skill->getTargetType());			//种族限制判定
 	if (!RaceArr||!RaceArr->count())
 		return;																//不满足种族限制条件
 	//CCArray* AttributeArr=AttributeJudgeArrCap(_CaptainSkill,RaceArr);	//属性限制判定(暂时取消)
@@ -43,11 +46,11 @@ void CaptainSkill::ExecuteCaptainSkill()
 	//	return;																//满足种族限制未满足属性限制
 	CCArray* AttributeArr = RaceArr;
 	CCArray* executeArr = CCArray::create();
-	for (int i=0;i<skill.getEffectSize(0);i++)							//触发队长技能效果
+	for (int i=0;i<skill->getEffectSize(0);i++)							//触发队长技能效果
 	{
-		if (!skill.getIndexEffect(0,i)->getEffectID())
+		if (!skill->getIndexEffect(0,i)->getEffectID())
 			continue;
-		CCArray* _arr = getTargetArrCap(skill.getIndexEffect(0,i),AttributeArr,arr);			
+		CCArray* _arr = getTargetArrCap(skill->getIndexEffect(0,i),AttributeArr,arr);			
 		AddArr(executeArr,_arr);
 	}
 	CCObject* ob = nullptr;
@@ -110,15 +113,15 @@ CCArray* CaptainSkill::RaceJudgeCap(CCArray* arr,int type)
 				{
 					if (!type)
 					{
-						 type = alive->role->roletype;
+						 type = alive->getBaseData()->getRoleType();
 						continue;
 					}
-					type2 = alive->role->roletype;
+					type2 = alive->getBaseData()->getRoleType();
 					continue;
 				}
 				if (type&&type2)
 				{
-					if (alive->role->roletype != type&&alive->role->roletype!=type2)
+					if (alive->getBaseData()->getRoleType() != type&&alive->getBaseData()->getRoleType()!=type2)
 					{
 						aliveArr = arr;
 						break;
@@ -155,10 +158,10 @@ CCArray* CaptainSkill::RaceJudge(CCArray* arr,int type,bool exclude/*= false*/,b
 		if (alive->getExecuteCap())continue;
 		if (exclude)
 		{
-			if (alive->role->roletype == type)continue;
+			if (alive->getBaseData()->getRoleType() == type)continue;
 			targetArr->addObject(obj);
 		}else{
-			if (alive->role->roletype != type)continue;
+			if (alive->getBaseData()->getRoleType() != type)continue;
 			targetArr->addObject(obj);
 		}
 	}
@@ -171,10 +174,10 @@ CCArray* CaptainSkill::RaceJudge(CCArray* arr,int type,bool exclude/*= false*/,b
 		WarAlive* alive = (WarAlive*)obj;
 		if (!secondType)
 		{
-			secondType = alive->role->roletype;
+			secondType = alive->getBaseData()->getRoleType();
 			continue;
 		}
-		if (secondType&&secondType!=alive->role->roletype)
+		if (secondType&&secondType!=alive->getBaseData()->getRoleType())
 		{
 			fail = false;
 			break;
@@ -204,42 +207,42 @@ bool CaptainSkill::AttributeJudge(WarAlive* alive,int type,int rate)
 	case allAtb: { return true; }
 	case DefRate:		//除去NedHpRate是少于规定触发外其他都是进入战斗立马处理，扣减完后触发队长技处理
 		{ 
-			alive->setDef(alive->role->def*rate*0.01f);
+			alive->setDef(alive->getBaseData()->getRoleDefense()*rate*0.01f);
 			return true;	
 		}break;
 	case AtkRate:		
 		{ 
-			alive->setAtk(alive->role->atk*rate*0.01f);			
+			alive->setAtk(alive->getBaseData()->getRoleAttack()*rate*0.01f);			
 			return true;	
 		}break;
 	case NedHpRate:			//血量少于某值触发效果
 		{ 
-			if (alive->getHp() <= alive->role->hp*rate*0.01f)
+			if (alive->getHp() <= alive->getBaseData()->getRoleHp()*rate*0.01f)
 				return true;	
 		}break;
 	case RenewRate:		
 		{ 
-			alive->setRenew(alive->role->renew*rate*0.01f);
+			alive->setRenew(alive->getBaseData()->getRoleRegain()*rate*0.01f);
 			return true;	
 		}break;
 	case DogeRate:		
 		{ 
-			alive->setDoge(alive->role->dodge*rate*0.01f);	
+			alive->setDoge(alive->getBaseData()->getRoleDodge()*rate*0.01f);	
 			return true;	
 		}break;
 	case HitRate:		
 		{ 
-			alive->setHit(alive->role->hit*rate*0.01f);		
+			alive->setHit(alive->getBaseData()->getRoleHit()*rate*0.01f);		
 			return true;	
 		}break;
 	case CritRate:		
 		{ 
-			if (alive->getCrit() >= alive->role->crit*rate*0.01f)			
+			if (alive->getCrit() >= alive->getBaseData()->getRoleCrit()*rate*0.01f)			
 				return true;	
 		}break;
 	case HpMaxRate:		
 		{ 
-			alive->setHp(alive->role->hp*rate*0.01f);				
+			alive->setHp(alive->getBaseData()->getRoleHp()*rate*0.01f);				
 			return true;	
 		}break;
 	default:
@@ -389,35 +392,35 @@ void CaptainSkill::AliveExecute(const skEffectData*pEffect,WarAlive*pAlive)
 	{
 	case DefRate:
 		{
-			pAlive->setDef(pAlive->getDef()+(pAlive->role->def * (pEffect->getImpactRate()*0.01f-1)));
+			pAlive->setDef(pAlive->getDef()+(pAlive->getBaseData()->getRoleDefense() * (pEffect->getImpactRate()*0.01f-1)));
 		}break;
 	case AtkRate:
 		{
-			pAlive->setAtk(pAlive->getAtk()+(pAlive->role->atk * (pEffect->getImpactRate()*0.01f-1)));
+			pAlive->setAtk(pAlive->getAtk()+(pAlive->getBaseData()->getRoleAttack() * (pEffect->getImpactRate()*0.01f-1)));
 		}break;
 	case AgilityRate:
 		{
-			pAlive->setAtkInterval(pAlive->getAtkInterval()+(pEffect->getImpactRate()*0.01f-1)*pAlive->role->atkInterval);
+			pAlive->setAtkInterval(pAlive->getAtkInterval()+(pEffect->getImpactRate()*0.01f-1)*pAlive->getBaseData()->getAttackSpeed());
 		}break;
 	case RenewRate:
 		{
-			pAlive->setRenew(pAlive->getRenew()+(pAlive->role->renew * (pEffect->getImpactRate()*0.01f-1)));
+			pAlive->setRenew(pAlive->getRenew()+(pAlive->getBaseData()->getRoleRegain() * (pEffect->getImpactRate()*0.01f-1)));
 		}break;
 	case DogeRate:
 		{
-			pAlive->setDoge(pAlive->getDoge() + (pAlive->role->dodge * (pEffect->getImpactRate()*0.01f-1)));
+			pAlive->setDoge(pAlive->getDoge() + (pAlive->getBaseData()->getRoleDodge() * (pEffect->getImpactRate()*0.01f-1)));
 		}break;
 	case HitRate:
 		{
-			pAlive->setHit(pAlive->getHit() + (pAlive->role->hit * (pEffect->getImpactRate()*0.01f-1)));
+			pAlive->setHit(pAlive->getHit() + (pAlive->getBaseData()->getRoleHit() * (pEffect->getImpactRate()*0.01f-1)));
 		}break;
 	case CritRate:
 		{
-			pAlive->setCrit(pAlive->getCrit() + (pAlive->role->crit * (pEffect->getImpactRate()*0.01f-1)));
+			pAlive->setCrit(pAlive->getCrit() + (pAlive->getBaseData()->getRoleCrit() * (pEffect->getImpactRate()*0.01f-1)));
 		}break;
 	case HpMaxRate:
 		{
-			pAlive->setMaxHp(pAlive->getMaxHp()+(pAlive->role->hp * (pEffect->getImpactRate()*0.01f-1)));
+			pAlive->setMaxHp(pAlive->getMaxHp()+(pAlive->getBaseData()->getRoleHp() * (pEffect->getImpactRate()*0.01f-1)));
 			pAlive->setHp(pAlive->getMaxHp());
 		}break;
 	default:

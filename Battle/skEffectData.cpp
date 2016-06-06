@@ -59,5 +59,8 @@ void skEffectData::clearBuffData()
 	}
 	mBuffVector.clear();
 }
-
-bool EffectSort(skEffectData Effect1,skEffectData Effect2){return Effect1.getGroupPos()<Effect2.getGroupPos();}
+//ÉýÐò
+bool EffectSort(const skEffectData* Effect1,const skEffectData* Effect2)
+{
+	return Effect1->getGroupPos() < Effect2->getGroupPos();
+}

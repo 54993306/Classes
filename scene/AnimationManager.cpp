@@ -40,20 +40,20 @@ CCAnimation* ActionModel::getAnimation(const char* action /*=nullptr*/)
 	{
 		switch (m_type)
 		{
-		case EF_Skill:
+		case eEffectSkill:
 			{
 				int index = 10000 + i;
 				sprintf(str,"%s_%d.png",m_name.c_str(),index);
 			}break;
-		case EF_PNG:
+		case eEffectPNG:
 			{
 				sprintf(str,"%s_%d.png",m_name.c_str(),i);
 			}break;
-		case EF_JPG:
+		case eEffectJPG:
 			{
 				sprintf(str,"%s_%d.jpg",m_name.c_str(),i);
 			}break;
-		case RoleType:
+		case eFrameRole:
 			{
 				CCArray* animFrames = CCArray::create();
 				CCSpriteFrameCache *cache = CCSpriteFrameCache::sharedSpriteFrameCache(); 
@@ -166,7 +166,7 @@ void AnimationManager::parseRoleAction(const char* name)
 		action->setActionFrames(actionKey[j],totalFrames);		//每个动作对应的帧数
 	}
 	action->setName(name);
-	action->setType(RoleType);
+	action->setType(eFrameRole);
 	addAction(action);											//添加到管理器当中
 }
 //特效解析
@@ -192,14 +192,14 @@ void AnimationManager::ParseAnimation(const char* name,int type /*=EF_Skill*/)
 	{
 		switch (type)
 		{
-		case EF_Skill:
+		case eEffectSkill:
 			{
 				int index = 10000 + i;					//所有特效的命名都是从1万开始的
 				sprintf(str,"%s_%d.png",name,index);
 			}break;
-		case EF_PNG:	{		sprintf(str,"%s_%d.png",name,i+1);    }  break;		//图片从1开始
-		case EF_JPG:	{		sprintf(str,"%s_%d.jpg",name,i+1);    }  break;
-		case RoleType:
+		case eEffectPNG:	{		sprintf(str,"%s_%d.png",name,i+1);    }  break;		//图片从1开始
+		case eEffectJPG:	{		sprintf(str,"%s_%d.jpg",name,i+1);    }  break;
+		case eFrameRole:
 			{
 				parseRoleAction(name);
 				return;

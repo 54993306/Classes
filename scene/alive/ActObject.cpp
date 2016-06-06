@@ -18,6 +18,7 @@
 #include "Battle/BattleMessage.h"
 #include "warscene/BattleTools.h"
 #include "Battle/MoveObject.h"
+#include "Battle/RoleBaseData.h"
 //#include <spine/AnimationState.h>
 ActObject::ActObject()
 	:m_MapData(nullptr),m_armatureEventData(nullptr), m_lastFrame(-1),m_Reset(false)
@@ -265,8 +266,8 @@ void ActObject::attackActionEnd()
 		NOTIFICATION->postNotification(B_CritEnd,m_Alive);
 	if (m_Alive->getHp()<=0)
 		this->AliveDie();									//释放完技能后自己死亡的情况处理
-	else if (m_Alive->role->CallType == AutoSkill||
-		m_Alive->role->CallType == OnlyOnce)				//陨石类释放攻击后死亡OnlyOnces
+	else if (m_Alive->getBaseData()->getCallType() == AutoSkill||
+		m_Alive->getBaseData()->getCallType() == OnlyOnce)				//陨石类释放攻击后死亡OnlyOnces
 		this->AliveDie();	
 	AtkEnd_Event();	
 }
@@ -507,7 +508,7 @@ void ActObject::roleMoveSpeed()
 	CCPoint p = m_MapData->getPoint(MoveGrid) + getoffs();							//目标点
 	if (firstBattle(p))
 		return ;
-	if (m_Alive->role->row==1&&m_Alive->role->col==1&&m_Enemy)
+	if (m_Alive->getBaseData()->getRoleRow()==1&&m_Alive->getBaseData()->getRoleCol()==1&&m_Enemy)
 		p = CCPoint(p.x+CCRANDOM_0_1()*15+5,p.y);									//防止武将叠在一起
 	walkDirection(p);
 	this->setSpeed((p - getPosition())/getMoveTime());
@@ -543,7 +544,7 @@ void ActObject::initMoveObject( CCNode* pMoveParent )
 		m_Alive->getCallType() != CommonType)
 		return;
 	MoveObject* tMoveObj = MoveObject::create();
-	tMoveObj->setRowCol(m_Alive->role->row,m_Alive->role->col);
+	tMoveObj->setRowCol(m_Alive->getBaseData()->getRoleRow(),m_Alive->getBaseData()->getRoleCol());
 	tMoveObj->setMoveAlive(m_Alive);
 	tMoveObj->setOffs(getoffs().x,getoffs().y);
 	tMoveObj->initMoveSprite();

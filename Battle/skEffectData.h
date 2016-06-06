@@ -56,5 +56,5 @@ private:
 	std::vector<RoleBuffData*> mBuffVector;
 };
 
-bool EffectSort(skEffectData Effect1,skEffectData Effect2);//{return Effect1.pos>Effect2.pos;}
+bool EffectSort(const skEffectData* Effect1,const skEffectData* Effect2);//{return Effect1.pos>Effect2.pos;}
 #endif
