@@ -326,7 +326,7 @@ const RoleSkill* WarAlive::getCurrSkill()
 		{
 			return getBaseData()->getActiveSkill();
 		}else{
-			CCLOG("[ *ERROR ] WarManager::getSkill CritSKILL IS NULL");
+			CCLOG("[ *ERROR ] WarAlive::getCurrSkill CritSKILL IS NULL");
 			return getBaseData()->getNormalSkill();
 		}
 	}else if (getSpeAtk())
@@ -335,7 +335,7 @@ const RoleSkill* WarAlive::getCurrSkill()
 		{
 			return getBaseData()->getSpecialSkill();
 		}else{
-			CCLOG("[ *ERROR ] WarManager::getSkill SpecialSKILL IS NULL");
+			CCLOG("[ *ERROR ] WarAlive::getCurrSkill SpecialSKILL IS NULL");
 			return getBaseData()->getNormalSkill();
 		}
 	}else{
@@ -345,14 +345,14 @@ const RoleSkill* WarAlive::getCurrSkill()
 
 const skEffectData* WarAlive::getCurrEffect()
 {
-	if (getGroupIndex() < getCurrSkill()->getListSize())
-		if ( getCurrSkill()->getEffectSize(getGroupIndex())>getEffIndex())
-			return getCurrSkill()->getIndexEffect(getGroupIndex(),getEffIndex());
+	if (this->getGroupIndex() < this->getCurrSkill()->getListSize())
+		if ( this->getCurrSkill()->getEffectSize(getGroupIndex())>getEffIndex())
+			return this->getCurrSkill()->getIndexEffect(getGroupIndex(),getEffIndex());
 		else
-			CCLOG("[ *ERROR ] EffIndex > EffectListSize  AliveID=%d mode=%d",getAliveID(),getBaseData()->getRoleModel());
+			CCLOG("[ *ERROR ] WarAlive::getCurrEffect EffIndex > EffectListSize  AliveID=%d mode=%d",getAliveID(),getBaseData()->getRoleModel());
 	else{
-		CCLOG("[ *ERROR ]Skill Effect Is NULL  AliveID=%d mode=%d EffectGroup=%d",getAliveID(),getBaseData()->getRoleModel(),getGroupIndex());
-		setGroupIndex(0);
+		CCLOG("[ *ERROR ]WarAlive::getCurrEffect NULL  AliveID=%d mode=%d EffectGroup=%d",getAliveID(),getBaseData()->getRoleModel(),getGroupIndex());
+		this->setGroupIndex(0);
 	}	
 	return nullptr;
 	CCTextureCache::sharedTextureCache()->dumpCachedTextureInfo();

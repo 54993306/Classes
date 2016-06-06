@@ -38,6 +38,7 @@ void RoleSkill::readData(const protos::common::Skill* pSkillData)
 	this->setAffectRatio(pSkillData->pro_rate());
 	this->setSkillLevel(pSkillData->level());
 	this->setMoveRole(pSkillData->move());
+	this->initEffectData(pSkillData);
 }
 
 void RoleSkill::initEffectData( const protos::common::Skill* pSkillData )
