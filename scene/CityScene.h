@@ -1,10 +1,12 @@
 ﻿#ifndef _CITY_SCENE_H_
 #define _CITY_SCENE_H_
 #include "AppUI.h"
-#include "alive/AliveDefine.h"
-//#include "layer/LayerDefine.h"
+//#include "alive/AliveDefine.h"
 #include<map>
 using namespace std;
+namespace BattleSpace{
+	class ActObject;
+}
 class CityScene : public CScene,public CCTargetedTouchDelegate 
 {
 public:
@@ -19,7 +21,7 @@ public:
 	void initScene();
 
 	void roleMoveToPos(int roleId, float x, float y);
-	ActObject* addAlive(unsigned int aliveID);//增加角色对象
+	BattleSpace::ActObject* addAlive(unsigned int aliveID);//增加角色对象
 	void removeAlive(unsigned int aliveID);//删除角色
 	void updateRoleProperty(const TMessage& tMsg);//更新角色属性
 	void ProcessMsg(int type, google::protobuf::Message *msg);
@@ -40,7 +42,7 @@ protected:
 protected:
 	//CCTMXTiledMap* m_map;
 	CCSprite* m_map;
-	ActObject* m_hero;
+	BattleSpace::ActObject* m_hero;
 	CCPoint m_desPos;
 	CCPoint m_real;
 	float m_fdetal;
@@ -52,6 +54,5 @@ protected:
 	//SetPanel* m_setPanel;
 	CCPoint m_cloudPos;
 	CCPoint m_cloudAPos;
-
 };
 #endif // !_CITY_SCENE_H_

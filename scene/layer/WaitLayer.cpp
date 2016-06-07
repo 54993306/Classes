@@ -1,6 +1,7 @@
 ﻿#include "WaitLayer.h"
 #include "common/color.h"
-
+#include "scene/effect/EffectObject.h"
+using namespace BattleSpace;
 bool WaitLayer::init()
 {
 	if (CPopupBox::init())

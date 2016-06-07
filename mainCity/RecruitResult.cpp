@@ -32,7 +32,7 @@ RecruitResult::RecruitResult()
 	,m_pItemInfo(nullptr)
 	,m_bIsSuccess(false)
 {}
-
+using namespace BattleSpace;
 RecruitResult::~RecruitResult()
 {
 	m_LotteryResult.clear();

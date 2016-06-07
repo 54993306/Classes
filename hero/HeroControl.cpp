@@ -441,7 +441,7 @@ void CHeroControl::processEvolveMsg(int type, google::protobuf::Message *msg)
 		{
 			HeroEvolRes *res = (HeroEvolRes*)msg;
 			CEvolResult evoRes; 
-			evoRes.read(*res);
+			evoRes.read(res);
 			if (evoRes.result==1)
 			{
 				if (res->has_hero())
@@ -640,6 +640,6 @@ void CHeroControl::updateHeroValue(CHero * hero)
 }
 
 void CHeroControl::setIsHideOperation(bool isHide)
-{
+{ 
 	m_isShowOpr = isHide;
 }

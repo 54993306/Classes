@@ -29,7 +29,7 @@ bool SortCComposeData(const CComposeData& data1, const CComposeData& data2)
 {
 	return data1.isCanGet>data2.isCanGet;
 }
-
+using namespace BattleSpace;
 
 CCompaseLayer::CCompaseLayer():m_selectHero(0),m_selectItem(nullptr),m_selectIndex(0),m_armorId(0),m_switchType(0)
 {

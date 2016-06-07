@@ -7,7 +7,7 @@
 #include "CCTK/scenemanager.h"
 #include "GMessage.h"
 #include "tools/UICloneMgr.h"
-
+using namespace BattleSpace;
 CGuideLayer::CGuideLayer()
 {
 

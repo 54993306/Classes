@@ -25,6 +25,8 @@
 #include "Global.h"
 #include "model/MapManager.h"
 #include "Battle/BattleMessage.h"
+namespace BattleSpace{
+	
 WarAssist::WarAssist()
 	:m_alive(nullptr)
 	,m_ui(nullptr)
@@ -383,3 +385,5 @@ void WarAssist::frameEvent( CCBone *pBone, const char *str, int a, int b )
 		PlayEffectSound(SFX_543);
 	}
 }
+
+};

@@ -25,7 +25,7 @@ CShopBuy::CShopBuy()
 {
 
 }
-
+using namespace BattleSpace	;
 
 bool CShopBuy::init()
 {

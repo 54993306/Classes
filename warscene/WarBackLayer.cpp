@@ -16,7 +16,7 @@ WarBackLayer::WarBackLayer()
 	m_ui = nullptr;
 	m_bSoundLock = false;
 }
-
+using namespace BattleSpace;
 bool WarBackLayer::init()
 {
 	bool res = BaseLayer::init();

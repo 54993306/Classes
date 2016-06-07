@@ -7,6 +7,7 @@
 #include "cocoa/CCArray.h"
 #include "common/CommonFunction.h"
 #include "DataPool.h"
+using namespace BattleSpace;
 
 DataCenter* DataCenter::m_dataCenter = nullptr;
 

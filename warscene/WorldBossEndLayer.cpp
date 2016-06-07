@@ -27,7 +27,7 @@ WorldBossEndLayer::WorldBossEndLayer()
 
 WorldBossEndLayer::~WorldBossEndLayer(){
 }
-
+using namespace BattleSpace;
 bool WorldBossEndLayer::init(){
 
 	bool res = BaseLayer::init();

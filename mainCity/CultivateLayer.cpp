@@ -30,6 +30,7 @@ bool CCultivateLayer::init()
 	}
 	return false;
 }
+using namespace BattleSpace;
 
 void CCultivateLayer::onEnter()
 { 

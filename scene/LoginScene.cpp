@@ -22,6 +22,7 @@
 #include "update/CDownloadPackage.h"
 #include "ApplicationDefine.h"
 #include "scene/AnimationManager.h"
+#include "scene/effect/EffectObject.h"
 #include "Resources.h"
 #include "ApplicationDefine.h"
 #include "common/RollLabel.h"
@@ -63,6 +64,7 @@ LoginScene::LoginScene():
 
 }
 
+using namespace BattleSpace;
 
 LoginScene::~LoginScene()
 {

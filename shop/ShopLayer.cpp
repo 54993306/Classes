@@ -29,7 +29,7 @@ CShopLayer::CShopLayer():
 
 }
 
-
+using namespace BattleSpace;
 bool CShopLayer::init()
 {
 	if (BaseLayer::init())

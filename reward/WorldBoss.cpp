@@ -12,7 +12,7 @@
 #include "warscene/ArmatureEventDataMgr.h"
 #include "tools/CCShake.h"
 #include "scene/alive/ActionDef.h"
-
+using namespace BattleSpace;
 CWorldBoss::CWorldBoss():
 m_ui(nullptr),m_pBossLayer(nullptr), m_pRuleLayer(nullptr),m_pShopLayer(nullptr),m_iType(WorldBossTabNull)
 {

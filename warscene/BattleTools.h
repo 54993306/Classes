@@ -14,26 +14,27 @@
  *
  *
  *************************************************************/
+namespace BattleSpace{
+	class WarAlive;
+	class RoleSkill;
+	class skEffectData;
 
-class WarAlive;
-class RoleSkill;
-class skEffectData;
 
+	bool RowUp_InBoundary(int originRow,int aimRow);
+	bool RowDown_InBoundary(int originRow,int aimRow);
+	bool ColUp_InBoundary(int originCol,int aimCol);
+	bool ColDown_InBoundary(int originCol,int aimCol);
+	int getNewRow(int originRow ,int aimRow ,int aim_row);
+	int getHeroNewCol(int originCol ,int aimCol ,int aim_col);
+	int getMonsterNewCol(int originCol ,int aimCol ,int aim_col);
+	void CallAliveByFixRange( WarAlive*father , WarAlive*child );
 
-bool RowUp_InBoundary(int originRow,int aimRow);
-bool RowDown_InBoundary(int originRow,int aimRow);
-bool ColUp_InBoundary(int originCol,int aimCol);
-bool ColDown_InBoundary(int originCol,int aimCol);
-int getNewRow(int originRow ,int aimRow ,int aim_row);
-int getHeroNewCol(int originCol ,int aimCol ,int aim_col);
-int getMonsterNewCol(int originCol ,int aimCol ,int aim_col);
-void CallAliveByFixRange( WarAlive*father , WarAlive*child );
+	void VectorRemoveRepeat(vector<int>& Vec);
 
-void VectorRemoveRepeat(vector<int>& Vec);
+	void VectorRemoveRepeat(vector<WarAlive*> &pVector);
 
-void VectorRemoveRepeat(vector<WarAlive*> &pVector);
+	void VectorSortAliveHp(vector<WarAlive*> &pVector);
 
-void VectorSortAliveHp(vector<WarAlive*> &pVector);
-
-void PlaySound_Event(int id);
+	void PlaySound_Event(int id);
+};
 #endif

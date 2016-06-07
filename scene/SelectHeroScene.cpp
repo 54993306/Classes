@@ -23,7 +23,7 @@ SelectHeroScene::SelectHeroScene()
 	m_lastFrame = 0;
 	m_armatureEventDataMgr = nullptr;
 }
-
+using namespace BattleSpace;
 void SelectHeroScene::onCreate()
 {
 	CWidgetWindow* layout = CWidgetWindow::create();

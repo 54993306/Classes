@@ -27,7 +27,7 @@ CSelectArmy::~CSelectArmy()
 {
 	CC_SAFE_RELEASE(m_cell);
 }
-
+using namespace BattleSpace	;
 CSelectArmy::CSelectArmy()
 	:m_selectType(0),m_currPage(0),m_selectFriend(NULL),m_frdId(0),
 	m_friendId(0), m_stageId(0), m_questId(0), m_pActiveLay(nullptr),

@@ -15,23 +15,24 @@
  *
 *************************************************************/
 #include "cocos2d.h"
-class WarAlive;
-class MoveObject : public cocos2d::CCNode
-{
-public:
-	MoveObject();
-	void initMoveSprite();
-	CREATE_FUNC(MoveObject);
-	CC_SYNTHESIZE(WarAlive*,m_Alive,MoveAlive);
-	CC_PROPERTY(int,m_grid,grid);
-	void setRowCol(int pRow,int pCol);
-	void setOffs(float pOffsX,float pOffsY);
-	std::vector<int> grids;
-private:
-	int m_Row;
-	int m_Col;
-	float m_OffsX;
-	float m_OffsY;
+namespace BattleSpace{
+	class WarAlive;
+	class MoveObject : public cocos2d::CCNode
+	{
+	public:
+		MoveObject();
+		void initMoveSprite();
+		CREATE_FUNC(MoveObject);
+		CC_SYNTHESIZE(WarAlive*,m_Alive,MoveAlive);
+		CC_PROPERTY(int,m_grid,grid);
+		void setRowCol(int pRow,int pCol);
+		void setOffs(float pOffsX,float pOffsY);
+		std::vector<int> grids;
+	private:
+		int m_Row;
+		int m_Col;
+		float m_OffsX;
+		float m_OffsY;
+	};
 };
-
 #endif

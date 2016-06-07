@@ -21,7 +21,7 @@
 #include "Resources.h"
 //#include <thread>
 //#include <future>
-
+using namespace BattleSpace;
 bool SortActivity(const CActivity& activity1, const CActivity& activity2)
 {
 	return activity1.iStatus<activity2.iStatus;

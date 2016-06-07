@@ -14,7 +14,7 @@
 #include "HeroDetail.h"
 #include "HeroMove.h"
 #include "HeroEvolve.h"
-#include "HeroData.h"
+#include "hero/HeroData.h"
 #include "HeroExp.h"
 USING_NS_CC;
 

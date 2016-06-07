@@ -18,18 +18,17 @@ class CWRuleLayer;
 class CWShopLayer;
 class ArmatureEventDataMgr;
 class ArmatureEventData;
-
 class CWorldBoss: public BaseLayer
 {
 public:
 	CWorldBoss();
 	~CWorldBoss();
-	
+
 	CREATE_LAYER(CWorldBoss);
 
-    virtual bool init();
-    void onEnter();
-    void onExit();
+	virtual bool init();
+	void onEnter();
+	void onExit();
 
 	void movementCallBack(CCArmature *armature, MovementEventType type, const char *data);
 

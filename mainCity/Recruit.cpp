@@ -31,6 +31,7 @@ CRecruit::CRecruit()
 	:m_Recruit(false),m_HeroType(0),m_ui(nullptr),m_RecruiLayer(nullptr)
 	,m_SendType(0), m_pMonsterInfo(nullptr),m_pItemInfo(nullptr)
 {}
+using namespace BattleSpace;
 CRecruit::~CRecruit()
 {
 	m_LotteryData.clear();

@@ -2,8 +2,9 @@
 #define __WAITLAYER_
 
 #include "AppUI.h"
-#include "scene/effect/EffectObject.h"
-
+namespace BattleSpace{
+	class EffectObject;
+}
 class WaitLayer: public CPopupBox
 {
 public:
@@ -19,6 +20,6 @@ protected:
 	void showSelf(float delt);
 private:
 	CLayout *m_ui;
-	EffectObject *m_loadEffect;
+	BattleSpace::EffectObject *m_loadEffect;
 };
 #endif // !__WAITLAYER_#

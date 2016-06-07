@@ -17,7 +17,7 @@
 
 
 int CRewardLayer::TableViewOffSet = 0;
-
+using namespace BattleSpace;
 bool CRewardLayer::init()
 {
 	if (BaseLayer::init())

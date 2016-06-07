@@ -21,7 +21,7 @@
 #include "mainCity/CNewHero.h"
 #include "common/CGameSound.h"
 #include "Resources.h"
-
+using namespace BattleSpace;
 CHeroEvolve::CHeroEvolve()
 	:m_iType(1),m_itemNeedNum(0), m_bAskNextQualityHero(false),m_pNewHero(nullptr),m_pHeroArmature(nullptr)
 {

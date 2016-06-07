@@ -3,7 +3,7 @@
 #include "AppUI.h"
 #include "scene/layer/LayerManager.h"
 #include "mainCity/CityData.h"
-#include "HeroData.h"
+#include "hero/HeroData.h"
 
 class CHeroCall: public BaseLayer
 {

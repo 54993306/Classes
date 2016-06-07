@@ -1,7 +1,7 @@
 ﻿#include "bagData.h"
 #include "scene/AnimationManager.h"
 #include "common/CommonFunction.h"
-
+using namespace BattleSpace;
 CPrize::CPrize():type(0), id(0), num(0), quality(0), thumb(0), color(0)
 {
 

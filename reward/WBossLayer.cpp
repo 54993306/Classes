@@ -19,7 +19,7 @@
 #include "reward/WorldBoss.h"
 #include "scene/alive/ActionDef.h"
 #include "warscene/EffectData.h"
-
+using namespace BattleSpace;
 bool WBossSortWarPrize(const Prize& data1, const Prize& data2)
 {
 	return data1.type()<data2.type();
@@ -718,7 +718,7 @@ void CWBossLayer::showStory( CCObject* pSender )
 
 	if(m_pStoryData==nullptr)
 	{
-		m_pStoryData = new StoryData;
+		m_pStoryData = new BattleSpace::StoryData;
 		CC_SAFE_RETAIN(m_pStoryData);
 		std::string sFile = CCString::createWithFormat("csv/story/boss_%d.json", m_pBoss.thumb)->m_sString;
 		std::string sFullPathName = CCFileUtils::sharedFileUtils()->fullPathForFilename(sFile.c_str());
@@ -726,10 +726,10 @@ void CWBossLayer::showStory( CCObject* pSender )
 		{
 			sFile = "csv/story/boss_1101.json";
 		}
-		m_pStoryData->LoadFile(sFile.c_str(), (int)StoryType::beginStory);
+		m_pStoryData->LoadFile(sFile.c_str(), (int)BattleSpace::StoryType::eBeginStory);
 	}
 
-	pLayer->CreateStoryWithStoryData(CCInteger::create((int)StoryType::beginStory), m_pStoryData);
+	pLayer->CreateStoryWithStoryData(CCInteger::create((int)BattleSpace::StoryType::eBeginStory), m_pStoryData);
 
 	pLayer->hideJumpBtn();
 }

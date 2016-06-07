@@ -24,7 +24,7 @@
 #include "common/CCRollLabelAction.h"
 
 const char WarWinLayer::WAR_WIN_RESULT[] = "war_win_show";
-
+using namespace BattleSpace;
 WarWinLayer::WarWinLayer()
 	:m_pMonsterInfo(nullptr)
 	,m_pItemInfo(nullptr)

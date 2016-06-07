@@ -33,7 +33,7 @@
 USING_NS_CC;
 using namespace CocosDenshion;
 using namespace cn::sharesdk;
-
+using namespace BattleSpace;
 AppDelegate::AppDelegate()
 {
 

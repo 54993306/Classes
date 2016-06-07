@@ -22,7 +22,7 @@ LoadScene::LoadScene()
 ,m_fPercent(0)
 ,m_iPlistIndex(0)
 {}
-
+using namespace BattleSpace;
 void LoadScene::onCreate()
 {
 	CWidgetWindow* layout = CWidgetWindow::create();

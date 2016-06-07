@@ -27,7 +27,7 @@ CRoleUpdate::CRoleUpdate()
 {
 
 }
-
+using namespace BattleSpace;
 bool CRoleUpdate::init()
 {
 	if (BaseLayer::init())

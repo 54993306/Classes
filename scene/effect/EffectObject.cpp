@@ -6,192 +6,193 @@
 #include "model/WarManager.h"
 #include "common/CGameSound.h"
 #include "Battle/BattleMessage.h"
+namespace BattleSpace{
+	EffectObject::EffectObject()
+		:m_effect(nullptr),m_TotalTime(0),m_Playtime(0),m_Type(PLAYERTYPE::once),m_Music(0)
+		,m_model(""),m_skewing(false),m_bIsNullEffect(false),m_Delaytime(0),m_LoopNum(1)
+		,m_DurationTime(0),m_Shake(false),m_LoopInterval(0)
+	{}
+	EffectObject::~EffectObject(){}
 
-EffectObject::EffectObject()
-	:m_effect(nullptr),m_TotalTime(0),m_Playtime(0),m_Type(PLAYERTYPE::once),m_Music(0)
-	,m_model(""),m_skewing(false),m_bIsNullEffect(false),m_Delaytime(0),m_LoopNum(1)
-	,m_DurationTime(0),m_Shake(false),m_LoopInterval(0)
-{}
-EffectObject::~EffectObject(){}
-
-EffectObject* EffectObject::create(const char* model,PLAYERTYPE type /*=EffectType::once*/)
-{
-	EffectObject* pRet = new EffectObject();
-	if( pRet && pRet->init() )
+	EffectObject* EffectObject::create(const char* model,PLAYERTYPE type /*=EffectType::once*/)
 	{
-		pRet->m_model = model;
-		pRet->m_Type = type;
-		pRet->autorelease();
-		return pRet;
-	}else{
-		delete pRet;
-		pRet = nullptr;
-		return nullptr;
-	}
-}
-
-bool EffectObject::init()
-{
-	bool bset = false;
-	do{
-		m_effect = CCSprite::create();					
-		bset = true;
-		this->addChild(m_effect);
-	} while (0);
-	return bset;
-}
-
-void EffectObject::onEnter()
-{
-	CCNode::onEnter();
-	if (strcmp(m_model.c_str(),"0")==0)
-	{
-		this->unscheduleAllSelectors();
-		this->removeFromParentAndCleanup(true);
-	}
-	if (m_skewing)
-	{
-		//修改这个类，不要以m_model为索引，同样的特效可能有不同的效果,特效位置,特效循环次数,音效次数,音效开始播放时间等
-		SpecialEffectInfo* spefdata = AnimationManager::sharedAction()->getSpcialEffectData()->getspEff(atoi(m_model.c_str())); 
-		if (spefdata)
+		EffectObject* pRet = new EffectObject();
+		if( pRet && pRet->init() )
 		{
-			m_effect->setPosition(ccp(spefdata->getp_x(),spefdata->getp_y()));
-			m_effect->setAnchorPoint(ccp(spefdata->getAcp_x(),spefdata->getAcp_y()));
-			m_effect->setScale(spefdata->getscale());
+			pRet->m_model = model;
+			pRet->m_Type = type;
+			pRet->autorelease();
+			return pRet;
+		}else{
+			delete pRet;
+			pRet = nullptr;
+			return nullptr;
 		}
 	}
-	play();
-}
-//特效帧数控制音效播放，控制音效播放次数，播放位置
-void EffectObject::play()
-{
-	CCAnimation* Animation = AnimationManager::sharedAction()->getAnimation(m_model.c_str());//获取特效动画的区域赋值给特效对象
-	if( Animation == nullptr )
+
+	bool EffectObject::init()
 	{
-		this->scheduleUpdate();
-		m_bIsNullEffect = true;
-		return;
+		bool bset = false;
+		do{
+			m_effect = CCSprite::create();					
+			bset = true;
+			this->addChild(m_effect);
+		} while (0);
+		return bset;
 	}
-	CCAnimate* animate = CCAnimate::create(Animation);
-	switch (m_Type)
+
+	void EffectObject::onEnter()
 	{
-	case PLAYERTYPE::once:
+		CCNode::onEnter();
+		if (strcmp(m_model.c_str(),"0")==0)
 		{
-			this->scheduleUpdate();
-			animate->setTag((int)PLAYERTYPE::Repeat);
-			m_effect->runAction(animate);
-			if (m_Music)
-				playeEffectMusic(m_Music);
-			m_TotalTime = Animation->getDuration();
-		}break;
-	case PLAYERTYPE::Repeat:
+			this->unscheduleAllSelectors();
+			this->removeFromParentAndCleanup(true);
+		}
+		if (m_skewing)
 		{
-			CCAction* Action = CCRepeatForever::create(animate);
-			Action->setTag((int)PLAYERTYPE::Repeat);
-			m_effect->runAction(Action);
-		}break;
-	case PLAYERTYPE::RepeatNum:
-		{
-			this->scheduleUpdate();
-			CCAction* Action = CCRepeat::create(animate,m_LoopNum);
-			Action->setTag((int)PLAYERTYPE::Repeat);
-			m_effect->runAction(Action);
-			m_TotalTime = Animation->getDuration()*m_LoopNum;
-		}break;
-	case PLAYERTYPE::Delay:
-		{
-			CCDelayTime* delay = CCDelayTime::create(m_Delaytime);
-			CCAction* seq = nullptr;
-			CCDelayTime* Interval = CCDelayTime::create(m_LoopInterval);
-			if (m_Shake)
+			//修改这个类，不要以m_model为索引，同样的特效可能有不同的效果,特效位置,特效循环次数,音效次数,音效开始播放时间等
+			SpecialEffectInfo* spefdata = AnimationManager::sharedAction()->getSpcialEffectData()->getspEff(atoi(m_model.c_str())); 
+			if (spefdata)
 			{
-				CCCallFunc* func = CCCallFunc::create(this,callfunc_selector(EffectObject::ShakeMessage));
-				CCCallFunc* func1 = CCCallFunc::create(this,callfunc_selector(EffectObject::PlayerMusic));
-				CCSequence* pSeq = CCSequence::create(animate/*,func*/,Interval,nullptr);									//每次重复都震动
-				seq = CCSequence::create(delay,func,CCRepeat::create(pSeq,m_LoopNum),CCRemoveSelf::create(),nullptr);		//只震动一次然后播重复动作
-			}else{
-				CCSequence* pSeq = CCSequence::create(animate,Interval,nullptr);
-				seq = CCSequence::create(delay,CCRepeat::create(pSeq,m_LoopNum),CCRemoveSelf::create(),nullptr);
+				m_effect->setPosition(ccp(spefdata->getp_x(),spefdata->getp_y()));
+				m_effect->setAnchorPoint(ccp(spefdata->getAcp_x(),spefdata->getAcp_y()));
+				m_effect->setScale(spefdata->getscale());
 			}
-			seq->setTag((int)PLAYERTYPE::Repeat);
-			m_effect->runAction(seq);
-			m_TotalTime = Animation->getDuration()*m_LoopNum+m_Delaytime;
-		}break;
-	case PLAYERTYPE::Duration:
-		{
-			CCAction* Action = CCRepeatForever::create(animate);
-			Action->setTag((int)PLAYERTYPE::Repeat);
-			m_effect->runAction(Action);
-			m_TotalTime = m_DurationTime;
-			this->scheduleUpdate();
-		}break;
-	default:
-		break;
-	}
-}
-//非循环类特效播放完毕自动删除
-void EffectObject::update(float dt)
-{
-	m_Playtime += dt;
-	if (this->isActionDone() || m_bIsNullEffect ||
-		(m_Type == PLAYERTYPE::Duration && m_Playtime >= m_DurationTime))
-	{
-		m_effect->stopAllActions();
-		this->unscheduleAllSelectors();
-		this->removeFromParentAndCleanup(true);
-	}
-}
-
-bool EffectObject::isActionDone()
-{
-	bool done = false;
-	do{
-		if (!m_effect)
-		{
-			CCLOG("ERROR:EffectObject::isDone()  m_effect IS NULL");
-			return true;
 		}
-		if (m_Type == PLAYERTYPE::Repeat)
-			return done;
-		CCAction* Action = m_effect->getActionByTag((int)PLAYERTYPE::Repeat);
-		if(!Action || Action->isDone())		//CCAction的isDone方法被它的不同子类重写过
+		play();
+	}
+	//特效帧数控制音效播放，控制音效播放次数，播放位置
+	void EffectObject::play()
+	{
+		CCAnimation* Animation = AnimationManager::sharedAction()->getAnimation(m_model.c_str());//获取特效动画的区域赋值给特效对象
+		if( Animation == nullptr )
 		{
-			done = true;
+			this->scheduleUpdate();
+			m_bIsNullEffect = true;
+			return;
+		}
+		CCAnimate* animate = CCAnimate::create(Animation);
+		switch (m_Type)
+		{
+		case PLAYERTYPE::once:
+			{
+				this->scheduleUpdate();
+				animate->setTag((int)PLAYERTYPE::Repeat);
+				m_effect->runAction(animate);
+				if (m_Music)
+					playeEffectMusic(m_Music);
+				m_TotalTime = Animation->getDuration();
+			}break;
+		case PLAYERTYPE::Repeat:
+			{
+				CCAction* Action = CCRepeatForever::create(animate);
+				Action->setTag((int)PLAYERTYPE::Repeat);
+				m_effect->runAction(Action);
+			}break;
+		case PLAYERTYPE::RepeatNum:
+			{
+				this->scheduleUpdate();
+				CCAction* Action = CCRepeat::create(animate,m_LoopNum);
+				Action->setTag((int)PLAYERTYPE::Repeat);
+				m_effect->runAction(Action);
+				m_TotalTime = Animation->getDuration()*m_LoopNum;
+			}break;
+		case PLAYERTYPE::Delay:
+			{
+				CCDelayTime* delay = CCDelayTime::create(m_Delaytime);
+				CCAction* seq = nullptr;
+				CCDelayTime* Interval = CCDelayTime::create(m_LoopInterval);
+				if (m_Shake)
+				{
+					CCCallFunc* func = CCCallFunc::create(this,callfunc_selector(EffectObject::ShakeMessage));
+					CCCallFunc* func1 = CCCallFunc::create(this,callfunc_selector(EffectObject::PlayerMusic));
+					CCSequence* pSeq = CCSequence::create(animate/*,func*/,Interval,nullptr);									//每次重复都震动
+					seq = CCSequence::create(delay,func,CCRepeat::create(pSeq,m_LoopNum),CCRemoveSelf::create(),nullptr);		//只震动一次然后播重复动作
+				}else{
+					CCSequence* pSeq = CCSequence::create(animate,Interval,nullptr);
+					seq = CCSequence::create(delay,CCRepeat::create(pSeq,m_LoopNum),CCRemoveSelf::create(),nullptr);
+				}
+				seq->setTag((int)PLAYERTYPE::Repeat);
+				m_effect->runAction(seq);
+				m_TotalTime = Animation->getDuration()*m_LoopNum+m_Delaytime;
+			}break;
+		case PLAYERTYPE::Duration:
+			{
+				CCAction* Action = CCRepeatForever::create(animate);
+				Action->setTag((int)PLAYERTYPE::Repeat);
+				m_effect->runAction(Action);
+				m_TotalTime = m_DurationTime;
+				this->scheduleUpdate();
+			}break;
+		default:
 			break;
 		}
-	} while (0);
-	return done;
-}
+	}
+	//非循环类特效播放完毕自动删除
+	void EffectObject::update(float dt)
+	{
+		m_Playtime += dt;
+		if (this->isActionDone() || m_bIsNullEffect ||
+			(m_Type == PLAYERTYPE::Duration && m_Playtime >= m_DurationTime))
+		{
+			m_effect->stopAllActions();
+			this->unscheduleAllSelectors();
+			this->removeFromParentAndCleanup(true);
+		}
+	}
 
-void EffectObject::setEffAnchorPoint(float x, float y)
-{
-	m_effect->setAnchorPoint(ccp(x,y));
-}
+	bool EffectObject::isActionDone()
+	{
+		bool done = false;
+		do{
+			if (!m_effect)
+			{
+				CCLOG("ERROR:EffectObject::isDone()  m_effect IS NULL");
+				return true;
+			}
+			if (m_Type == PLAYERTYPE::Repeat)
+				return done;
+			CCAction* Action = m_effect->getActionByTag((int)PLAYERTYPE::Repeat);
+			if(!Action || Action->isDone())		//CCAction的isDone方法被它的不同子类重写过
+			{
+				done = true;
+				break;
+			}
+		} while (0);
+		return done;
+	}
 
-void EffectObject::playeEffectMusic(int musicId)
-{
-	if (!musicId)return;
-	char musicAds[60] = {0};
+	void EffectObject::setEffAnchorPoint(float x, float y)
+	{
+		m_effect->setAnchorPoint(ccp(x,y));
+	}
+
+	void EffectObject::playeEffectMusic(int musicId)
+	{
+		if (!musicId)return;
+		char musicAds[60] = {0};
 #if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
-	sprintf(musicAds,"SFX/Test/%d.mp3",musicId);
+		sprintf(musicAds,"SFX/Test/%d.mp3",musicId);
 #else
-	sprintf(musicAds,"SFX/%d.ogg",musicId);
+		sprintf(musicAds,"SFX/%d.ogg",musicId);
 #endif
-	PlayEffectSound(musicAds);				//播放效果音效
-}
+		PlayEffectSound(musicAds);				//播放效果音效
+	}
 
-void EffectObject::setShaderEffect( CCGLProgram* pGl )
-{
-	m_effect->setShaderProgram(pGl);
-}
+	void EffectObject::setShaderEffect( CCGLProgram* pGl )
+	{
+		m_effect->setShaderProgram(pGl);
+	}
 
-void EffectObject::ShakeMessage()
-{
-	NOTIFICATION->postNotification(B_Shark,nullptr);
-}
+	void EffectObject::ShakeMessage()
+	{
+		NOTIFICATION->postNotification(B_Shark,nullptr);
+	}
 
-void EffectObject::PlayerMusic()
-{
-	if (m_Music)
-		playeEffectMusic(m_Music);
+	void EffectObject::PlayerMusic()
+	{
+		if (m_Music)
+			playeEffectMusic(m_Music);
+	}
 }

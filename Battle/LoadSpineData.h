@@ -18,41 +18,41 @@
 #include <thread>
 #include <functional>
 using namespace spine;
-class WarManager;
+namespace BattleSpace{
+	class WarManager;
+	class LoadSpineData : public cocos2d::CCObject 
+	{
 
-class LoadSpineData : public cocos2d::CCObject 
-{
+	public: 
+		LoadSpineData();
+		~LoadSpineData();
+		virtual bool init();
+		CREATE_FUNC(LoadSpineData);
 
-public: 
-	LoadSpineData();
-	~LoadSpineData();
-	virtual bool init();
-	CREATE_FUNC(LoadSpineData);
+		void initStoryData();
+		void AddRoleSpineID(int id);
+		void AddStorySpineID(int id);
+		void LoadStoryData(int id);
+		void LoadRoleData(int id);
+		void LoadVecRoleData();
+		void LoadVecStoryData();
+		void LoadSpineAnimation();
+		void LoadRoleAction();
+		void LoadStoryAction();
+		void RealLoadTexture(const char* str);
+		bool AsyncLoadTexture(const char* str);
+		void LoadSpineAction(const char* json,const char* atlas,const char* key);
+		void LoadTextureCallBack(CCObject* ob);
+		spSkeletonData* loadSpineImmediately(const char* key,const char* path);
+		void AddSpineDataInMap(const char* name,spSkeletonData* skeletonData,spAtlas*atlas);
+		CC_SYNTHESIZE(bool,m_LoadSucceed,LoadSucceed)
+	private:
+		std::vector<int> m_VecRole;
+		std::vector<int> m_VecStory;
+		int m_LoadSpineNum;
+		int m_TotalSpineNum;
+		WarManager* m_Manage;
 
-	void initStoryData();
-	void AddRoleSpineID(int id);
-	void AddStorySpineID(int id);
-	void LoadStoryData(int id);
-	void LoadRoleData(int id);
-	void LoadVecRoleData();
-	void LoadVecStoryData();
-	void LoadSpineAnimation();
-	void LoadRoleAction();
-	void LoadStoryAction();
-	void RealLoadTexture(const char* str);
-	bool AsyncLoadTexture(const char* str);
-	void LoadSpineAction(const char* json,const char* atlas,const char* key);
-	void LoadTextureCallBack(CCObject* ob);
-	spSkeletonData* loadSpineImmediately(const char* key,const char* path);
-	void AddSpineDataInMap(const char* name,spSkeletonData* skeletonData,spAtlas*atlas);
-	CC_SYNTHESIZE(bool,m_LoadSucceed,LoadSucceed)
-private:
-	std::vector<int> m_VecRole;
-	std::vector<int> m_VecStory;
-	int m_LoadSpineNum;
-	int m_TotalSpineNum;
-	WarManager* m_Manage;
-	
+	};
 };
-
 #endif

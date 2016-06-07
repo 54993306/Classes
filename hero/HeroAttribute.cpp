@@ -32,7 +32,7 @@ CHeroAttribute::CHeroAttribute():m_itemIndex(0),m_foodCount(0),m_bIsToLeft(false
 
 }
 
-
+using namespace BattleSpace;
 bool CHeroAttribute::init()
 {
 	if (BaseLayer::init())

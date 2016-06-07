@@ -32,7 +32,7 @@ CTollgateLayer::CTollgateLayer():m_selectChapterIndex(0),m_isStory(true),m_iCurr
 	m_iOpenChapterCount[0] = 0;
 	m_iOpenChapterCount[1] = 0;
 }
-
+using namespace BattleSpace	;
 
 CTollgateLayer::~CTollgateLayer()
 {

@@ -26,7 +26,9 @@ void inline AskForRestChallengeTime()
 }
 
 class CSkillInfo;
-class StoryData;
+namespace BattleSpace{
+	class StoryData;
+}
 
 class CWBossLayer: public BaseLayer
 {
@@ -105,5 +107,5 @@ private:
 	int m_iBuffId;
 	CSkillInfo* m_pSkillInfo;
 	CCNode* m_pArmature;
-	StoryData* m_pStoryData;
+	BattleSpace::StoryData* m_pStoryData;
 };

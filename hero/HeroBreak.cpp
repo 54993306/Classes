@@ -26,7 +26,7 @@ bool CHeroBreak::init()
 	}
 	return false;
 } 
-
+using namespace BattleSpace;
 
 void CHeroBreak::levelSkillUp(CHero* hero,const Hero* pHero)
 {

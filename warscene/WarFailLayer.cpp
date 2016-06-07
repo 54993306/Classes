@@ -19,7 +19,7 @@ WarFailLayer::WarFailLayer(void)
 {
 }
 
- 
+ using namespace BattleSpace;
 WarFailLayer::~WarFailLayer(void)
 {
 }

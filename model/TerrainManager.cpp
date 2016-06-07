@@ -11,7 +11,8 @@
 #include "common/CommonFunction.h"
 #include "Battle/BattleRole.h"
 #include "Battle/RoleBaseData.h"
-using namespace cocos2d;
+namespace BattleSpace{
+	using namespace cocos2d;
 
 terData::terData(){}
 
@@ -368,4 +369,5 @@ void TerrainManager::AttributeDispose(WarAlive* alive,Terrain* ter)
 		alive->setTerType(0);
 		alive->setTerTypeNum(0);
 	}
+}
 }

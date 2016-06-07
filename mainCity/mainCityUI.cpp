@@ -51,7 +51,7 @@ bool CMainCityUI::init()
 	}
 	return false;
 }
-
+using namespace BattleSpace;
 
 void CMainCityUI::onEnter()
 {

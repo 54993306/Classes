@@ -59,7 +59,7 @@ void CMainScene::onCreate()
 
 	m_fMoveSpeed = 0.0f;
 }
-
+using namespace BattleSpace;
 void CMainScene::onEnter()
 {	
 	CCSize deviceSize = CCDirector::sharedDirector()->getWinSizeInPixels();

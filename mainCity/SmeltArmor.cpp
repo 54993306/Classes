@@ -29,7 +29,7 @@ CSmeltArmor::CSmeltArmor():m_noEquip(true),m_yesEquip(true)
 	}
 }
 
-
+using namespace BattleSpace;
 CSmeltArmor::~CSmeltArmor()
 {
 	CC_SAFE_RELEASE(m_pCellInfo);

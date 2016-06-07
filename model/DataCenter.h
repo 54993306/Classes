@@ -11,10 +11,8 @@
 #include "RewardGM.h"
 #include "DataPool.h"
 
-class WarManager;
-class MapManager;
-class TerrainManager;
-class CombatGuideManage;
+
+
 class CRroleData;
 class CDataPool;
 
@@ -30,16 +28,20 @@ enum CityActionType{
 	CA_GoToWorldBoss
 };
 
-
 enum Task_Type
 {
 	Evole_Task,
 	Normal_Task,
 };
 
+namespace BattleSpace{
+	class WarManager;
+	class MapManager;
+	class TerrainManager;
+	class CombatGuideManage;
+};
 
 USING_NS_CC;
-
 class DataCenter : public CCObject
 {
 public:
@@ -48,9 +50,9 @@ public:
 	static DataCenter* sharedData();
 	static void destroy();
 public:
-	WarManager* getWar();
-	TerrainManager* getTer();
-	MapManager* getMap();
+	BattleSpace::WarManager* getWar();
+	BattleSpace::TerrainManager* getTer();
+	BattleSpace::MapManager* getMap();
 	UserManager* getUser();
 	SkillGM* getSkill();
 	TaskGM* getTask(int taskType);
@@ -58,7 +60,7 @@ public:
 	HeroInfoGM* getHeroInfo();
 	ItemGM* getItemDesc();
 	CStageData* getStageData();
-	CombatGuideManage* getCombatGuideMg();
+	BattleSpace::CombatGuideManage* getCombatGuideMg();
 	bool initWar();
 	RewardDataGM* getRewardDataGM();
 	CDataPool* getDataPool();
@@ -68,16 +70,16 @@ public:
 protected:
 	virtual bool init();	
 protected:
-	MapManager* m_map;
-	WarManager* m_war;
-	TerrainManager* m_ter;
+	BattleSpace::MapManager* m_map;
+	BattleSpace::WarManager* m_war;
+	BattleSpace::TerrainManager* m_ter;
 	UserManager* m_user;
 	SkillGM* m_skill;
 	TaskGM*  m_task;
 	TollgateGM* m_tollgate;
 	HeroInfoGM* m_heroInfo;
 	ItemGM* m_itemDesc;
-	CombatGuideManage* m_CombatguideMG;
+	BattleSpace::CombatGuideManage* m_CombatguideMG;
 	CStageData *m_stageData;
 	RewardDataGM *m_rewardData;
 	CDataPool *m_dataPool;

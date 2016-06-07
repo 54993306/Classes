@@ -44,7 +44,7 @@ bool CTopLayer::init()
 	return false;
 }
 
-
+using namespace BattleSpace;
 void CTopLayer::onEnter()
 {
 	BaseLayer::onEnter();

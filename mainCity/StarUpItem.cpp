@@ -71,7 +71,7 @@ void CRisingResponse::read( const RisingResponse& res )
 	this->bStarUp = res.canrising();
 }
 
-
+using namespace BattleSpace;
 
 CStarUpItem::CStarUpItem():m_strenLeft(nullptr),m_itemAttr(nullptr)
 	,m_isHpAdding(false),m_isAtkAdding(false),m_isDefAdding(false),m_isUseGold(false)

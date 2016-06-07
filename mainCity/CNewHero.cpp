@@ -10,7 +10,7 @@ CNewHero::CNewHero():m_ui(nullptr),m_pEffect(nullptr),m_bEvolve(false),m_bShowin
 {
 
 }
-
+using namespace BattleSpace;
 bool CNewHero::init()
 {
 	if(BaseLayer::init())

@@ -32,7 +32,7 @@ struct CEvolResult
 // 	bool canEvol;		//是否仍可继续进阶
 // 	vector<CEvolQuest> questsList;		//下一进阶任务列表
 // 	CEvolInfo evolInfo;
-	void read(const HeroEvolRes& eq);
+	void read(const protos::HeroEvolRes* eq);
 };
 
 #endif

@@ -3,7 +3,6 @@
 #include "Global.h"
 
 //=======================================================================//
-
 ArmatureEventData::ArmatureEventData()
 {
 	m_armatureId = 0;
@@ -33,7 +32,7 @@ vector<ArmatureEvent*>& ArmatureEventData::getEventVector( const char* sAction, 
 //=======================================================================//
 ArmatureEventDataMgr::ArmatureEventDataMgr()
 {
-	
+
 }
 
 ArmatureEventDataMgr::~ArmatureEventDataMgr()
@@ -77,12 +76,12 @@ bool ArmatureEventDataMgr::init()
 				//初始化当个骨骼帧数据
 				ArmatureEventData* pArmatureEventData = new ArmatureEventData;
 				pArmatureEventData->setArmatureId(armatureSingle["RoleID"].GetInt());
-				
+
 				const rapidjson::Value &actionArray = armatureSingle["ActionArray"];
 				for(unsigned int j=0; j<actionArray.Size(); j++)
 				{
 					const rapidjson::Value &actionSingle = actionArray[j];
-					
+
 					//动作名
 					string actionName = actionSingle["ActionName"].GetString();
 

@@ -12,7 +12,7 @@
 #include "common/CGameSound.h"
 #include "Resources.h"
 #include "scene/AnimationManager.h"
-
+using namespace BattleSpace;
 bool CHeroSkill::init()
 {
 	if (BaseLayer::init())

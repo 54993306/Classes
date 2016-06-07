@@ -38,7 +38,7 @@ CLevelUpItem::CLevelUpItem():m_strenLeft(nullptr),m_itemAttr(nullptr),m_smeltLay
 	}
 }
 
-
+using namespace BattleSpace;
 CLevelUpItem::~CLevelUpItem()
 {
 	CC_SAFE_RELEASE(m_pCellInfo);
