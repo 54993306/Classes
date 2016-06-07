@@ -1,7 +1,7 @@
 ﻿#include "MoveRule.h"
 #include "warscene/ConstNum.h"
 #include "model/DataCenter.h"
-#include "Battle/BattleRole.h"
+#include "Battle/BaseRole.h"
 #include "model/WarManager.h"
 #include "model/MapManager.h"
 #include "scene/alive/AliveDefine.h"
@@ -22,7 +22,7 @@ namespace BattleSpace{
 		m_testState = !m_testState;
 	}
 
-	bool MoveRule::MonstMoveExcute(WarAlive* monster)
+	bool MoveRule::MonstMoveExcute(BaseRole* monster)
 	{
 		if (!monster->getMove()||monster->getAliveStat() == INVINCIBLE)
 			return false;
@@ -36,7 +36,7 @@ namespace BattleSpace{
 		return false;
 	}
 
-	int MoveRule::monsterMove(WarAlive* alive)
+	int MoveRule::monsterMove(BaseRole* alive)
 	{
 #if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
 		if (m_testState)
@@ -52,7 +52,7 @@ namespace BattleSpace{
 		return grid;
 	}
 
-	int MoveRule::getMonsterMoveGrid(WarAlive* alive)
+	int MoveRule::getMonsterMoveGrid(BaseRole* alive)
 	{
 		if (alive->getEnemy())
 		{
@@ -77,9 +77,9 @@ namespace BattleSpace{
 		return INVALID_GRID;
 	}
 
-	int MoveRule::MoveJudge(WarAlive* alive,int grid)
+	int MoveRule::MoveJudge(BaseRole* alive,int grid)
 	{
-		WarAlive* targetAlive = DataCenter::sharedData()->getWar()->getAliveByGrid(grid);
+		BaseRole* targetAlive = DataCenter::sharedData()->getWar()->getAliveByGrid(grid);
 		if( targetAlive == nullptr|| targetAlive == alive ||targetAlive->getEnemy())
 		{
 			return getMoveGrid(alive,grid);	
@@ -88,7 +88,7 @@ namespace BattleSpace{
 		}
 	}
 
-	int MoveRule::getMoveGrid(WarAlive* alive,int grid)
+	int MoveRule::getMoveGrid(BaseRole* alive,int grid)
 	{
 		if (alive->mStandGrids.size()>1)							//在判断多个格子情况
 		{
@@ -115,7 +115,7 @@ namespace BattleSpace{
 					canMove = false;						//判断行列变化是否超出边界
 					break;
 				}
-				WarAlive* p_Alive = DataCenter::sharedData()->getWar()->getAliveByGrid(us_point+c_Num);
+				BaseRole* p_Alive = DataCenter::sharedData()->getWar()->getAliveByGrid(us_point+c_Num);
 				if (alive->getEnemy())
 				{
 					if (alive->getGridIndex()<C_BEGINGRID)
@@ -140,7 +140,7 @@ namespace BattleSpace{
 		}
 	}
 
-	int MoveRule::FrontBack(WarAlive* alive,int range,bool enemy)
+	int MoveRule::FrontBack(BaseRole* alive,int range,bool enemy)
 	{
 		int index = alive->getGridIndex();
 		int row = index % C_GRID_ROW;
@@ -215,7 +215,7 @@ namespace BattleSpace{
 					bool pMoveGrid = false;
 					CCARRAY_FOREACH(arr,obj)
 					{
-						WarAlive* alive = (WarAlive*)obj;
+						BaseRole* alive = (BaseRole*)obj;
 						if (alive->getMoveGrid() == pGrid)								//且无人将要过去
 							pMoveGrid = true;
 					}

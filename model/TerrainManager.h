@@ -3,11 +3,11 @@
 #include "cocos2d.h"
 #include <map>
 #include "Battle/BattleTrap.h"
-#include "Battle/RoleBuffData.h"
+#include "Battle/BuffData.h"
 using namespace std;
 USING_NS_CC;
 namespace BattleSpace{
-	class WarAlive;
+	class BaseRole;
 	//  [12/10/2014 xc_lin]
 	/**************** 地形数据 *****************/
 	class terData : public CCObject
@@ -90,10 +90,10 @@ namespace BattleSpace{
 		CCArray* getTerrains();
 		Terrain* getTerrainByGrid(char grid);
 		bool addAliveAtGrid(unsigned int terrainID,char grid);
-		void AttributeDispose(WarAlive* alive,Terrain* ter = nullptr);	//处理地形对武将属性的影响
+		void AttributeDispose(BaseRole* alive,Terrain* ter = nullptr);	//处理地形对武将属性的影响
 		void clear();
 		void initData(vector<BattleTrap>& VecTerrain);
-		terRound* TerrainAI(WarAlive* alive);
+		terRound* TerrainAI(BaseRole* alive);
 		void reduceRoundNum();									//减少所有地形持续回合数
 	protected:
 		bool init(){return true;};

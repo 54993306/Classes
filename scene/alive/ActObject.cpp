@@ -4,7 +4,7 @@
 #include "model/WarManager.h"
 #include "model/DataCenter.h"
 #include "model/BuffManage.h"
-#include "Battle/BattleRole.h"
+#include "Battle/BaseRole.h"
 #include "model/MapManager.h"
 #include "warscene/ConstNum.h"
 #include "warscene/EffectData.h"
@@ -18,7 +18,7 @@
 #include "Battle/BattleMessage.h"
 #include "warscene/BattleTools.h"
 #include "Battle/MoveObject.h"
-#include "Battle/RoleBaseData.h"
+#include "Battle/BaseRoleData.h"
 //#include <spine/AnimationState.h>
 namespace BattleSpace{
 	ActObject::ActObject()
@@ -38,7 +38,7 @@ namespace BattleSpace{
 		return true;
 	}
 
-	void ActObject::setAlive( WarAlive* var )
+	void ActObject::setAlive( BaseRole* var )
 	{
 		AliveObject::setAlive(var);
 		initStateManage(); 
@@ -384,7 +384,7 @@ namespace BattleSpace{
 	void ActObject::removeAct( CCNode* node )
 	{
 		ActObject* act = (ActObject*) node;
-		WarAlive* alive = act->getAlive();
+		BaseRole* alive = act->getAlive();
 		NOTIFICATION->postNotification(B_ActObjectRemove,alive);		//我方主帅死亡,战斗失败
 		if (m_Reset)
 		{

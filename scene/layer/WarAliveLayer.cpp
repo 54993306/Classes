@@ -26,8 +26,8 @@
 #include "warscene/CHeroSoundData.h"
 #include "Battle/BattleMessage.h"
 #include "Battle/MoveObject.h"
-#include "Battle/BattleRole.h"
-#include "Battle/RoleBaseData.h"
+#include "Battle/BaseRole.h"
+#include "Battle/BaseRoleData.h"
 namespace BattleSpace{
 	WarAliveLayer::WarAliveLayer()
 		:m_TouchAlive(nullptr),m_grid(0),m_AliveNode(0)
@@ -63,7 +63,7 @@ namespace BattleSpace{
 
 	void WarAliveLayer::createMoveTarget()
 	{
-		WarAlive* alive = WarAlive::create();
+		BaseRole* alive = BaseRole::create();
 		alive->retain();
 		m_MoveActObject = ActObject::create();
 		m_MoveActObject->setAlive(alive);
@@ -114,7 +114,7 @@ namespace BattleSpace{
 
 	void WarAliveLayer::monsterSoleSprite( ActObject* aliveOb )
 	{
-		WarAlive* alive = aliveOb->getAlive();
+		BaseRole* alive = aliveOb->getAlive();
 		if (!alive->getEnemy())
 			return;
 		CCSprite* ef = nullptr;
@@ -129,7 +129,7 @@ namespace BattleSpace{
 
 	void WarAliveLayer::initActObjectOffs(ActObject* aliveOb,int grid)
 	{
-		WarAlive* alive = aliveOb->getAlive();
+		BaseRole* alive = aliveOb->getAlive();
 		if (alive->getBaseData()->getRoleRow()>1)
 		{
 			if (alive->getBaseData()->getRoleRow()>2)
@@ -158,7 +158,7 @@ namespace BattleSpace{
 
 	void WarAliveLayer::AddActToGrid(ActObject* aliveOb,int grid)
 	{
-		WarAlive* alive = aliveOb->getAlive();
+		BaseRole* alive = aliveOb->getAlive();
 		if (alive->getDelaytime()>0)
 			grid = 0;
 		initActObjectPosition(aliveOb,grid);
@@ -171,7 +171,7 @@ namespace BattleSpace{
 		}
 	}
 	//绘制战场武将
-	void WarAliveLayer::initActobject(WarAlive* alive,int createType)
+	void WarAliveLayer::initActobject(BaseRole* alive,int createType)
 	{
 		if (alive->getActObject())
 		{
@@ -229,7 +229,7 @@ namespace BattleSpace{
 	//初始化触摸武将存储的信息。
 	void WarAliveLayer::aliveEntranceBattle(CCObject* ob)
 	{
-		WarAlive* alive = (WarAlive*)ob;
+		BaseRole* alive = (BaseRole*)ob;
 		initActobject(alive);
 		initTouchAlive(alive);
 		m_TouchAliveBtn = true;
@@ -265,7 +265,7 @@ namespace BattleSpace{
 		CCARRAY_FOREACH(ob_Arr,obj)
 		{
 			ActObject* act = (ActObject*)obj;
-			WarAlive* t_alive = act->getAlive();	
+			BaseRole* t_alive = act->getAlive();	
 			if (t_alive->getCaptain())continue;
 			setEnableRecursiveCascading(act->getArmature(),true,ccc3(255,255,255),255);
 			if (lucency)
@@ -273,7 +273,7 @@ namespace BattleSpace{
 		}
 	}
 
-	void WarAliveLayer::initTouchAlive(WarAlive* alive)
+	void WarAliveLayer::initTouchAlive(BaseRole* alive)
 	{
 		m_TouchAlive = alive;
 		ActObject* aliveOb = alive->getActObject();										//指针复制，复制被触摸武将
@@ -288,7 +288,7 @@ namespace BattleSpace{
 
 	bool WarAliveLayer::touchInAlive( int grid,CCPoint& p )
 	{
-		vector<WarAlive*>* Vec = m_Manage->getVecHeros();
+		vector<BaseRole*>* Vec = m_Manage->getVecHeros();
 		for (auto i : *Vec)
 		{
 			if (i->getCallType()!=CommonType)continue;
@@ -437,7 +437,7 @@ namespace BattleSpace{
 		m_TouchAlive->setAIState(false);
 	}
 	//@@边界判断
-	bool WarAliveLayer::borderJudge( WarAlive* pAlive,vector<int>& pVector )
+	bool WarAliveLayer::borderJudge( BaseRole* pAlive,vector<int>& pVector )
 	{
 		for (auto i : pVector)									//主帅位置不可替换
 			if (i>=C_CAPTAINGRID||i<C_GRID_ROW+C_BEGINGRID)		//我方武将边缘处理
@@ -448,7 +448,7 @@ namespace BattleSpace{
 		return false;
 	}
 	//@得到目标点集
-	vector<int> WarAliveLayer::getDestinations( WarAlive* pAlive,int pGrid )	//这个方法可以抽象出来放到武将的身上。很多地方都调用了这个方法。到某个位置后武将所站的区域点
+	vector<int> WarAliveLayer::getDestinations( BaseRole* pAlive,int pGrid )	//这个方法可以抽象出来放到武将的身上。很多地方都调用了这个方法。到某个位置后武将所站的区域点
 	{
 		vector<int> tDestinations ;
 		for (int i=0;i<pAlive->getBaseData()->getRoleRow();i++)
@@ -464,7 +464,7 @@ namespace BattleSpace{
 	{
 		for (auto tGrid:pDestinations)
 		{
-			WarAlive* tDestinationAlive = getAliveByMoveGrid(tGrid);
+			BaseRole* tDestinationAlive = getAliveByMoveGrid(tGrid);
 			if (!tDestinationAlive)
 				continue;
 			if (DataCenter::sharedData()->getCombatGuideMg()->IsGuide())
@@ -480,7 +480,7 @@ namespace BattleSpace{
 		return true;
 	}
 	//@@被替换武将移动
-	void WarAliveLayer::moveSwappingAlives( vector<WarAlive*>& pVector,int pOffs )
+	void WarAliveLayer::moveSwappingAlives( vector<BaseRole*>& pVector,int pOffs )
 	{
 		for (auto tAlive:pVector)
 		{
@@ -502,12 +502,12 @@ namespace BattleSpace{
 		return false;
 	}
 	//得到一个区域内的所有武将
-	vector<WarAlive*> WarAliveLayer::getAliveInArea( vector<int>& pAreas )
+	vector<BaseRole*> WarAliveLayer::getAliveInArea( vector<int>& pAreas )
 	{
-		vector<WarAlive*> tAreaAlives;
+		vector<BaseRole*> tAreaAlives;
 		for (auto tGrid:pAreas)
 		{
-			WarAlive* tAlive = getAliveByMoveGrid(tGrid);
+			BaseRole* tAlive = getAliveByMoveGrid(tGrid);
 			if (tAlive)
 			{
 				bool tAddAlive = true;
@@ -528,7 +528,7 @@ namespace BattleSpace{
 	//交换的规则,可以进行多种拓展,有可能每个武将不一样,但是控制会乱
 	bool WarAliveLayer::swappingRule(vector<int>& pDestination)
 	{
-		vector<WarAlive*> tAreaAlives = getAliveInArea(pDestination);
+		vector<BaseRole*> tAreaAlives = getAliveInArea(pDestination);
 		int tOffs = m_TouchAlive->getMoveObject()->getgrid()-m_grid;
 		for (auto tSwappingAlive:tAreaAlives)
 		{
@@ -540,7 +540,7 @@ namespace BattleSpace{
 			{
 				for (auto atGrid : tAliveDes)
 				{
-					WarAlive* atAlive = getAliveByMoveGrid(atGrid);
+					BaseRole* atAlive = getAliveByMoveGrid(atGrid);
 					if (atAlive && atAlive != m_TouchAlive && atAlive != tSwappingAlive)
 						return false;
 				}
@@ -568,7 +568,7 @@ namespace BattleSpace{
 		return true;
 	}
 	//放到数据中心供武将调用的方法
-	WarAlive* WarAliveLayer::getAliveByMoveGrid( int grid )
+	BaseRole* WarAliveLayer::getAliveByMoveGrid( int grid )
 	{
 		CCArray* arr = m_MoveNode->getChildren();
 		CCObject* obj = nullptr;
@@ -644,7 +644,7 @@ namespace BattleSpace{
 		CCObject* obj = nullptr;
 		CCARRAY_FOREACH(arr,obj)
 		{
-			WarAlive* alive = (WarAlive*)obj;
+			BaseRole* alive = (BaseRole*)obj;
 			if(alive->getAliveID() >= C_BatchMonst+batchNumber*100)
 				initActobject(alive,SceneTrap);
 		}

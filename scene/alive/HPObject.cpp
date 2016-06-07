@@ -8,7 +8,7 @@
 #include "common/ShaderDataHelper.h"
 #include "warscene/CHeroSoundData.h"
 #include "Battle/BattleMessage.h"
-#include "Battle/BattleRole.h"
+#include "Battle/BaseRole.h"
 namespace BattleSpace{
 	HPObject::HPObject()
 		:m_Skin(nullptr),m_Background(nullptr),m_HpNumber(0),m_HpNumberMax(0),m_Percent(0)

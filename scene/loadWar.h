@@ -38,7 +38,7 @@ namespace BattleSpace{
 		SkipLoginScene,			//登陆界面
 		skipSelectHero,
 	};
-	class RoleBaseData;
+	class BaseRoleData;
 	class WarManager;
 	class LoadSpineData;
 	class LoadWar : public CScene
@@ -65,7 +65,7 @@ namespace BattleSpace{
 
 		void CocosBoneCallBack(float dt);
 		void TextureThread(const char* url, const char* model, LoadType type = LoadType::Load_Effect);		//异步加载处理
-		void SkillParse(const RoleBaseData* pRole,vector<int>&VecEffect,vector<int>&VecBuff);
+		void SkillParse(const BaseRoleData* pRole,vector<int>&VecEffect,vector<int>&VecBuff);
 		void LoadBeingAnimation();
 		void ProgressEnd();
 		void LoadCocosEffect();

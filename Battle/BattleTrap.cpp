@@ -1,6 +1,6 @@
 
 #include "Battle/BattleTrap.h"
-#include "Battle/RoleBuffData.h"
+#include "Battle/BuffData.h"
 
 BattleTrap::BattleTrap()
 :id(0),terrainId(0),name(""),terrainType(0),pro_type(0),pro_rate(0),

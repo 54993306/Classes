@@ -1,15 +1,17 @@
 ﻿#ifndef _HITCOUNT_H_
 #define _HITCOUNT_H_
 #include "AppUI.h"
-#include "warscene/BattleResult.h"
 /************************************************************************/
 /* 
 	用于做伤害计算、攻击闪避、暴击等相关战斗结果的处理数值运算等   //  [9/9/2014 xc_lin]                                                                 
 */
 /************************************************************************/
+#include "warscene/BattleResult.h"
+
 namespace BattleSpace{
-	class WarAlive;
+	class BaseRole;
 	class WarManager;
+	class BattleResult;
 	class HurtCount : public cocos2d::CCObject
 	{
 	public:
@@ -17,21 +19,21 @@ namespace BattleSpace{
 		virtual ~HurtCount();
 		virtual bool init();
 		CREATE_FUNC(HurtCount);
-		BattleResult* AttackExcute(WarAlive* target);
-		void HurtExcute(BattleResult*Result,WarAlive*AtkAlive,WarAlive*HitAlive);
+		BattleResult* AttackExcute(BaseRole* target);
+		void HurtExcute(BattleResult*Result,BaseRole*AtkAlive,BaseRole*HitAlive);
 		void EffectTypeExcute(BattleResult*Result);								//
-		STR_LostHp hitNum(WarAlive* AtcTarget , WarAlive* HitTarget);			//返回引用效率更高
-		STR_LostHp lostCount(WarAlive* AtcTarget , WarAlive* HitTarget);		//攻击计算
-		STR_LostHp gainCount(WarAlive* AtcTarget , WarAlive* HitTarget);		//加血计算
-		bool hitJudge(WarAlive* AtcTarget , WarAlive* HitTarget);				//命中判断
-		int  critJudge(WarAlive* AtcTarget , WarAlive* HitTarget);				//暴击判断
-		float attributeHurt(WarAlive* AtcTarget);								//属性对技能伤害影响
-		float raceDispose(WarAlive* AtcTarget , WarAlive* HitTarget);			//属性伤害计算
+		STR_LostHp hitNum(BaseRole* AtcTarget , BaseRole* HitTarget);			//返回引用效率更高
+		STR_LostHp lostCount(BaseRole* AtcTarget , BaseRole* HitTarget);		//攻击计算
+		STR_LostHp gainCount(BaseRole* AtcTarget , BaseRole* HitTarget);		//加血计算
+		bool hitJudge(BaseRole* AtcTarget , BaseRole* HitTarget);				//命中判断
+		int  critJudge(BaseRole* AtcTarget , BaseRole* HitTarget);				//暴击判断
+		float attributeHurt(BaseRole* AtcTarget);								//属性对技能伤害影响
+		float raceDispose(BaseRole* AtcTarget , BaseRole* HitTarget);			//属性伤害计算
 		int lostType(float race,int crit);
-		void BuffHandleLogic(WarAlive* pAlive);								//对每一个效果进行BUF逻辑处理
-		int ChangeLocation(WarAlive* AtcTarget , WarAlive* HitTarget);			//改变位置效果处理
-		void addHittingAlive(WarAlive* AtcTarget , WarAlive* HitTarget);
-		void woldBossHurt(WarAlive* pAlive,float pHurt);
+		void BuffHandleLogic(BaseRole* pAlive);								//对每一个效果进行BUF逻辑处理
+		int ChangeLocation(BaseRole* AtcTarget , BaseRole* HitTarget);			//改变位置效果处理
+		void addHittingAlive(BaseRole* AtcTarget , BaseRole* HitTarget);
+		void woldBossHurt(BaseRole* pAlive,float pHurt);
 		float getAllTargetLostHp(BattleResult* pResult);
 	private:
 		WarManager* m_Manage;

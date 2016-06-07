@@ -23,7 +23,7 @@ namespace protos{
 }
 #include "cocos2d.h"
 namespace BattleSpace{
-	class RoleBuffData;
+	class BuffData;
 	class skEffectData : public cocos2d::CCObject
 	{
 	public:
@@ -51,10 +51,10 @@ namespace BattleSpace{
 	public:
 		void readData(const protos::common::Effect* pEffect);
 		void clearBuffData();
-		const std::vector<RoleBuffData*>& getBuffVector()const;
+		const std::vector<BuffData*>& getBuffVector()const;
 	private:
 		void addBuffData(const protos::common::Buff* pBuffData);
-		std::vector<RoleBuffData*> mBuffVector;
+		std::vector<BuffData*> mBuffVector;
 	};
 
 	bool EffectSort(const skEffectData* Effect1,const skEffectData* Effect2);//{return Effect1.pos>Effect2.pos;}

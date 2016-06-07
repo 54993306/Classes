@@ -101,12 +101,12 @@ namespace BattleSpace{
 	typedef map<int,BuffEffect*> BuffEffMap;
 	typedef map<bool,BuffEffMap> JsonEffectMap;
 
-	class BuffData : public CCObject
+	class BuffConfig : public CCObject
 	{
 	public: 
-		~BuffData();
+		~BuffConfig();
 		virtual bool init ();
-		CREATE_FUNC(BuffData);
+		CREATE_FUNC(BuffConfig);
 		void ClearData();
 		void AddBuffEffect(BuffEffect* info);
 		BuffEffect* getBuffEffect(int bufftype,bool Dbuf);			//根据buff类型得到相应的buff特效

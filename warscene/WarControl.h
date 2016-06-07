@@ -19,7 +19,7 @@
 class CSpecialProgress;
 
 namespace BattleSpace{
-	class WarAlive;
+	class BaseRole;
 	class WarScene;
 	class WarManager;
 	class WarControl : public BaseLayer
@@ -47,7 +47,7 @@ namespace BattleSpace{
 		void upContinuousNumber(CCObject* ob);				//
 		void AliveBarFullCallBack(CCObject* ob);
 		void AliveBattleDispose(CCObject* ob);
-		void CallAliveEntranceBattle(WarAlive*alive);
+		void CallAliveEntranceBattle(BaseRole*alive);
 
 		CWidgetTouchModel AliveButtonBeginClick(CCObject* ob,CCTouch* pTouch);
 		void AliveButtonClick(CCObject* ob);
@@ -79,11 +79,11 @@ namespace BattleSpace{
 
 		void initNormalAbove();										//init normal panel above part
 
-		void initWorldBossAbove(WarAlive* boss);					//have word init panel above part
+		void initWorldBossAbove(BaseRole* boss);					//have word init panel above part
 
 		void initCostBar();											//init cost bar
 
-		void initAliveButton(CCNode* Layout,WarAlive* alive);		//init single role button
+		void initAliveButton(CCNode* Layout,BaseRole* alive);		//init single role button
 
 		void initAliveButtonBar(CCNode* Layout,int model);			//init role bar
 
@@ -97,7 +97,7 @@ namespace BattleSpace{
 
 		bool guideStateButtonEffect(CCNode* layout);				//guide state button dispose
 
-		void AliveBattlefield(WarAlive* alive);						//role log in battlefield or leave
+		void AliveBattlefield(BaseRole* alive);						//role log in battlefield or leave
 
 		void updateBatchNumber(int currbatch);						//update batch number
 

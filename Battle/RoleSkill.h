@@ -15,6 +15,8 @@
 #ifndef __RoleSkill_H_
 #define __RoleSkill_H_
 #include "cocos2d.h"
+#include "Battle/skEffectData.h"
+
 namespace protos{
 	namespace common{
 		class Skill;
@@ -37,7 +39,6 @@ namespace BattleSpace{
 		eCapAtk		=5, 
 	};
 
-	class skEffectData;
 	class RoleSkill : public cocos2d::CCObject
 	{
 	public:

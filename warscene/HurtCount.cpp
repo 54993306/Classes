@@ -1,14 +1,16 @@
 ﻿#include "HurtCount.h"
 #include "warscene/ConstNum.h"
 #include "MoveRule.h"
-#include "Battle/RoleBaseData.h"
+#include "Battle/BaseRoleData.h"
 #include "model/BuffManage.h"
-#include "Battle/BattleRole.h"
+#include "Battle/BaseRole.h"
 #include "model/DataCenter.h"
 #include "model/WarManager.h"
 #include "warscene/BattleResult.h"
 #include "common/CommonFunction.h"
 #include "scene/alive/HPObject.h"
+#include "Battle/BuffData.h"
+#include "Battle/skEffectData.h"
 namespace BattleSpace{
 
 	HurtCount::HurtCount():m_Manage(nullptr){}
@@ -20,23 +22,23 @@ namespace BattleSpace{
 	}
 
 	// << 血量变化 >> 、 << 怒气值变化 >> 、<< 打击位移效果 >> 处理,目标为受击数组
-	BattleResult* HurtCount::AttackExcute(WarAlive* alive)
+	BattleResult* HurtCount::AttackExcute(BaseRole* alive)
 	{
 		BattleResult* Result = BattleResult::create();
 		Result->setAlive(alive);
 		if (alive->getOpposite())													//为了做击退处理
 		{
-			vector<WarAlive*>::reverse_iterator iter = alive->mAreaTargets.rbegin();//迭代器反向遍历(用下标效率是最高的)
+			vector<BaseRole*>::reverse_iterator iter = alive->mAreaTargets.rbegin();//迭代器反向遍历(用下标效率是最高的)
 			for (;iter != alive->mAreaTargets.rend();iter++)
 			{
-				WarAlive* HitAlive = *iter;
+				BaseRole* HitAlive = *iter;
 				HurtExcute(Result,alive,HitAlive);
 			}
 		}else{
-			vector<WarAlive*>::iterator iter = alive->mAreaTargets.begin();
+			vector<BaseRole*>::iterator iter = alive->mAreaTargets.begin();
 			for (;iter != alive->mAreaTargets.end();iter ++)
 			{
-				WarAlive* HitAlive = *iter;
+				BaseRole* HitAlive = *iter;
 				HurtExcute(Result,alive,HitAlive);
 			}
 		}
@@ -44,7 +46,7 @@ namespace BattleSpace{
 		return Result;
 	}
 	//多人打击的情况有返回值才能确定具体移动
-	int HurtCount::ChangeLocation(WarAlive* AtcAlive , WarAlive* HitAlive)
+	int HurtCount::ChangeLocation(BaseRole* AtcAlive , BaseRole* HitAlive)
 	{
 #if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
 		//return HitAlive->getGridIndex();
@@ -68,7 +70,7 @@ namespace BattleSpace{
 		return HitAlive->getGridIndex();
 	}
 	//连击的时候武将的攻击掉血帧数如果不够则无法计算完全部伤害,无法处理击退效果
-	void HurtCount::HurtExcute(BattleResult*Result,WarAlive*AtkAlive,WarAlive*HitAlive)
+	void HurtCount::HurtExcute(BattleResult*Result,BaseRole*AtkAlive,BaseRole*HitAlive)
 	{
 		unsigned int hitID = HitAlive->getAliveID();
 		Result->m_HitTargets.push_back(hitID);
@@ -81,7 +83,7 @@ namespace BattleSpace{
 			Result->m_Repel[hitID] = HitAlive->getGridIndex();
 	}
 	//负值为扣血，正值为加血，伤害跟效果挂钩
-	STR_LostHp HurtCount::hitNum(WarAlive* AtcTarget , WarAlive* HitTarget)
+	STR_LostHp HurtCount::hitNum(BaseRole* AtcTarget , BaseRole* HitTarget)
 	{
 		STR_LostHp vec;
 		const skEffectData* effect = AtcTarget->getCurrEffect();
@@ -102,7 +104,7 @@ namespace BattleSpace{
 		return vec; 
 	}
 
-	void HurtCount::addHittingAlive( WarAlive* AtcTarget , WarAlive* HitTarget )
+	void HurtCount::addHittingAlive( BaseRole* AtcTarget , BaseRole* HitTarget )
 	{
 		if (AtcTarget->HittingAlive.size())
 		{
@@ -117,7 +119,7 @@ namespace BattleSpace{
 		}
 	}
 
-	void HurtCount::woldBossHurt( WarAlive* pAlive,float pHurt )
+	void HurtCount::woldBossHurt( BaseRole* pAlive,float pHurt )
 	{
 		if (pAlive->getAliveType() == E_ALIVETYPE::eWorldBoss)							//世界boss受击
 		{
@@ -128,7 +130,7 @@ namespace BattleSpace{
 	}
 
 	//对一个武将造成伤害计算
-	STR_LostHp HurtCount::lostCount(WarAlive* AtcTarget , WarAlive* HitTarget)
+	STR_LostHp HurtCount::lostCount(BaseRole* AtcTarget , BaseRole* HitTarget)
 	{
 		HitTarget->setCloaking(false);														//伤害击中取消隐身状态		
 		STR_LostHp hp;
@@ -152,7 +154,7 @@ namespace BattleSpace{
 		return hp;
 	}
 
-	STR_LostHp HurtCount::gainCount(WarAlive* AtcTarget, WarAlive* HitTarget)
+	STR_LostHp HurtCount::gainCount(BaseRole* AtcTarget, BaseRole* HitTarget)
 	{
 		STR_LostHp str;
 		float addNum = 0;	//加血只与加血方有关
@@ -174,7 +176,7 @@ namespace BattleSpace{
 		return str;
 	}
 	//命中=命中/(命中+目标闪避）* 100
-	bool HurtCount::hitJudge(WarAlive* AtcTarget , WarAlive* HitTarget)
+	bool HurtCount::hitJudge(BaseRole* AtcTarget , BaseRole* HitTarget)
 	{
 		int ranNum = CCRANDOM_0_1()*100;									//0到100的数
 		float atc_hit = AtcTarget->getHit();
@@ -185,7 +187,7 @@ namespace BattleSpace{
 		return false;
 	}
 
-	int  HurtCount::critJudge(WarAlive* AtcTarget , WarAlive* HitTarget)
+	int  HurtCount::critJudge(BaseRole* AtcTarget , BaseRole* HitTarget)
 	{
 		//暴击百分比 = 暴击*0.25/300
 		int ranNum = CCRANDOM_0_1()*100;		//0到100的数
@@ -220,7 +222,7 @@ namespace BattleSpace{
 	//根据不同的效果类型对攻击武将进行不同处理,扣自己血量给其他目标加血
 	void HurtCount::EffectTypeExcute( BattleResult*Result )
 	{
-		WarAlive *alive = Result->getAlive();
+		BaseRole *alive = Result->getAlive();
 		const skEffectData* effect = alive->getCurrEffect();
 		int tLostHp = getAllTargetLostHp(Result);
 		switch (effect->getEffectType())
@@ -269,7 +271,7 @@ namespace BattleSpace{
 		return lostHp;
 	}
 
-	float HurtCount::attributeHurt(WarAlive* AtcTarget)
+	float HurtCount::attributeHurt(BaseRole* AtcTarget)
 	{
 		const skEffectData* effect = AtcTarget->getCurrEffect();
 		//属性影响类型*属性影响频率
@@ -304,7 +306,7 @@ namespace BattleSpace{
 		}
 	}
 	//只能计算最后一个效果添加在武将身上的buff
-	void HurtCount::BuffHandleLogic(WarAlive* pAlive)
+	void HurtCount::BuffHandleLogic(BaseRole* pAlive)
 	{
 		const skEffectData* tKillEffect = pAlive->getCurrEffect();
 		BuffManage* AtcbufManege = pAlive->getBuffManage();
@@ -312,10 +314,10 @@ namespace BattleSpace{
 		{
 			if (tAlive->getHp()<=0 || tAlive->getDieState())
 				continue;
-			vector<RoleBuffData*>::const_iterator tItre = tKillEffect->getBuffVector().begin();
+			vector<BuffData*>::const_iterator tItre = tKillEffect->getBuffVector().begin();
 			for (;tItre != tKillEffect->getBuffVector().end();++tItre)
 			{
-				RoleBuffData* buff = *tItre;
+				BuffData* buff = *tItre;
 				int ranNum = CCRANDOM_0_1()*100;
 				if (ranNum > buff->getTriggerRate()/*true*/)//每个buf都需要进行添加判断
 				{
@@ -342,7 +344,7 @@ namespace BattleSpace{
 		}
 	}
 	//属性克制
-	float HurtCount::raceDispose(WarAlive* AtcTarget , WarAlive* HitTarget)
+	float HurtCount::raceDispose(BaseRole* AtcTarget , BaseRole* HitTarget)
 	{
 		return 1;
 		//火1>木3; 木3>水2; 水2>火1

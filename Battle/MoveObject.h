@@ -16,14 +16,14 @@
 *************************************************************/
 #include "cocos2d.h"
 namespace BattleSpace{
-	class WarAlive;
+	class BaseRole;
 	class MoveObject : public cocos2d::CCNode
 	{
 	public:
 		MoveObject();
 		void initMoveSprite();
 		CREATE_FUNC(MoveObject);
-		CC_SYNTHESIZE(WarAlive*,m_Alive,MoveAlive);
+		CC_SYNTHESIZE(BaseRole*,m_Alive,MoveAlive);
 		CC_PROPERTY(int,m_grid,grid);
 		void setRowCol(int pRow,int pCol);
 		void setOffs(float pOffsX,float pOffsY);

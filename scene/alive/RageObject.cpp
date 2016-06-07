@@ -4,7 +4,7 @@
 #include "common/color.h"
 #include "scene/alive/HPObject.h"
 #include "model/DataCenter.h"
-#include "Battle/BattleRole.h"
+#include "Battle/BaseRole.h"
 namespace BattleSpace{
 	RageObject::RageObject()
 		:m_rage(nullptr)

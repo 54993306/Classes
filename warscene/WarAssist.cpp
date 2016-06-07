@@ -10,7 +10,7 @@
 #include "scene/layer/WarAliveLayer.h"
 #include "warscene/WarControl.h"
 #include "tools/ToolDefine.h"
-#include "Battle/BattleRole.h"
+#include "Battle/BaseRole.h"
 #include "scene/alive/RageObject.h"
 #include "scene/effect/EffectObject.h"
 #include "scene/WarScene.h"

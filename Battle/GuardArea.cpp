@@ -1,6 +1,6 @@
 #include "Battle/GuardArea.h"
-#include "Battle/BattleRole.h"
-#include "Battle/RoleBaseData.h"
+#include "Battle/BaseRole.h"
+#include "Battle/BaseRoleData.h"
 #include "warscene/ConstNum.h"
 #include "warscene/BattleTools.h"
 #include "model/WarManager.h"
@@ -23,7 +23,7 @@ namespace BattleSpace{
 		}
 	}
 	//警戒区域的变化情况值跟武将的位置变化有关系,而且是武将的移动对象格子变化。不用每次都去刷新处理
-	int GuardArea::getAliveGuard( WarAlive* pAlive )
+	int GuardArea::getAliveGuard( BaseRole* pAlive )
 	{
 		vector<int> Vecguard;
 		initAliveGuard(pAlive,Vecguard);
@@ -49,7 +49,7 @@ namespace BattleSpace{
 		return INVALID_GRID;												//没有警戒区域自动不处理
 	}
 
-	void GuardArea::initAliveGuard( WarAlive* pAlive,vector<int>& pGuards )
+	void GuardArea::initAliveGuard( BaseRole* pAlive,vector<int>& pGuards )
 	{
 		switch (pAlive->getBaseData()->getAlertType())
 		{
@@ -80,7 +80,7 @@ namespace BattleSpace{
 		sort(pGuards.begin(),pGuards.end(),greater<int>());				//警戒区域优先判断后方与上方区域是否有人
 	}
 
-	void GuardArea::initAliveCurrGrids( WarAlive* pAlive,vector<int>& pVector )
+	void GuardArea::initAliveCurrGrids( BaseRole* pAlive,vector<int>& pVector )
 	{
 		if (pAlive->getTouchState())
 		{
@@ -90,7 +90,7 @@ namespace BattleSpace{
 		}
 	}
 
-	void GuardArea::guradUpAndDown( WarAlive* pAlive,vector<int>& pGuards )
+	void GuardArea::guradUpAndDown( BaseRole* pAlive,vector<int>& pGuards )
 	{
 		vector<int>tGrids;
 		initAliveCurrGrids(pAlive,tGrids);
@@ -106,7 +106,7 @@ namespace BattleSpace{
 		}
 	}
 
-	void GuardArea::guardFront( WarAlive* pAlive,vector<int>& pGuards )
+	void GuardArea::guardFront( BaseRole* pAlive,vector<int>& pGuards )
 	{
 		vector<int>tGrids;
 		initAliveCurrGrids(pAlive,tGrids);
@@ -117,7 +117,7 @@ namespace BattleSpace{
 		}
 	}
 
-	void GuardArea::guradBack( WarAlive* pAlive,vector<int>& pGuards )
+	void GuardArea::guradBack( BaseRole* pAlive,vector<int>& pGuards )
 	{
 		vector<int>tGrids;
 		initAliveCurrGrids(pAlive,tGrids);
@@ -128,7 +128,7 @@ namespace BattleSpace{
 		}
 	}
 
-	void GuardArea::guradFrontAndBack( WarAlive* pAlive,vector<int>& pGuards )
+	void GuardArea::guradFrontAndBack( BaseRole* pAlive,vector<int>& pGuards )
 	{
 		vector<int>tGrids;
 		initAliveCurrGrids(pAlive,tGrids);

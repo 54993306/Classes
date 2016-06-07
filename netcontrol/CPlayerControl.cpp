@@ -7,7 +7,7 @@
 #include "scene/loadWar.h"
 #include "scene/WarScene.h"
 #include "GMessage.h"
-#include "Battle/RoleBaseData.h"
+#include "Battle/BaseRoleData.h"
 #include "task/TaskControl.h"
 #include "common/RollLabel.h"
 #include "guide/GuideManager.h"

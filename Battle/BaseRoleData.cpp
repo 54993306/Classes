@@ -1,12 +1,12 @@
 
 
 #include <vector>
-#include "Battle/RoleBaseData.h"
+#include "Battle/BaseRoleData.h"
 #include "Battle/RoleSkill.h"
 using namespace std;
 namespace BattleSpace{
 
-	RoleBaseData::RoleBaseData()
+	BaseRoleData::BaseRoleData()
 		:mServerID(0),mRoleModel(0),mRoleType(0),mRoleHp(0),mRoleAttack(0),mRoleDefense(0),mRoleCrit(0),mRoleHit(0),mRoleDodge(0)
 		,mCostSpeed(0),mMaxCost(0),mInitGrid(0),mRoleRow(1),mRoleCol(1),mRoleZoom(0),mRoleDrop(0),mColdDown(0),mExpendCost(0)
 		,mCritTime(0),mMoveSpeed(0),mCallRole(false),mCallID(0),mAlertRange(0),mCallType(0),mMonsterType(0)
@@ -22,7 +22,7 @@ namespace BattleSpace{
 		mCaptainSkill->retain();
 	}
 
-	RoleBaseData::~RoleBaseData()
+	BaseRoleData::~BaseRoleData()
 	{
 		CC_SAFE_RELEASE(mNormalSkill);
 		mNormalSkill = nullptr;
@@ -34,50 +34,50 @@ namespace BattleSpace{
 		mCaptainSkill = nullptr;
 	}
 
-	bool RoleBaseData::hasSpecialSkill() const
+	bool BaseRoleData::hasSpecialSkill() const
 	{
 		if (mSpecialSkill->getSkillID())
 			return true;
 		return false;
 	}
 
-	bool RoleBaseData::hasActiveSkill() const
+	bool BaseRoleData::hasActiveSkill() const
 	{
 		if (mActiveSkill->getSkillID())
 			return true;
 		return false;
 	}
 
-	int RoleBaseData::getActiveSkillType() const
+	int BaseRoleData::getActiveSkillType() const
 	{
 		if (mActiveSkill->getSkillID())
 			return mActiveSkill->getSkillType();
 		return 0;
 	}
 
-	bool RoleBaseData::hasCaptainSkill() const
+	bool BaseRoleData::hasCaptainSkill() const
 	{
 		if (mCaptainSkill->getSkillID())
 			return true;
 		return false;
 	}
 
-	const RoleSkill* RoleBaseData::getNormalSkill() const
+	const RoleSkill* BaseRoleData::getNormalSkill() const
 	{
 		return mNormalSkill;
 	}
 
-	const RoleSkill* RoleBaseData::getSpecialSkill() const
+	const RoleSkill* BaseRoleData::getSpecialSkill() const
 	{
 		return mSpecialSkill;
 	}
 
-	const RoleSkill* RoleBaseData::getActiveSkill() const
+	const RoleSkill* BaseRoleData::getActiveSkill() const
 	{
 		return mActiveSkill;
 	}
 
-	const RoleSkill* RoleBaseData::getCaptainSkill() const
+	const RoleSkill* BaseRoleData::getCaptainSkill() const
 	{
 		return mCaptainSkill;
 	}

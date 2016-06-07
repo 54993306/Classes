@@ -8,7 +8,7 @@
 #include "WarAssist.h"
 #include "tools/CCShake.h"
 #include "warscene/EffectData.h"
-#include "Battle/BattleRole.h"
+#include "Battle/BaseRole.h"
 #include "scene/alive/ActObject.h"
 #include "CombatTask.h"
 #include "scene/alive/RageObject.h"
@@ -28,7 +28,7 @@
 #include "warscene/BattleTools.h"
 #include "warscene/HurtCount.h"
 #include "Battle/BattleMessage.h"
-#include "Battle/RoleBaseData.h"
+#include "Battle/BaseRoleData.h"
 #include "Battle/RoleSkill.h"
 #include "Battle/skEffectData.h"
 namespace BattleSpace{
@@ -85,7 +85,7 @@ namespace BattleSpace{
 				CCObject* mObj = nullptr;
 				CCARRAY_FOREACH(monsters,mObj)
 				{
-					WarAlive* alive = (WarAlive*)mObj;
+					BaseRole* alive = (BaseRole*)mObj;
 					if(alive->getHp()<=0 
 						&& alive->getActObject() != nullptr
 						&& !alive->getDieState())
@@ -102,7 +102,7 @@ namespace BattleSpace{
 	void CombatEffect::continuousHurt()
 	{
 		float tAttackNum = CountAliveAtk();
-		vector<WarAlive*>* Vec = DataCenter::sharedData()->getWar()->getVecMonsters();
+		vector<BaseRole*>* Vec = DataCenter::sharedData()->getWar()->getVecMonsters();
 		for (auto alive : *Vec)
 		{
 			ActObject* actObject = alive->getActObject();
@@ -126,7 +126,7 @@ namespace BattleSpace{
 		CCObject* obj = nullptr;
 		CCARRAY_FOREACH(heros,obj)
 		{
-			WarAlive* alive = (WarAlive*)obj;
+			BaseRole* alive = (BaseRole*)obj;
 			if (alive->getBaseData()->getCallRole())
 				continue;
 			const HeroInfoData *c_data = DataCenter::sharedData()->getHeroInfo()->getCfg(alive->getBaseData()->getRoleModel());
@@ -179,7 +179,7 @@ namespace BattleSpace{
 
 	void CombatEffect::BattleEffect(BattleResult* Result)
 	{
-		WarAlive*alive = Result->getAlive();
+		BaseRole*alive = Result->getAlive();
 		ActObject* aliveOb = alive->getActObject();
 		const skEffectData* efInfo = alive->getCurrEffect();									//状态性的数据	
 		EffectInfo* effectinfo = DataCenter::sharedData()->getWar()->getEffData()->getEffectInfo(efInfo->getEffectID());	
@@ -192,7 +192,7 @@ namespace BattleSpace{
 			aliveOb->playerNum(Result->getusNum(),Result->getusType());						//攻击武将播放血量变化(吸血类效果有时应该差时而非同步播放)
 		for(vector<unsigned int>::iterator iter = Result->m_HitTargets.begin();iter!=Result->m_HitTargets.end();++iter)
 		{
-			WarAlive* pAlive = Result->m_Alive_s[*iter];
+			BaseRole* pAlive = Result->m_Alive_s[*iter];
 			ActObject* pAliveOb = pAlive->getActObject();
 			if ( !pAlive|| !pAliveOb)continue;													
 			EffectObject* SkillEffect = EffectObject::create(ToString(effectinfo->getfoeEft()));									//受击目标播放受击特效
@@ -231,7 +231,7 @@ namespace BattleSpace{
 
 	void CombatEffect::AttackNull(BattleResult* Result)
 	{
-		WarAlive*alive = Result->getAlive();
+		BaseRole*alive = Result->getAlive();
 		ActObject* aliveOb = alive->getActObject();
 		const skEffectData* efInfo = alive->getCurrEffect();
 		EffectInfo* effectinfo = DataCenter::sharedData()->getWar()->getEffData()->getEffectInfo(efInfo->getEffectID());
@@ -249,7 +249,7 @@ namespace BattleSpace{
 		aliveOb->setPlayerEffect(effectinfo->getfoeEft());
 	}
 
-	void CombatEffect::PlayerSkill(WarAlive* alive)
+	void CombatEffect::PlayerSkill(BaseRole* alive)
 	{
 		CCSize size = CCDirector::sharedDirector()->getWinSize();
 		CCNode* SkillEffect = CCNode::create();
@@ -315,7 +315,7 @@ namespace BattleSpace{
 
 		//获取技能文本
 		WarManager* warManager = DataCenter::sharedData()->getWar();
-		const SkillCfg* pSkillCfg = DataCenter::sharedData()->getSkill()->getCfg(((WarAlive*)SkillEffect->getUserData())->getCurrSkill()->getSkillID());
+		const SkillCfg* pSkillCfg = DataCenter::sharedData()->getSkill()->getCfg(((BaseRole*)SkillEffect->getUserData())->getCurrSkill()->getSkillID());
 		std::string text = pSkillCfg->name;
 		CCSprite* pSprite = CCSprite::create(CCString::createWithFormat("warScene/playerSkill/%d.png", pSkillCfg->id)->getCString());
 		if(!pSprite)
@@ -363,7 +363,7 @@ namespace BattleSpace{
 	void CombatEffect::SkillEfHandle(CCObject* ob) 
 	{ 
 		CCSize winSize = CCDirector::sharedDirector()->getWinSize();
-		WarAlive* pAlive = (WarAlive*)ob;
+		BaseRole* pAlive = (BaseRole*)ob;
 		_armaturePlayerSkill->setVisible(true);
 		_armaturePlayerSkill->getAnimation()->playWithIndex(m_PlayerNum);
 		PlayEffectSound(SFX_504);

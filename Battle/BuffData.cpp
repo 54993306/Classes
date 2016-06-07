@@ -1,13 +1,13 @@
-#include "Battle/RoleBuffData.h"
+#include "Battle/BuffData.h"
 #include <protos/common/skill_common.pb.h>
 namespace BattleSpace{
-	RoleBuffData::RoleBuffData()
+	BuffData::BuffData()
 		:m_BuffID(0),m_BuffType(0),m_BuffDes(""),m_ChangeNum(0),m_Precent(0)
 		,m_TriggerRate(0),m_IsDBuff(false),m_TargetType(0),m_BuffDuration(0)
 		,m_BuffTarget(0),m_BuffLevel(0)
 	{}
 
-	void RoleBuffData::readData(const protos::common::Buff* buff)
+	void BuffData::readData(const protos::common::Buff* buff)
 	{
 		this->setBuffID(buff->buffid());		
 		this->setBuffType(buff->type());
@@ -23,7 +23,7 @@ namespace BattleSpace{
 		//this->durative = buf.durative();	//来自atbType 属性影响类型，僵尸/道士/神将
 	}
 	//使用父类对象给子类对象赋值的标准写法
-	void RoleBuffData::initData( RoleBuffData& pData )
+	void BuffData::initData( BuffData& pData )
 	{
 		*this = pData;
 	}

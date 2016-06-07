@@ -9,8 +9,8 @@
 #include "model/WarManager.h"
 #include "model/MapManager.h"
 #include "common/CommonFunction.h"
-#include "Battle/BattleRole.h"
-#include "Battle/RoleBaseData.h"
+#include "Battle/BaseRole.h"
+#include "Battle/BaseRoleData.h"
 namespace BattleSpace{
 	using namespace cocos2d;
 
@@ -213,7 +213,7 @@ bool TerrainManager::addAliveAtGrid(unsigned int terrainID,char grid)
 	return false;
 }
 
-terRound* TerrainManager::TerrainAI(WarAlive* alive)
+terRound* TerrainManager::TerrainAI(BaseRole* alive)
 {
 	if (alive)
 	{
@@ -262,7 +262,7 @@ void TerrainManager::reduceRoundNum()
 	ClearNullityTerrain();	//清理无效地形
 }
 
-void TerrainManager::AttributeDispose(WarAlive* alive,Terrain* ter)
+void TerrainManager::AttributeDispose(BaseRole* alive,Terrain* ter)
 {
 	if(outPutERRORMsg("TerrainManager::AttributeDispose",alive))return;
 	bool dispose = true;		//默认为添加武将地形效果

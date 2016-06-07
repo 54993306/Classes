@@ -14,7 +14,7 @@ namespace BattleSpace{
 	class EffectInfo;
 	class ActObject;
 	class WarScene;
-	class WarAlive;
+	class BaseRole;
 	class BattleResult; 
 	class CombatEffect : public CCObject
 	{
@@ -24,7 +24,7 @@ namespace BattleSpace{
 		virtual bool init();
 		CREATE_FUNC(CombatEffect)
 			void AttackNull(BattleResult* Result);
-		void PlayerSkill(WarAlive* alive);
+		void PlayerSkill(BaseRole* alive);
 		void SkillEfHandle(CCObject* ob);
 		void SkillEfHandleForEnemy(CCObject* ob);
 		void skillShowCallBack(CCObject* ob);

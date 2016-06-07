@@ -26,21 +26,21 @@ namespace BattleSpace{
 		eFrontAndBackGuard,				//前后范围
 		eUpDownGuard,					//警戒区域为上下范围
 	};
-	class WarAlive;
+	class BaseRole;
 	class WarManager;
 	class GuardArea : public cocos2d::CCObject
 	{
 	public:
 		GuardArea(WarManager* pManage);
 		static GuardArea* create(WarManager* pManage);
-		int getAliveGuard(WarAlive* pAlive);	
-		void initAliveGuard(WarAlive* pAlive,std::vector<int>& pGuards);									//
+		int getAliveGuard(BaseRole* pAlive);	
+		void initAliveGuard(BaseRole* pAlive,std::vector<int>& pGuards);									//
 	protected:
-		void initAliveCurrGrids(WarAlive* pAlive,std::vector<int>& pVector);
-		void guradUpAndDown(WarAlive* pAlive,std::vector<int>& pGuards);
-		void guardFront(WarAlive* pAlive,std::vector<int>& pGuards);
-		void guradBack(WarAlive* pAlive,std::vector<int>& pGuards);
-		void guradFrontAndBack(WarAlive* pAlive,std::vector<int>& pGuards);
+		void initAliveCurrGrids(BaseRole* pAlive,std::vector<int>& pVector);
+		void guradUpAndDown(BaseRole* pAlive,std::vector<int>& pGuards);
+		void guardFront(BaseRole* pAlive,std::vector<int>& pGuards);
+		void guradBack(BaseRole* pAlive,std::vector<int>& pGuards);
+		void guradFrontAndBack(BaseRole* pAlive,std::vector<int>& pGuards);
 	private:
 		WarManager* mManage;
 	};

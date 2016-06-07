@@ -5,7 +5,7 @@
 #include "warscene/ConstNum.h"
 #include "scene/alive/ActObject.h"
 #include "tools/commonDef.h"
-#include "Battle/BattleRole.h"
+#include "Battle/BaseRole.h"
 #include "warscene/SkillRange.h"
 #include "scene/layer/WarAliveLayer.h"
 #include "warscene/MoveRule.h"
@@ -20,7 +20,8 @@
 #include "Battle/BattleMessage.h"
 #include "Battle/GuardArea.h"
 #include "Battle/SkillMacro.h"
-#include "Battle/RoleBaseData.h"
+#include "Battle/BaseRoleData.h"
+#include "Battle/skEffectData.h"
 namespace BattleSpace{
 
 #define AddMoveImg		"lv.png"
@@ -165,7 +166,7 @@ namespace BattleSpace{
 
 	void WarMapLayer::CancelGuide() { m_DisPlayArea->getChildByTag(map_guide)->setVisible(false); }
 
-	void WarMapLayer::DrawAtkArea(WarAlive* alive)
+	void WarMapLayer::DrawAtkArea(BaseRole* alive)
 	{
 		alive->setTouchState(true);
 		vector<int>VecGrid;
@@ -185,7 +186,7 @@ namespace BattleSpace{
 			sp->setDisplayFrame(CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(AtksImg));
 			sp->setVisible(true);
 			m_VecGridIndex.push_back(grid+map_Bg);
-			WarAlive* t_alive = m_Manage->getAliveByGrid(grid);
+			BaseRole* t_alive = m_Manage->getAliveByGrid(grid);
 			if (t_alive&&t_alive->getEnemy() != alive->getEnemy())
 			{
 				if (alive->getOpposite())
@@ -210,7 +211,7 @@ namespace BattleSpace{
 		alive->setTouchState(false);
 	}
 
-	void WarMapLayer::DrawMoveArea(WarAlive* alive)
+	void WarMapLayer::DrawMoveArea(BaseRole* alive)
 	{
 		for (auto i : *m_Manage->getMoveVec())
 		{
@@ -232,7 +233,7 @@ namespace BattleSpace{
 
 	void WarMapLayer::DrawMoveAtkArea(CCObject* ob)
 	{
-		WarAlive* alive = dynamic_cast<WarAlive*>(ob);
+		BaseRole* alive = dynamic_cast<BaseRole*>(ob);
 		if (!alive)
 		{
 			CCLOG("[ *ERROR ] WarMapLayer::DrawMoveAtkArea");
@@ -251,7 +252,7 @@ namespace BattleSpace{
 			m_SkillRange->initSkillArea(alive,tVector);
 			for (auto tGrid:tVector)
 			{
-				WarAlive* pAlive = m_Manage->getAliveByGrid(tGrid);
+				BaseRole* pAlive = m_Manage->getAliveByGrid(tGrid);
 				if (pAlive&&pAlive->getEnemy() != alive->getEnemy())
 					ReverseArea = true;
 			}
@@ -266,7 +267,7 @@ namespace BattleSpace{
 	void WarMapLayer::DrawAtkEffect(CCObject* ob)
 	{
 		ActObject* act = (ActObject*)ob;
-		WarAlive* alive = act->getAlive();
+		BaseRole* alive = act->getAlive();
 		for (auto i:alive->mSkillArea)
 		{
 			CCSprite* sp = (CCSprite*)m_DisPlayArea->getChildByTag(i+map_Bg);
@@ -287,7 +288,7 @@ namespace BattleSpace{
 	//现在攻击的情况已经不绘制攻击范围了
 	void WarMapLayer::CancelCombatArea(CCObject* ob)
 	{
-		WarAlive* alive = (WarAlive*)ob;
+		BaseRole* alive = (BaseRole*)ob;
 		for (auto tGrid : alive->mSkillArea)
 		{
 			CCSprite* sp = (CCSprite*)m_DisPlayArea->getChildByTag(tGrid+map_Bg);
@@ -298,7 +299,7 @@ namespace BattleSpace{
 
 	void WarMapLayer::CombatArea(CCObject* ob)
 	{
-		WarAlive* alive = (WarAlive*)ob;
+		BaseRole* alive = (BaseRole*)ob;
 		for (auto i:alive->mSkillArea)
 		{
 			CCSprite* sp = (CCSprite*)m_DisPlayArea->getChildByTag(i+map_Bg);
@@ -312,7 +313,7 @@ namespace BattleSpace{
 		touchAreaCancel(nullptr);
 		m_FrontArea = false;
 		m_BackArea = false;
-		WarAlive* alive = (WarAlive*)ob;
+		BaseRole* alive = (BaseRole*)ob;
 		alive->setCriAtk(true);
 		DrawAtkArea(alive);		//先判断前方是否有敌人
 		if (m_FrontArea)

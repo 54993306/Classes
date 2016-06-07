@@ -172,9 +172,9 @@ namespace BattleSpace{
 		,effect_down(0),up_Loop(false),down_Loop(false),m_Dbuf(false)
 	{}
 
-	BuffData::~BuffData() { ClearData(); }
+	BuffConfig::~BuffConfig() { ClearData(); }
 
-	bool BuffData::init()
+	bool BuffConfig::init()
 	{
 		unsigned long size = 0;
 		unsigned char *buff = CCFileUtils::sharedFileUtils()->getFileData(CSV_ROOT("buff.json"),"r",&size);
@@ -254,7 +254,7 @@ namespace BattleSpace{
 		return true;
 	}
 
-	void BuffData::ClearData()
+	void BuffConfig::ClearData()
 	{
 		for (auto j : m_JsonEffectMap)
 		{
@@ -268,7 +268,7 @@ namespace BattleSpace{
 		m_JsonEffectMap.clear();
 	}
 
-	void BuffData::AddBuffEffect(BuffEffect* info)
+	void BuffConfig::AddBuffEffect(BuffEffect* info)
 	{
 		JsonEffectMap::iterator iter = m_JsonEffectMap.find(info->getDbuf());
 		if (iter != m_JsonEffectMap.end())
@@ -287,7 +287,7 @@ namespace BattleSpace{
 		}
 	}
 
-	BuffEffect* BuffData::getBuffEffect( int bufftype,bool Dbuf )
+	BuffEffect* BuffConfig::getBuffEffect( int bufftype,bool Dbuf )
 	{
 		JsonEffectMap::iterator iter = m_JsonEffectMap.find(Dbuf);
 		if (iter != m_JsonEffectMap.end())

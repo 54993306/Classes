@@ -1,28 +1,32 @@
-#include "Battle/BattleRole.h"
+#include "Battle/BaseRole.h"
 #include "model/BuffManage.h"
 #include "warscene/ConstNum.h"
 #include "scene/alive/ActObject.h"
-#include "Battle/RoleBaseData.h"
+#include "Battle/BaseRoleData.h"
 #include "Battle/SkillMacro.h"
 #include "Battle/RoleSkill.h"
+#include "Battle/skEffectData.h"
+#include "Battle/BuffData.h"
+using namespace cocos2d;
+using namespace std;
 namespace BattleSpace{
-	WarAlive::WarAlive()
+	BaseRole::BaseRole()
 		:m_Enemy(false),m_Hp(0),m_MaxHp(0),m_GridIndex(INVALID_GRID),m_MoveGrid(0),m_AtkDelay(0)
 		,m_AtkNum(0),m_Move(true),m_CritSkill(false),m_Hrt(0),m_HrtPe(0),m_AIState(false)
 		,m_initCost(0),m_Batch(0),m_CostMax(0),m_AddCost(0),m_Atk(0),m_Def(0),m_Hit(0),m_NorAtk(true)
 		,m_Doge(0),m_Crit(0),m_Zoom(0),m_Renew(0),m_GroupIndex(0),m_EffectIndex(0),m_LastAlive(false)
 		,m_Opposite(false),m_ExecuteCap(false),m_TerType(0),m_TerTypeNum(0),m_cloaking(false)
 		,m_SortieNum(0),m_ActObject(nullptr),m_BuffManage(nullptr),m_UILayout(0),m_Atktime(0)
-		,m_AtkInterval(0),m_TimePercent(1),m_SpecialAtk(false),m_Battle(false),m_MoveSpeed(0)
+		,m_AtkInterval(0),m_SpecialAtk(false),m_Battle(false),m_MoveSpeed(0)
 		,m_CritTime(0),m_FatherID(0),m_Captain(false),m_CritEffect(false),m_DieState(false)
 		,m_TouchGrid(0),m_TouchState(false),m_MoveObj(nullptr),m_CallType(0),m_CallAliveNum(0)
-		,m_Delaytime(0),m_AliveState(COMMONSTATE),m_AliveType(E_ALIVETYPE::eCommon),m_StateDelay(0)	
-		,m_Model(0),m_AliveID(0),m_MstType(0),mBaseData(nullptr)
+		,m_Delaytime(0),m_AliveState(COMMONSTATE),m_AliveType(E_ALIVETYPE::eCommon)
+		,m_Model(0),m_AliveID(0),m_MstType(0),mBaseData(nullptr),mLogicData(nullptr)
 	{
 		setBuffManage(nullptr);
 	}
 
-	WarAlive::~WarAlive()
+	BaseRole::~BaseRole()
 	{
 		CC_SAFE_RELEASE(m_BuffManage);
 		m_BuffManage = nullptr;
@@ -33,11 +37,11 @@ namespace BattleSpace{
 		mAreaTargets.clear();
 	}
 
-	void WarAlive::initAliveByFather( WarAlive*pFather )
+	void BaseRole::initAliveByFather( BaseRole*pFather )
 	{
 		this->setModel(getBaseData()->getRoleModel());
 		this->setZoom(this->getBaseData()->getRoleZoom()*0.01f);
-		this->setInitCost(this->getBaseData()->getInitCost());									//召唤消耗的cost(根技能消耗的相等)
+		this->setInitCost(this->getBaseData()->getInitCost());				//召唤消耗的cost(根技能消耗的相等)
 		if (pFather->getAliveType() == E_ALIVETYPE::eWorldBoss)
 		{
 			this->setAtkInterval(this->getBaseData()->getAttackSpeed());
@@ -66,7 +70,7 @@ namespace BattleSpace{
 		}
 	}
 
-	void WarAlive::initAliveData()
+	void BaseRole::initAliveData()
 	{
 		mStandGrids.clear();
 		if (getEnemy())															//把指针转化成相应的类型对特殊的敌方进行相应的初始化
@@ -108,7 +112,6 @@ namespace BattleSpace{
 		this->setRenew(getBaseData()->getRoleRegain());
 		this->setDoge(getBaseData()->getRoleDodge());
 		this->setZoom(getBaseData()->getRoleZoom()*0.01f);
-		this->setMove(true); 
 #if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
 		if (this->getEnemy())
 		{
@@ -121,20 +124,20 @@ namespace BattleSpace{
 #endif
 	}
 
-	void WarAlive::setMoveGrid(int var)
+	void BaseRole::setMoveGrid(int var)
 	{
 		if (var == INVALID_GRID)
 			CCLOG("[ TIPS ] WarAlive::setMoveGrid");
 		m_MoveGrid = var;
 	}
 
-	void WarAlive::setBuffManage(BuffManage*)
+	void BaseRole::setBuffManage(BuffManage*)
 	{
 		m_BuffManage = BuffManage::create();
 		m_BuffManage->retain();
 	}
 
-	void WarAlive::setAtkNum(int var)
+	void BaseRole::setAtkNum(int var)
 	{
 		m_AtkNum += var;
 		if (m_AtkNum >= 3)					//第四次攻击为特殊攻击
@@ -148,7 +151,7 @@ namespace BattleSpace{
 		}
 	}
 
-	void WarAlive::setHp(int hp)
+	void BaseRole::setHp(int hp)
 	{
 		int max = getMaxHp();
 		if (hp > max)			//做最值判断
@@ -161,26 +164,26 @@ namespace BattleSpace{
 		}
 	}
 
-	void WarAlive::setDef(int def)
+	void BaseRole::setDef(int def)
 	{
 		m_Def = def;
 		if (m_Def<=0)
 			m_Def = 0;
 	}
 
-	void WarAlive::setNorAtk(bool var)
+	void BaseRole::setNorAtk(bool var)
 	{
 		m_NorAtk = var;
 		if (!m_NorAtk)
 			m_Atktime = 0;
 	}
 
-	void WarAlive::setAtktime(float var)
+	void BaseRole::setAtktime(float var)
 	{
 		//增加攻速、减少攻速(百分比、直接数值两类)
 		if (m_NorAtk == true)
 			return;
-		m_Atktime += var * m_TimePercent;				//攻速增减参数使用
+		m_Atktime += var;
 		if (m_Atktime >= m_AtkInterval)
 		{
 			m_Atktime = m_AtkInterval;
@@ -192,7 +195,7 @@ namespace BattleSpace{
 		m_ActObject->setNickName(time);
 	}
 	//怪物释放必杀技时间
-	void WarAlive::setCritTime(float var)
+	void BaseRole::setCritTime(float var)
 	{
 		m_CritTime += var;
 		if ( m_CritTime >= getBaseData()->getCritTime())
@@ -206,27 +209,16 @@ namespace BattleSpace{
 		}
 	}
 
-	void WarAlive::setDelaytime(float var) { m_Delaytime -= var; }
+	void BaseRole::setDelaytime(float var) { m_Delaytime -= var; }
 
-	void WarAlive::setAtkDelay(float var){m_AtkDelay = var;}
+	void BaseRole::setAtkDelay(float var){m_AtkDelay = var;}
 
-	void WarAlive::setAliveStat(int var)
+	void BaseRole::setAliveStat(int var)
 	{
 		m_AliveState = var;
 	}
 
-	void WarAlive::setStatDelay(float var)
-	{
-		if (var <0)
-		{
-			m_StateDelay = 0;
-			m_AliveState = COMMONSTATE;
-		}else{
-			m_StateDelay = var;
-		}
-	}
-
-	void WarAlive::setGridIndex(int var)
+	void BaseRole::setGridIndex(int var)
 	{
 		if (var == m_GridIndex||m_Delaytime>0)
 			return;
@@ -248,7 +240,7 @@ namespace BattleSpace{
 		}
 	}
 
-	void WarAlive::setTouchGrid(int var)
+	void BaseRole::setTouchGrid(int var)
 	{
 		m_TouchGrid = var;
 		mTouchGrids.clear();
@@ -264,14 +256,14 @@ namespace BattleSpace{
 		}
 	}
 
-	void WarAlive::setCallType(int var)
+	void BaseRole::setCallType(int var)
 	{
 		if (var == AutoSkill)							//进入战场就释放技能(陨石类)
 			setCriAtk( true );							//只有必杀技是没有怪物也会释放的
 		m_CallType = var;
 	}
 
-	void WarAlive::ResetAttackState()
+	void BaseRole::ResetAttackState()
 	{
 		if (!m_Enemy && m_CritSkill)
 		{
@@ -287,7 +279,7 @@ namespace BattleSpace{
 		ExcuteNextEffect();
 	}
 
-	void WarAlive::ExcuteNextEffect()
+	void BaseRole::ExcuteNextEffect()
 	{
 		setSortieNum(0);																//当前效果攻击次数
 		setOpposite(false);																//重置反向攻击
@@ -296,7 +288,7 @@ namespace BattleSpace{
 		clearHitAlive();
 	}
 
-	bool WarAlive::canSummonAlive()
+	bool BaseRole::canSummonAlive()
 	{
 		if (getBaseData()->getActiveSkillType() ==eCallAtk)
 		{
@@ -307,7 +299,7 @@ namespace BattleSpace{
 		return false;
 	}
 
-	void WarAlive::clearHitAlive()
+	void BaseRole::clearHitAlive()
 	{
 		for (auto alive:HittingAlive)
 		{
@@ -319,7 +311,7 @@ namespace BattleSpace{
 		HittingAlive.clear();
 	}
 
-	const RoleSkill* WarAlive::getCurrSkill()
+	const RoleSkill* BaseRole::getCurrSkill()
 	{
 		if (getCriAtk())
 		{
@@ -344,7 +336,7 @@ namespace BattleSpace{
 		}
 	}
 
-	const skEffectData* WarAlive::getCurrEffect()
+	const skEffectData* BaseRole::getCurrEffect()
 	{
 		if (this->getGroupIndex() < this->getCurrSkill()->getListSize())
 			if ( this->getCurrSkill()->getEffectSize(getGroupIndex())>getEffIndex())
@@ -359,7 +351,7 @@ namespace BattleSpace{
 		CCTextureCache::sharedTextureCache()->dumpCachedTextureInfo();
 	}
 
-	bool WarAlive::NextEffect()
+	bool BaseRole::NextEffect()
 	{
 		int effId = getEffIndex() + 1;
 		int ranNum = CCRANDOM_0_1()*100;								//0到100的数
@@ -376,12 +368,12 @@ namespace BattleSpace{
 		return false;
 	}
 
-	int WarAlive::getSkillType()
+	int BaseRole::getSkillType()
 	{
 		return getCurrSkill()->getSkillType();
 	}
 
-	bool WarAlive::captainCallNumberJudge()
+	bool BaseRole::captainCallNumberJudge()
 	{
 		if (getCaptain() )
 		{
@@ -395,7 +387,7 @@ namespace BattleSpace{
 		return false;
 	}
 
-	bool WarAlive::hasAliveByTargets( WarAlive* pAlive )
+	bool BaseRole::hasAliveByTargets( BaseRole* pAlive )
 	{
 		bool tHasAlive = false;
 		for (auto tAlive:mAreaTargets)
@@ -409,11 +401,11 @@ namespace BattleSpace{
 		return tHasAlive;
 	}
 
-	bool WarAlive::pierceJudge()
+	bool BaseRole::pierceJudge()
 	{
 		if (getCurrEffect()->getAreaType() == ePuncture&&mAreaTargets.size())//贯穿与非贯穿类处理
 		{
-			WarAlive* alive = mAreaTargets.at(0);
+			BaseRole* alive = mAreaTargets.at(0);
 			if (!alive->getCloaking())									//潜行类怪物处理
 				return true;
 			mAreaTargets.clear();
@@ -421,7 +413,7 @@ namespace BattleSpace{
 		return false;
 	}
 
-	void WarAlive::cloakingTarget()
+	void BaseRole::cloakingTarget()
 	{
 		if (!getCriAtk()&& mAreaTargets.size())						//判断受击目标是否为潜行类怪物							
 		{
@@ -434,7 +426,7 @@ namespace BattleSpace{
 		}
 	}
 
-	bool WarAlive::standInGrid( int pGrid )
+	bool BaseRole::standInGrid( int pGrid )
 	{
 		if (pGrid >= C_CAPTAINGRID && getCaptain() )
 			return true;
@@ -446,7 +438,7 @@ namespace BattleSpace{
 		return false;
 	}
 
-	bool WarAlive::critJudge()
+	bool BaseRole::critJudge()
 	{
 		if (!getCaptain()&&
 			getCriAtk()&&

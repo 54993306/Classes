@@ -41,10 +41,10 @@
 #include "update/CDownloadPackage.h"
 #include "jni/CJniHelper.h"
 #include "Battle/MoveObject.h"
-#include "Battle/BattleRole.h"
+#include "Battle/BaseRole.h"
 #include "Battle/GuardArea.h"
 #include "Battle/RoleSkill.h"
-#include "Battle/RoleBaseData.h"
+#include "Battle/BaseRoleData.h"
 #include "Battle/MonsterData.h"
 namespace BattleSpace{
 	CombatLogic::CombatLogic()
@@ -124,7 +124,7 @@ namespace BattleSpace{
 		CCArray* arr = m_Manage->getAlivesByCamp(false,true);
 		CCARRAY_FOREACH(arr,obj)
 		{
-			WarAlive* alive = (WarAlive*)obj;
+			BaseRole* alive = (BaseRole*)obj;
 			m_MaxCost += alive->getCostmax();
 			if (alive->getCaptain())
 				m_CurrCost += alive->getInitCost();
@@ -306,7 +306,7 @@ namespace BattleSpace{
 		}
 	}
 	//cost 计算(帧)或以秒为单位进行计算、位置实时更新
-	void CombatLogic::CostCount(WarAlive* alive,float dt)
+	void CombatLogic::CostCount(BaseRole* alive,float dt)
 	{
 		if ( alive->getEnemy() ||	//敌方武将
 			alive->getFatherID()||	//召唤类武将
@@ -326,7 +326,7 @@ namespace BattleSpace{
 		Members* map_Alive = m_Manage->getMembers();
 		for (Members::iterator iter = map_Alive->begin();iter != map_Alive->end(); iter++)
 		{
-			WarAlive* alive = iter->second;
+			BaseRole* alive = iter->second;
 			CostCount(alive,delta);															//计算我方所有武将cost值
 			if (!alive->getActObject())continue;
 			if (m_Alive && alive != m_Alive)continue;										//一次只处理一个武将播放技能的情况，若是处理多个则以武将技能状态判断，而不用单一武将进行判断
@@ -344,7 +344,7 @@ namespace BattleSpace{
 		}
 	}
 	//@@这整一个方法都是由一个入口开始的对武将的处理啊,都是调用的武将的属性
-	void CombatLogic::HeroExcuteAI( WarAlive* pAlive )
+	void CombatLogic::HeroExcuteAI( BaseRole* pAlive )
 	{
 		int ActionCode = pAlive->getActObject()->getCurrActionCode();	
 		m_SkillRange->initAttackInfo(pAlive);
@@ -388,7 +388,7 @@ namespace BattleSpace{
 		}
 	}
 	//@@自动移动的我方武将无受击目标情况处理
-	bool CombatLogic::IsAutoMoveType( WarAlive*alive )
+	bool CombatLogic::IsAutoMoveType( BaseRole*alive )
 	{
 		if (alive->getCallType() != AutoMoveType)
 			return false;
@@ -404,7 +404,7 @@ namespace BattleSpace{
 		return true;
 	}
 	//@@骸兽逃跑处理
-	bool CombatLogic::monsterFlee( WarAlive* alive )
+	bool CombatLogic::monsterFlee( BaseRole* alive )
 	{
 		if (DataCenter::sharedData()->getWar()->getStageID())				//当前是为新手引导关卡,可以抽象出一个方法用于判断是否为新手关卡
 			return false;
@@ -429,7 +429,7 @@ namespace BattleSpace{
 		return false;
 	}
 	//@@
-	void CombatLogic::MonsterExcuteAI( WarAlive* alive,float dt )
+	void CombatLogic::MonsterExcuteAI( BaseRole* alive,float dt )
 	{
 		if (monsterFlee(alive))											//骸兽逃跑处理,将AI执行的都放在这个地方后面好整理
 			return;
@@ -465,14 +465,14 @@ namespace BattleSpace{
 		}
 	}
 
-	void CombatLogic::monsterCritEffect( WarAlive* alive)
+	void CombatLogic::monsterCritEffect( BaseRole* alive)
 	{
 		alive->getActObject()->TurnStateTo(Stand_Index);		
 		m_MapLayer->DrawWarningEffect(alive->mSkillArea);						//格子预警
 		m_CombatEffect->PlayerSkill(alive);
 	}
 
-	void CombatLogic::heroCritEffect( WarAlive* alive )
+	void CombatLogic::heroCritEffect( BaseRole* alive )
 	{
 		ActObject* pActObject = alive->getActObject();
 		m_Run = false;
@@ -492,7 +492,7 @@ namespace BattleSpace{
 		m_CombatEffect->PlayerSkill(alive);
 	}
 
-	void CombatLogic::excuteCritEffect( WarAlive* alive)
+	void CombatLogic::excuteCritEffect( BaseRole* alive)
 	{
 		if (alive->getEnemy())
 		{
@@ -502,7 +502,7 @@ namespace BattleSpace{
 		}
 	}
 
-	void CombatLogic::attackEffect( WarAlive*alive )
+	void CombatLogic::attackEffect( BaseRole*alive )
 	{
 		ActObject* pActObject = alive->getActObject();
 		const skEffectData* effect = alive->getCurrEffect();						//开始播放攻击音效攻击特效的时机可以由策划配置
@@ -516,7 +516,7 @@ namespace BattleSpace{
 		pActObject->TurnStateTo(info->getActionID());
 	}
 
-	void CombatLogic::attackDirection( WarAlive*alive )
+	void CombatLogic::attackDirection( BaseRole*alive )
 	{
 		ActObject* pActObject = alive->getActObject();
 		if (!alive->getCaptain()&& alive->getOpposite())									//反向攻击处理
@@ -530,7 +530,7 @@ namespace BattleSpace{
 		}
 	}
 	//@@
-	void CombatLogic::AliveExcuteAI(WarAlive* alive)
+	void CombatLogic::AliveExcuteAI(BaseRole* alive)
 	{
 		if (alive->critJudge())
 		{
@@ -547,7 +547,7 @@ namespace BattleSpace{
 			m_RecordNum++;
 	}
 
-	void CombatLogic::AliveCritEnd( WarAlive* alive )
+	void CombatLogic::AliveCritEnd( BaseRole* alive )
 	{
 		if (alive->getHp()>0&&alive->getBattle()&&!alive->getCaptain())				//我方武将释放技能时会扣自己血将自己击杀
 		{
@@ -576,7 +576,7 @@ namespace BattleSpace{
 
 	void CombatLogic::CritAtkEnd(CCObject* ob)
 	{
-		WarAlive* alive = dynamic_cast<WarAlive*>(ob);
+		BaseRole* alive = dynamic_cast<BaseRole*>(ob);
 		AliveCritEnd(alive);
 		m_AliveLayer->clearAlivesPauseMark();
 		m_UILayer->ResetButtonState(m_Alive);
@@ -588,7 +588,7 @@ namespace BattleSpace{
 	//攻击帧回调逻辑处理、武将执行一次伤害计算并播放效果
 	void CombatLogic::doLostHp(CCObject* ob)
 	{
-		WarAlive* alive = (WarAlive*)ob;
+		BaseRole* alive = (BaseRole*)ob;
 		const skEffectData* effect = alive->getCurrEffect();
 		if(!effect || alive->getSortieNum() >= effect->getBatter() )										//当掉血帧多于实际逻辑值，少于实际逻辑值情况处理
 			return;	
@@ -608,7 +608,7 @@ namespace BattleSpace{
 		case eCallAtk:
 			{
 				alive->setSortieNum(alive->getSortieNum()+1);								//一次性可召唤多个武将
-				WarAlive* pAlive = m_Manage->getCallAlive(alive,alive->getCurrSkill());	//得到被召唤的武将
+				BaseRole* pAlive = m_Manage->getCallAlive(alive,alive->getCurrSkill());	//得到被召唤的武将
 				if (!pAlive)
 				{
 					CCLOG("[ *ERROR ] CombatLoginc::AtkLogic CallAlive NULL");
@@ -625,7 +625,7 @@ namespace BattleSpace{
 		}
 	}
 	//延迟出场武将
-	bool CombatLogic::delayEntrance( WarAlive* alive,float dt )
+	bool CombatLogic::delayEntrance( BaseRole* alive,float dt )
 	{
 		if (alive->getBattle())
 			return false;
@@ -645,7 +645,7 @@ namespace BattleSpace{
 		return true;
 	}
 	//
-	bool CombatLogic::autoSkillAlive( WarAlive* alive )
+	bool CombatLogic::autoSkillAlive( BaseRole* alive )
 	{
 		if ((alive->getBaseData()->getCallType() == AutoSkill || alive->getBaseData()->getMonsterType() == MST_SKILL)&&!alive->getCriAtk())						//进入战场就释放技能(陨石类)
 		{
@@ -660,7 +660,7 @@ namespace BattleSpace{
 		return false;
 	}
 
-	void CombatLogic::attackTime( WarAlive* alive,float dt )
+	void CombatLogic::attackTime( BaseRole* alive,float dt )
 	{
 		int ActionCode = alive->getActObject()->getCurrActionCode();
 		if (ActionCode == Stand_Index	|| 
@@ -672,7 +672,7 @@ namespace BattleSpace{
 		alive->getBuffManage()->upDateBuff(dt);									// BUFF应该是每一帧都自动处理的
 	}
 	//武将进行逻辑处理前状态结算
-	bool CombatLogic::StateDispose( WarAlive* alive,float dt )
+	bool CombatLogic::StateDispose( BaseRole* alive,float dt )
 	{
 		if (alive->getCallType() == NotAttack	||								//石头类武将不做攻击判断处理
 			alive->getAliveStat() == UNATK		||
@@ -688,7 +688,7 @@ namespace BattleSpace{
 		return false;
 	}
 
-	bool CombatLogic::walkState( WarAlive* alive )
+	bool CombatLogic::walkState( BaseRole* alive )
 	{
 		if (alive->getEnemy()||alive->getCallType()==AutoMoveType)		//我方自动移动类武将
 		{
@@ -703,7 +703,7 @@ namespace BattleSpace{
 		}
 	}
 
-	bool CombatLogic::aliveAttackState( WarAlive* alive )
+	bool CombatLogic::aliveAttackState( BaseRole* alive )
 	{
 		if (alive->getSpeAtk())
 		{
@@ -718,7 +718,7 @@ namespace BattleSpace{
 		}
 	}
 	//武将状态判断,武将是否可攻击判断,提高效率关键方法之一
-	bool CombatLogic::AttackJudge( WarAlive* alive )
+	bool CombatLogic::AttackJudge( BaseRole* alive )
 	{
 		int ActionCode = alive->getActObject()->getCurrActionCode();
 		if (ActionCode == Walk_Index)
@@ -745,7 +745,7 @@ namespace BattleSpace{
 	{
 		if (m_Manage->getAliveByType(E_ALIVETYPE::eBoss))
 		{
-			WarAlive* boss = m_Manage->getAliveByType(E_ALIVETYPE::eBoss);
+			BaseRole* boss = m_Manage->getAliveByType(E_ALIVETYPE::eBoss);
 			m_Assist->DisplayBossWarning(m_UILayer,boss->getModel());							//第一波就出现超大boss的情况	
 			m_AliveLayer->removeMessage();														//释放掉触摸消息
 		}else if(m_BatchNum == m_CurrBatchNum)
@@ -775,7 +775,7 @@ namespace BattleSpace{
 		displayBatchWarning();
 	}
 
-	void CombatLogic::monsterRemove( WarAlive* alive )
+	void CombatLogic::monsterRemove( BaseRole* alive )
 	{
 		if (!alive->getLastAlive())
 			return;
@@ -794,14 +794,14 @@ namespace BattleSpace{
 
 	void CombatLogic::ActObjectRemove( CCObject* ob )
 	{
-		WarAlive* alive = (WarAlive*)ob;
+		BaseRole* alive = (BaseRole*)ob;
 		if (alive->getEnemy())
 		{
 			monsterRemove(alive);
 		}
 	}
 
-	void CombatLogic::monsterDieDispose( WarAlive* alive )
+	void CombatLogic::monsterDieDispose( BaseRole* alive )
 	{
 		if (m_Manage->checkMonstOver())
 		{
@@ -821,7 +821,7 @@ namespace BattleSpace{
 	//控制关卡进度的地方处理
 	void CombatLogic::AliveDieDispose( CCObject* ob )
 	{
-		WarAlive* alive = (WarAlive*)ob;
+		BaseRole* alive = (BaseRole*)ob;
 		if (alive->getEnemy())
 		{
 			monsterDieDispose(alive);
@@ -842,7 +842,7 @@ namespace BattleSpace{
 	void CombatLogic::battleWin()
 	{
 		PlayBackgroundMusic(SFX_Win,false);	
-		WarAlive* alive = m_Manage->getAliveByGrid(C_CAPTAINGRID);	
+		BaseRole* alive = m_Manage->getAliveByGrid(C_CAPTAINGRID);	
 		int hp = alive->getHp();
 		if (hp>alive->getBaseData()->getRoleHp())
 			hp = alive->getBaseData()->getRoleHp();

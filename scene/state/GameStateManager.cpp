@@ -26,7 +26,7 @@ namespace BattleSpace{
 		registerState(SpecialAttackState::create());				//6、 特殊攻击
 		registerState(SkillState::create());						//7、 主动技能
 		registerState(VictoryState::create());						//8、 胜利动作
-		registerState(DieState::create());							//9、 死亡
+		registerState(DiedState::create());							//9、 死亡
 		registerState(StartState::create());						//10、入场
 		return true;
 	}

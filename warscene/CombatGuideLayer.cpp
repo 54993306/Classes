@@ -17,7 +17,7 @@
 #include "Battle/LoadSpineData.h"
 #include "Battle/BattleMessage.h"
 #include "Battle/MoveObject.h"
-#include "Battle/BattleRole.h"
+#include "Battle/BaseRole.h"
 namespace BattleSpace{
 	CombatGuideLayer::CombatGuideLayer()
 		:m_Step(nullptr),m_root(nullptr),m_mapData(nullptr)
@@ -312,7 +312,7 @@ namespace BattleSpace{
 			return;
 		CCSprite* arrows = CCSprite::create("public/guide/arrows.png"); 
 		arrows->setAnchorPoint(ccp(0.8f,0.5f));
-		WarAlive* alive = DataCenter::sharedData()->getWar()->getAliveByGrid(C_CAPTAINSTAND);
+		BaseRole* alive = DataCenter::sharedData()->getWar()->getAliveByGrid(C_CAPTAINSTAND);
 		CCPoint p = alive->getActObject()->getPosition();									//得到点阵图坐标
 		CCPoint point(p.x-GRID_WIDTH,p.y+GRID_HEIGHT);										//得到偏移坐标
 		CCPoint point_offset = m_root->convertToNodeSpace(m_AliveLayer->convertToWorldSpace(point));					//在warAliveLayer上的点都会默认减去地图的一半,因此直接转化世界坐标就可以，因为m_root的关系，这里还是转为相对坐标
@@ -323,9 +323,9 @@ namespace BattleSpace{
 		m_root->addChild(arrows, 6);
 	}
 
-	void CombatGuideLayer::creaAliveByVector( vector<WarAlive*>VecAlive,CombatGuideStep* step )
+	void CombatGuideLayer::creaAliveByVector( vector<BaseRole*>VecAlive,CombatGuideStep* step )
 	{
-		for(WarAlive*alive:VecAlive)
+		for(BaseRole*alive:VecAlive)
 		{
 			for (auto compel:step->m_VecCompel)
 			{
@@ -348,10 +348,10 @@ namespace BattleSpace{
 		m_Scene->getMoveLayer()->runAction(mt);
 		CCArray* arr = DataCenter::sharedData()->getWar()->getAlivesByCamp(false);
 		CCObject* obj = nullptr;
-		vector<WarAlive*>VecAlive;
+		vector<BaseRole*>VecAlive;
 		CCARRAY_FOREACH(arr,obj)
 		{
-			WarAlive* alive = (WarAlive*)obj;
+			BaseRole* alive = (BaseRole*)obj;
 			if (alive->getCaptain())														//重置我方数据
 				continue;
 			VecAlive.push_back(alive);

@@ -1,10 +1,10 @@
 ﻿#include "SkillTips.h"
 #include "warscene/WarControl.h"
 #include "common/CommonFunction.h"
-#include "Battle/BattleRole.h"
+#include "Battle/BaseRole.h"
 #include "model/DataCenter.h"
 #include "Battle/BattleMessage.h"
-#include "Battle/RoleBaseData.h"
+#include "Battle/BaseRoleData.h"
 #include "Battle/RoleSkill.h"
 namespace BattleSpace{
 
@@ -57,7 +57,7 @@ namespace BattleSpace{
 		return res;
 	}
 
-	void SkillTips::setSkillInfo(CCObject* target,WarAlive* alive)
+	void SkillTips::setSkillInfo(CCObject* target,BaseRole* alive)
 	{
 		if (outPutERRORMsg("SkillTips::setSkillInfo",target))
 			return;

@@ -8,7 +8,7 @@
 #include "common/CommonFunction.h"
 #include "warscene/EffectData.h"
 #include "warscene/CombatGuideManage.h"
-#include "Battle/RoleBaseData.h"
+#include "Battle/BaseRoleData.h"
 #include "model/TerrainManager.h"
 #include "model/WarManager.h"
 #include "model/MapManager.h"
@@ -17,7 +17,7 @@
 #include "Battle/LoadSpineData.h"
 #include "warscene/BattleTools.h"
 /******************************************/
-#include "Battle/RoleBaseData.h"
+#include "Battle/BaseRoleData.h"
 #include "Battle/RoleSkill.h"
 #include "Battle/skEffectData.h"
 #include "Battle/BattleDataCenter.h"
@@ -147,7 +147,7 @@ namespace BattleSpace{
 		m_tip->setVisible(false);
 	}
 	//技能解析,通过技能得到加载数据
-	void LoadWar::SkillParse( const RoleBaseData* pRole,vector<int>&VecEffect,vector<int>&VecBuff )
+	void LoadWar::SkillParse( const BaseRoleData* pRole,vector<int>&VecEffect,vector<int>&VecBuff )
 	{
 		vector< const RoleSkill*> VSkill;
 		VSkill.push_back(pRole->getNormalSkill());
@@ -159,7 +159,7 @@ namespace BattleSpace{
 				for (skEffectData* tEffectData:tVecEffect)
 				{
 					VecEffect.push_back(tEffectData->getEffectID());		//for (auto l:k.buffList){}		需要引入头文件
-					BuffData* Buffdata = m_Manage->getBuffData();
+					BuffConfig* Buffdata = m_Manage->getBuffData();
 					for (auto p:tEffectData->getBuffVector())
 					{
 						BuffEffect* effect = Buffdata->getBuffEffect(p->getBuffType(),p->getIsDBuff());
@@ -401,7 +401,7 @@ namespace BattleSpace{
 				TextureThread(plist_str,ToString(i));
 			}
 		}
-		BuffData* Buffdata = m_Manage->getBuffData();
+		BuffConfig* Buffdata = m_Manage->getBuffData();
 		for (auto ptr:m_WarResouse.find(ResourceType::Load_Buff)->second)
 		{
 			if ( !ptr )continue;

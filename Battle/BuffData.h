@@ -24,12 +24,12 @@ namespace protos{
 }
 namespace BattleSpace{
 	//用于对服务器数据做转换和接收
-	class RoleBuffData  : public cocos2d::CCObject
+	class BuffData  : public cocos2d::CCObject
 	{
 	public:
-		RoleBuffData();										//详细参见datadefine Bufinfo		
+		BuffData();										//详细参见datadefine Bufinfo		
 		virtual bool init(){return true;}
-		CREATE_FUNC(RoleBuffData);
+		CREATE_FUNC(BuffData);
 		CC_SYNTHESIZE(int,m_BuffID,BuffID);					//buff ID
 		CC_SYNTHESIZE(int,m_BuffType,BuffType);				//buff影响类型
 		CC_SYNTHESIZE(int,m_ChangeNum,ChangeNum);			//影响数值
@@ -42,10 +42,10 @@ namespace BattleSpace{
 		CC_SYNTHESIZE(int,m_TargetType,TargetType);			//种族限制(火1,木2,水3,0是不限制)
 		CC_SYNTHESIZE(std::string,m_BuffDes,BuffDes);		//buff名称
 		void readData(const protos::common::Buff* buff);
-		void initData(RoleBuffData& pData);
+		void initData(BuffData& pData);
 	};
 	//战斗中实际使用到的buff结构,buff是可以具备很多逻辑的,但是现在buff的逻辑都放在buff管理器里面去写了。应该是接口的方式抽象出来写才对
-	class BuffInfo : public RoleBuffData
+	class BuffInfo : public BuffData
 	{
 	public:
 		BuffInfo();

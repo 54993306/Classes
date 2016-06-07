@@ -1,11 +1,11 @@
 
 #include "Battle/MoveObject.h"
-#include "Battle/BattleRole.h"
+#include "Battle/BaseRole.h"
 #include "model/DataCenter.h"
 #include "model/MapManager.h"
 #include "warscene/ConstNum.h"
 #include "scene/alive/ActObject.h"
-#include "Battle/RoleBaseData.h"
+#include "Battle/BaseRoleData.h"
 namespace BattleSpace{
 	MoveObject::MoveObject()
 		:m_grid(0),m_Alive(nullptr),m_Row(1),m_Col(1),m_OffsX(0),m_OffsY(0)

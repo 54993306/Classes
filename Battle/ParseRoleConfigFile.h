@@ -19,7 +19,7 @@
 
 using namespace cocos2d;
 using namespace std;
-class RoleBaseData;
+class BaseRoleData;
 class ParseRoleConfigFile : public CCObject
 {
 public:
@@ -27,7 +27,7 @@ public:
 	~ParseRoleConfigFile();
 	virtual bool init(){return true;}
 	CREATE_FUNC(ParseRoleConfigFile);
-	void pauseData(vector<RoleBaseData*>& Vec);
+	void pauseData(vector<BaseRoleData*>& Vec);
 protected:
 	
 private:

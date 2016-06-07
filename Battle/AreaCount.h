@@ -18,13 +18,13 @@
 #include <vector>
 #include "cocos2d.h"
 namespace BattleSpace{
-	class WarAlive;
+	class BaseRole;
 
 	class AreaCountInfo
 	{
 	public:
-		AreaCountInfo(std::vector<int>& pVector,WarAlive* pAlive);
-		CC_SYNTHESIZE(WarAlive*,mAlive,Alive);		
+		AreaCountInfo(std::vector<int>& pVector,BaseRole* pAlive);
+		CC_SYNTHESIZE(BaseRole*,mAlive,Alive);		
 		CC_SYNTHESIZE(int,mGrid,Grid);						//范围计算参照点
 		CC_SYNTHESIZE(bool,mEnemy,Enemy);					//武将阵营
 		CC_SYNTHESIZE(bool,mBackAttack,BackAttack);			//反向攻击

@@ -15,7 +15,7 @@
  *
  *************************************************************/
 namespace BattleSpace{
-	class WarAlive;
+	class BaseRole;
 	class RoleSkill;
 	class skEffectData;
 
@@ -27,13 +27,13 @@ namespace BattleSpace{
 	int getNewRow(int originRow ,int aimRow ,int aim_row);
 	int getHeroNewCol(int originCol ,int aimCol ,int aim_col);
 	int getMonsterNewCol(int originCol ,int aimCol ,int aim_col);
-	void CallAliveByFixRange( WarAlive*father , WarAlive*child );
+	void CallAliveByFixRange( BaseRole*father , BaseRole*child );
 
 	void VectorRemoveRepeat(vector<int>& Vec);
 
-	void VectorRemoveRepeat(vector<WarAlive*> &pVector);
+	void VectorRemoveRepeat(vector<BaseRole*> &pVector);
 
-	void VectorSortAliveHp(vector<WarAlive*> &pVector);
+	void VectorSortAliveHp(vector<BaseRole*> &pVector);
 
 	void PlaySound_Event(int id);
 };

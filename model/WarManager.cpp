@@ -10,7 +10,7 @@
 #include "tools/commonDef.h"
 #include "scene/layer/WarAliveLayer.h"
 #include <functional>					//sort 的降序排序使用
-#include "Battle/BattleRole.h"
+#include "Battle/BaseRole.h"
 #include "warscene/EffectData.h"
 #include "tollgate/Chapter.h"
 #include "scene/alive/AliveDefine.h"
@@ -27,9 +27,10 @@
 #include "Battle/SkillMacro.h"
 #include "Battle/RoleSkill.h"
 #include "Battle/BattleRoleMacro.h"
-#include "Battle/RoleBaseData.h"
+#include "Battle/BaseRoleData.h"
 #include "Battle/MonsterData.h"
 #include "Battle/HeroData.h"
+#include "Battle/skEffectData.h"
 namespace BattleSpace{
 
 };
@@ -123,10 +124,10 @@ namespace BattleSpace{
 
 	void WarManager::setBossHurtCount(int hurt){ m_BossHurtCount += hurt;}
 
-	void WarManager::addAlive(WarAlive* alive)
+	void WarManager::addAlive(BaseRole* alive)
 	{
 		if(!alive) return;
-		WarAlive* tpAlive = getAlive(alive->getAliveID());
+		BaseRole* tpAlive = getAlive(alive->getAliveID());
 		if( tpAlive == alive ) return;
 		if( tpAlive )
 		{
@@ -138,7 +139,7 @@ namespace BattleSpace{
 		m_members[alive->getAliveID()] = alive;
 	}
 
-	WarAlive* WarManager::getAlive(unsigned int aliveID)
+	BaseRole* WarManager::getAlive(unsigned int aliveID)
 	{
 		Members::iterator iter = m_members.find(aliveID);
 		if( iter != m_members.end() ) return iter->second;
@@ -159,7 +160,7 @@ namespace BattleSpace{
 		m_efdata->retain();
 		m_terData = terData::create();
 		m_terData->retain();
-		m_BuffData = BuffData::create();
+		m_BuffData = BuffConfig::create();
 		m_BuffData->retain();
 		m_StoryData = StoryData::create();
 		m_StoryData->retain();
@@ -176,7 +177,7 @@ namespace BattleSpace{
 		const vector<HeroData*>tVector = BattleData->getHeroVector();
 		for (int tIndex = 1 ;tIndex<=tVector.size(); tIndex++)
 		{
-			WarAlive* alive = WarAlive::create();							//创建数据对象
+			BaseRole* alive = BaseRole::create();							//创建数据对象
 			alive->setBaseData(tVector.at(tIndex-1));
 			alive->setAliveID(tIndex);										//战场上武将的唯一id
 			alive->setEnemy(false);
@@ -193,7 +194,7 @@ namespace BattleSpace{
 			if (tVector.at(tIndex)->getCallRole() ||
 				tVector.at(tIndex)->getBatchNumber()!=batch)
 				continue;
-			WarAlive* alive = WarAlive::create();								//创建数据对象
+			BaseRole* alive = BaseRole::create();								//创建数据对象
 			if (tVector.at(tIndex)->getBossMonster())							//大怪物提示
 				if (m_BossModel)
 					alive->setAliveType(E_ALIVETYPE::eWorldBoss);				//世界boss
@@ -217,8 +218,8 @@ namespace BattleSpace{
 		{
 			for (int j =0;j<arr->count()-1-i;j++)
 			{
-				int front = ((WarAlive*)arr->objectAtIndex(j))->getGridIndex();
-				int back  = ((WarAlive*)arr->objectAtIndex(j+1))->getGridIndex();
+				int front = ((BaseRole*)arr->objectAtIndex(j))->getGridIndex();
+				int back  = ((BaseRole*)arr->objectAtIndex(j+1))->getGridIndex();
 				if ( front > back)						//从小到大排序,把大的换到后面
 					arr->exchangeObjectAtIndex(j,j+1);
 			}
@@ -246,14 +247,14 @@ namespace BattleSpace{
 		return arr;
 	}
 
-	WarAlive* WarManager::getAliveByGrid(int grid)
+	BaseRole* WarManager::getAliveByGrid(int grid)
 	{
 		if (grid == INVALID_GRID)
 			return nullptr;
 		for(Members::iterator iter = m_members.begin(); iter != m_members.end();++iter)
 		{
 			//先判断是否为boss如果为boss判断boss所站的区域是否包含该格子
-			WarAlive* alive = iter->second;
+			BaseRole* alive = iter->second;
 			if (alive->getHp() <= 0)
 				continue;
 			if (grid >=  C_CAPTAINGRID)
@@ -272,11 +273,11 @@ namespace BattleSpace{
 		return nullptr;
 	}
 
-	WarAlive* WarManager::getAliveByType( E_ALIVETYPE type,bool Monster/* = true*/ )
+	BaseRole* WarManager::getAliveByType( E_ALIVETYPE type,bool Monster/* = true*/ )
 	{
 		for(Members::iterator iter = m_members.begin(); iter != m_members.end();++iter)
 		{
-			WarAlive* alive = iter->second;
+			BaseRole* alive = iter->second;
 			if (alive->getHp() <= 0 || alive->getEnemy() != Monster)
 				continue;
 			if (alive->getAliveType() == type)
@@ -301,17 +302,17 @@ namespace BattleSpace{
 		return &m_members; }
 	EffectData* WarManager::getEffData() { 
 		return m_efdata; }
-	BuffData* WarManager::getBuffData(){
+	BuffConfig* WarManager::getBuffData(){
 		return m_BuffData;}
 	StoryData* WarManager::getStoryData(){
 		return m_StoryData;}
 
-	WarAlive* WarManager::getAbsentCallAlive( WarAlive* fatherAlive )
+	BaseRole* WarManager::getAbsentCallAlive( BaseRole* fatherAlive )
 	{
 		Members::iterator iter = m_members.begin();
 		for(; iter != m_members.end();++iter)			//判断是否有已创建但未上阵的召唤武将
 		{
-			WarAlive* alive = iter->second;
+			BaseRole* alive = iter->second;
 			if (alive->getHp()<=0 || alive->getEnemy() != fatherAlive->getEnemy())
 				continue;
 			if (alive->getBaseData()->getCallRole() && 
@@ -322,14 +323,14 @@ namespace BattleSpace{
 		return nullptr;
 	}
 
-	WarAlive* WarManager::getNewCallAlive(WarAlive* Father,int CallId)
+	BaseRole* WarManager::getNewCallAlive(BaseRole* Father,int CallId)
 	{
 		const vector<MonsterData*>tVector = BattleData->getCallRoleVector();
 		for (MonsterData* tBaseData:tVector)
 		{
 			if (tBaseData->getCallID() != CallId)
 				continue;
-			WarAlive* child = WarAlive::create();
+			BaseRole* child = BaseRole::create();
 			child->setBaseData(tBaseData);
 			child->setCallType(tBaseData->getCallType());
 			child->setEnemy(Father->getEnemy());
@@ -362,9 +363,9 @@ namespace BattleSpace{
 		return nullptr;
 	}
 
-	WarAlive* WarManager::getCallAlive(WarAlive* Father,const RoleSkill* skill)
+	BaseRole* WarManager::getCallAlive(BaseRole* Father,const RoleSkill* skill)
 	{
-		WarAlive* alive = getAbsentCallAlive(Father);					
+		BaseRole* alive = getAbsentCallAlive(Father);					
 		if (alive)
 			return alive;
 		if (Father->captainCallNumberJudge())
@@ -385,7 +386,7 @@ namespace BattleSpace{
 		m_AliveRoles.clear();
 		for(Members::iterator iter = m_members.begin(); iter != m_members.end();++iter)
 		{
-			WarAlive* tAlive = iter->second;
+			BaseRole* tAlive = iter->second;
 			if (tAlive->getHp() <= 0||!tAlive->getBattle()||!tAlive->getActObject())
 				continue;
 			if (tAlive->getEnemy())
@@ -421,7 +422,7 @@ namespace BattleSpace{
 		CSceneManager::sharedSceneManager()->replaceScene(scene);
 	}
 
-	vector<WarAlive*>* WarManager::getSkillTargets(WarAlive* pAlive)
+	vector<BaseRole*>* WarManager::getSkillTargets(BaseRole* pAlive)
 	{
 		int tTarget = pAlive->getCurrEffect()->getTargetType();
 		if ((pAlive->getEnemy()&&tTarget == eUsType)	|| 
@@ -433,21 +434,21 @@ namespace BattleSpace{
 		return getAliveRoles(true);
 	}
 
-	vector<WarAlive*>* WarManager::getVecMonsters(bool pSort /*=false*/)
+	vector<BaseRole*>* WarManager::getVecMonsters(bool pSort /*=false*/)
 	{
 		if (pSort)
 			VectorRemoveRepeat(m_Monsters);
 		return &m_Monsters;
 	}
 
-	vector<WarAlive*>* WarManager::getVecHeros(bool pSort /*=false*/)
+	vector<BaseRole*>* WarManager::getVecHeros(bool pSort /*=false*/)
 	{
 		if (pSort)
 			VectorRemoveRepeat(m_Heros);
 		return &m_Heros;
 	}
 
-	vector<WarAlive*>* WarManager::getAliveRoles( bool pSort /*= false*/ )
+	vector<BaseRole*>* WarManager::getAliveRoles( bool pSort /*= false*/ )
 	{
 		if (pSort)
 			VectorRemoveRepeat(m_AliveRoles);

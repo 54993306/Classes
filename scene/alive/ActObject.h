@@ -19,7 +19,7 @@
 class ArmatureEventData;
 
 namespace BattleSpace{
-	class WarAlive;
+	class BaseRole;
 	class SpecialEffectInfo;
 	class EffectData;
 	class WarControl;
@@ -51,7 +51,7 @@ namespace BattleSpace{
 		virtual bool init();
 		virtual void setModel(int model);						//重写父类的方法
 		virtual void setActionKey(string actionKey);			//
-		virtual void setAlive(WarAlive* var);
+		virtual void setAlive(BaseRole* var);
 		virtual void setMoveState(int var = Walk_Index);
 		void initStateManage();
 		void SpineActionEvent(int trackIndex,spEvent* Event);

@@ -10,7 +10,7 @@
 //
 //************************************************************************/
 namespace BattleSpace{
-	class WarAlive;
+	class BaseRole;
 	class WarScene;
 	class WarMapData;
 	class WarMapLayer;
@@ -56,7 +56,7 @@ namespace BattleSpace{
 		void describe(CombatGuideStep* step);
 		void captainMark(CombatGuideStep* step);
 		void resetAlive(CombatGuideStep* step);
-		void creaAliveByVector(vector<WarAlive*>VecAlive,CombatGuideStep* step);
+		void creaAliveByVector(vector<BaseRole*>VecAlive,CombatGuideStep* step);
 	private:
 		CCNode* m_root;
 		WarScene* m_Scene;

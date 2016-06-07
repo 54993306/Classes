@@ -11,7 +11,7 @@ ParseRoleConfigFile::~ParseRoleConfigFile()
 
 }
 
-void ParseRoleConfigFile::pauseData( vector<RoleBaseData*>& Vec )
+void ParseRoleConfigFile::pauseData( vector<BaseRoleData*>& Vec )
 {
 
 }

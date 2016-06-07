@@ -111,12 +111,12 @@ namespace BattleSpace{
 		virtual void leaveState(StateManager* actor,StateMachine* self){};
 	};
 	//9死亡
-	class DieState:public PostureState
+	class DiedState:public PostureState
 	{
 	public:
-		DieState(){m_stateCode = Die_Index;};
-		virtual ~DieState(){};
-		CREATE_FUNC(DieState);
+		DiedState(){m_stateCode = Die_Index;};
+		virtual ~DiedState(){};
+		CREATE_FUNC(DiedState);
 		virtual void entryState(StateManager* actor,StateMachine* self);
 		virtual void leaveState(StateManager* actor,StateMachine* self){};
 	};

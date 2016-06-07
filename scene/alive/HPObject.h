@@ -17,7 +17,7 @@ namespace BattleSpace{
 		addCritType			= 9,		//增加型暴击
 	};
 	class AliveObject;
-	class WarAlive;
+	class BaseRole;
 	USING_NS_CC;
 	class HPObject : public CCNode
 	{
@@ -50,7 +50,7 @@ namespace BattleSpace{
 		CCProgressTimer* m_Skin;
 		CCSprite* m_Background;
 		float m_Percent;
-		WarAlive* m_Alive;
+		BaseRole* m_Alive;
 		AliveObject* m_ActObject;
 	};
 }

@@ -1,11 +1,13 @@
 ﻿#include "BuffManage.h"
 #include "Global.h"
-#include "Battle/BattleRole.h"
+#include "Battle/BaseRole.h"
 #include "DataCenter.h"
 #include "scene/alive/AliveDefine.h"
 #include "warscene/ConstNum.h"
 #include "Battle/BattleMessage.h"
-#include "Battle/RoleBaseData.h"
+#include "Battle/BaseRoleData.h"
+#include "Battle/skEffectData.h"
+#include "Battle/BuffData.h"
 using namespace cocos2d;
 using namespace cocos2d::extension;
 namespace BattleSpace{
@@ -58,7 +60,7 @@ namespace BattleSpace{
 			m_EffectMap[buffid] = Vec;
 	}
 
-	void BuffManage::AddBuff(RoleBuffData& buf)
+	void BuffManage::AddBuff(BuffData& buf)
 	{
 		if (m_alive->getHp()<=0||!m_alive->getBattle()||!m_alive->getActObject())
 		{
@@ -164,7 +166,7 @@ namespace BattleSpace{
 	}
 
 	//返回true表示不添加新Buf
-	bool BuffManage::AddBuffLogic(RoleBuffData& buff)
+	bool BuffManage::AddBuffLogic(BuffData& buff)
 	{
 		BuffInfo* oldBuff = getbuffbyType(buff.getBuffType());
 		if (oldBuff)															/*存在相同类型的buf*/

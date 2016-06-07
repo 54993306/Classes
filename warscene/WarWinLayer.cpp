@@ -10,7 +10,7 @@
 #include "bag/bagData.h"
 #include "tollgate/Chapter.h"
 #include "model/DataCenter.h"
-#include "Battle/BattleRole.h"
+#include "Battle/BaseRole.h"
 #include "model/WarManager.h"
 #include "warscene/RandomBusineseMan.h"
 #include "guide/GuideManager.h"

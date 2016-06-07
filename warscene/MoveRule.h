@@ -16,7 +16,7 @@
  *
  *************************************************************/
 namespace BattleSpace{
-	class WarAlive;
+	class BaseRole;
 	class MoveRule : public CCObject
 	{
 	public:
@@ -25,13 +25,13 @@ namespace BattleSpace{
 		virtual bool init();
 		CREATE_FUNC(MoveRule);
 		void changeTestState(CCObject* ob);
-		int getMonsterMoveGrid(WarAlive* alive);
+		int getMonsterMoveGrid(BaseRole* alive);
 
-		int getMoveGrid(WarAlive* alive,int grid);
-		int MoveJudge(WarAlive* alive,int grid);				//用于判断是否可以移动，多格站位处理
-		int FrontBack(WarAlive* alive,int range,bool enemy);
-		int monsterMove(WarAlive* target);
-		bool MonstMoveExcute(WarAlive* monster);
+		int getMoveGrid(BaseRole* alive,int grid);
+		int MoveJudge(BaseRole* alive,int grid);				//用于判断是否可以移动，多格站位处理
+		int FrontBack(BaseRole* alive,int range,bool enemy);
+		int monsterMove(BaseRole* target);
+		bool MonstMoveExcute(BaseRole* monster);
 		int getCurrRandomGrid(int grid,bool hasAlive = false);
 	private:
 		bool m_testState;

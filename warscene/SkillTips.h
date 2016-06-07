@@ -4,7 +4,7 @@
 #include "scene/layer/LayerManager.h"
 //长按技能提示实现
 namespace BattleSpace{
-	class WarAlive;
+	class BaseRole;
 
 	class SkillTips : public BaseLayer
 	{
@@ -17,7 +17,7 @@ namespace BattleSpace{
 		CREATE_FUNC(SkillTips);
 		void removeTips(CCObject* ob);
 		bool ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent);
-		void setSkillInfo(CCObject* target,WarAlive* alive);
+		void setSkillInfo(CCObject* target,BaseRole* alive);
 	private:
 		CLayout *m_ui;
 	};

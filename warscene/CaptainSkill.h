@@ -12,7 +12,7 @@
 #include "AppUI.h"
 namespace BattleSpace{
 
-	class WarAlive;
+	class BaseRole;
 	class RoleSkill;
 	class skEffectData;
 	class CaptainSkill : public CCObject
@@ -26,12 +26,12 @@ namespace BattleSpace{
 		CCArray* RaceJudgeCap(CCArray* arr,int type);
 		CCArray* RaceJudge(CCArray* arr,int type,bool exclude = false,bool And = false);
 		CCArray* AttributeJudgeArrCap(RoleSkill& skill,CCArray* arr);
-		bool AttributeJudge(WarAlive* alive,int type,int rate);
+		bool AttributeJudge(BaseRole* alive,int type,int rate);
 		CCArray* PositionJudgeArrCap(CCArray* arr,int type);
 		bool PositionJudge(bool Enemy,int grid,int type);
 		CCArray* getTargetArrCap(const skEffectData*pEffect,CCArray*targetArr,CCArray*arr);			//得到执行队长技效果的目标数组并执行效果
 		void ExecuteArrCap(const skEffectData*pEffect,CCArray* arr);
-		void AliveExecute(const skEffectData*pEffect,WarAlive*alive);
+		void AliveExecute(const skEffectData*pEffect,BaseRole*alive);
 		void AddArr(CCArray* target,CCArray*arr);
 	private:
 

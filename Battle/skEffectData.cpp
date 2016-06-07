@@ -1,6 +1,6 @@
 
 #include "Battle/skEffectData.h"
-#include "Battle/RoleBuffData.h"
+#include "Battle/BuffData.h"
 #include <protos/common/skill_common.pb.h>
 namespace BattleSpace{
 	skEffectData::skEffectData()
@@ -38,14 +38,14 @@ namespace BattleSpace{
 		this->setChangeCost(pEffect->cost());
 	}
 
-	const std::vector<RoleBuffData*>& skEffectData::getBuffVector() const
+	const std::vector<BuffData*>& skEffectData::getBuffVector() const
 	{
 		return mBuffVector;
 	}
 
 	void skEffectData::addBuffData( const protos::common::Buff* pBuffData )
 	{
-		RoleBuffData* tBuffData = RoleBuffData::create();
+		BuffData* tBuffData = BuffData::create();
 		tBuffData->readData(pBuffData);
 		tBuffData->retain();
 		mBuffVector.push_back(tBuffData);

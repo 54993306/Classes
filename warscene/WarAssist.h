@@ -12,7 +12,7 @@ namespace BattleSpace{
 	class WarAliveLayer;
 	class WarControl;
 	class ActObject;
-	class WarAlive;
+	class BaseRole;
 	class WarAliveLayer;
 	class WarAliveLayer;
 	class WarScene;

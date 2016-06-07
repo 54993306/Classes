@@ -1,7 +1,7 @@
 #include "BattleTools.h"
 #include "warscene/ConstNum.h"
-#include "Battle/BattleRole.h"
-#include "Battle/RoleBaseData.h"
+#include "Battle/BaseRole.h"
+#include "Battle/BaseRoleData.h"
 #include "common/CGameSound.h"
 namespace BattleSpace{
 	bool RowUp_InBoundary( int originRow,int aimRow )
@@ -121,7 +121,7 @@ namespace BattleSpace{
 		return newCol;
 	}
 	//武将固定位置间隔召唤其他武将
-	void CallAliveByFixRange( WarAlive*father , WarAlive*child )
+	void CallAliveByFixRange( BaseRole*father , BaseRole*child )
 	{
 		int originCol = father->getGridIndex() / C_GRID_ROW;
 		int originRow = father->getGridIndex() % C_GRID_ROW;
@@ -165,13 +165,13 @@ namespace BattleSpace{
 		PlayEffectSound(str);				//播放效果音效
 	}
 	//对武将血量百分比进行排序
-	void SortAliveHp(vector<WarAlive*>* VecAlive,int left,int right)
+	void SortAliveHp(vector<BaseRole*>* VecAlive,int left,int right)
 	{
 		if ( left < right )
 		{
 			int i = left;
 			int j = right;
-			WarAlive* alive = VecAlive->at(i);
+			BaseRole* alive = VecAlive->at(i);
 			float pe = (float)alive->getHp()/alive->getMaxHp();
 			while ( i < j ) 
 			{
@@ -205,29 +205,29 @@ namespace BattleSpace{
 		pVector.erase(unique(pVector.begin(),pVector.end()),pVector.end());
 	}
 	//升序
-	bool sortAliveGrid(const WarAlive*apAlive,const WarAlive*bpAlive)	
+	bool sortAliveGrid(const BaseRole*apAlive,const BaseRole*bpAlive)	
 	{ 
 		return  apAlive->getGridIndex() < bpAlive->getGridIndex(); 
 	}
 
-	void VectorRemoveRepeat( vector<WarAlive*> &pVector )
+	void VectorRemoveRepeat( vector<BaseRole*> &pVector )
 	{
-		vector<WarAlive*>::iterator pos;
+		vector<BaseRole*>::iterator pos;
 		pos = unique(pVector.begin(),pVector.end());		//得到重复元素开始的位置
 		pVector.erase(pos,pVector.end());
 		sort(pVector.begin(),pVector.end(),sortAliveGrid);
 	}
 
-	bool sortAliveHp(const WarAlive* apAlive,const WarAlive* bpAlive)
+	bool sortAliveHp(const BaseRole* apAlive,const BaseRole* bpAlive)
 	{
 		float atHpPerent = (float)apAlive->getHp()/apAlive->getMaxHp();
 		float btHpPerent = (float)bpAlive->getHp()/bpAlive->getMaxHp();
 		return atHpPerent < btHpPerent;
 	}
 
-	void VectorSortAliveHp( vector<WarAlive*> &pVector )
+	void VectorSortAliveHp( vector<BaseRole*> &pVector )
 	{
-		vector<WarAlive*>::iterator pos;
+		vector<BaseRole*>::iterator pos;
 		pos = unique(pVector.begin(),pVector.end());		//得到重复元素开始的位置
 		pVector.erase(pos,pVector.end());
 		sort(pVector.begin(),pVector.end(),sortAliveHp);

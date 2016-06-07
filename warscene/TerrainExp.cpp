@@ -4,7 +4,7 @@
 #include "model/terrainLayer.h"
 #include "scene/alive/AliveDefine.h"
 #include "Global.h"
-#include "Battle/BattleRole.h"
+#include "Battle/BaseRole.h"
 #include "model/TerrainManager.h"
 #include "scene/effect/EffectDefine.h"
 namespace BattleSpace{
@@ -17,7 +17,7 @@ namespace BattleSpace{
 
 	bool TerrainExp::init() { return true; }
 
-	float TerrainExp::DataHandle(WarAlive* alive, float time , terRound* round,CCArray* m_task)
+	float TerrainExp::DataHandle(BaseRole* alive, float time , terRound* round,CCArray* m_task)
 	{
 		float ptime = 0;
 		do{
@@ -41,7 +41,7 @@ namespace BattleSpace{
 		return ptime;
 	}
 
-	float TerrainExp::StateHandle(ActObject* aliveOb,WarAlive* alive,float sysTime ,float lostHp ,float currHp,CCArray* m_task)
+	float TerrainExp::StateHandle(ActObject* aliveOb,BaseRole* alive,float sysTime ,float lostHp ,float currHp,CCArray* m_task)
 	{
 		float ptime = 0;
 		do{

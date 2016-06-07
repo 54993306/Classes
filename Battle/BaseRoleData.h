@@ -28,11 +28,11 @@ namespace protos{
 }
 namespace BattleSpace{
 	class RoleSkill;
-	class RoleBaseData : public cocos2d::CCObject
+	class BaseRoleData : public cocos2d::CCObject
 	{
 	public:
-		RoleBaseData();
-		~RoleBaseData();		
+		BaseRoleData();
+		~BaseRoleData();		
 		CC_SYNTHESIZE(int,mServerID,ServerID);							//服务器角色ID
 		CC_SYNTHESIZE(int,mRoleModel,RoleModel);						//模型id
 		CC_SYNTHESIZE(int,mRoleType,RoleType);							//武将属性(火1,水2,木3)

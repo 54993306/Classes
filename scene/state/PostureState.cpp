@@ -2,7 +2,7 @@
 #include "AppUI.h"
 #include "Global.h"
 #include "PostureState.h"
-#include "Battle/BattleRole.h"
+#include "Battle/BaseRole.h"
 #include "warscene/ConstNum.h"
 #include "common/CommonFunction.h"
 #include "scene/alive/AliveDefine.h"
@@ -113,7 +113,7 @@ namespace BattleSpace{
 		act->setActionKey(Win_Action);
 	}
 	//9死亡
-	void DieState::entryState(StateManager* actor,StateMachine* self)
+	void DiedState::entryState(StateManager* actor,StateMachine* self)
 	{
 		if(outPutERRORMsg("DieState::entryState",self))return;
 		ActObject* act = (ActObject*) self;

@@ -24,7 +24,7 @@ namespace BattleSpace{
 
 	class HPObject;
 	class EffectObject;
-	class WarAlive;
+	class BaseRole;
 	class MoveObject;
 
 	enum AliveDirection	//武将朝向有可能有8个方向,若仅是2个方向可以使用布尔值替代
@@ -51,7 +51,7 @@ namespace BattleSpace{
 		void initTypeIconPath( char* pPath );
 		void lostHpDispose();
 	public:
-		CC_SYNTHESIZE(WarAlive*,m_Alive,Alive);				//设置逻辑对象
+		CC_SYNTHESIZE(BaseRole*,m_Alive,Alive);				//设置逻辑对象
 		CC_SYNTHESIZE(MoveObject*,m_MoveObj,MoveObject);			//设置移动对象
 		CC_SYNTHESIZE(int,m_ID,ID);							//显示对象id
 		CC_SYNTHESIZE(bool,m_Enemy,Enemy);					//阵营

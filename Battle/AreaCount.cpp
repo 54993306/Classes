@@ -1,10 +1,11 @@
 #include "battle/AreaCount.h"
-#include "Battle/BattleRole.h"
+#include "Battle/BaseRole.h"
 #include "warscene/ConstNum.h"
 #include "Battle/SkillMacro.h"
+#include "Battle/skEffectData.h"
 using namespace cocos2d;
 namespace BattleSpace{
-	AreaCountInfo::AreaCountInfo(vector<int>& pVector,WarAlive* pAlive)
+	AreaCountInfo::AreaCountInfo(vector<int>& pVector,BaseRole* pAlive)
 		:mGrid(0),mVector(pVector),mAlive(pAlive),mEnemy(false),mBackAttack(false)
 		,mAreaType(0),mAreaRange(0),mDistance(0),mTargetType(0)
 	{

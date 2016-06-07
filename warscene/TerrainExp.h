@@ -8,7 +8,7 @@
 /************************************************************************/
 namespace BattleSpace{
 	class ActObject;
-	class WarAlive;
+	class BaseRole;
 	class terRound;
 
 	class TerrainExp : public CCObject
@@ -19,8 +19,8 @@ namespace BattleSpace{
 		virtual bool init();
 		CREATE_FUNC(TerrainExp);
 		void playerTerrainEffect(CCObject* ob);
-		float DataHandle(WarAlive* alive,float time , terRound* round,CCArray* m_task);		//对数据进行二次处理调试数据在此处进行
-		float StateHandle(ActObject* aliveOb,WarAlive* alive,float sysTime ,float lostHp ,float currHp,CCArray* m_task);	//所有的类似的对象都应该是这样的两个函数
+		float DataHandle(BaseRole* alive,float time , terRound* round,CCArray* m_task);		//对数据进行二次处理调试数据在此处进行
+		float StateHandle(ActObject* aliveOb,BaseRole* alive,float sysTime ,float lostHp ,float currHp,CCArray* m_task);	//所有的类似的对象都应该是这样的两个函数
 	private:
 
 	};

@@ -1,6 +1,6 @@
 #include "Battle/HeroData.h"
 #include "Battle/BattleDataCenter.h"
-#include "Battle/RoleBaseData.h"
+#include "Battle/BaseRoleData.h"
 #include "Battle/MonsterData.h"
 #include <protos/stage_protocol.pb.h>
 #include <protos/boss_protocol.pb.h>

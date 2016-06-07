@@ -18,8 +18,8 @@
  *************************************************************/
 using namespace std;
 namespace BattleSpace{
-	class WarAlive;
-	class RoleBuffData;
+	class BaseRole;
+	class BuffData;
 	class BuffInfo;
 	typedef map<unsigned int,BuffInfo*> BuffMap;	
 	typedef map<int,vector<CCNode*>>	BuffEffectMapList;	
@@ -30,14 +30,14 @@ namespace BattleSpace{
 		BuffManage();
 		virtual ~BuffManage();
 		CREATE_FUNC(BuffManage);
-		CC_SYNTHESIZE(WarAlive*,m_alive,Alive);
+		CC_SYNTHESIZE(BaseRole*,m_alive,Alive);
 		void Buffclear();
 		void clearDbuf();											//清除减益buf
 		BuffInfo* getbuff(int bufID);
 		BuffInfo* getbuffbyType(int buftype);
 		void removeBuf(int id);
-		void AddBuff(RoleBuffData& buf);							//将buff对象添加到武将身上
-		bool AddBuffLogic(RoleBuffData& buff);						//buf替换添加逻辑
+		void AddBuff(BuffData& buf);							//将buff对象添加到武将身上
+		bool AddBuffLogic(BuffData& buff);						//buf替换添加逻辑
 		void upDateBuff(float dt);
 		BuffMap* getBuffMap(){return &m_BuffMap;}
 		vector<CCNode*>* getVecEffect(int buffid);					//判断是否已经存在效果数组

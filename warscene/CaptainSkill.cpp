@@ -1,12 +1,12 @@
 ﻿#include "CaptainSkill.h"
 #include "model/DataCenter.h"
-#include "Battle/BattleRole.h"
+#include "Battle/BaseRole.h"
 #include "SkillRange.h"
 #include "model/WarManager.h"
 #include "model/MapManager.h"
 #include "warscene/ConstNum.h"
 #include "Battle/RoleSkill.h"
-#include "Battle/RoleBaseData.h"
+#include "Battle/BaseRoleData.h"
 #include "Battle/skEffectData.h"
 namespace BattleSpace{
 
@@ -35,7 +35,7 @@ namespace BattleSpace{
 
 	void CaptainSkill::ExecuteCaptainSkill()
 	{
-		WarAlive* alive  = DataCenter::sharedData()->getWar()->getAliveByGrid(C_CAPTAINGRID);
+		BaseRole* alive  = DataCenter::sharedData()->getWar()->getAliveByGrid(C_CAPTAINGRID);
 		CCArray* arr = DataCenter::sharedData()->getWar()->getAlivesByCamp(false,true);
 		if (!alive||!arr||alive->getBaseData()->hasCaptainSkill())
 			return;
@@ -58,7 +58,7 @@ namespace BattleSpace{
 		CCObject* ob = nullptr;
 		CCARRAY_FOREACH(executeArr,ob)
 		{
-			WarAlive* alive = (WarAlive*)ob;									//只触发一次队长技,但是需要触发完队长技的效果才行	
+			BaseRole* alive = (BaseRole*)ob;									//只触发一次队长技,但是需要触发完队长技的效果才行	
 			alive->setExecuteCap(true);
 		}
 	}
@@ -72,10 +72,10 @@ namespace BattleSpace{
 		CCARRAY_FOREACH(arr,ob)
 		{
 			_add = true;
-			WarAlive* alive = (WarAlive*)ob;
+			BaseRole* alive = (BaseRole*)ob;
 			CCARRAY_FOREACH(pTargetArray,obj)
 			{
-				WarAlive* _alive = (WarAlive*)obj;
+				BaseRole* _alive = (BaseRole*)obj;
 				if (alive == _alive)
 				{
 					_add = false;
@@ -109,7 +109,7 @@ namespace BattleSpace{
 				if (arr->count() < 3)break;
 				CCARRAY_FOREACH(arr,obj)
 				{
-					WarAlive* alive = (WarAlive*)obj;
+					BaseRole* alive = (BaseRole*)obj;
 					if (alive->getExecuteCap())continue;
 					if (!type || !type2)
 					{
@@ -138,7 +138,7 @@ namespace BattleSpace{
 					CCObject* ob = nullptr;
 					CCARRAY_FOREACH(arr,ob)
 					{
-						WarAlive* alive = (WarAlive*)ob;
+						BaseRole* alive = (BaseRole*)ob;
 						if (alive->getExecuteCap())continue;
 						aliveArr->addObject(ob);
 					}
@@ -156,7 +156,7 @@ namespace BattleSpace{
 		CCObject* obj = nullptr;
 		CCARRAY_FOREACH(arr,obj)
 		{
-			WarAlive* alive = (WarAlive*)obj;
+			BaseRole* alive = (BaseRole*)obj;
 			if (alive->getExecuteCap())continue;
 			if (exclude)
 			{
@@ -173,7 +173,7 @@ namespace BattleSpace{
 		bool fail = true;
 		CCARRAY_FOREACH(targetArr,obj)
 		{
-			WarAlive* alive = (WarAlive*)obj;
+			BaseRole* alive = (BaseRole*)obj;
 			if (!secondType)
 			{
 				secondType = alive->getBaseData()->getRoleType();
@@ -195,14 +195,14 @@ namespace BattleSpace{
 		CCObject* obj = nullptr;
 		CCARRAY_FOREACH(arr,obj)
 		{
-			WarAlive* alive = (WarAlive*)obj;
+			BaseRole* alive = (BaseRole*)obj;
 			if (AttributeJudge(alive,skill.getAffectType(),skill.getAffectRatio()))
 				_arr->addObject(obj);
 		}
 		return _arr;
 	}
 	//属性判定
-	bool CaptainSkill::AttributeJudge(WarAlive* alive,int type,int rate)
+	bool CaptainSkill::AttributeJudge(BaseRole* alive,int type,int rate)
 	{
 		switch (type)
 		{
@@ -259,7 +259,7 @@ namespace BattleSpace{
 		CCObject* obj = nullptr;
 		CCARRAY_FOREACH(arr,obj)
 		{
-			WarAlive* alive = (WarAlive*)obj;
+			BaseRole* alive = (BaseRole*)obj;
 			if (PositionJudge(alive->getEnemy(),alive->getGridIndex(),type))
 				targetArr->addObject(obj);
 		}
@@ -382,13 +382,13 @@ namespace BattleSpace{
 		CCObject* obj = nullptr;
 		CCARRAY_FOREACH(pArray,obj)
 		{
-			WarAlive* alive = (WarAlive*)obj;
+			BaseRole* alive = (BaseRole*)obj;
 			if (alive->getExecuteCap())continue;	//执行过主帅技
 			AliveExecute(pEffect,alive);
 		}
 	}
 	//队长技效果武将属性变化
-	void CaptainSkill::AliveExecute(const skEffectData*pEffect,WarAlive*pAlive)
+	void CaptainSkill::AliveExecute(const skEffectData*pEffect,BaseRole*pAlive)
 	{
 		switch (pEffect->getImpactType())
 		{

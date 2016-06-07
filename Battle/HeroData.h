@@ -14,10 +14,10 @@
 
 #ifndef __HeroData_H_
 #define __HeroData_H_
-#include "Battle/RoleBaseData.h"
+#include "Battle/BaseRoleData.h"
 namespace BattleSpace{
 	//гЂал
-	class HeroData :public RoleBaseData 
+	class HeroData :public BaseRoleData 
 	{
 	public:
 		HeroData();

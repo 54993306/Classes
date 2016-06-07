@@ -6,7 +6,7 @@
 #include "tools/CCShake.h"
 #include "scene/WarScene.h"
 #include "model/DataCenter.h"
-#include "Battle/BattleRole.h"
+#include "Battle/BaseRole.h"
 #include "model/WarManager.h"
 #include "model/MapManager.h"
 #include "tools/ShowTexttip.h"
@@ -37,8 +37,8 @@
 
 #include "Battle/RoleSkill.h"
 #include "Battle/skEffectData.h"
-#include "Battle/BattleRole.h"
-#include "Battle/RoleBaseData.h"
+#include "Battle/BaseRole.h"
+#include "Battle/BaseRoleData.h"
 
 namespace BattleSpace{
 	WarControl::WarControl()
@@ -201,7 +201,7 @@ namespace BattleSpace{
 	//初始化界面上部分
 	void WarControl::initUIAbove()
 	{
-		WarAlive* boss = m_Manage->getAliveByType(E_ALIVETYPE::eWorldBoss);
+		BaseRole* boss = m_Manage->getAliveByType(E_ALIVETYPE::eWorldBoss);
 		if (boss)
 		{
 			m_ControLayer->findWidgetById("layer_up_boss")->setVisible(true);
@@ -247,7 +247,7 @@ namespace BattleSpace{
 		m_boxIconPos = pBox->getParent()->convertToWorldSpace(m_boxIconPos);
 	}
 	//初始化世界bossUI
-	void WarControl::initWorldBossAbove(WarAlive* boss)
+	void WarControl::initWorldBossAbove(BaseRole* boss)
 	{											
 		CLabel* pDamageText = (CLabel*)m_ControLayer->findWidgetById("attack_index");					//伤害
 		m_pAllDamage = CCLabelAtlas::create("0", "worldBoss/no_07.png", 17, 28, 48);
@@ -276,7 +276,7 @@ namespace BattleSpace{
 	//update word boss damage
 	void WarControl::updateWorldBossDamage()
 	{
-		WarAlive* boss = m_Manage->getAliveByType(E_ALIVETYPE::eWorldBoss);
+		BaseRole* boss = m_Manage->getAliveByType(E_ALIVETYPE::eWorldBoss);
 		int num = m_Manage->getBossHurtCount();
 		m_pAllDamage->runAction(CCRollLabelAction::create(0.3f, atoi(m_pAllDamage->getString()), num, m_pAllDamage));
 		m_pAllDamage->runAction(CCSequence::createWithTwoActions(CCScaleTo::create(0.1f, 1.5f), CCScaleTo::create(0.05f, 1.0f)));
@@ -324,7 +324,7 @@ namespace BattleSpace{
 		int costMax = 0;
 		CCARRAY_FOREACH(arr,obj)
 		{
-			WarAlive* alive = (WarAlive*)obj;
+			BaseRole* alive = (BaseRole*)obj;
 			costMax += alive->getCostmax();
 			costNum += alive->getInitCost();
 		}
@@ -370,7 +370,7 @@ namespace BattleSpace{
 		pCircle->addChild(Eff);
 	}
 	//初始化武将按钮信息
-	void WarControl::initAliveButton(CCNode* Layout,WarAlive* alive)
+	void WarControl::initAliveButton(CCNode* Layout,BaseRole* alive)
 	{
 		CButton* btn = (CButton*)Layout->getChildByTag(CL_Btn);
 		btn->setLoingClickTime(0.5f);
@@ -450,7 +450,7 @@ namespace BattleSpace{
 		int index = 0;
 		CCARRAY_FOREACH(arr,obj)
 		{
-			WarAlive* alive = (WarAlive*)obj;
+			BaseRole* alive = (BaseRole*)obj;
 			CLayout* MoveLaout = nullptr;	
 			if (alive->getCaptain())
 			{
@@ -531,7 +531,7 @@ namespace BattleSpace{
 		{
 			CCNode* MoveLaout = getMoveLayout(i);
 			CButton* btn = (CButton*)MoveLaout->getChildByTag(CL_Btn);
-			WarAlive* alive = (WarAlive*)btn->getUserObject();
+			BaseRole* alive = (BaseRole*)btn->getUserObject();
 			if (!alive)continue;
 			MoveLaout->getChildByTag(CL_BtnSkillEff)->setVisible(false);
 			MoveLaout->getChildByTag(CL_BtnCallEff)->setVisible(false);	
@@ -556,9 +556,9 @@ namespace BattleSpace{
 		}
 	}
 	//call role log in battlefield
-	void WarControl::CallAliveEntranceBattle(WarAlive*alive)
+	void WarControl::CallAliveEntranceBattle(BaseRole*alive)
 	{
-		WarAlive* pAlive = m_Manage->getAlive(alive->getFatherID());
+		BaseRole* pAlive = m_Manage->getAlive(alive->getFatherID());
 		CCNode* MoveLaout = getMoveLayout(pAlive->getUiLayout()-CL_BtnLayout1);
 		CButton* btn = (CButton*)MoveLaout->getChildByTag(CL_Btn);
 		initButtonBackImage(btn,pAlive->getCallAliveNum());
@@ -571,7 +571,7 @@ namespace BattleSpace{
 			CdBar->startProgressFromTo(0,100,pAlive->getBaseData()->getActiveSkill()->getCooldown());
 	}
 	//role log in battlefield or leave
-	void WarControl::AliveBattlefield( WarAlive* alive )
+	void WarControl::AliveBattlefield( BaseRole* alive )
 	{
 		CLayout* BtnLay = (CLayout*)m_ControLayer->getChildByTag(alive->getUiLayout());
 		CCNode* MoveLaout = (CLayout*)BtnLay->getChildByTag(CL_HeroNode);
@@ -595,7 +595,7 @@ namespace BattleSpace{
 	//role log in or leave message dispose
 	void WarControl::AliveBattleDispose(CCObject* ob)
 	{
-		WarAlive* alive = (WarAlive*)ob;
+		BaseRole* alive = (BaseRole*)ob;
 		if (alive->getBaseData()->getCallRole())
 		{
 			CallAliveEntranceBattle(alive);
@@ -607,14 +607,14 @@ namespace BattleSpace{
 	CWidgetTouchModel WarControl::AliveButtonBeginClick(CCObject* ob,CCTouch* pTouch)
 	{
 		CButton* btn = (CButton*)ob;	
-		WarAlive* alive = dynamic_cast<WarAlive*>(btn->getUserObject());			//根据点击的按钮来判断点了哪个人
+		BaseRole* alive = dynamic_cast<BaseRole*>(btn->getUserObject());			//根据点击的按钮来判断点了哪个人
 		int cost = m_Manage->getLogicObj()->getCurrCost();
 		if (alive->getBattle()&&alive->getHp()>0)
 		{
 			const RoleSkill* skill = alive->getBaseData()->getActiveSkill();
 			if (skill->getSkillType() == eCallAtk&&cost >= skill->getExpendCost())
 			{
-				WarAlive* pAlive = m_Manage->getCallAlive(alive,skill);
+				BaseRole* pAlive = m_Manage->getCallAlive(alive,skill);
 				if (!pAlive)
 					return eWidgetTouchTransient;
 				CaptainSkill::create()->ExecuteCaptainSkill();
@@ -639,7 +639,7 @@ namespace BattleSpace{
 	void WarControl::AliveButtonClick( CCObject* ob )
 	{
 		CButton* btn = (CButton*)ob;	
-		WarAlive* alive = dynamic_cast<WarAlive*>(btn->getUserObject());			//根据点击的按钮来判断点了哪个人
+		BaseRole* alive = dynamic_cast<BaseRole*>(btn->getUserObject());			//根据点击的按钮来判断点了哪个人
 		const RoleSkill* skill = alive->getBaseData()->getActiveSkill();
 		if (  skill->getSkillType() == eCallAtk
 			||m_Manage->getLogicObj()->getCurrCost()<skill->getExpendCost() 
@@ -665,7 +665,7 @@ namespace BattleSpace{
 
 	void WarControl::ResetButtonState( CCObject* ob )
 	{
-		WarAlive* alive = (WarAlive*)ob;
+		BaseRole* alive = (BaseRole*)ob;
 		CCNode* MoveLaout = getMoveLayout(alive->getUiLayout() - CL_BtnLayout1);
 		CProgressBar* CdBar = (CProgressBar*)MoveLaout->getChildByTag(CL_HeroPro);
 		CdBar->startProgressFromTo(0,100,alive->getBaseData()->getActiveSkill()->getCooldown());										//技能CD
@@ -674,7 +674,7 @@ namespace BattleSpace{
 	bool WarControl::AliveButtonLongClick(CCObject* pSender, CCTouch* pTouch)
 	{
 		CButton* tog = (CButton*)pSender;
-		WarAlive* alive = (WarAlive*)tog->getUserObject();
+		BaseRole* alive = (BaseRole*)tog->getUserObject();
 		SkillTips *tips = SkillTips::create(); 
 		tips->setSkillInfo(pSender,alive);//根据武将当前状态判断武将释放的技能从而给出提示信息( CC制不需要技能提示 )
 		LayerManager::instance()->push(tips);
@@ -758,7 +758,7 @@ namespace BattleSpace{
 	//必杀技闪屏效果
 	void WarControl::SkillMask( CCObject* ob )
 	{
-		WarAlive* alive = (WarAlive*)ob;
+		BaseRole* alive = (BaseRole*)ob;
 		if (alive->getEnemy())
 			return;
 		if (alive->getBaseData()->getRoleType() == FireType)
@@ -836,7 +836,7 @@ namespace BattleSpace{
 
 	void WarControl::CaptainHit( CCObject* ob )
 	{
-		WarAlive* alive = (WarAlive*)ob;
+		BaseRole* alive = (BaseRole*)ob;
 		if (alive->getHp()>0)
 		{
 			m_ArmatureTips->stopAllActions();

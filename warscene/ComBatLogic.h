@@ -30,7 +30,7 @@ namespace BattleSpace{
 	class GuardArea;
 	class MoveRule;
 	class WarScene; 
-	class WarAlive;
+	class BaseRole;
 	class WarAssist;
 	class ActObject;
 	class HurtCount;
@@ -73,7 +73,7 @@ namespace BattleSpace{
 		CC_SYNTHESIZE(int, m_iGameTimeCount, GameTimeCount);		//倒计时时间
 		CC_SYNTHESIZE(bool, m_bCountDown, CountDown);				//倒计时开启
 		void downloadPackageEnd(bool bAnswer);
-		void CostCount(WarAlive* alive,float dt);
+		void CostCount(BaseRole* alive,float dt);
 		void StoryEndEvent(CCObject* ob);
 		void combatResult(CCObject* ob);
 		void initMapBackground();
@@ -87,36 +87,36 @@ namespace BattleSpace{
 		void showRound();
 		void runLogic(float delt);
 		void ExcuteAI(float dt);
-		bool IsAutoMoveType(WarAlive*alive);
-		bool monsterFlee(WarAlive* alive);
-		void MonsterExcuteAI(WarAlive* alive,float dt); 
-		void HeroExcuteAI(WarAlive* alive);
-		void AliveExcuteAI(WarAlive* alive);	
+		bool IsAutoMoveType(BaseRole*alive);
+		bool monsterFlee(BaseRole* alive);
+		void MonsterExcuteAI(BaseRole* alive,float dt); 
+		void HeroExcuteAI(BaseRole* alive);
+		void AliveExcuteAI(BaseRole* alive);	
 		void BatterRecord(CCObject* ob);
-		void AliveCritEnd(WarAlive* alive);
+		void AliveCritEnd(BaseRole* alive);
 		void CritAtkEnd(CCObject* ob);
-		void excuteCritEffect(WarAlive* alive);
-		void monsterCritEffect(WarAlive* alive);
-		void heroCritEffect(WarAlive* alive);
-		void attackEffect(WarAlive*alive);
-		void attackDirection(WarAlive*alive);
+		void excuteCritEffect(BaseRole* alive);
+		void monsterCritEffect(BaseRole* alive);
+		void heroCritEffect(BaseRole* alive);
+		void attackEffect(BaseRole*alive);
+		void attackDirection(BaseRole*alive);
 		void critComboEffect();
 		void doLostHp(CCObject* ob);
-		bool walkState(WarAlive* alive);
-		bool AttackJudge(WarAlive* alive);
-		bool delayEntrance(WarAlive* alive,float dt);
-		bool autoSkillAlive(WarAlive* alive);
-		void attackTime(WarAlive* alive,float dt);
-		bool aliveAttackState(WarAlive* alive);
+		bool walkState(BaseRole* alive);
+		bool AttackJudge(BaseRole* alive);
+		bool delayEntrance(BaseRole* alive,float dt);
+		bool autoSkillAlive(BaseRole* alive);
+		void attackTime(BaseRole* alive,float dt);
+		bool aliveAttackState(BaseRole* alive);
 		void displayBatchWarning();
 		void displayRoundTips();
 		void displayGuide();
-		void monsterRemove(WarAlive* alive);
+		void monsterRemove(BaseRole* alive);
 		void AliveDieDispose(CCObject* ob);
-		void monsterDieDispose(WarAlive* alive);
+		void monsterDieDispose(BaseRole* alive);
 		void ActObjectRemove(CCObject* ob);
 		void NextBatch(float dt);
-		bool StateDispose(WarAlive* alive,float dt);
+		bool StateDispose(BaseRole* alive,float dt);
 		void battleWin();
 		void battleFail();
 		void beginStageFloorEffect();
@@ -138,7 +138,7 @@ namespace BattleSpace{
 		int m_PlayerNum;				//播放次数
 		bool m_bRecvFinish;				//是否接收到服务器结算信息
 		float m_fCurrentCostAdd;		//当前cost变化速度
-		WarAlive* m_Alive;				//存储释放技能的武将信息
+		BaseRole* m_Alive;				//存储释放技能的武将信息
 		BufExp* m_bufExp;
 		WarScene* m_Scene;
 		MoveRule* m_MoveRule;

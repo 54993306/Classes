@@ -14,10 +14,10 @@
 
 #ifndef __MonsterData_H_
 #define __MonsterData_H_
-#include "Battle/RoleBaseData.h"
+#include "Battle/BaseRoleData.h"
 namespace BattleSpace{
 	//π÷ŒÔ
-	class MonsterData :public RoleBaseData
+	class MonsterData :public BaseRoleData
 	{ 
 	public:
 		MonsterData();

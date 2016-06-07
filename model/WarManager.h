@@ -12,7 +12,7 @@
 class ArmatureEventDataMgr;
 
 namespace BattleSpace{
-	class WarAlive;
+	class BaseRole;
 	class EffectData;
 	class SpecialEffectData;
 	class EffectInfo;
@@ -20,11 +20,11 @@ namespace BattleSpace{
 	class terData;
 	class CombatLogic;
 	class MoveObject;
-	class BuffData;
+	class BuffConfig;
 	class StoryData;
 	class RoleSkill;
 	using namespace std;
-	typedef map<unsigned int,WarAlive*> Members;	
+	typedef map<unsigned int,BaseRole*> Members;	
 	typedef std::pair<spSkeletonData*,spAtlas*> SpData;
 	typedef map<std::string,SpData> MapSkeletonData;
 
@@ -36,12 +36,12 @@ namespace BattleSpace{
 		bool init(){return true;}
 		CREATE_FUNC(WarManager);	
 	public:
-		void addAlive(WarAlive* alive);
-		WarAlive* getAlive(unsigned int aliveID);
-		WarAlive* getAliveByGrid(int grid);
-		WarAlive* getCallAlive(WarAlive* pAlive,const RoleSkill* skill);
-		WarAlive* getAliveByType(E_ALIVETYPE type,bool Monster = true);
-		WarAlive* getAbsentCallAlive(WarAlive* fatherAlive);
+		void addAlive(BaseRole* alive);
+		BaseRole* getAlive(unsigned int aliveID);
+		BaseRole* getAliveByGrid(int grid);
+		BaseRole* getCallAlive(BaseRole* pAlive,const RoleSkill* skill);
+		BaseRole* getAliveByType(E_ALIVETYPE type,bool Monster = true);
+		BaseRole* getAbsentCallAlive(BaseRole* fatherAlive);
 		void BattleDataClear();
 		void ReleaseSpineData();
 		void initData();
@@ -49,16 +49,16 @@ namespace BattleSpace{
 		void initMonsterByBatch(int batch);
 		void initHeroData();
 		EffectData* getEffData();
-		BuffData* getBuffData();
+		BuffConfig* getBuffData();
 		StoryData* getStoryData();
 		ArmatureEventDataMgr* getArmatureDataMgr();
 		terData* getTerData(){return m_terData;};
 		Members* getMembers();
 		void updateAlive();
-		vector<WarAlive*>* getVecHeros(bool pSort = false);
-		vector<WarAlive*>* getVecMonsters(bool pSort = false);
-		vector<WarAlive*>* getAliveRoles(bool pSort = false);
-		vector<WarAlive*>* getSkillTargets(WarAlive* pAlive);
+		vector<BaseRole*>* getVecHeros(bool pSort = false);
+		vector<BaseRole*>* getVecMonsters(bool pSort = false);
+		vector<BaseRole*>* getAliveRoles(bool pSort = false);
+		vector<BaseRole*>* getSkillTargets(BaseRole* pAlive);
 		bool isSpine(int id);
 		SpData* getSpineData(string Name);
 		MapSkeletonData& getSpineMap(){return m_MapSpineData;}
@@ -68,7 +68,7 @@ namespace BattleSpace{
 		/*************************************************/
 		void sortArrayByGridIndex(CCArray* arr);
 		CCArray* getAlivesByCamp(bool enemy = true,bool isAlive = false,bool sort = true);
-		WarAlive* getNewCallAlive(WarAlive* Father,int CallId);
+		BaseRole* getNewCallAlive(BaseRole* Father,int CallId);
 		void initCommonData();
 		void clearOldData();
 	public:
@@ -96,14 +96,14 @@ namespace BattleSpace{
 		vector<int> m_SpineID;										//记录spine的ID
 		Members m_members;											//战场上活着的英雄
 		EffectData* m_efdata;
-		BuffData* m_BuffData;
+		BuffConfig* m_BuffData;
 		StoryData* m_StoryData;
 		ArmatureEventDataMgr* m_armatureEventDataMgr;
 		terData* m_terData;
 		int m_SceneTarpID;											//场景效果类型记录
-		vector<WarAlive*> m_Heros;
-		vector<WarAlive*> m_Monsters;
-		vector<WarAlive*> m_AliveRoles;
+		vector<BaseRole*> m_Heros;
+		vector<BaseRole*> m_Monsters;
+		vector<BaseRole*> m_AliveRoles;
 	};
 };
 #endif // !_WAR_MANAGER_H_

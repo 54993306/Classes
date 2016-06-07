@@ -1,9 +1,9 @@
 ﻿#include "SkillRange.h"
 #include "model/DataCenter.h"
-#include "Battle/RoleBaseData.h"
+#include "Battle/BaseRoleData.h"
 #include "common/CommonFunction.h"
 #include "tools/commonDef.h"
-#include "Battle/BattleRole.h"
+#include "Battle/BaseRole.h"
 #include "warscene/ConstNum.h"
 #include "model/WarManager.h"
 #include "model/MapManager.h"
@@ -34,7 +34,7 @@ namespace BattleSpace{
 		}
 	}
 	//武将当前站位区域
-	void SkillRange::getSelfArea( WarAlive* pAlive )
+	void SkillRange::getSelfArea( BaseRole* pAlive )
 	{
 		if (pAlive->getCurrEffect()->getTargetType() != eEnemyType)					//效果目标是敌方阵营
 			return;
@@ -42,7 +42,7 @@ namespace BattleSpace{
 			pAlive->mStandGrids.begin(),pAlive->mStandGrids.end());			//最优先攻击相同格子怪物			
 	}
 	//得到武将有效攻击范围判断格子(多格武将),武将站位格子排序从大到小
-	void SkillRange::initValidGrids( WarAlive* pAlive,vector<int>& pValids )
+	void SkillRange::initValidGrids( BaseRole* pAlive,vector<int>& pValids )
 	{
 		int aliveGrid = 0;
 		vector<int> CountGrid;
@@ -72,7 +72,7 @@ namespace BattleSpace{
 		}
 	}
 
-	void SkillRange::initSkillEffectArea( WarAlive* pAlive,vector<int>& pVector )
+	void SkillRange::initSkillEffectArea( BaseRole* pAlive,vector<int>& pVector )
 	{
 		AreaCountInfo CountInfo(pVector,pAlive);
 		initEffectTypeArea(CountInfo);	
@@ -82,7 +82,7 @@ namespace BattleSpace{
 			sort(pVector.begin(),pVector.end(),greater<int>());					//我方武将正向攻击的情况(对格子进行反向排序)
 	}
 	//返回受击区域(可以使用先获取敌方目标的方式然后判断敌方目标格子是否在攻击范围内)
-	void SkillRange::initSkillArea( WarAlive* pAlive,vector<int>& pVector )	
+	void SkillRange::initSkillArea( BaseRole* pAlive,vector<int>& pVector )	
 	{
 		if ( !pAlive->getCurrEffect() )				//在此处判断是因为该方法被多处调用
 		{
@@ -96,14 +96,14 @@ namespace BattleSpace{
 		initSkillEffectArea(pAlive,pVector);
 	}
 	//返回受击范围内受击武将
-	void SkillRange::initAreaTargets(WarAlive* pAlive)
+	void SkillRange::initAreaTargets(BaseRole* pAlive)
 	{
-		vector<WarAlive*>* VecAlive = mManage->getSkillTargets(pAlive);	//不直接使用格子去寻找是为了减少遍历的次数																
+		vector<BaseRole*>* VecAlive = mManage->getSkillTargets(pAlive);	//不直接使用格子去寻找是为了减少遍历的次数																
 		for (auto tGrid : pAlive->mSkillArea)								//格子是排序好的,要使用格子来进行遍历(必须,不同阵营获取目标顺序不同)
 		{
 			if ( pAlive->pierceJudge() )
 				break;
-			for (WarAlive* tAlive: *VecAlive)
+			for (BaseRole* tAlive: *VecAlive)
 			{
 				if ( pAlive->hasAliveByTargets(tAlive) || 
 					!tAlive->standInGrid(tGrid) )
@@ -118,7 +118,7 @@ namespace BattleSpace{
 		pAlive->cloakingTarget();
 	}
 	//返回攻击区域受击武将信息
-	void SkillRange::initAttackInfo(WarAlive* pAlive)
+	void SkillRange::initAttackInfo(BaseRole* pAlive)
 	{
 		int tGroupIndex = 0;
 		for (;tGroupIndex < pAlive->getCurrSkill()->getListSize(); tGroupIndex++)
@@ -144,7 +144,7 @@ namespace BattleSpace{
 		pAlive->setGroupIndex(0);					//都没有打中目标,默认显示第一个效果组
 	}
 	//主帅警戒区域处理,先判断所有位置效果组1，再判断所有位置效果组2
-	int SkillRange::CaptainGuard( WarAlive* pAlive )
+	int SkillRange::CaptainGuard( BaseRole* pAlive )
 	{
 		int currgrid = pAlive->getGridIndex();
 		int tGroupIndex = 0;
@@ -387,10 +387,10 @@ namespace BattleSpace{
 	//前方单体						101，后方单体		103
 	void SkillRange::FrontOrBackOnesArea(AreaCountInfo& pInfo,bool pBack/*false*/)
 	{
-		vector<WarAlive*>* tAlives = mManage->getSkillTargets(pInfo.getAlive());
+		vector<BaseRole*>* tAlives = mManage->getSkillTargets(pInfo.getAlive());
 		if (pBack)
 		{
-			vector<WarAlive*>::reverse_iterator iter = (*tAlives).rbegin();
+			vector<BaseRole*>::reverse_iterator iter = (*tAlives).rbegin();
 			for (;iter != (*tAlives).rend();iter++)
 			{
 				if ( (*iter)->getCaptain() )		//非主帅的后方位置
@@ -406,7 +406,7 @@ namespace BattleSpace{
 	//中间单体						102
 	void SkillRange::CenterAreaDispose(AreaCountInfo& pInfo)
 	{
-		vector<WarAlive*>* tAlives = mManage->getSkillTargets(pInfo.getAlive());
+		vector<BaseRole*>* tAlives = mManage->getSkillTargets(pInfo.getAlive());
 		if (!tAlives->size())
 			return;
 		pInfo.addGrid(tAlives->at(tAlives->size()/2)->getGridIndex());
@@ -428,12 +428,12 @@ namespace BattleSpace{
 	//任意武将目标(range个)			112
 	void SkillRange::FixAlive(AreaCountInfo& pInfo)
 	{
-		vector<WarAlive*>* tAlives = mManage->getSkillTargets(pInfo.getAlive());
+		vector<BaseRole*>* tAlives = mManage->getSkillTargets(pInfo.getAlive());
 		int tRange = min(tAlives->size(),pInfo.getAreaRange());		// num < val 表示武将不足	
 		for (int tLoopNum = 0;tLoopNum < eLoopNumberMax;tLoopNum++)
 		{
 			int tIndex = CCRANDOM_0_1() *(tAlives->size() - 1);						//随机数的范围 num > j >= 0 
-			WarAlive* tAlive = tAlives->at(tIndex);
+			BaseRole* tAlive = tAlives->at(tIndex);
 			if (tAlive->getCaptain())												//随机得到几个有人的位置,不包含主帅
 				if (tAlives->size() == 1)											//只有敌方主帅一人的情况
 					return;
@@ -518,7 +518,7 @@ namespace BattleSpace{
 	//血量最低单位
 	void SkillRange::lowestAlive(AreaCountInfo& pInfo)
 	{
-		vector<WarAlive*>* tAlives = mManage->getSkillTargets(pInfo.getAlive());
+		vector<BaseRole*>* tAlives = mManage->getSkillTargets(pInfo.getAlive());
 		VectorSortAliveHp(*tAlives);
 		if (pInfo.getAreaRange() >= tAlives->size())
 		{

@@ -45,7 +45,7 @@ namespace BattleSpace{
 	class SkillRange;
 	class MapBackgroundManage;
 	class WarManager;
-	class WarAlive;
+	class BaseRole;
 	class GuardArea;
 	class WarMapLayer:public CCNode
 	{
@@ -58,8 +58,8 @@ namespace BattleSpace{
 		void addEvent();	
 		void removeEvent();
 		void touchAreaCancel(CCObject* ob);
-		void DrawAtkArea(WarAlive* alive);
-		void DrawMoveArea(WarAlive* alive);
+		void DrawAtkArea(BaseRole* alive);
+		void DrawMoveArea(BaseRole* alive);
 		void DrawMoveAtkArea(CCObject* ob);
 		void DrawAtkEffect(CCObject* ob);
 		void setBlackBg(CCObject* ob);

@@ -1,7 +1,7 @@
 ﻿#include "BufExp.h"
 #include "Global.h"
 #include "warscene/ConstNum.h"
-#include "Battle/BattleRole.h"
+#include "Battle/BaseRole.h"
 #include "model/BuffManage.h"
 #include "model/DataCenter.h"
 #include "model/WarManager.h"
@@ -10,6 +10,7 @@
 #include "scene/alive/AliveDefine.h"
 #include "scene/effect/EffectObject.h"
 #include "Battle/BattleMessage.h"
+#include "Battle/BuffData.h"
 namespace BattleSpace{
 
 	BufExp::BufExp():m_hpSize(CCPointZero),m_interval(0){}
@@ -30,7 +31,7 @@ namespace BattleSpace{
 	//每个buff新添加时都发送一条消息
 	void BufExp::AddBuffExcute( CCObject* ob )
 	{
-		WarAlive* alive = (WarAlive*)ob;
+		BaseRole* alive = (BaseRole*)ob;
 		if (m_hpSize.equals(CCPointZero))
 		{
 			m_hpSize.x = alive->getActObject()->getHp()->getContentSize().width;
@@ -151,7 +152,7 @@ namespace BattleSpace{
 	//刷新移除后个个图标的位置、最多同时显示4个小图标
 	void BufExp::updatePosition( CCObject* ob )
 	{
-		WarAlive* alive = (WarAlive*)ob;
+		BaseRole* alive = (BaseRole*)ob;
 		float scaleNum = 1/alive->getActObject()->getBody()->getScale();
 		if (m_hpSize.equals(CCPointZero))
 		{
