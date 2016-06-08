@@ -17,7 +17,6 @@
 
 #ifndef __TempData__
 #define __TempData__
-
 #include "cocos2d.h"
 
 namespace protos{
@@ -27,6 +26,13 @@ namespace protos{
 	}
 }
 namespace BattleSpace{
+	enum struct E_RoleNature													//角色种类(可以存在多种角色的,很多个阵营的角色)
+	{
+		eNULL					= 0,
+		eHeroRole				= 1,										//英雄类角色
+		eMonsterRole			= 2,										//怪物类角色
+	};
+
 	class RoleSkill;
 	class BaseRoleData : public cocos2d::CCObject
 	{
@@ -52,7 +58,9 @@ namespace BattleSpace{
 		CC_SYNTHESIZE(int,mCallType,CallType);							//召唤类型(Control)
 		CC_SYNTHESIZE(int,mCallID,CallID);								//召唤的武将ID
 		CC_SYNTHESIZE(float,mDelayTime,DelayTime);						//出现延迟时间
-
+		CC_SYNTHESIZE(E_RoleNature,mRoleNature,RoleNature)				//角色种类(后续接口)
+	public:
+		//hero
 		CC_SYNTHESIZE(int,mAlertType,AlertType);						//警戒类型
 		CC_SYNTHESIZE(int,mAlertRange,AlertRange);						//警戒范围
 		CC_SYNTHESIZE(int,mColdDown,ColdDown);							//上阵CD
@@ -61,7 +69,8 @@ namespace BattleSpace{
 		CC_SYNTHESIZE(int,mCostSpeed,CostSpeed);						//cost恢复速度(1/s)
 		CC_SYNTHESIZE(int,mMaxCost,MaxCost);							//cost上限
 		CC_SYNTHESIZE(bool,mCaptain,Captain);							//武将是否为上阵状态(战斗中标记队长)
-
+	public:
+		//monster
 		CC_SYNTHESIZE(int,mMonsterType,MonsterType);					//怪物类型
 		CC_SYNTHESIZE(int,mMaxHp,MaxHp);								//最大血量值(世界boss专用
 		CC_SYNTHESIZE(bool,mCallRole,CallRole);							//是否为召唤类武将(敌方怪物都可能,在怪物列表中读取)
@@ -84,6 +93,4 @@ namespace BattleSpace{
 		RoleSkill* mCaptainSkill;										//主帅技能 	
 	};
 };
-
-
 #endif

@@ -13,6 +13,20 @@ namespace BattleSpace{
 		clearEffectData();
 	}
 
+	RoleSkill* RoleSkill::create()
+	{
+		RoleSkill* tSkill = new RoleSkill();
+		if (tSkill)
+		{
+			tSkill->autorelease();
+			return tSkill;
+		}else{
+			delete tSkill;
+			tSkill = nullptr;
+			return nullptr;
+		}
+	}
+
 	void RoleSkill::clearEffectData()
 	{
 		for (auto tVector : mEffectList)

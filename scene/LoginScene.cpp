@@ -32,11 +32,11 @@
 //网关服务器
 #if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
 //const GateServer GATE_SERVER = {"125.227.163.145",	5203};//李辉服务器
-//const GateServer GATE_SERVER = {"192.168.0.9",			7303};//大毛服务器
+const GateServer GATE_SERVER = {"192.168.0.9",			7303};//大毛服务器
 //const GateServer GATE_SERVER = {"127.0.0.1",					5203};//本机服务器
 //const GateServer GATE_SERVER = {"192.168.1.2",			5203};//局域网服务器
 //const GateServer GATE_SERVER = {"192.168.0.2",			5203};//香港局域网服务器 
-const GateServer GATE_SERVER = {"103.31.20.79",			7303};//外网服务器
+//const GateServer GATE_SERVER = {"103.31.20.79",			7303};//外网服务器
 //const GateServer GATE_SERVER = {"54.251.138.176",			5203};//泰国-境外 
 #else
 //const GateServer GATE_SERVER = {"125.227.163.145",	5203};//李辉服务器

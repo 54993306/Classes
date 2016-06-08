@@ -1,15 +1,15 @@
 /************************************************************* 
- *
- *
- *		Data : 2016.5.26
- *	
- *		Name : BattleRole
- *
- *		Author : Lin_Xiancheng
- *
- *		Description : 
- *
- *
+*
+*
+*		Data : 2016.5.26
+*	
+*		Name : BattleRole
+*
+*		Author : Lin_Xiancheng
+*
+*		Description : 
+*
+*
 *************************************************************/
 
 #ifndef __BattleRole__
@@ -30,12 +30,13 @@ namespace BattleSpace{
 	class BaseRoleData;
 	class RoleSkill;
 	class skEffectData;
-	class BaseRole:public cocos2d::CCObject					//定义数据的顺序结构是为了方便查看数据
+	class BaseRole:public cocos2d::CCObject			//定义数据的顺序结构是为了方便查看数据
 	{
-	public:
+	protected:
 		BaseRole();
+	public:
 		virtual ~BaseRole();
-		CREATE_FUNC(BaseRole);						
+		static BaseRole* create();
 		void ResetAttackState();					//重置武将当前状态信息
 		void ExcuteNextEffect();					//重置武将下执行下一个效果状态
 		bool canSummonAlive();						//是否可以召唤武将
@@ -127,7 +128,6 @@ namespace BattleSpace{
 		CC_SYNTHESIZE(bool,m_cloaking,Cloaking);			//隐身状态
 		CC_SYNTHESIZE(bool,m_LastAlive,LastAlive);			//场上最后武将
 	protected:
-		inline bool init(){return true;}
 	};
 };
 #endif

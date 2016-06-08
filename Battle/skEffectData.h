@@ -27,10 +27,8 @@ namespace BattleSpace{
 	class skEffectData : public cocos2d::CCObject
 	{
 	public:
-		skEffectData();									//详细参见datadefine Bufinfo
-		~skEffectData();
-		virtual bool init(){return true;}
-		CREATE_FUNC(skEffectData);
+		virtual ~skEffectData();
+		static skEffectData* create();
 		CC_SYNTHESIZE(int,mEffectID,EffectID);
 		CC_SYNTHESIZE(int,mGroup,Group);				//效果所属效果组
 		CC_SYNTHESIZE(int,mGroupPos,GroupPos);			//效果组内位置
@@ -53,6 +51,7 @@ namespace BattleSpace{
 		void clearBuffData();
 		const std::vector<BuffData*>& getBuffVector()const;
 	private:
+		skEffectData();									//详细参见datadefine Bufinfo
 		void addBuffData(const protos::common::Buff* pBuffData);
 		std::vector<BuffData*> mBuffVector;
 	};

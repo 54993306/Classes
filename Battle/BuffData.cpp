@@ -6,6 +6,19 @@ namespace BattleSpace{
 		,m_TriggerRate(0),m_IsDBuff(false),m_TargetType(0),m_BuffDuration(0)
 		,m_BuffTarget(0),m_BuffLevel(0)
 	{}
+	BuffData* BuffData::create()
+	{
+		BuffData* tBuffData = new BuffData();
+		if (tBuffData)
+		{
+			tBuffData->autorelease();
+			return tBuffData;
+		}else{
+			delete tBuffData;
+			tBuffData = nullptr;
+			return nullptr;
+		}
+	}
 
 	void BuffData::readData(const protos::common::Buff* buff)
 	{
@@ -28,14 +41,30 @@ namespace BattleSpace{
 		*this = pData;
 	}
 
-	BuffInfo::BuffInfo()
+	BuffInfo::BuffInfo(BuffData& pData)
 		:m_Excute(false),m_Handle(false),m_ExTime(0),m_AddFirst(true)
-	{}
-#define BUFFTIME   1.0f
+	{
+		this->initData(pData);
+	}
+
+	BuffInfo* BuffInfo::create(BuffData& pData)
+	{
+		BuffInfo* tRet = new BuffInfo(pData);
+		if (tRet)
+		{
+			tRet->autorelease();
+			return tRet;
+		}else{
+			delete tRet;
+			tRet = nullptr;
+			return nullptr;
+		}
+	}
 	void BuffInfo::setExTime(float var)
 	{
 		m_ExTime += var;
-		if (m_ExTime < BUFFTIME)				//设置buff的默认触发时间
+		int tTime = 1.0f;
+		if (m_ExTime < tTime)				//设置buff的默认触发时间
 			return;
 		m_ExTime = 0;
 		m_Excute = true;

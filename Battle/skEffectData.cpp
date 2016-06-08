@@ -14,6 +14,20 @@ namespace BattleSpace{
 		clearBuffData();
 	}
 
+	skEffectData* skEffectData::create()
+	{
+		skEffectData* tData = new skEffectData();
+		if (tData)
+		{
+			tData->autorelease();
+			return tData;
+		}else{
+			delete tData;
+			tData = nullptr;
+			return nullptr;
+		}
+	}
+
 	void skEffectData::readData(const protos::common::Effect* pEffect)
 	{
 		this->setEffectID(pEffect->effectid());
@@ -59,7 +73,7 @@ namespace BattleSpace{
 		}
 		mBuffVector.clear();
 	}
-	//ÉýÐò
+//ÉýÐò
 	bool EffectSort(const skEffectData* Effect1,const skEffectData* Effect2)
 	{
 		return Effect1->getGroupPos() < Effect2->getGroupPos();

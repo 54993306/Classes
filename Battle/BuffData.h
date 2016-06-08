@@ -27,9 +27,8 @@ namespace BattleSpace{
 	class BuffData  : public cocos2d::CCObject
 	{
 	public:
-		BuffData();										//详细参见datadefine Bufinfo		
-		virtual bool init(){return true;}
-		CREATE_FUNC(BuffData);
+		virtual ~BuffData(){};
+		static BuffData* create();
 		CC_SYNTHESIZE(int,m_BuffID,BuffID);					//buff ID
 		CC_SYNTHESIZE(int,m_BuffType,BuffType);				//buff影响类型
 		CC_SYNTHESIZE(int,m_ChangeNum,ChangeNum);			//影响数值
@@ -42,21 +41,23 @@ namespace BattleSpace{
 		CC_SYNTHESIZE(int,m_TargetType,TargetType);			//种族限制(火1,木2,水3,0是不限制)
 		CC_SYNTHESIZE(std::string,m_BuffDes,BuffDes);		//buff名称
 		void readData(const protos::common::Buff* buff);
+	protected:
+		BuffData();										//详细参见datadefine Bufinfo		
 		void initData(BuffData& pData);
 	};
 	//战斗中实际使用到的buff结构,buff是可以具备很多逻辑的,但是现在buff的逻辑都放在buff管理器里面去写了。应该是接口的方式抽象出来写才对
 	class BuffInfo : public BuffData
 	{
+	private:
+		BuffInfo(BuffData& pData);
 	public:
-		BuffInfo();
-		CREATE_FUNC(BuffInfo);
+		virtual ~BuffInfo(){};
+		static BuffInfo* create(BuffData& pData);
 	public:
 		CC_PROPERTY(float,m_ExTime,ExTime);					//执行时间
 		CC_SYNTHESIZE(bool,m_Excute,Excute);				//是否为持续性Buf
 		CC_SYNTHESIZE(bool,m_Handle,Handle);				//是否进行过处理（非持续性buf只处理一次，流血类每回合都需要处理）
 		CC_SYNTHESIZE(bool,m_AddFirst,AddFirst);			//是否为第一次添加
-	protected:
-
 	};
 	//遵循等级替换规则
 	enum struct BUFFTYPE

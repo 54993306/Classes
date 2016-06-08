@@ -75,10 +75,9 @@ namespace BattleSpace{
 		}
 		if (AddBuffLogic(buf))
 			return;
-		BuffInfo* tBuffinfo = BuffInfo::create();
-		tBuffinfo->initData(buf);
+		BuffInfo* tBuffinfo = BuffInfo::create(buf);
 		tBuffinfo->retain();									//clear方法里面safa release的作用就是在这了
-		ExcuteBuff(tBuffinfo);								//执行buff逻辑
+		ExcuteBuff(tBuffinfo);									//执行buff逻辑
 		m_BuffMap[tBuffinfo->getBuffID()] = tBuffinfo;			//map添加信息的方法	
 		if (m_alive->getHp()<=0)
 			m_alive->getActObject()->AliveDie();

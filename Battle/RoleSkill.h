@@ -42,10 +42,8 @@ namespace BattleSpace{
 	class RoleSkill : public cocos2d::CCObject
 	{
 	public:
-		RoleSkill();
-		~RoleSkill();
-		virtual bool init(){return true;}
-		CREATE_FUNC(RoleSkill);
+		virtual ~RoleSkill();
+		static RoleSkill* create();
 		CC_SYNTHESIZE(int,mSkillID,SkillID);				//技能ID
 		CC_SYNTHESIZE(int,mSkillType,SkillType);			//技能类型( E_SKILLTYPE )
 		CC_SYNTHESIZE(int,mUserRatio,UserRatio);			//成功施放概率(种族限制)
@@ -68,6 +66,7 @@ namespace BattleSpace{
 		const skEffectData* getSummonEffect() const;
 		const std::vector<std::vector<skEffectData*>>& getEffectVector()const;
 	private:
+		RoleSkill();
 		void initEffectData(const protos::common::Skill* pSkillData);
 		std::vector<std::vector<skEffectData*>>mEffectList;
 	};

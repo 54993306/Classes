@@ -37,6 +37,20 @@ namespace BattleSpace{
 		mAreaTargets.clear();
 	}
 
+	BaseRole* BaseRole::create()
+	{
+		BaseRole* tBase = new BaseRole();
+		if (tBase)
+		{
+			tBase->autorelease();
+			return tBase;
+		}else{
+			delete tBase;
+			tBase = nullptr;
+			return nullptr;
+		}
+	}
+
 	void BaseRole::initAliveByFather( BaseRole*pFather )
 	{
 		this->setModel(getBaseData()->getRoleModel());
