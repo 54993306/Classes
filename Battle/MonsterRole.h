@@ -21,10 +21,6 @@ namespace BattleSpace{
 	public:
 		MonsterRole();
 		~MonsterRole();
-
-	protected:
-
-	private:
 	};
 };
 

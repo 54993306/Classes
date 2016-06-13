@@ -10,16 +10,32 @@ namespace BattleSpace{
 		,mAreaType(0),mAreaRange(0),mDistance(0),mTargetType(0)
 	{
 		setAlive(mAlive);
-		setTargetType(mAlive->getCurrEffect()->getTargetType());
 		setEnemy(mAlive->getEnemy());
 		setBackAttack(mAlive->getOpposite());
-		setAreaType(mAlive->getCurrEffect()->getAreaType());
+		setTargetType(mAlive->getCurrEffect()->getTargetType());
+		//setAreaType(mAlive->getCurrEffect()->getAreaType());
 		setAreaRange(mAlive->getCurrEffect()->getAreaSize());
 		setDistance(mAlive->getCurrEffect()->getSpaceRange());
 #if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
 		//setAreaRange(1);
 		//setAreaType(eVertical);
-#endif // cctar
+#endif
+	}
+
+	void AreaCountInfo::excludeStandGrid()
+	{
+		for (auto tGrid : getAlive()->mStandGrids)
+		{
+			vector<int>::iterator iter = mVector.begin();
+			for (;iter != mVector.end();)
+			{
+				if (tGrid == *iter)
+				{
+					mVector.erase(iter);
+					break;
+				}
+			}
+		}
 	}
 
 	void AreaCountInfo::excludeCaptain( )
@@ -52,15 +68,12 @@ namespace BattleSpace{
 
 	int AreaCountInfo::getColByInfo( int pGrod )
 	{
-		int tCol = pGrod / C_GRID_ROW;
-		if (getAreaType() == eMapAnyDoubleLine)
-			return tCol;
 		if (getEnemy() && !getBackAttack() || 
 			!getEnemy() && getBackAttack())			//让技能区域整体移动的情况就类似于武将位置变动了的情况
 		{
-			return tCol + getDistance();
+			return pGrod / C_GRID_ROW + getDistance();
 		}else{
-			return tCol - getDistance();
+			return pGrod / C_GRID_ROW - getDistance();
 		}
 	}
 
@@ -86,7 +99,7 @@ namespace BattleSpace{
 		vector<int> tVector;													//不能在遍历中添加元素
 		for (auto tGrid : getVector())										
 		{
-			if (getAlive()->standInGrid(tGrid))								//武将站立区域不做分散处理
+			if (getAlive()->standInGrid(tGrid))									//武将站立区域不做分散处理
 				continue;														
 			int tRow = tGrid % C_GRID_ROW;
 			int tCol = tGrid / C_GRID_ROW;
@@ -130,13 +143,13 @@ namespace BattleSpace{
 				case eCentenDirection:
 					{
 						if ((getTargetType()==eUsType		&& getEnemy())	||
-							(getTargetType()==eEnemyType	&& !getEnemy())||
+							(getTargetType()==eEnemyType	&& !getEnemy())	||
 							(getTargetType()==eAllType		&& !getEnemy()) )
 						{
 							if (tCol >= tarCol && tarCol > tCol - getAreaRange())		//偏向敌方
 								tVector.push_back(i);
-						}else if (	(getTargetType()==eEnemyType		&& getEnemy())	||
-							(getTargetType()==eUsType			&& !getEnemy())		|| 
+						}else if (	(getTargetType()==eEnemyType&& getEnemy())	||
+							(getTargetType()==eUsType			&& !getEnemy())	|| 
 							(getTargetType()==eAllType			&& getEnemy()))
 						{
 							if (tCol <= tarCol && tarCol < tCol + getAreaRange())		//偏向我方
@@ -148,14 +161,14 @@ namespace BattleSpace{
 				case eBackDirection:
 					{
 						if ((getTargetType()==eUsType		&& getEnemy())		||
-							(getTargetType()==eEnemyType	&& !getEnemy())	||
+							(getTargetType()==eEnemyType	&& !getEnemy())		||
 							(getTargetType()==eAllType		&& !getEnemy()))
 						{
 							if (tCol <= tarCol && tarCol < tCol + getAreaRange())		//偏向我方
 								tVector.push_back(i);
 						}else if (	(getTargetType()==eEnemyType	&& getEnemy())	||
-							(getTargetType()==eUsType		&& !getEnemy())		|| 
-							(getTargetType()==eAllType	&& getEnemy()))
+									(getTargetType()==eUsType		&& !getEnemy())	|| 
+									(getTargetType()==eAllType		&& getEnemy()))
 						{
 							if (tCol >= tarCol && tarCol > tCol - getAreaRange())		//偏向敌方
 								tVector.push_back(i);

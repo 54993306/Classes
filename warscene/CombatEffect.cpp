@@ -69,17 +69,17 @@ namespace BattleSpace{
 	//连击造成伤害效果
 	void CombatEffect::SpineActionEvent( int trackIndex, spEvent* pEvent )
 	{
-		switch ((EventType)pEvent->intValue)
+		switch ((E_ActionEvent)pEvent->intValue)
 		{
-		case EventType::HitEvent:
+		case E_ActionEvent::eHitEvent:
 			{
 				continuousHurt();
 			}break;
-		case EventType::SharkEvent:
+		case E_ActionEvent::eShark:
 			{
 				NOTIFICATION->postNotification(B_Shark,nullptr);
 			}break;
-		case EventType::Die:
+		case E_ActionEvent::eAttackEventEnd:
 			{
 				CCArray* monsters = DataCenter::sharedData()->getWar()->getAlivesByCamp(true,false,false);
 				CCObject* mObj = nullptr;

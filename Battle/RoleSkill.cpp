@@ -94,7 +94,7 @@ namespace BattleSpace{
 		return mEffectList.at(pIndex).size();
 	}
 
-	const skEffectData* RoleSkill::getIndexEffect(unsigned int pListIndex,unsigned int pEffectIndex ) const
+	skEffectData* RoleSkill::getIndexEffect(unsigned int pListIndex,unsigned int pEffectIndex ) const
 	{
 		if (pListIndex >= mEffectList.size())
 			return nullptr;
@@ -103,7 +103,7 @@ namespace BattleSpace{
 		return mEffectList.at(pListIndex).at(pEffectIndex);
 	}
 
-	const skEffectData* RoleSkill::getFirstEffect() const
+	skEffectData* RoleSkill::getFirstEffect() const
 	{
 		if ( !mEffectList.size())
 			return nullptr;
@@ -112,7 +112,7 @@ namespace BattleSpace{
 		return mEffectList.at(0).at(0);
 	}
 
-	const skEffectData* RoleSkill::getSecondEffect() const
+	skEffectData* RoleSkill::getSecondEffect() const
 	{
 		if ( mEffectList.size() < 1)
 			return nullptr;
@@ -121,7 +121,7 @@ namespace BattleSpace{
 		return mEffectList.at(1).at(0);
 	}
 
-	const skEffectData* RoleSkill::getSummonEffect() const
+	skEffectData* RoleSkill::getSummonEffect() const
 	{
 		if (getSkillType() == eCallAtk)
 			if (mEffectList.size())

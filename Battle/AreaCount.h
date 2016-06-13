@@ -19,7 +19,6 @@
 #include "cocos2d.h"
 namespace BattleSpace{
 	class BaseRole;
-
 	class AreaCountInfo
 	{
 	public:
@@ -35,6 +34,7 @@ namespace BattleSpace{
 	public:
 		void excludeCaptain();
 		void excludeInvalid();
+		void excludeStandGrid();
 		int getRowByGrid(int pGrid);
 		int getColByInfo(int pGrod);
 		void addGrid(int pGrid);

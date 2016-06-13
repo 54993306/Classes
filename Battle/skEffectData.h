@@ -22,8 +22,12 @@ namespace protos{
 	}
 }
 #include "cocos2d.h"
+#include "Battle/SkillMacro.h"
 namespace BattleSpace{
+	class BaseRole;
 	class BuffData;
+	class AffectArea;
+	class AreaCountInfo;
 	class skEffectData : public cocos2d::CCObject
 	{
 	public:
@@ -41,19 +45,23 @@ namespace BattleSpace{
 		CC_SYNTHESIZE(int,mBatter,Batter);				//连击数(怪物配置一次召唤多少怪物时使用)
 		CC_SYNTHESIZE(int,mRepel,Repel);				//受击移动距离(受击对象移动距离，分敌我双方)
 		CC_SYNTHESIZE(float,mHurtRatio,HurtRatio);		//伤害浮动值(百分比)
-		CC_SYNTHESIZE(int,mAreaType,AreaType);			//范围类型(1 直线群体...27 随机固定武将区域)
+		//CC_SYNTHESIZE(int,mAreaType,AreaType);			//范围类型(1 直线群体...27 随机固定武将区域)
 		CC_SYNTHESIZE(int,mSpaceRange,SpaceRange);		//范围距离行数
 		CC_SYNTHESIZE(int,mAreaSize,AreaSize);			//范围大小
 		CC_SYNTHESIZE(int,mImpactType,ImpactType);		//属性影响类型(召唤数量限制)
 		CC_SYNTHESIZE(int,mImpactRate,ImpactRate);		//属性影响比率(加血吸血使用)
 	public:
-		void readData(const protos::common::Effect* pEffect);
 		void clearBuffData();
+		void setAreaType(int pType);
+		AffectType getAreaType() const;
+		void readData(const protos::common::Effect* pEffect);
+		void initArea(AreaCountInfo& pInfo) ;
 		const std::vector<BuffData*>& getBuffVector()const;
 	private:
 		skEffectData();									//详细参见datadefine Bufinfo
 		void addBuffData(const protos::common::Buff* pBuffData);
 		std::vector<BuffData*> mBuffVector;
+		AffectArea* mAffectArea;
 	};
 
 	bool EffectSort(const skEffectData* Effect1,const skEffectData* Effect2);//{return Effect1.pos>Effect2.pos;}

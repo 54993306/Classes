@@ -2,8 +2,6 @@
 #include "Battle/HeroRole.h"
 
 namespace BattleSpace{
-
-
 	HeroRole::HeroRole()
 	{
 
@@ -13,5 +11,4 @@ namespace BattleSpace{
 	{
 
 	}
-
 }

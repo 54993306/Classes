@@ -20,8 +20,9 @@
 /******************* 战场武将数据 ********************/
 #include "cocos2d.h"
 #include "Battle/BattleMacro.h"
-#include "Battle/BattleRoleMacro.h"
+#include "Battle/RoleMacro.h"
 
+using namespace cocos2d;
 using namespace std;
 namespace BattleSpace{
 	class BuffManage;
@@ -30,7 +31,8 @@ namespace BattleSpace{
 	class BaseRoleData;
 	class RoleSkill;
 	class skEffectData;
-	class BaseRole:public cocos2d::CCObject			//定义数据的顺序结构是为了方便查看数据
+	class WarManager;
+	class BaseRole:public CCObject			//定义数据的顺序结构是为了方便查看数据
 	{
 	protected:
 		BaseRole();
@@ -41,8 +43,8 @@ namespace BattleSpace{
 		void ExcuteNextEffect();					//重置武将下执行下一个效果状态
 		bool canSummonAlive();						//是否可以召唤武将
 		void clearHitAlive();
-		const skEffectData* getCurrEffect();		//得到武将当前效果
-		const RoleSkill* getCurrSkill();			//得到武将当前效果
+		skEffectData* getCurrEffect();		//得到武将当前效果
+		RoleSkill* getCurrSkill();			//得到武将当前效果
 		bool NextEffect();							//判断第二个效果是否释放
 		int getSkillType();
 		bool captainCallNumberJudge();
@@ -53,6 +55,7 @@ namespace BattleSpace{
 		bool critJudge();
 		void initAliveData();
 		void initAliveByFather(BaseRole*pFather);
+		vector<BaseRole*>* getSkillTargets();
 	public:
 		//public
 		CC_SYNTHESIZE(BaseRoleData*,mBaseData,BaseData);
@@ -128,6 +131,7 @@ namespace BattleSpace{
 		CC_SYNTHESIZE(bool,m_cloaking,Cloaking);			//隐身状态
 		CC_SYNTHESIZE(bool,m_LastAlive,LastAlive);			//场上最后武将
 	protected:
+		WarManager* mManage;
 	};
 };
 #endif

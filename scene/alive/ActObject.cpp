@@ -301,22 +301,22 @@ namespace BattleSpace{
 
 	void ActObject::SpineActionEvent( int trackIndex,spEvent* Event )
 	{
-		switch ((EventType)Event->intValue)
+		switch ((E_ActionEvent)Event->intValue)
 		{
-		case EventType::BeginEvevt:
+		case E_ActionEvent::eBeginEvevt:
 			{
 				AtkBegin_Event();			//开始攻击(受击数组受伤)
 			}break;
-		case EventType::HitEvent:
+		case E_ActionEvent::eHitEvent:
 			{
 				HpChange_Event();			//显示受击方血量处理
 				AtkBegin_Event();			//开始攻击(受击数组受伤)
 			}break;
-		case EventType::SharkEvent:
+		case E_ActionEvent::eShark:
 			{
 				NOTIFICATION->postNotification(B_Shark,nullptr);
 			}break;
-		case EventType::Mask:
+		case E_ActionEvent::eMask:
 			{
 				NOTIFICATION->postNotification(B_SKILL_MASK,m_Alive);
 			}break;

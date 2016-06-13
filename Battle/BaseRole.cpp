@@ -7,8 +7,8 @@
 #include "Battle/RoleSkill.h"
 #include "Battle/skEffectData.h"
 #include "Battle/BuffData.h"
-using namespace cocos2d;
-using namespace std;
+#include "model/DataCenter.h"
+#include "model/WarManager.h"
 namespace BattleSpace{
 	BaseRole::BaseRole()
 		:m_Enemy(false),m_Hp(0),m_MaxHp(0),m_GridIndex(INVALID_GRID),m_MoveGrid(0),m_AtkDelay(0)
@@ -24,6 +24,7 @@ namespace BattleSpace{
 		,m_Model(0),m_AliveID(0),m_MstType(0),mBaseData(nullptr),mLogicData(nullptr)
 	{
 		setBuffManage(nullptr);
+		mManage = DataCenter::sharedData()->getWar();
 	}
 
 	BaseRole::~BaseRole()
@@ -325,7 +326,7 @@ namespace BattleSpace{
 		HittingAlive.clear();
 	}
 
-	const RoleSkill* BaseRole::getCurrSkill()
+	 RoleSkill* BaseRole::getCurrSkill()
 	{
 		if (getCriAtk())
 		{
@@ -350,7 +351,7 @@ namespace BattleSpace{
 		}
 	}
 
-	const skEffectData* BaseRole::getCurrEffect()
+	 skEffectData* BaseRole::getCurrEffect()
 	{
 		if (this->getGroupIndex() < this->getCurrSkill()->getListSize())
 			if ( this->getCurrSkill()->getEffectSize(getGroupIndex())>getEffIndex())
@@ -417,7 +418,7 @@ namespace BattleSpace{
 
 	bool BaseRole::pierceJudge()
 	{
-		if (getCurrEffect()->getAreaType() == ePuncture&&mAreaTargets.size())//贯穿与非贯穿类处理
+		if (getCurrEffect()->getAreaType() == AffectType::ePuncture&&mAreaTargets.size())//贯穿与非贯穿类处理
 		{
 			BaseRole* alive = mAreaTargets.at(0);
 			if (!alive->getCloaking())									//潜行类怪物处理
@@ -463,5 +464,17 @@ namespace BattleSpace{
 			return true;
 		}
 		return false;
+	}
+
+	vector<BaseRole*>* BaseRole::getSkillTargets()
+	{
+		int tTarget = getCurrEffect()->getTargetType();
+		if ((getEnemy()&&tTarget == eUsType)	|| 
+			(!getEnemy()&&tTarget == eEnemyType) )			/*敌方自己，我方敌人*/
+			return mManage->getVecMonsters(true);
+		if ((getEnemy()&&tTarget == eEnemyType) ||
+			(!getEnemy()&&tTarget == eUsType))				/*敌方敌人，我方自己*/
+			return mManage->getVecHeros(true);
+		return mManage->getAliveRoles(true); 
 	}
 };

@@ -174,10 +174,7 @@ namespace BattleSpace{
 		{
 			mGuardArea->initAliveGuard(alive,VecGrid);
 		}else{
-			vector<int> tVector;
-			m_SkillRange->initSkillArea(alive,tVector);
-			for (auto tGrid:tVector)
-				VecGrid.push_back(tGrid);
+			m_SkillRange->initSkillArea(alive,VecGrid);
 		}
 		for (int grid:VecGrid) 
 		{
@@ -195,7 +192,7 @@ namespace BattleSpace{
 					m_FrontArea = true;
 				if(alive->getCurrEffect())
 				{
-					if (alive->getCurrEffect()->getAreaType() == ePuncture)
+					if (alive->getCurrEffect()->getAreaType() == AffectType::ePuncture)
 						break;//合并成一个方法,暴露出来的内容太多，每次需要修改effect结构的时候会多很多地方造成影响，不容易维护和拓展
 				}
 			}

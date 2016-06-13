@@ -16,52 +16,53 @@
  *
  *************************************************************/
 #define eLoopNumberMax 200
-
-//技能施放区域类型
-enum SkillAreaType{
-	nullArea = 0,
-	eFront,								//前方格子类型				1
-	eNearby,							//周边范围					2
-	eVertical,							//纵向格子类型				3(计算所有武将站位格子)
-	eCross,								//十字						4
-	eFrontTow,							//前方两边					5
-	eNearbyUnself,						//周边范围不包含自身			6
-	eEnemy,								//敌方全体					7	
-	eOur,								//我方全体					8
-	eAllArea,							//全图						9
-	ePuncture,							//前方格子类型不贯穿			10
-	eTArea,								//T型区域					11
-	
-	//与武将站位格子无关类攻击范围		(从100开始进行特殊化处理)		
-	RestArea = 100,
-	eFrontOne,						//前军单体					101
-	eCenterOne,						//中	军单体					102
-	eBackOne,						//后	军单体					103
-	eFrontDisperse,					//前军分散范围				104
-	eCenterDisperse,				//中军分散范围				105
-	eBackArea,						//后军分散范围				106
-	eFrontRow,						//前军n排					107
-	eCenterRow,						//中军n排					108
-	eBackRow,						//后军n排					109
-	eAnyFix,						//随机固定格子				110
-	eAnyFixDisperse,				//随机固定格子分散区域		111
-	eAnyAlive,						//随机固定武将				112
-	eAnyAliveDisperse,				//随机固定武将区域			113
-	eLowestHp,						//血量最低对象				114
-	eMapCenterTwoLine,				//地图中间两行区域			115
-	eFrontFourGrid,					//地图四行区域				116		
-	LowestHpUnCaptain,				//除主帅外血量最低对象		117
-	eMapAnyDoubleLine,				//地图中任意两行				118
-};
-
-enum AreaMark
+namespace BattleSpace
 {
-	eUsType	= 1,			//我方目标
-	eEnemyType,				//敌方目标
-	eAllType,				//双方目标
+	enum struct AffectType 
+	{
+		eNullArea						= 0,
+		eFront							= 1,//前方格子类型				
+		eNearby							= 2,//周边范围					
+		eVertical						= 3,//纵向格子类型				
+		eCross							= 4,//十字						
+		eFrontTow						= 5,//前方两边					
+		eNearbyUnself					= 6,//周边范围不包含自身			
+		eEnemy							= 7,//敌方全体					
+		eOur							= 8,//我方全体					
+		eAllArea						= 9,//全图					
+		ePuncture						= 10,//前方格子类型不贯穿			
+		eTArea							= 11,//T型区域				
+		//与武将站位格子无关类攻击范围		(从100开始进行特殊化处理)		
+		RestArea						= 100,
+		eFrontSingle					= 101,//前军单体					
+		eCenterSingle					= 102,//中军单体					
+		eBackSingle						= 103,//后军单体					
+		eFrontDisperse					= 104,//前军分散范围				
+		eCenterDisperse					= 105,//中军分散范围				
+		eBackDisperse					= 106,//后军分散范围				
+		eFrontRow						= 107,//前军n排					
+		eCenterRow						= 108,//中军n排					
+		eBackRow						= 109,//后军n排					
+		eAnyFixGrid						= 110,//随机固定格子				
+		eAnyFixGridDisperse				= 111,//随机固定格子分散区域		
+		eAnyFixAlive					= 112,//随机固定武将				
+		eAnyFixAliveDisperse			= 113,//随机固定武将区域			
+		eLowestHp						= 114,//血量最低对象				
+		eMapCenterTwoLine				= 115,//地图中间两行区域			
+		eFrontFourGrid					= 116,//地图四行区域				
+		eLowestHpUnCaptain				= 117,//除主帅外血量最低对象		
+		eMapAnyDoubleLine				= 118,//地图中任意两行			
+	};
 
-	eFrontDirection			= 11,		//前
-	eCentenDirection		= 12,		//中
-	eBackDirection			= 13,		//后
-};
+	enum AreaMark
+	{
+		eUsType	= 1,			//我方目标
+		eEnemyType,				//敌方目标
+		eAllType,				//双方目标
+
+		eFrontDirection			= 11,		//前
+		eCentenDirection		= 12,		//中
+		eBackDirection			= 13,		//后
+	};
+}
 #endif

@@ -78,12 +78,12 @@ namespace BattleSpace{
 		CC_SYNTHESIZE(int,mRoleDrop,RoleDrop);							//掉落物品类型1、蓝2、金3、彩4、道具5、金币
 		CC_SYNTHESIZE(float,mCritTime,CritTime);						//怪物释放必杀技时间
 	public:
-		const RoleSkill* getNormalSkill()const;
-		const RoleSkill* getSpecialSkill()const;
-		const RoleSkill* getActiveSkill()const;
-		const RoleSkill* getCaptainSkill()const;
+		RoleSkill* getNormalSkill()const;
+		RoleSkill* getSpecialSkill()const;
+		RoleSkill* getActiveSkill()const;
+		RoleSkill* getCaptainSkill()const;
 		bool hasSpecialSkill()const;
-		bool hasActiveSkill()const;
+		bool hasActiveSkill()const; 
 		bool hasCaptainSkill()const;
 		int getActiveSkillType()const;
 	protected:

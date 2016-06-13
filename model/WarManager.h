@@ -7,7 +7,7 @@
 /************************************************************************/
 #include "AppUI.h"
 #include "Battle/BattleMacro.h"
-#include "Battle/BattleRoleMacro.h"
+#include "Battle/RoleMacro.h"
 #include <spine/spine-cocos2dx.h>
 class ArmatureEventDataMgr;
 
@@ -58,7 +58,6 @@ namespace BattleSpace{
 		vector<BaseRole*>* getVecHeros(bool pSort = false);
 		vector<BaseRole*>* getVecMonsters(bool pSort = false);
 		vector<BaseRole*>* getAliveRoles(bool pSort = false);
-		vector<BaseRole*>* getSkillTargets(BaseRole* pAlive);
 		bool isSpine(int id);
 		SpData* getSpineData(string Name);
 		MapSkeletonData& getSpineMap(){return m_MapSpineData;}

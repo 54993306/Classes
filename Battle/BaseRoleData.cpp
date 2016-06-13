@@ -62,22 +62,22 @@ namespace BattleSpace{
 		return false;
 	}
 
-	const RoleSkill* BaseRoleData::getNormalSkill() const
+	RoleSkill* BaseRoleData::getNormalSkill() const
 	{
 		return mNormalSkill;
 	}
 
-	const RoleSkill* BaseRoleData::getSpecialSkill() const
+	RoleSkill* BaseRoleData::getSpecialSkill() const
 	{
 		return mSpecialSkill;
 	}
 
-	const RoleSkill* BaseRoleData::getActiveSkill() const
+	RoleSkill* BaseRoleData::getActiveSkill() const
 	{
 		return mActiveSkill;
 	}
 
-	const RoleSkill* BaseRoleData::getCaptainSkill() const
+	RoleSkill* BaseRoleData::getCaptainSkill() const
 	{
 		return mCaptainSkill;
 	}

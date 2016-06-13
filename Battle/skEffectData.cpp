@@ -1,17 +1,20 @@
 
 #include "Battle/skEffectData.h"
 #include "Battle/BuffData.h"
+#include "Battle/AffectArea/AffectArea.h"
 #include <protos/common/skill_common.pb.h>
 namespace BattleSpace{
 	skEffectData::skEffectData()
 		:mEffectID(0),mEffectType(0),mUserRate(0),mImpactType(0),mImpactRate(0),mGroupPos(0)
 		,mChangeCost(0),mDamageRate(0),mRealHurt(0),mTargetType(0),mAreaSize(0),mGroup(0)
-		,mBatter(0),mRepel(0),mHurtRatio(0),mAreaType(0),mSpaceRange(0)
+		,mBatter(0),mRepel(0),mHurtRatio(0),mSpaceRange(0),mAffectArea(nullptr)
 	{}
 
 	skEffectData::~skEffectData()
 	{
 		clearBuffData();
+		CC_SAFE_RELEASE(mAffectArea);
+		mAffectArea = nullptr;
 	}
 
 	skEffectData* skEffectData::create()
@@ -73,7 +76,29 @@ namespace BattleSpace{
 		}
 		mBuffVector.clear();
 	}
-//ÉýÐò
+
+	void skEffectData::setAreaType( int pType )
+	{
+		if (mAffectArea)
+		{
+			CC_SAFE_RELEASE(mAffectArea);
+			mAffectArea = nullptr;
+		}
+		mAffectArea = AffectArea::create(pType);
+		mAffectArea->retain();
+	}
+
+	AffectType skEffectData::getAreaType() const
+	{
+		return mAffectArea->getAreaType();
+	}
+
+	void skEffectData::initArea( AreaCountInfo& pInfo ) 
+	{
+		mAffectArea->initArea(pInfo);
+	}
+
+	//ÉýÐò
 	bool EffectSort(const skEffectData* Effect1,const skEffectData* Effect2)
 	{
 		return Effect1->getGroupPos() < Effect2->getGroupPos();

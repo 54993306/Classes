@@ -26,7 +26,7 @@
 #include "Battle/BattleDataCenter.h"
 #include "Battle/SkillMacro.h"
 #include "Battle/RoleSkill.h"
-#include "Battle/BattleRoleMacro.h"
+#include "Battle/RoleMacro.h"
 #include "Battle/BaseRoleData.h"
 #include "Battle/MonsterData.h"
 #include "Battle/HeroData.h"
@@ -420,18 +420,6 @@ namespace BattleSpace{
 		CScene* scene = GETSCENE(LoadWar);
 		LayerManager::instance()->closeAll();
 		CSceneManager::sharedSceneManager()->replaceScene(scene);
-	}
-
-	vector<BaseRole*>* WarManager::getSkillTargets(BaseRole* pAlive)
-	{
-		int tTarget = pAlive->getCurrEffect()->getTargetType();
-		if ((pAlive->getEnemy()&&tTarget == eUsType)	|| 
-			(!pAlive->getEnemy()&&tTarget == eEnemyType) )			/*敌方自己，我方敌人*/
-			return getVecMonsters(true);
-		if ((pAlive->getEnemy()&&tTarget == eEnemyType) ||
-			(!pAlive->getEnemy()&&tTarget == eUsType))				/*敌方敌人，我方自己*/
-			return getVecHeros(true);
-		return getAliveRoles(true);
 	}
 
 	vector<BaseRole*>* WarManager::getVecMonsters(bool pSort /*=false*/)

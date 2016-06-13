@@ -22,3 +22,4 @@ static const char* EVE_SHAKE					= "Shake";				/*震屏标记			*/
 static const char* EVE_ANIMAT					= "Animat";				/*播放动画			*/
 static const char* EVE_SOUND					= "Sound";				/*播放声效			*/
 static const char* EVE_MASK						= "mask";				/*技能遮罩			*/
+static const char* EVE_SCALESCENE				= "scalescene";			/*场景缩放			*/

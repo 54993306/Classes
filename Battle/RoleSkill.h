@@ -59,11 +59,11 @@ namespace BattleSpace{
 		void clearEffectData();
 		int getListSize()const;
 		int getEffectSize(unsigned int pIndex) const;
-		const skEffectData*getIndexEffect(unsigned int pListIndex,unsigned int pEffectIndex)const;
+		skEffectData*getIndexEffect(unsigned int pListIndex,unsigned int pEffectIndex)const;
 
-		const skEffectData* getFirstEffect() const;
-		const skEffectData* getSecondEffect() const;
-		const skEffectData* getSummonEffect() const;
+		skEffectData* getFirstEffect() const;
+		skEffectData* getSecondEffect() const;
+		skEffectData* getSummonEffect() const;
 		const std::vector<std::vector<skEffectData*>>& getEffectVector()const;
 	private:
 		RoleSkill();

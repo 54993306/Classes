@@ -33,13 +33,14 @@ namespace BattleSpace{
 		RousedState_Eff,			//buf效果id
 	};
 
-	enum struct EventType
+	enum struct E_ActionEvent
 	{
-		BeginEvevt,
-		HitEvent,
-		SharkEvent,
-		Mask,
-		Die,
+		eBeginEvevt					=0,//攻击开始
+		eHitEvent					=1,//攻击帧
+		eShark						=2,//震动
+		eMask						=3,//marsk
+		eAttackEventEnd				=4,//攻击动作结束
+		eScaleScene					=5,//场景缩放
 	};
 
 	class ActObject : public AliveObject,public StateMachine
