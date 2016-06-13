@@ -3,7 +3,6 @@
 #include "warscene/ConstNum.h"
 #include "scene/alive/ActObject.h"
 #include "Battle/BaseRoleData.h"
-#include "Battle/SkillMacro.h"
 #include "Battle/RoleSkill.h"
 #include "Battle/skEffectData.h"
 #include "Battle/BuffData.h"
@@ -326,7 +325,7 @@ namespace BattleSpace{
 		HittingAlive.clear();
 	}
 
-	 RoleSkill* BaseRole::getCurrSkill()
+	RoleSkill* BaseRole::getCurrSkill()
 	{
 		if (getCriAtk())
 		{
@@ -351,7 +350,7 @@ namespace BattleSpace{
 		}
 	}
 
-	 skEffectData* BaseRole::getCurrEffect()
+	skEffectData* BaseRole::getCurrEffect()
 	{
 		if (this->getGroupIndex() < this->getCurrSkill()->getListSize())
 			if ( this->getCurrSkill()->getEffectSize(getGroupIndex())>getEffIndex())
@@ -414,18 +413,6 @@ namespace BattleSpace{
 			}
 		}
 		return tHasAlive;
-	}
-
-	bool BaseRole::pierceJudge()
-	{
-		if (getCurrEffect()->getAreaType() == AffectType::ePuncture&&mAreaTargets.size())//贯穿与非贯穿类处理
-		{
-			BaseRole* alive = mAreaTargets.at(0);
-			if (!alive->getCloaking())									//潜行类怪物处理
-				return true;
-			mAreaTargets.clear();
-		}
-		return false;
 	}
 
 	void BaseRole::cloakingTarget()

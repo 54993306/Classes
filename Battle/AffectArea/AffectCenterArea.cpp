@@ -13,7 +13,6 @@
 *************************************************************/
 
 #include "Battle/AffectArea/AffectCenterArea.h"
-
 namespace BattleSpace
 {
 	//中心单体

@@ -42,6 +42,7 @@ namespace BattleSpace
 
 	/***************************************************************************/
 
+	//前方范围不贯穿类型
 	AffectType AffectPuncture::getAreaType()
 	{
 		return AffectType::ePuncture;
@@ -50,10 +51,18 @@ namespace BattleSpace
 	void AffectPuncture::initArea( AreaCountInfo& pInfo )
 	{
 		AffectFront::initArea(pInfo);
+		pInfo.excludeInvalid();
 		vector<BaseRole*>* VecAlive = pInfo.getAlive()->getSkillTargets();
-		vector<int>::const_iterator iter = pInfo.getVector().begin();
-		/*for ()
+		for (auto tRole: *VecAlive)
 		{
-		}*/
+			for (int tIndex=0;tIndex < pInfo.getVector().size();tIndex++)
+			{
+				if (tRole->getGridIndex() == pInfo.getVector().at(tIndex) && !tRole->getCloaking())
+				{
+					pInfo.removeByIndex(++tIndex);
+					return;
+				}
+			}
+		}
 	}
 }

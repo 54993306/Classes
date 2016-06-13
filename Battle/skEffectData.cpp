@@ -43,7 +43,6 @@ namespace BattleSpace{
 		this->setBatter(pEffect->batter());
 		this->setRepel(pEffect->repel());
 		this->setHurtRatio(pEffect->erange()*0.01f);
-		this->setAreaType(pEffect->mode());
 		this->setSpaceRange(pEffect->distance());
 		this->setAreaSize(pEffect->range());
 		this->setImpactType(pEffect->pro_type());
@@ -53,6 +52,8 @@ namespace BattleSpace{
 			addBuffData(&pEffect->bufflist(i));
 		this->setuserRate(pEffect->userrate());
 		this->setChangeCost(pEffect->cost());
+
+		this->initAffect(pEffect->mode());
 	}
 
 	const std::vector<BuffData*>& skEffectData::getBuffVector() const
@@ -77,7 +78,7 @@ namespace BattleSpace{
 		mBuffVector.clear();
 	}
 
-	void skEffectData::setAreaType( int pType )
+	void skEffectData::initAffect( int pType )
 	{
 		if (mAffectArea)
 		{
@@ -85,16 +86,20 @@ namespace BattleSpace{
 			mAffectArea = nullptr;
 		}
 		mAffectArea = AffectArea::create(pType);
+		mAffectArea->setEffectData(this);
 		mAffectArea->retain();
-	}
-
-	AffectType skEffectData::getAreaType() const
-	{
-		return mAffectArea->getAreaType();
 	}
 
 	void skEffectData::initArea( AreaCountInfo& pInfo ) 
 	{
+		if (!mAreaSize)
+			return;
+		if (mTargetType == eEnemyType)
+		{
+			for (auto tGrid : pInfo.getAlive()->mStandGrids)
+				pInfo.addGrid(tGrid);
+		}
+		mAffectArea->commonHandle();
 		mAffectArea->initArea(pInfo);
 	}
 

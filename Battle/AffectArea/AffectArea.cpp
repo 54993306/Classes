@@ -202,4 +202,9 @@ namespace BattleSpace
 				pValids.push_back(CountGrid.at(i));
 		}
 	}
+
+	void AffectArea::commonHandle()
+	{
+
+	}
 }

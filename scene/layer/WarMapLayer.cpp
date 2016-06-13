@@ -19,7 +19,6 @@
 #include "tools/ShowTexttip.h"
 #include "Battle/BattleMessage.h"
 #include "Battle/GuardArea.h"
-#include "Battle/SkillMacro.h"
 #include "Battle/BaseRoleData.h"
 #include "Battle/skEffectData.h"
 namespace BattleSpace{
@@ -190,11 +189,6 @@ namespace BattleSpace{
 					m_BackArea = true;
 				else
 					m_FrontArea = true;
-				if(alive->getCurrEffect())
-				{
-					if (alive->getCurrEffect()->getAreaType() == AffectType::ePuncture)
-						break;//合并成一个方法,暴露出来的内容太多，每次需要修改effect结构的时候会多很多地方造成影响，不容易维护和拓展
-				}
 			}
 		}
 		for (auto i : alive->mTouchGrids)

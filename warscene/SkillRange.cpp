@@ -10,7 +10,6 @@
 #include <functional>					//sort 的降序排序使用
 #include "scene/alive/AliveDefine.h"
 #include "warscene/BattleTools.h"
-#include "Battle/SkillMacro.h"
 #include "Battle/AreaCount.h"
 #include "Battle/RoleSkill.h"
 #include "Battle/skEffectData.h"
@@ -33,25 +32,6 @@ namespace BattleSpace{
 			return NULL;
 		}
 	}
-	//武将当前站位区域
-	void SkillRange::getSelfArea( BaseRole* pAlive )
-	{
-		if (pAlive->getCurrEffect()->getTargetType() != eEnemyType)					//效果目标是敌方阵营
-			return;
-		pAlive->mSkillArea.assign(
-			pAlive->mStandGrids.begin(),pAlive->mStandGrids.end());			//最优先攻击相同格子怪物			
-	}
-
-
-	void SkillRange::initSkillEffectArea( BaseRole* pAlive,vector<int>& pVector )
-	{
-		AreaCountInfo CountInfo(pVector,pAlive);
-		pAlive->getCurrEffect()->initArea(CountInfo);
-		CountInfo.excludeInvalid();
-		VectorRemoveRepeat(pVector);											//包括了正向遍历和除去重复
-		if (!pAlive->getEnemy() && !pAlive->getOpposite())
-			sort(pVector.begin(),pVector.end(),greater<int>());					//我方武将正向攻击的情况(对格子进行反向排序)
-	}
 	//返回受击区域(可以使用先获取敌方目标的方式然后判断敌方目标格子是否在攻击范围内)
 	void SkillRange::initSkillArea( BaseRole* pAlive,vector<int>& pVector )	
 	{
@@ -61,10 +41,9 @@ namespace BattleSpace{
 			pVector.clear();
 			return;
 		}
-		getSelfArea(pAlive);
-		if (!pAlive->getCurrEffect()->getAreaSize())
-			return;
-		initSkillEffectArea(pAlive,pVector);
+		AreaCountInfo CountInfo(pVector,pAlive);
+		pAlive->getCurrEffect()->initArea(CountInfo);
+		CountInfo.excludeInvalid();
 	}
 	//返回受击范围内受击武将
 	void SkillRange::initAreaTargets(BaseRole* pAlive)
@@ -72,8 +51,6 @@ namespace BattleSpace{
 		vector<BaseRole*>* VecAlive = pAlive->getSkillTargets();	//不直接使用格子去寻找是为了减少遍历的次数																
 		for (auto tGrid : pAlive->mSkillArea)								//格子是排序好的,要使用格子来进行遍历(必须,不同阵营获取目标顺序不同)
 		{
-			if ( pAlive->pierceJudge() )
-				break;
 			for (BaseRole* tAlive: *VecAlive)
 			{
 				if ( pAlive->hasAliveByTargets(tAlive) || 
@@ -96,8 +73,6 @@ namespace BattleSpace{
 		{
 			pAlive->setGroupIndex(tGroupIndex);
 			initSkillArea(pAlive,pAlive->mSkillArea);
-			if (!pAlive->mSkillArea.size())
-				break;
 			initAreaTargets(pAlive);
 			if (pAlive->mAreaTargets.size())
 				return;

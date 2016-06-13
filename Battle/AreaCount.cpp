@@ -1,8 +1,9 @@
 #include "battle/AreaCount.h"
 #include "Battle/BaseRole.h"
 #include "warscene/ConstNum.h"
-#include "Battle/SkillMacro.h"
 #include "Battle/skEffectData.h"
+#include "warscene/BattleTools.h"
+
 using namespace cocos2d;
 namespace BattleSpace{
 	AreaCountInfo::AreaCountInfo(vector<int>& pVector,BaseRole* pAlive)
@@ -60,6 +61,9 @@ namespace BattleSpace{
 			else
 				iter++;
 		}
+		VectorRemoveRepeat(mVector);											//包括了正向遍历和除去重复
+		if (!mAlive->getEnemy() && !mAlive->getOpposite())
+			sort(mVector.begin(),mVector.end(),greater<int>());					//我方武将正向攻击的情况(对格子进行反向排序)
 	}
 	int AreaCountInfo::getRowByGrid( int pGrid )
 	{
@@ -80,6 +84,11 @@ namespace BattleSpace{
 	void AreaCountInfo::addGrid( int pGrid )
 	{
 		mVector.push_back(pGrid);
+	}
+
+	void AreaCountInfo::removeByIndex( int pIndex )
+	{
+		mVector.erase(mVector.begin()+pIndex,mVector.end());
 	}
 
 	bool AreaCountInfo::hasGrid( int pGrid )

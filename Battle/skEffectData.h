@@ -22,7 +22,6 @@ namespace protos{
 	}
 }
 #include "cocos2d.h"
-#include "Battle/SkillMacro.h"
 namespace BattleSpace{
 	class BaseRole;
 	class BuffData;
@@ -52,8 +51,7 @@ namespace BattleSpace{
 		CC_SYNTHESIZE(int,mImpactRate,ImpactRate);		//属性影响比率(加血吸血使用)
 	public:
 		void clearBuffData();
-		void setAreaType(int pType);
-		AffectType getAreaType() const;
+		void initAffect(int pType);
 		void readData(const protos::common::Effect* pEffect);
 		void initArea(AreaCountInfo& pInfo) ;
 		const std::vector<BuffData*>& getBuffVector()const;
@@ -64,6 +62,12 @@ namespace BattleSpace{
 		AffectArea* mAffectArea;
 	};
 
+	enum E_TargetType
+	{
+		eUsType	= 1,			//我方目标
+		eEnemyType,				//敌方目标
+		eAllType,				//双方目标
+	};
 	bool EffectSort(const skEffectData* Effect1,const skEffectData* Effect2);//{return Effect1.pos>Effect2.pos;}
 };
 #endif

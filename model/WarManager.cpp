@@ -24,7 +24,6 @@
 #include "warscene/BattleTools.h"
 /**************************************/
 #include "Battle/BattleDataCenter.h"
-#include "Battle/SkillMacro.h"
 #include "Battle/RoleSkill.h"
 #include "Battle/RoleMacro.h"
 #include "Battle/BaseRoleData.h"

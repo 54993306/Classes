@@ -13,7 +13,6 @@
  *************************************************************/
 
 #include "Battle/AffectArea/AffectFrontArea.h"
-
 namespace BattleSpace
 {
 	//前方单体

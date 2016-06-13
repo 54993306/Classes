@@ -49,7 +49,6 @@ namespace BattleSpace{
 		int getSkillType();
 		bool captainCallNumberJudge();
 		bool hasAliveByTargets(BaseRole* pAlive);
-		bool pierceJudge();
 		void cloakingTarget();						//判断受击目标内是否全为隐身对象
 		bool standInGrid(int pGrid);
 		bool critJudge();

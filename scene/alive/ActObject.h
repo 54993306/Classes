@@ -25,14 +25,6 @@ namespace BattleSpace{
 	class WarControl;
 	class WarMapData;
 	class WarManager;
-	enum ActObjectTag
-	{
-		Crit_Effect = 0,
-		Boil_Effect,
-		hit_tag,					//标记受击特效
-		RousedState_Eff,			//buf效果id
-	};
-
 	enum struct E_ActionEvent
 	{
 		eBeginEvevt					=0,//攻击开始

@@ -29,6 +29,7 @@ namespace BattleSpace
 
 	/***************************************************************************/
 
+	//前方范围不贯穿类型
 	class AffectPuncture : public AffectFront
 	{
 	public:
