@@ -35,11 +35,11 @@ namespace BattleSpace{
 };
 namespace BattleSpace{
 	WarManager::WarManager()
-		:m_SceneTarpID(0),m_efdata(nullptr),m_terData(nullptr),m_armatureEventDataMgr(nullptr)
-		,m_StageID(-1),m_Batch(-1),m_Logic(nullptr),m_iLastStageId(0),m_StageType(0),m_BuffData(nullptr)
+		:m_SceneTarpID(0),m_efdata(nullptr),m_armatureEventDataMgr(nullptr)
+		,m_StageID(-1),m_Batch(-1),m_Logic(nullptr),m_iLastStageId(0),m_StageType(0)
 		,m_bNormal(true),m_ChapterCount(0),m_ChapterIndex(0), m_BossModel(false)
-		,m_VerifyNum(0),m_BossHurtCount(0),m_BossHurtPe(0),m_iWorldBossRank(0),m_StoryData(nullptr)
-		,m_BattleOver(false),m_FirstStage(true)
+		,m_VerifyNum(0),m_BossHurtCount(0),m_BossHurtPe(0),m_iWorldBossRank(0)
+		,mBattleOver(false),mFirstStage(true),mStoryData(nullptr),mBuffData(nullptr)
 	{
 		int id[100] = {146,1464,1565,3014,3064,3514,10664,319,576,1096,1101,391,1102};
 		for (auto i:id)
@@ -61,39 +61,34 @@ namespace BattleSpace{
 		return false;
 	}
 
-	WarManager::~WarManager(){}
-
 	void WarManager::BattleDataClear()
 	{
-		for(Members::iterator iter = m_members.begin(); iter != m_members.end();++iter)
+		for (auto tRole : m_members)
 		{
-			CC_SAFE_RELEASE(iter->second);
-			iter->second = nullptr;
+			CC_SAFE_RELEASE(tRole.second);
 		}
-		m_FirstStage = true;
-		BattleData->releaseRoleData();
-		m_BattleOver = true;
+		m_members.clear();
+		m_Batch = -1;
+		m_StageID = -1;
+		m_Heros.clear();
+		m_Logic = nullptr;
+		m_Monsters.clear();
+		mFirstStage = true;
+		mBattleOver = true;
 		m_BossHurtPe = 0;
 		ReleaseSpineData();
-		m_members.clear();
 		m_SceneTarpID = 0;
-		m_StageID = -1;
-		m_Batch = -1;
-		m_Logic = nullptr;
 		m_VecBossHurt.clear();
-		m_Heros.clear();
-		m_Monsters.clear();
 		m_AliveRoles.clear();
 		m_CantMoveGrid.clear();
 		m_AddCostGrid.clear();
+		BattleData->releaseRoleData();
 		CC_SAFE_RELEASE(m_efdata);
 		m_efdata = nullptr;
-		CC_SAFE_RELEASE(m_terData);
-		m_terData = nullptr;
-		CC_SAFE_RELEASE(m_BuffData);
-		m_BuffData = nullptr;
-		CC_SAFE_RELEASE(m_StoryData);
-		m_StoryData = nullptr;
+		CC_SAFE_RELEASE(mBuffData);
+		mBuffData = nullptr;
+		CC_SAFE_RELEASE(mStoryData);
+		mStoryData = nullptr;
 		CC_SAFE_RELEASE(m_armatureEventDataMgr);
 		m_armatureEventDataMgr = nullptr;
 	}
@@ -157,12 +152,10 @@ namespace BattleSpace{
 	{
 		m_efdata = EffectData::create();									//创建这些对象都需要读取文件，最好是整个战斗过程中只创建一次
 		m_efdata->retain();
-		m_terData = terData::create();
-		m_terData->retain();
-		m_BuffData = BuffConfig::create();
-		m_BuffData->retain();
-		m_StoryData = StoryData::create();
-		m_StoryData->retain();
+		mBuffData = BuffConfig::create();
+		mBuffData->retain();
+		mStoryData = StoryData::create();
+		mStoryData->retain();
 		m_armatureEventDataMgr = ArmatureEventDataMgr::create();
 		m_armatureEventDataMgr->retain();
 		initHeroData();
@@ -252,22 +245,16 @@ namespace BattleSpace{
 			return nullptr;
 		for(Members::iterator iter = m_members.begin(); iter != m_members.end();++iter)
 		{
-			//先判断是否为boss如果为boss判断boss所站的区域是否包含该格子
 			BaseRole* alive = iter->second;
 			if (alive->getHp() <= 0)
 				continue;
-			if (grid >=  C_CAPTAINGRID)
-			{
-				if (alive->getCaptain())
-					return alive;
-				else
-					continue;
-			}
 			for (int i=0; i < alive->mStandGrids.size();i++)
 			{
 				if (alive->mStandGrids.at(i) == grid)
 					return alive;
 			}
+			if (grid >=  C_CAPTAINGRID && alive->getCaptain())
+				return alive;
 		}
 		return nullptr;
 	}
@@ -295,87 +282,25 @@ namespace BattleSpace{
 		return true;
 	}
 
-	ArmatureEventDataMgr* WarManager::getArmatureDataMgr() { 
-		return m_armatureEventDataMgr; }
-	const Members* WarManager::getMembers() { 
-		return &m_members; }
-	EffectData* WarManager::getEffData() { 
-		return m_efdata; }
-	BuffConfig* WarManager::getBuffData(){
-		return m_BuffData;}
-	StoryData* WarManager::getStoryData(){
-		return m_StoryData;}
-
-	BaseRole* WarManager::getAbsentCallAlive( BaseRole* fatherAlive )
-	{
-		Members::iterator iter = m_members.begin();
-		for(; iter != m_members.end();++iter)			//判断是否有已创建但未上阵的召唤武将
-		{
-			BaseRole* alive = iter->second;
-			if (alive->getHp()<=0 || alive->getEnemy() != fatherAlive->getEnemy())
-				continue;
-			if (alive->getBaseData()->getCallRole() && 
-				!alive->getBattle() && 
-				alive->getFatherID()==fatherAlive->getAliveID())
-				return alive;
-		}
-		return nullptr;
+	ArmatureEventDataMgr* WarManager::getArmatureDataMgr() 
+	{ 
+		return m_armatureEventDataMgr; 
 	}
-
-	BaseRole* WarManager::getNewCallAlive(BaseRole* Father,int CallId)
-	{
-		const vector<MonsterData*>tVector = BattleData->getCallRoleVector();
-		for (MonsterData* tBaseData:tVector)
-		{
-			if (tBaseData->getCallID() != CallId)
-				continue;
-			BaseRole* child = BaseRole::create();
-			child->setBaseData(tBaseData);
-			child->setCallType(tBaseData->getCallType());
-			child->setEnemy(Father->getEnemy());
-			if (Father->getEnemy())
-			{
-				child->setAliveID(m_members.size()+C_CallMonst);
-				if (child->getBaseData()->getMonsterType() == MST_HIDE)
-					child->setCloaking(true);
-				child->setDelaytime(tBaseData->getDelayTime());
-				if (tBaseData->getInitGrid())
-				{
-					CallAliveByFixRange(Father,child);
-				}else{
-					int ran = CCRANDOM_0_1()*(Father->mStandGrids.size()-1);
-					int grid = MoveRule::create()->getCurrRandomGrid(Father->mStandGrids.at(ran));	//得到当前武将格子的附近范围格子
-					child->setGridIndex(grid);
-				}
-				child->setMstType(child->getBaseData()->getMonsterType());
-				child->setMove(tBaseData->getMoveState());
-			}else{
-				child->setAliveID(m_members.size()+C_CallHero);
-				child->setGridIndex(INVALID_GRID);
-			}
-			child->initAliveByFather(Father);
-			addAlive(child);
-			child->setFatherID(Father->getAliveID());
-			return child;
-		}
-		CCLOG("[ *ERROR ]WarManager::getNewCallAlive  CallId =%d ",CallId);
-		return nullptr;
+	const Members* WarManager::getMembers() 
+	{ 
+		return &m_members; 
 	}
-
-	BaseRole* WarManager::getCallAlive(BaseRole* Father,const RoleSkill* skill)
+	EffectData* WarManager::getEffData() 
+	{ 
+		return m_efdata; 
+	}
+	BuffConfig* WarManager::getBuffData()
 	{
-		BaseRole* alive = getAbsentCallAlive(Father);					
-		if (alive)
-			return alive;
-		if (Father->captainCallNumberJudge())
-			return nullptr;
-		const skEffectData* effect = skill->getSummonEffect();
-		if (!effect)
-		{
-			CCLOG("[ *ERROR ] WarManager::getCallAlive Skill Effect NULL");
-			return nullptr;
-		}
-		return getNewCallAlive(Father,effect->getTargetType());
+		return mBuffData;
+	}
+	StoryData* WarManager::getStoryData()
+	{
+		return mStoryData;
 	}
 	//每帧刷新一次武将信息
 	void WarManager::updateAlive()
@@ -413,8 +338,8 @@ namespace BattleSpace{
 		ReleaseSpineData();													//应该有更好的管理方法
 		ParseMoveGrid(m_StageID,m_CantMoveGrid);
 		ParseAddCostGrid(m_StageID,m_AddCostGrid);
-		m_BattleOver = false;
-		m_StoryData->initStoryData(m_StageID);
+		mBattleOver = false;
+		mStoryData->initStoryData(m_StageID);
 
 		CScene* scene = GETSCENE(LoadWar);
 		LayerManager::instance()->closeAll();
@@ -463,4 +388,55 @@ namespace BattleSpace{
 			return false;
 		}
 	}
+
+	int WarManager::getCurrRandomGrid( int grid,bool hasAlive /*= false*/ )
+	{
+		int row = grid % C_GRID_ROW;
+		int col = grid / C_GRID_ROW;
+
+		CCArray* arr = CCArray::create();
+		if ((row+1)<C_GRID_ROW)
+			arr->addObject(CCInteger::create(col * C_GRID_ROW + row+1));
+		if ((row-1)>=0)
+			arr->addObject(CCInteger::create(col * C_GRID_ROW + row-1));
+		if ((col+1)<C_GRID_COL)
+		{
+			arr->addObject(CCInteger::create((col+1) * C_GRID_ROW + row));
+			if ((row+1)<C_GRID_ROW)
+				arr->addObject(CCInteger::create((col+1) * C_GRID_ROW + row+1));
+			if ((row-1)>=0)
+				arr->addObject(CCInteger::create((col+1) * C_GRID_ROW + row-1));
+		}	
+		if ((col-1)>=0)
+		{
+			arr->addObject(CCInteger::create((col-1) * C_GRID_ROW + row));
+			if ((row+1)<C_GRID_ROW)
+				arr->addObject(CCInteger::create((col-1) * C_GRID_ROW + row+1));
+			if ((row-1)>=0)
+				arr->addObject(CCInteger::create((col-1) * C_GRID_ROW + row-1));
+		}
+		int pGrid = grid;
+		do{
+			pGrid = ((CCInteger*)arr->randomObject())->getValue();
+			if (pGrid >= C_CAPTAINGRID)
+				continue;
+			if ( hasAlive && !getAliveByGrid(pGrid))
+			{
+				CCArray* arr = getAlivesByCamp(false,true);
+				CCObject* obj = nullptr;
+				bool pMoveGrid = false;
+				CCARRAY_FOREACH(arr,obj)
+				{
+					BaseRole* alive = (BaseRole*)obj;
+					if (alive->getMoveGrid() == pGrid)								//且无人将要过去
+						pMoveGrid = true;
+				}
+				if (pMoveGrid)
+					continue;
+			}
+			return pGrid;
+		} while (true);
+		return pGrid;
+	}
+
 }

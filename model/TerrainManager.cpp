@@ -153,7 +153,7 @@ Terrain* TerrainManager::getTerrain(unsigned int terrainID)
 void TerrainManager::initData(vector<BattleTrap>& VecTerrain)
 {
 	clear();
-	terData* data = DataCenter::sharedData()->getWar()->getTerData();
+	terData* data = nullptr/*DataCenter::sharedData()->getWar()->getTerData()*/;
 	for (int i =0 ; i<VecTerrain.size() ; i++)
 	{
 		Terrain* terrain = Terrain::create();

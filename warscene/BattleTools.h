@@ -36,5 +36,6 @@ namespace BattleSpace{
 	void VectorSortAliveHp(vector<BaseRole*> &pVector);
 
 	void PlaySound_Event(int id);
+
 };
 #endif

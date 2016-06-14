@@ -611,10 +611,10 @@ namespace BattleSpace{
 		int cost = m_Manage->getLogicObj()->getCurrCost();
 		if (alive->getBattle()&&alive->getHp()>0)
 		{
-			const RoleSkill* skill = alive->getBaseData()->getActiveSkill();
+			RoleSkill* skill = alive->getBaseData()->getActiveSkill();		//我方目前只有主动技为召唤技
 			if (skill->getSkillType() == eCallAtk&&cost >= skill->getExpendCost())
 			{
-				BaseRole* pAlive = m_Manage->getCallAlive(alive,skill);
+				BaseRole* pAlive = alive->getCallAlive(skill);
 				if (!pAlive)
 					return eWidgetTouchTransient;
 				CaptainSkill::create()->ExecuteCaptainSkill();

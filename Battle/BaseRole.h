@@ -50,6 +50,9 @@ namespace BattleSpace{
 		void attackDirection();
 		void SkillActionAndEffect(int pActionIndex,int pEffectID);
 		void AliveCritEnd();
+		BaseRole* getAbsentCallAlive();
+		BaseRole* getCallAlive( RoleSkill* skill );
+		BaseRole* getNewCallAlive(int CallId);
 		/****************** Hero *********************/
 		void heroCritEffect();
 		void HeroExcuteAI();

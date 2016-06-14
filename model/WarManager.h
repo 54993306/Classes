@@ -14,16 +14,10 @@ class ArmatureEventDataMgr;
 namespace BattleSpace{
 	class BaseRole;
 	class EffectData;
-	class SpecialEffectData;
 	class EffectInfo;
-	class SpecialEffectInfo;
-	class terData;
 	class CombatLogic;
-	class MoveObject;
 	class BuffConfig;
 	class StoryData;
-	class RoleSkill;
-	class ActObject;
 	using namespace std;
 	typedef map<unsigned int,BaseRole*> Members;	
 	typedef std::pair<spSkeletonData*,spAtlas*> SpData;
@@ -33,16 +27,14 @@ namespace BattleSpace{
 	{
 	public:
 		WarManager();
-		virtual ~WarManager();
+		virtual ~WarManager(){};
 		bool init(){return true;}
 		CREATE_FUNC(WarManager);	
 	public:
 		void addAlive(BaseRole* alive);
 		BaseRole* getAlive(unsigned int aliveID);
 		BaseRole* getAliveByGrid(int grid);
-		BaseRole* getCallAlive(BaseRole* pAlive,const RoleSkill* skill);
 		BaseRole* getAliveByType(E_ALIVETYPE type,bool Monster = true);
-		BaseRole* getAbsentCallAlive(BaseRole* fatherAlive);
 		void BattleDataClear();
 		void ReleaseSpineData();
 		void initData();
@@ -53,7 +45,6 @@ namespace BattleSpace{
 		BuffConfig* getBuffData();
 		StoryData* getStoryData();
 		ArmatureEventDataMgr* getArmatureDataMgr();
-		terData* getTerData(){return m_terData;};
 		const Members* getMembers();
 		void updateAlive();
 		vector<BaseRole*>* getVecHeros(bool pSort = false);
@@ -68,11 +59,11 @@ namespace BattleSpace{
 		/*************************************************/
 		void sortArrayByGridIndex(CCArray* arr);
 		CCArray* getAlivesByCamp(bool enemy = true,bool isAlive = false,bool sort = true);
-		BaseRole* getNewCallAlive(BaseRole* Father,int CallId);
 		void initCommonData();
 		void clearOldData();
 		void initRoleSkillInfo(int pEffectID,BaseRole* pRole);
 		bool inAddCostArea(int pGrid);
+		int getCurrRandomGrid(int grid,bool hasAlive = false);
 	public:
 		CC_SYNTHESIZE(int, m_iWorldBossRank, WorldBossRank);			//世界BOSS狂暴状态
 		CC_SYNTHESIZE(int,m_LoadImage,LoadImage);						//用于记录加载图片的id
@@ -88,8 +79,8 @@ namespace BattleSpace{
 		CC_SYNTHESIZE(int, m_BossHurtPe,BossHurtPe);					//世界boss伤害加成百分比
 		CC_PROPERTY_CONSTREAD(int, m_VerifyNum,VerifyNum);				//验证所有武将造成的伤害信息(验证伤害是否被恶意修改)
 		CC_PROPERTY_CONSTREAD(int, m_BossHurtCount,BossHurtCount);		//造成的总伤害
-		CC_SYNTHESIZE(bool, m_BattleOver, battleOver);					//战斗结束
-		CC_SYNTHESIZE(bool, m_FirstStage, FirstStage);					//首次进入关卡
+		CC_SYNTHESIZE(bool, mBattleOver, battleOver);					//战斗结束
+		CC_SYNTHESIZE(bool, mFirstStage, FirstStage);					//首次进入关卡
 	protected:
 		vector<int> m_CantMoveGrid;									//可移动格子存储
 		vector<int> m_AddCostGrid;									//可增加cost格子存储
@@ -98,10 +89,9 @@ namespace BattleSpace{
 		vector<int> m_SpineID;										//记录spine的ID
 		Members m_members;											//战场上活着的英雄
 		EffectData* m_efdata;
-		BuffConfig* m_BuffData;
-		StoryData* m_StoryData;
+		BuffConfig* mBuffData;
+		StoryData* mStoryData;
 		ArmatureEventDataMgr* m_armatureEventDataMgr;
-		terData* m_terData;
 		int m_SceneTarpID;											//场景效果类型记录
 		vector<BaseRole*> m_Heros;
 		vector<BaseRole*> m_Monsters;

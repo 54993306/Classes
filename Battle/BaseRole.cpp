@@ -6,6 +6,8 @@
 #include "Battle/BattleMessage.h"
 #include "Battle/MoveObject.h"
 #include "Battle/GuardArea.h"
+#include "Battle/MonsterData.h"
+#include "Battle/BattleDataCenter.h"
 
 #include "model/DataCenter.h"
 #include "model/WarManager.h"
@@ -13,6 +15,7 @@
 #include "scene/alive/ActObject.h"
 #include "warscene/ConstNum.h"
 #include "warscene/SkillRange.h"
+#include "warscene/BattleTools.h"
 
 namespace BattleSpace{
 	BaseRole::BaseRole()
@@ -890,6 +893,80 @@ namespace BattleSpace{
 			if (getBaseData()->getAlertType())
 				setAIState(true);
 		}
+	}
+
+	BaseRole* BaseRole::getAbsentCallAlive()
+	{
+		const Members* tRoleMap = mManage->getMembers();
+		Members::const_iterator iter = tRoleMap->begin();
+		for(; iter != tRoleMap->end();++iter)			//判断是否有已创建但未上阵的召唤武将
+		{
+			BaseRole* tRole = iter->second;
+			if (tRole->getHp()<=0 || tRole->getEnemy() != getEnemy())
+				continue;
+			if (tRole->getBaseData()->getCallRole() && 
+				!tRole->getBattle() && 
+				tRole->getFatherID()==getAliveID())
+				return tRole;
+		}
+		return nullptr;
+	}
+
+	BaseRole* BaseRole::getCallAlive( RoleSkill* skill )
+	{
+		BaseRole* alive = getAbsentCallAlive();					
+		if (alive)
+			return alive;
+		if (captainCallNumberJudge())
+			return nullptr;
+		const skEffectData* effect = skill->getSummonEffect();
+		if (!effect)
+		{
+			CCLOG("[ *ERROR ] WarManager::getCallAlive Skill Effect NULL");
+			return nullptr;
+		}
+		return getNewCallAlive(effect->getTargetType());
+	}
+
+	BaseRole* BaseRole::getNewCallAlive( int CallId )
+	{
+		const vector<MonsterData*>tVector = BattleData->getCallRoleVector();
+		for (int tIndex=0;tIndex < tVector.size();tIndex++)
+		{
+			MonsterData* tBaseData = tVector.at(tIndex);
+			if (tBaseData->getCallID() != CallId)
+				continue;
+			BaseRole* child = BaseRole::create();
+			child->setBaseData(tBaseData);
+			child->setCallType(tBaseData->getCallType());
+			child->setEnemy(getEnemy());
+			if ( getEnemy() )
+			{
+				child->setAliveID(tIndex+C_CallMonst);
+				if (child->getBaseData()->getMonsterType() == MST_HIDE)
+					child->setCloaking(true);
+				child->setDelaytime(tBaseData->getDelayTime());
+				if (tBaseData->getInitGrid())
+				{
+					CallAliveByFixRange(this,child);
+				}else{
+					int ran = CCRANDOM_0_1()*(mStandGrids.size()-1);
+					int grid = mManage->getCurrRandomGrid(mStandGrids.at(ran));	//得到当前武将格子的附近范围格子
+					child->setGridIndex(grid);
+				}
+				child->setMstType(child->getBaseData()->getMonsterType());
+				child->setMove(tBaseData->getMoveState());
+			}else{
+				child->setAliveID(tIndex+C_CallHero);
+				child->setGridIndex(INVALID_GRID);
+			}
+			child->initAliveByFather(this);
+			mManage->addAlive(child);
+			child->setFatherID(getAliveID());
+			return child;
+		}
+		CCLOG("[ *ERROR ]WarManager::getNewCallAlive  CallId =%d ",CallId);
+		return nullptr;
 	}
 
 };

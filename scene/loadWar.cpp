@@ -420,7 +420,7 @@ namespace BattleSpace{
 	void LoadWar::LoadTerrain()
 	{
 		return;
-		terData* data = m_Manage->getTerData();
+		terData* data = nullptr/*m_Manage->getTerData()*/;
 		char plist_str[60] = {0};
 		for (auto id: m_WarResouse.find(ResourceType::Load_Terrain)->second)
 		{

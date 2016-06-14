@@ -370,7 +370,7 @@ namespace BattleSpace{
 		case eCallAtk:
 			{
 				alive->setSortieNum(alive->getSortieNum()+1);								//一次性可召唤多个武将
-				BaseRole* pAlive = m_Manage->getCallAlive(alive,alive->getCurrSkill());	//得到被召唤的武将
+				BaseRole* pAlive = alive->getCallAlive(alive->getCurrSkill());	//得到被召唤的武将
 				if (!pAlive)
 				{
 					CCLOG("[ *ERROR ] CombatLoginc::AtkLogic CallAlive NULL");
@@ -551,18 +551,18 @@ namespace BattleSpace{
 		if (m_Manage->getWorldBoss())
 		{
 			wordBossFinish();						//世界boss结束情况
-		}else{
-			if ( m_Manage->getStageID() )
+			return;
+		}
+		if ( m_Manage->getStageID() )
+		{
+			if( ob )				
 			{
-				if( ob )				
-				{
-					battleWin();
-				}else{		
-					battleFail();
-				}
-			}else{
-				downloadPackageEnd(true);			//新手引导关卡
+				battleWin();
+			}else{		
+				battleFail();
 			}
+		}else{
+			downloadPackageEnd(true);			//新手引导关卡
 		}
 	}
 
@@ -629,7 +629,6 @@ namespace BattleSpace{
 				m_AliveLayer->heroWinAction();
 				m_task->addObject(CombatTask::create(m_Assist,callfuncO_selector(WarAssist::WinEffect),m_time+1));
 			}break;
-		default:break;
 		}
 	}
 	//显示返回层
@@ -651,7 +650,6 @@ namespace BattleSpace{
 				onPause();
 			}
 		}else{
-
 			WarBackLayer* blayer = WarBackLayer::create();
 			blayer->setTag(backLayer_tag);
 			m_Scene->addChild(blayer, 100);
