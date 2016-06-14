@@ -88,7 +88,6 @@ namespace BattleSpace{
 		void BatterRecord(CCObject* ob);
 		void CritAtkEnd(CCObject* ob);
 		void critComboEffect();
-		void doLostHp(CCObject* ob);
 		void displayBatchWarning();
 		void displayRoundTips();
 		void displayGuide();
@@ -122,7 +121,6 @@ namespace BattleSpace{
 		WarMapData* m_MapData;
 		WarManager* m_Manage;
 		WarControl* m_UILayer;
-		HurtCount* m_HurtCount;
 		WarMapLayer* m_MapLayer;
 		StoryLayer* m_StoryLayer;
 		WarAliveLayer* m_AliveLayer;

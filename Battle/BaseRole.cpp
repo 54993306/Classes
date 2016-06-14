@@ -16,7 +16,7 @@
 #include "warscene/ConstNum.h"
 #include "warscene/SkillRange.h"
 #include "warscene/BattleTools.h"
-
+#include "warscene/HurtCount.h"
 namespace BattleSpace{
 	BaseRole::BaseRole()
 		:m_Enemy(false),m_Hp(0),m_MaxHp(0),m_GridIndex(INVALID_GRID),m_MoveGrid(0),m_AtkDelay(0)
@@ -28,7 +28,7 @@ namespace BattleSpace{
 		,m_AtkInterval(0),m_SpecialAtk(false),m_Battle(false),m_MoveSpeed(0),mSkillRange(nullptr)
 		,m_CritTime(0),m_FatherID(0),m_Captain(false),m_CritEffect(false),m_DieState(false)
 		,m_TouchGrid(0),m_TouchState(false),m_MoveObj(nullptr),m_CallType(0),m_CallAliveNum(0)
-		,m_Delaytime(0),m_AliveState(COMMONSTATE),m_AliveType(E_ALIVETYPE::eCommon)
+		,m_Delaytime(0),m_AliveState(COMMONSTATE),m_AliveType(E_ALIVETYPE::eCommon),mHurtCount(nullptr)
 		,m_Model(0),m_AliveID(0),m_MstType(0),mBaseData(nullptr),mLogicData(nullptr)
 	{}
 
@@ -59,6 +59,9 @@ namespace BattleSpace{
 
 		mGuardArea = GuardArea::create(mManage);
 		mGuardArea->retain();
+
+		mHurtCount = HurtCount::create();
+		mHurtCount->retain();
 		return true;
 	}
 
@@ -969,4 +972,42 @@ namespace BattleSpace{
 		return nullptr;
 	}
 
+	void BaseRole::attackEventLogic()
+	{
+		if( soriteNumberEnd() )										//当掉血帧多于实际逻辑值，少于实际逻辑值情况处理
+			return;	
+		switch ( getSkillType() )
+		{
+		case eNorAtk:
+		case eSpeAtk:
+		case eCriAtk:
+			{
+				setSortieNum(getSortieNum()+1);											//表示执行了一次攻击逻辑
+				BattleResult* tResult = mHurtCount->AttackExcute(this);					//实际进行伤害计算的地方，不应由动作来控制的，动作可以控制播放。
+				if ( getCriAtk() && !getEffIndex())										//必杀技多释一个空效果
+					NOTIFICATION->postNotification(B_AttactNull,tResult);
+				if (!tResult->m_HitTargets.empty())
+					NOTIFICATION->postNotification(B_AttackResult,tResult);
+			}break;
+		case eCallAtk:
+			{
+				setSortieNum(getSortieNum()+1);											//一次性可召唤多个武将
+				BaseRole* tRole = getCallAlive(getCurrSkill());							//得到被召唤的武将	
+				if (tRole)
+					NOTIFICATION->postNotification(B_SkillCreateRole,tRole);
+			}break;
+		}
+		if( soriteNumberEnd() )
+		{
+			mHurtCount->BuffHandleLogic(this);											//伤害计算完成才能添加新的BUFF
+			clearHitAlive();
+		}
+	}
+
+	bool BaseRole::soriteNumberEnd()
+	{
+		if(getSortieNum() >= getCurrEffect()->getBatter() )										//当掉血帧多于实际逻辑值，少于实际逻辑值情况处理
+			return true;
+		return false;
+	}
 };

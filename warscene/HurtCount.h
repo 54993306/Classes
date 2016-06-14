@@ -1,13 +1,20 @@
 ﻿#ifndef _HITCOUNT_H_
 #define _HITCOUNT_H_
-#include "AppUI.h"
-/************************************************************************/
-/* 
-	用于做伤害计算、攻击闪避、暴击等相关战斗结果的处理数值运算等   //  [9/9/2014 xc_lin]                                                                 
-*/
-/************************************************************************/
+/************************************************************* 
+ *
+ *
+ *		Data : 2016.6.14
+ *	
+ *		Name : 
+ *
+ *		Author : Lin_Xiancheng
+ *
+ *		Description : 
+ *
+ *
+ *************************************************************/
+#include "cocos2d.h"
 #include "warscene/BattleResult.h"
-
 namespace BattleSpace{
 	class BaseRole;
 	class WarManager;

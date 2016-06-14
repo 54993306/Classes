@@ -11,24 +11,22 @@ using namespace spine;
 class CPlayerSkillData;
 
 namespace BattleSpace{
-	class EffectInfo;
-	class ActObject;
 	class WarScene;
 	class BaseRole;
-	class BattleResult; 
 	class CombatEffect : public CCObject
 	{
 	public:
 		CombatEffect();
 		~CombatEffect();
 		virtual bool init();
+		void addEvent();
 		CREATE_FUNC(CombatEffect)
-		void AttackNull(BattleResult* Result);
+		void AttackNull(CCObject* ob);
 		void PlayerSkill(BaseRole* alive);
 		void SkillEfHandle(CCObject* ob);
 		void SkillEfHandleForEnemy(CCObject* ob);
 		void skillShowCallBack(CCObject* ob);
-		void BattleEffect(BattleResult* Result);
+		void BattleEffect(CCObject* ob);
 		void setScene(WarScene* scene);
 		void armatureMovementEventCallFunc(CCArmature * pArmature, MovementEventType type, const char *data);
 		void SpineActionEnd(int trackIndex);

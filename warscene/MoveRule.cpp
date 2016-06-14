@@ -79,6 +79,8 @@ namespace BattleSpace{
 
 	int MoveRule::MoveJudge(BaseRole* alive,int grid)
 	{
+		if (alive->getEnemy())
+			return grid;
 		BaseRole* targetAlive = DataCenter::sharedData()->getWar()->getAliveByGrid(grid);
 		if( targetAlive == nullptr|| targetAlive == alive ||targetAlive->getEnemy())
 		{

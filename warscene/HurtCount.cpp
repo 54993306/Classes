@@ -1,4 +1,17 @@
-﻿#include "HurtCount.h"
+﻿/************************************************************* 
+ *
+ *
+ *		Data : 2016.6.14
+ *	
+ *		Name : 
+ *
+ *		Author : Lin_Xiancheng
+ *
+ *		Description : 
+ *
+ *
+ *************************************************************/
+#include "HurtCount.h"
 #include "warscene/ConstNum.h"
 #include "MoveRule.h"
 #include "Battle/BaseRoleData.h"
@@ -26,21 +39,11 @@ namespace BattleSpace{
 	{
 		BattleResult* Result = BattleResult::create();
 		Result->setAlive(alive);
-		if (alive->getOpposite())													//为了做击退处理
+		vector<BaseRole*>::iterator iter = alive->mAreaTargets.begin();
+		for (;iter != alive->mAreaTargets.end();iter ++)
 		{
-			vector<BaseRole*>::reverse_iterator iter = alive->mAreaTargets.rbegin();//迭代器反向遍历(用下标效率是最高的)
-			for (;iter != alive->mAreaTargets.rend();iter++)
-			{
-				BaseRole* HitAlive = *iter;
-				HurtExcute(Result,alive,HitAlive);
-			}
-		}else{
-			vector<BaseRole*>::iterator iter = alive->mAreaTargets.begin();
-			for (;iter != alive->mAreaTargets.end();iter ++)
-			{
-				BaseRole* HitAlive = *iter;
-				HurtExcute(Result,alive,HitAlive);
-			}
+			BaseRole* HitAlive = *iter;
+			HurtExcute(Result,alive,HitAlive);
 		}
 		EffectTypeExcute(Result);												//用于计算我方受伤信息
 		return Result;
@@ -48,15 +51,12 @@ namespace BattleSpace{
 	//多人打击的情况有返回值才能确定具体移动
 	int HurtCount::ChangeLocation(BaseRole* AtcAlive , BaseRole* HitAlive)
 	{
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
-		//return HitAlive->getGridIndex();
-#endif
 		if (HitAlive->getCallType() == FixedlyCantFlyType 
 			|| HitAlive->getCallType() == NotAttack||HitAlive->getCaptain()
 			|| HitAlive->getAliveType() == E_ALIVETYPE::eWorldBoss)//不可被击飞类型武将
 			return HitAlive->getGridIndex();
 		const skEffectData* effect = AtcAlive->getCurrEffect();
-		if (effect->getBatter() != AtcAlive->getSortieNum())
+		if (effect->getBatter() != AtcAlive->getSortieNum() || !effect->getRepel())
 			return HitAlive->getGridIndex();									//连击的最后一次才做击退
 		bool enemy = AtcAlive->getEnemy();
 		if (AtcAlive->getOpposite())
@@ -100,7 +100,6 @@ namespace BattleSpace{
 				addHittingAlive(AtcTarget,HitTarget);
 			}
 		}
-		//BuffHandleLogic(AtcTarget,HitTarget);						//伤害计算完成才能添加新的BUFF
 		return vec; 
 	}
 

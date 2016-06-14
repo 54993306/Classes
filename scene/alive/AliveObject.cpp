@@ -190,7 +190,7 @@ namespace BattleSpace{
 	//操作受击数组,播完掉血则移除当前回合受击数组
 	void AliveObject::HpChange_Event()
 	{
-		NOTIFICATION->postNotification(B_LostHpEvent,m_Alive);
+		m_Alive->attackEventLogic();
 		if (m_PlayerEffect)
 			NOTIFICATION->postNotification(B_SkilEffectInMap,this);
 	}

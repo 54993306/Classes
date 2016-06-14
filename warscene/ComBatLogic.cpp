@@ -49,7 +49,7 @@ namespace BattleSpace{
 		:m_time(0),m_Assist(nullptr),m_task(nullptr),m_CombatEffect(nullptr),m_bufExp(nullptr),m_terExp(nullptr)
 		,m_BatchNum(0),m_CurrBatchNum(0),m_FiratBatch(true),m_Scene(nullptr),m_UILayer(nullptr)
 		,m_MapLayer(nullptr),m_AliveLayer(nullptr),m_TerrainLayer(nullptr),m_StoryLayer(nullptr)
-		,m_GuideLayer(nullptr),m_Run(false),m_HurtCount(nullptr),m_Manage(nullptr),m_MaxCost(0)
+		,m_GuideLayer(nullptr),m_Run(false),m_Manage(nullptr),m_MaxCost(0)
 		,m_CurrCost(0),m_speed(1),m_Alive(nullptr),m_bRecvFinish(false),m_fCurrentCostAdd(0),
 		m_iGameTimeCount(0), m_bCountDown(false),m_Record(true),m_RecordNum(0),m_PlayerNum(0)
 	{}
@@ -66,8 +66,6 @@ namespace BattleSpace{
 		m_bufExp = nullptr;
 		CC_SAFE_RELEASE(m_CombatEffect);
 		m_CombatEffect = nullptr;
-		CC_SAFE_RELEASE(m_HurtCount);
-		m_HurtCount = nullptr;
 
 		m_Scene = nullptr;
 		m_UILayer = nullptr;
@@ -131,18 +129,17 @@ namespace BattleSpace{
 
 	bool CombatLogic::init()
 	{
-		m_Assist = WarAssist::create();
-		m_Assist->retain();
 		m_task = CCArray::create();
 		m_task->retain();
 		m_bufExp = BufExp::create();
 		m_bufExp->retain();
 		m_terExp = TerrainExp::create();
 		m_terExp->retain();
+		m_Assist = WarAssist::create();
+		m_Assist->retain();
 		m_CombatEffect = CombatEffect::create();
 		m_CombatEffect->retain();
-		m_HurtCount = HurtCount::create();
-		m_HurtCount->retain();
+
 		m_Manage = DataCenter::sharedData()->getWar();
 		m_MapData = DataCenter::sharedData()->getMap()->getCurrWarMap();
 		return true;
@@ -152,7 +149,6 @@ namespace BattleSpace{
 	{
 		NOTIFICATION->addObserver(this,callfuncO_selector(CombatLogic::StoryEndEvent),B_StoryOver,nullptr);
 		NOTIFICATION->addObserver(this,callfuncO_selector(CombatLogic::RoundStart),B_RoundStart,nullptr);
-		NOTIFICATION->addObserver(this,callfuncO_selector(CombatLogic::doLostHp),B_LostHpEvent,nullptr);
 		NOTIFICATION->addObserver(this,callfuncO_selector(CombatLogic::changeSpeed),B_ChangeSceneSpeed,nullptr);
 		NOTIFICATION->addObserver(this,callfuncO_selector(CombatLogic::ActObjectRemove),B_ActObjectRemove,nullptr);
 		NOTIFICATION->addObserver(this,callfuncO_selector(CombatLogic::CritAtkEnd),B_CritEnd,nullptr);
@@ -346,44 +342,6 @@ namespace BattleSpace{
 		LGResume(m_AliveLayer);
 		m_Alive = nullptr;
 		critComboEffect();
-	}
-	//攻击帧回调逻辑处理、武将执行一次伤害计算并播放效果
-	void CombatLogic::doLostHp(CCObject* ob)
-	{
-		BaseRole* alive = (BaseRole*)ob;
-		const skEffectData* effect = alive->getCurrEffect();
-		if(!effect || alive->getSortieNum() >= effect->getBatter() )										//当掉血帧多于实际逻辑值，少于实际逻辑值情况处理
-			return;	
-		switch (alive->getSkillType())
-		{
-		case eNorAtk:
-		case eSpeAtk:
-		case eCriAtk:
-			{
-				alive->setSortieNum(alive->getSortieNum()+1);								//表示执行了一次攻击逻辑
-				BattleResult* Result = m_HurtCount->AttackExcute(alive);					//实际进行伤害计算的地方，不应由动作来控制的，动作可以控制播放。
-				if (alive->getCriAtk()&&!alive->getEffIndex())								//必杀技多释一个空效果
-					m_CombatEffect->AttackNull(Result);
-				if (!Result->m_HitTargets.empty())
-					m_CombatEffect->BattleEffect(Result);
-			}break;
-		case eCallAtk:
-			{
-				alive->setSortieNum(alive->getSortieNum()+1);								//一次性可召唤多个武将
-				BaseRole* pAlive = alive->getCallAlive(alive->getCurrSkill());	//得到被召唤的武将
-				if (!pAlive)
-				{
-					CCLOG("[ *ERROR ] CombatLoginc::AtkLogic CallAlive NULL");
-					return;
-				}		
-				m_AliveLayer->initActobject(pAlive,SceneTrap);
-			}break;
-		}
-		if( alive->getSortieNum() >= effect->getBatter() )
-		{
-			m_HurtCount->BuffHandleLogic(alive);									//伤害计算完成才能添加新的BUFF
-			alive->clearHitAlive();
-		}
 	}
 
 	void CombatLogic::displayBatchWarning()

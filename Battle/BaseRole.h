@@ -29,6 +29,7 @@ namespace BattleSpace{
 	class WarManager;
 	class SkillRange;
 	class GuardArea;
+	class HurtCount;
 	class BaseRole:public CCObject			//定义数据的顺序结构是为了方便查看数据
 	{
 	protected:
@@ -36,6 +37,7 @@ namespace BattleSpace{
 		WarManager* mManage;
 		GuardArea* mGuardArea;
 		SkillRange* mSkillRange;
+		HurtCount* mHurtCount;
 	public:
 		virtual void excuteLogic(float pTime);
 		bool stateDispose(float pTime);
@@ -53,6 +55,8 @@ namespace BattleSpace{
 		BaseRole* getAbsentCallAlive();
 		BaseRole* getCallAlive( RoleSkill* skill );
 		BaseRole* getNewCallAlive(int CallId);
+		void attackEventLogic();
+		bool soriteNumberEnd();
 		/****************** Hero *********************/
 		void heroCritEffect();
 		void HeroExcuteAI();

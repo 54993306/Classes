@@ -50,6 +50,51 @@ namespace BattleSpace{
 		CCTextureCache::sharedTextureCache()->removeTextureForKey("warScene/playerskill/confirm0.png");
 	}
 
+	void CombatEffect::addEvent()
+	{
+		NOTIFICATION->addObserver(this,callfuncO_selector(CombatEffect::AttackNull),B_AttactNull,nullptr);
+		NOTIFICATION->addObserver(this,callfuncO_selector(CombatEffect::BattleEffect),B_AttackResult,nullptr);
+	}
+
+
+	bool CombatEffect::init()
+	{
+		CCSize winSize = CCDirector::sharedDirector()->getWinSize();
+		addEvent();
+		//加载配置信息
+		_playerSkillData = new CPlayerSkillData;
+		_playerSkillData->reloadFile();
+
+		//加载骨骼
+		CCArmatureDataManager::sharedArmatureDataManager()->addArmatureFileInfo("warScene/playerSkill/confirm.ExportJson");
+
+		//创建骨骼
+		_armaturePlayerSkill = CCArmature::create("confirm");
+		_armaturePlayerSkill->getAnimation()->setMovementEventCallFunc(this, movementEvent_selector(CombatEffect::armatureMovementEventCallFunc));
+		_armaturePlayerSkill->setPosition(ccp(winSize.width*0.5f, winSize.height*0.5f));
+		_armaturePlayerSkill->setVisible(false);
+		CC_SAFE_RETAIN(_armaturePlayerSkill);
+
+		//绑定裁切区域
+		CCClippingNode* pClippingNode = CCClippingNode::create();
+		pClippingNode->setPosition(ccp(-winSize.width/2, -winSize.height/2));
+
+		CCDrawNode*stencil = CCDrawNode::create();
+		CCPoint rectangle[4];
+		rectangle[0]= ccp(0, 132);
+		rectangle[1]= ccp(winSize.width, 312);
+		rectangle[2]= ccp(winSize.width, winSize.height);
+		rectangle[3]= ccp(0, winSize.height);
+		//绘制一个矩形
+		ccColor4F white= {1, 1, 1, 1};
+		stencil->drawPolygon(rectangle, 4, white, 1, white);
+		pClippingNode->setStencil(stencil);
+
+		//添加内容
+		_armaturePlayerSkill->addChild(pClippingNode, _armaturePlayerSkill->getBone("lightball3")->getZOrder()+1, FRAME_ACTION_HEAD_CHILD_TAG);
+		return true;
+	}
+
 	void CombatEffect::setScene(WarScene* scene)
 	{
 		CCSize winSize = CCDirector::sharedDirector()->getWinSize();
@@ -177,8 +222,9 @@ namespace BattleSpace{
 		}
 	}
 
-	void CombatEffect::BattleEffect(BattleResult* Result)
+	void CombatEffect::BattleEffect(CCObject* ob)
 	{
+		BattleResult* Result = (BattleResult*)ob;
 		BaseRole*alive = Result->getAlive();
 		ActObject* aliveOb = alive->getActObject();
 		const skEffectData* efInfo = alive->getCurrEffect();									//状态性的数据	
@@ -229,8 +275,9 @@ namespace BattleSpace{
 		}
 	}
 
-	void CombatEffect::AttackNull(BattleResult* Result)
+	void CombatEffect::AttackNull(CCObject* ob)
 	{
+		BattleResult* Result = (BattleResult*)ob;
 		BaseRole*alive = Result->getAlive();
 		ActObject* aliveOb = alive->getActObject();
 		const skEffectData* efInfo = alive->getCurrEffect();
@@ -437,43 +484,5 @@ namespace BattleSpace{
 	{
 		CCNode* pNode = (CCNode*)ob;
 		pNode->removeFromParentAndCleanup(true);
-	}
-
-	bool CombatEffect::init()
-	{
-		CCSize winSize = CCDirector::sharedDirector()->getWinSize();
-
-		//加载配置信息
-		_playerSkillData = new CPlayerSkillData;
-		_playerSkillData->reloadFile();
-
-		//加载骨骼
-		CCArmatureDataManager::sharedArmatureDataManager()->addArmatureFileInfo("warScene/playerSkill/confirm.ExportJson");
-
-		//创建骨骼
-		_armaturePlayerSkill = CCArmature::create("confirm");
-		_armaturePlayerSkill->getAnimation()->setMovementEventCallFunc(this, movementEvent_selector(CombatEffect::armatureMovementEventCallFunc));
-		_armaturePlayerSkill->setPosition(ccp(winSize.width*0.5f, winSize.height*0.5f));
-		_armaturePlayerSkill->setVisible(false);
-		CC_SAFE_RETAIN(_armaturePlayerSkill);
-
-		//绑定裁切区域
-		CCClippingNode* pClippingNode = CCClippingNode::create();
-		pClippingNode->setPosition(ccp(-winSize.width/2, -winSize.height/2));
-
-		CCDrawNode*stencil = CCDrawNode::create();
-		CCPoint rectangle[4];
-		rectangle[0]= ccp(0, 132);
-		rectangle[1]= ccp(winSize.width, 312);
-		rectangle[2]= ccp(winSize.width, winSize.height);
-		rectangle[3]= ccp(0, winSize.height);
-		//绘制一个矩形
-		ccColor4F white= {1, 1, 1, 1};
-		stencil->drawPolygon(rectangle, 4, white, 1, white);
-		pClippingNode->setStencil(stencil);
-
-		//添加内容
-		_armaturePlayerSkill->addChild(pClippingNode, _armaturePlayerSkill->getBone("lightball3")->getZOrder()+1, FRAME_ACTION_HEAD_CHILD_TAG);
-		return true;
 	}
 };

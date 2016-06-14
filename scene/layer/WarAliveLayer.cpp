@@ -671,4 +671,10 @@ namespace BattleSpace{
 		}
 	}
 
+	void WarAliveLayer::SkillCreateRole( CCObject* ob )
+	{
+		BaseRole* tRole = (BaseRole*)ob;
+		initActobject(tRole,SceneTrap);
+	}
+
 };

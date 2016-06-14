@@ -98,6 +98,7 @@ namespace BattleSpace{
 
 		void roleWantIntoBattle(CCObject* ob);
 		void changeLight(CCObject* ob);
+		void SkillCreateRole(CCObject* ob);
 	protected:
 		BaseRole*		m_TouchAlive;		//被触摸的武将id
 		ActObject*		m_MoveActObject;		//拖拽移动对象
