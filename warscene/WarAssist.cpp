@@ -196,7 +196,7 @@ void WarAssist::DisplayBossWarning(CCObject* ob,int model/* = 0*/)
 	if(model != 0)
 	{
 		//拖屏幕,普通关卡才会拖屏幕//新手关卡,不滑
-		if(DataCenter::sharedData()->getWar()->getNormal() && DataCenter::sharedData()->getWar()->getStageID() != 0)
+		if(DataCenter::sharedData()->getWar()->getNormal() && DataCenter::sharedData()->getWar()->getStageID())
 		{
 			CCNode* MoveLayer = m_scene->getMoveLayer();
 

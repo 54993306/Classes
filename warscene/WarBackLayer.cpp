@@ -105,7 +105,7 @@ void WarBackLayer::returnCity(CCObject* ob)
 	}else{
 
 		//如果是在引导,重启游戏
-		if(DataCenter::sharedData()->getWar()->getStageID() == 0)
+		if( !DataCenter::sharedData()->getWar()->getStageID())
 		{
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 			CJniHelper::getInstance()->restartGame();

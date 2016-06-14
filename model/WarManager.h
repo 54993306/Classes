@@ -23,6 +23,7 @@ namespace BattleSpace{
 	class BuffConfig;
 	class StoryData;
 	class RoleSkill;
+	class ActObject;
 	using namespace std;
 	typedef map<unsigned int,BaseRole*> Members;	
 	typedef std::pair<spSkeletonData*,spAtlas*> SpData;
@@ -53,7 +54,7 @@ namespace BattleSpace{
 		StoryData* getStoryData();
 		ArmatureEventDataMgr* getArmatureDataMgr();
 		terData* getTerData(){return m_terData;};
-		Members* getMembers();
+		const Members* getMembers();
 		void updateAlive();
 		vector<BaseRole*>* getVecHeros(bool pSort = false);
 		vector<BaseRole*>* getVecMonsters(bool pSort = false);
@@ -70,6 +71,8 @@ namespace BattleSpace{
 		BaseRole* getNewCallAlive(BaseRole* Father,int CallId);
 		void initCommonData();
 		void clearOldData();
+		void initRoleSkillInfo(int pEffectID,BaseRole* pRole);
+		bool inAddCostArea(int pGrid);
 	public:
 		CC_SYNTHESIZE(int, m_iWorldBossRank, WorldBossRank);			//世界BOSS狂暴状态
 		CC_SYNTHESIZE(int,m_LoadImage,LoadImage);						//用于记录加载图片的id

@@ -289,7 +289,7 @@ namespace BattleSpace{
 	{
 		for(Members::iterator iter = m_members.begin(); iter != m_members.end();++iter)
 		{
-			if(iter->second->getEnemy() &&!iter->second->getDieState())
+			if(iter->second->getEnemy() && !iter->second->getDieState())
 				return false;
 		}
 		return true;
@@ -297,7 +297,7 @@ namespace BattleSpace{
 
 	ArmatureEventDataMgr* WarManager::getArmatureDataMgr() { 
 		return m_armatureEventDataMgr; }
-	Members* WarManager::getMembers() { 
+	const Members* WarManager::getMembers() { 
 		return &m_members; }
 	EffectData* WarManager::getEffData() { 
 		return m_efdata; }
@@ -440,5 +440,27 @@ namespace BattleSpace{
 		if (pSort)
 			VectorRemoveRepeat(m_AliveRoles);
 		return &m_AliveRoles;
+	}
+
+	void WarManager::initRoleSkillInfo( int pEffectID,BaseRole* pRole )
+	{
+		EffectInfo* tInfo = m_efdata->getEffectInfo(pEffectID);
+		if (tInfo)
+		{
+			pRole->SkillActionAndEffect(tInfo->getActionID(),tInfo->getusEft());
+		}else{
+			CCLOG("[ *ERROR ] WarManager::initRoleSkillInfo");
+			pRole->SkillActionAndEffect(Stand_Index,0);
+		}
+	}
+
+	bool WarManager::inAddCostArea( int pGrid )
+	{
+		if (std::find(m_AddCostGrid.begin(),m_AddCostGrid.end(),pGrid) != m_AddCostGrid.end())
+		{
+			return true;
+		}else{
+			return false;
+		}
 	}
 }

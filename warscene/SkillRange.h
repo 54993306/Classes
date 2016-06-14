@@ -1,13 +1,19 @@
 ﻿#ifndef _SCOPECOUNT_H_
 #define _SCOPECOUNT_H_
 #include "AppUI.h"
-
-/************************************************************************/
-/*                  
-用于获取技能范围的区域得到范围内的对象		//  [9/9/2014 xc_lin]
-*/
-/************************************************************************/
-
+/************************************************************* 
+ *
+ *
+ *		Data : 2016.6.14
+ *	
+ *		Name : 
+ *
+ *		Author : Lin_Xiancheng
+ *
+ *		Description : 
+ *
+ *
+ *************************************************************/
 namespace BattleSpace{
 
 	class BaseRole;
@@ -25,7 +31,6 @@ namespace BattleSpace{
 		void initSkillArea(BaseRole* pAlive,vector<int>& pVector);								//受击区域
 		void initAreaTargets(BaseRole* pAlive);													//受击武将
 		void initAttackInfo(BaseRole* pAlive);													//受击信息(战斗处提升效率核心方法)
-
 		int CaptainGuard(BaseRole* pAlive);
 	private:
 		WarManager* mManage;

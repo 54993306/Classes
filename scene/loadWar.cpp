@@ -520,7 +520,7 @@ namespace BattleSpace{
 		if (m_Release)
 		{
 			CCLOG("m_Release true");
-			if (!m_Manage->getStageID())	//统一释放了spine动画,是否可以统一的去释放骨骼动画资源
+			if ( !m_Manage->getStageID())	//统一释放了spine动画,是否可以统一的去释放骨骼动画资源
 				CCArmatureDataManager::sharedArmatureDataManager()->removeArmatureFileInfo("warpublic/open.ExportJson");
 			this->unscheduleAllSelectors();
 			DataCenter::sharedData()->getCombatGuideMg()->clearGuideData(true);

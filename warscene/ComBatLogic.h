@@ -27,7 +27,6 @@ namespace BattleSpace{
 
 	class MonsterData;
 	class BufExp;
-	class GuardArea;
 	class MoveRule;
 	class WarScene; 
 	class BaseRole;
@@ -38,7 +37,6 @@ namespace BattleSpace{
 	class WarControl;
 	class StoryLayer;
 	class WarManager;
-	class SkillRange;
 	class WarMapData;
 	class WarMapLayer;
 	class TerrainLayer;
@@ -66,57 +64,38 @@ namespace BattleSpace{
 		void scheduleForRequesBossFinish();
 		void onPause();
 		void onResume();
-		CC_SYNTHESIZE(WarAssist*,m_Assist,WarAssist);
-		CC_SYNTHESIZE(CCArray*,m_task,TaskArray);
-		CC_SYNTHESIZE(float,m_MaxCost,MaxCost);
 		CC_SYNTHESIZE(bool,m_Run,RunLogic);
-		CC_SYNTHESIZE(int, m_iGameTimeCount, GameTimeCount);		//倒计时时间
-		CC_SYNTHESIZE(bool, m_bCountDown, CountDown);				//倒计时开启
+		CC_SYNTHESIZE_READONLY(WarAssist*,m_Assist,WarAssist);
+		CC_SYNTHESIZE_READONLY(CCArray*,m_task,TaskArray);
+		CC_SYNTHESIZE_READONLY(float,m_MaxCost,MaxCost);
+		CC_SYNTHESIZE_READONLY(int, m_iGameTimeCount, GameTimeCount);		//倒计时时间
+		CC_SYNTHESIZE_READONLY(bool, m_bCountDown, CountDown);				//倒计时开启
+		CC_SYNTHESIZE_READONLY(float,m_time,Time);
+		CC_SYNTHESIZE_READONLY(int,m_CurrCost,CurrCost);
 		void downloadPackageEnd(bool bAnswer);
 		void CostCount(BaseRole* alive,float dt);
 		void StoryEndEvent(CCObject* ob);
 		void combatResult(CCObject* ob);
 		void initMapBackground();
-		float getTime() { return m_time; }
-		int getCurrCost(){return m_CurrCost;}
 		void changeCost(CCObject* ob);
 		void costUpdate(float delta);
 		void changeSpeed(CCObject* ob);
 		void RoundStart(CCObject* ob);
-		void TaskArray();
+		void updateTask();
 		void showRound();
 		void runLogic(float delt);
 		void ExcuteAI(float dt);
-		bool IsAutoMoveType(BaseRole*alive);
-		bool monsterFlee(BaseRole* alive);
-		void MonsterExcuteAI(BaseRole* alive,float dt); 
-		void HeroExcuteAI(BaseRole* alive);
-		void AliveExcuteAI(BaseRole* alive);	
 		void BatterRecord(CCObject* ob);
-		void AliveCritEnd(BaseRole* alive);
 		void CritAtkEnd(CCObject* ob);
-		void excuteCritEffect(BaseRole* alive);
-		void monsterCritEffect(BaseRole* alive);
-		void heroCritEffect(BaseRole* alive);
-		void attackEffect(BaseRole*alive);
-		void attackDirection(BaseRole*alive);
 		void critComboEffect();
 		void doLostHp(CCObject* ob);
-		bool walkState(BaseRole* alive);
-		bool AttackJudge(BaseRole* alive);
-		bool delayEntrance(BaseRole* alive,float dt);
-		bool autoSkillAlive(BaseRole* alive);
-		void attackTime(BaseRole* alive,float dt);
-		bool aliveAttackState(BaseRole* alive);
 		void displayBatchWarning();
 		void displayRoundTips();
 		void displayGuide();
-		void monsterRemove(BaseRole* alive);
 		void AliveDieDispose(CCObject* ob);
 		void monsterDieDispose(BaseRole* alive);
 		void ActObjectRemove(CCObject* ob);
 		void NextBatch(float dt);
-		bool StateDispose(BaseRole* alive,float dt);
 		void battleWin();
 		void battleFail();
 		void beginStageFloorEffect();
@@ -125,11 +104,9 @@ namespace BattleSpace{
 		void wordBossFinish();
 		void OnBattleFinish(int type, google::protobuf::Message *msg);
 		void onWordBossFinish(int type, google::protobuf::Message *msg);
-
+		void rolePlyaSkill(CCObject* ob);
 	private:	
-		int m_CurrCost;
 		int	m_CurrBatchNum;				//记录当前战斗批次					这个参数+1的地方太多了，需要修改一下初始值
-		float m_time;
 		float m_speed;					//速度变化参数
 		int m_BatchNum;					//当前关卡批次
 		bool m_FiratBatch;				//第一批怪物提示
@@ -141,22 +118,18 @@ namespace BattleSpace{
 		BaseRole* m_Alive;				//存储释放技能的武将信息
 		BufExp* m_bufExp;
 		WarScene* m_Scene;
-		MoveRule* m_MoveRule;
 		TerrainExp* m_terExp;
 		WarMapData* m_MapData;
 		WarManager* m_Manage;
 		WarControl* m_UILayer;
 		HurtCount* m_HurtCount;
 		WarMapLayer* m_MapLayer;
-		SkillRange* m_SkillRange;
-		GuardArea* mGuardArea;
 		StoryLayer* m_StoryLayer;
 		WarAliveLayer* m_AliveLayer;
 		TerrainLayer* m_TerrainLayer;
 		CombatEffect* m_CombatEffect;
 		CombatGuideLayer* m_GuideLayer;
 		GameFinishData m_finishData;
-
 	};
 };
 #endif

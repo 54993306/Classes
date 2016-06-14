@@ -16,7 +16,6 @@
 #include "warscene/MapEffect.h"
 #include "warscene/TerrainExp.h"
 #include "warscene/CombatTask.h"
-#include "warscene/SkillRange.h"
 #include "warscene/EffectData.h"
 #include "warscene/WarControl.h"
 #include "model/TerrainManager.h"
@@ -42,22 +41,18 @@
 #include "jni/CJniHelper.h"
 #include "Battle/MoveObject.h"
 #include "Battle/BaseRole.h"
-#include "Battle/GuardArea.h"
 #include "Battle/RoleSkill.h"
 #include "Battle/BaseRoleData.h"
 #include "Battle/MonsterData.h"
 namespace BattleSpace{
 	CombatLogic::CombatLogic()
-		:m_time(0),m_Assist(nullptr),m_task(nullptr),m_CombatEffect(nullptr),m_bufExp(nullptr),m_terExp(nullptr),m_SkillRange(nullptr)
-		,m_BatchNum(0),m_CurrBatchNum(0),m_FiratBatch(true),m_Scene(nullptr),m_UILayer(nullptr),mGuardArea(nullptr)
+		:m_time(0),m_Assist(nullptr),m_task(nullptr),m_CombatEffect(nullptr),m_bufExp(nullptr),m_terExp(nullptr)
+		,m_BatchNum(0),m_CurrBatchNum(0),m_FiratBatch(true),m_Scene(nullptr),m_UILayer(nullptr)
 		,m_MapLayer(nullptr),m_AliveLayer(nullptr),m_TerrainLayer(nullptr),m_StoryLayer(nullptr)
-		,m_GuideLayer(nullptr),m_Run(false),m_HurtCount(nullptr),m_MoveRule(nullptr),m_Manage(nullptr),m_MaxCost(0)
+		,m_GuideLayer(nullptr),m_Run(false),m_HurtCount(nullptr),m_Manage(nullptr),m_MaxCost(0)
 		,m_CurrCost(0),m_speed(1),m_Alive(nullptr),m_bRecvFinish(false),m_fCurrentCostAdd(0),
 		m_iGameTimeCount(0), m_bCountDown(false),m_Record(true),m_RecordNum(0),m_PlayerNum(0)
-	{
-		m_Manage = DataCenter::sharedData()->getWar();
-		m_MapData = DataCenter::sharedData()->getMap()->getCurrWarMap();
-	}
+	{}
 
 	CombatLogic::~CombatLogic()
 	{
@@ -71,14 +66,8 @@ namespace BattleSpace{
 		m_bufExp = nullptr;
 		CC_SAFE_RELEASE(m_CombatEffect);
 		m_CombatEffect = nullptr;
-		CC_SAFE_RELEASE(m_SkillRange);
-		m_SkillRange = nullptr;
-		CC_SAFE_RELEASE(mGuardArea);
-		mGuardArea = nullptr;
 		CC_SAFE_RELEASE(m_HurtCount);
 		m_HurtCount = nullptr;
-		CC_SAFE_RELEASE(m_MoveRule);
-		m_MoveRule = nullptr;
 
 		m_Scene = nullptr;
 		m_UILayer = nullptr;
@@ -142,7 +131,6 @@ namespace BattleSpace{
 
 	bool CombatLogic::init()
 	{
-		m_time = 0;
 		m_Assist = WarAssist::create();
 		m_Assist->retain();
 		m_task = CCArray::create();
@@ -153,14 +141,10 @@ namespace BattleSpace{
 		m_terExp->retain();
 		m_CombatEffect = CombatEffect::create();
 		m_CombatEffect->retain();
-		m_SkillRange = SkillRange::create(m_Manage);
-		m_SkillRange->retain();
-		mGuardArea = GuardArea::create(m_Manage);
-		mGuardArea->retain();
-		m_MoveRule = MoveRule::create();
-		m_MoveRule->retain();
 		m_HurtCount = HurtCount::create();
 		m_HurtCount->retain();
+		m_Manage = DataCenter::sharedData()->getWar();
+		m_MapData = DataCenter::sharedData()->getMap()->getCurrWarMap();
 		return true;
 	}
 
@@ -176,6 +160,7 @@ namespace BattleSpace{
 		NOTIFICATION->addObserver(this,callfuncO_selector(CombatLogic::cReturnLayer),B_ReturnLayer,nullptr);
 		NOTIFICATION->addObserver(this,callfuncO_selector(CombatLogic::changeCost),B_ChangeCostNumber,nullptr);
 		NOTIFICATION->addObserver(this,callfuncO_selector(CombatLogic::BatterRecord),B_RecordContinuousSkill,nullptr);
+		NOTIFICATION->addObserver(this,callfuncO_selector(CombatLogic::rolePlyaSkill),B_RoleSkill,nullptr);
 		CNetClient::getShareInstance()->registerMsgHandler(ExitStage,this,CMsgHandler_selector(CombatLogic::OnBattleFinish));
 		CNetClient::getShareInstance()->registerMsgHandler(BossFinishReqMsg,this,CMsgHandler_selector(CombatLogic::onWordBossFinish));
 	}
@@ -224,7 +209,7 @@ namespace BattleSpace{
 	{
 		m_time += delta;
 		showRound();
-		TaskArray();
+		updateTask();
 		m_bufExp->ResetInterval(delta);
 		runLogic(delta);
 		m_UILayer->updateCostNumber(m_CurrCost);
@@ -249,7 +234,7 @@ namespace BattleSpace{
 		}
 	}
 
-	void CombatLogic::TaskArray()
+	void CombatLogic::updateTask()
 	{
 		CCObject* object = nullptr;
 		CCArray* findRs = CCArray::create();		//维护一个任务队列
@@ -306,256 +291,33 @@ namespace BattleSpace{
 		}
 	}
 	//cost 计算(帧)或以秒为单位进行计算、位置实时更新
-	void CombatLogic::CostCount(BaseRole* alive,float dt)
+	void CombatLogic::CostCount(BaseRole* tRole,float dt)
 	{
-		if ( alive->getEnemy() ||	//敌方武将
-			alive->getFatherID()||	//召唤类武将
-			m_Alive	)				//必杀技状态
+		if ( tRole->getEnemy() || tRole->getFatherID() || m_Alive)			
 			return;
-		vector<int>* grids = m_Manage->getAddcostVec();
-		if (!alive->getMoveObject()||
-			std::find(grids->begin(),grids->end(),alive->getMoveObject()->getgrid()) != grids->end())
+		if (m_Manage->inAddCostArea(tRole->getGridIndex()))
 		{
-			m_CurrCost += alive->getAddCost() * dt;					//怒气值每帧变化率
-			m_fCurrentCostAdd += alive->getAddCost();
+			m_CurrCost += tRole->getAddCost() * dt;					//怒气值每帧变化率
+			m_fCurrentCostAdd += tRole->getAddCost();
 		}
 	}
 	//每一帧都判断每个武将的信息                   
-	void CombatLogic::ExcuteAI(float delta)
+	void CombatLogic::ExcuteAI(float pTime)
 	{
-		Members* map_Alive = m_Manage->getMembers();
-		for (Members::iterator iter = map_Alive->begin();iter != map_Alive->end(); iter++)
+		const Members* map_Alive = m_Manage->getMembers();
+		for (Members::const_iterator iter = map_Alive->begin();iter != map_Alive->end(); iter++)
 		{
-			BaseRole* alive = iter->second;
-			CostCount(alive,delta);															//计算我方所有武将cost值
-			if (!alive->getActObject())continue;
-			if (m_Alive && alive != m_Alive)continue;										//一次只处理一个武将播放技能的情况，若是处理多个则以武将技能状态判断，而不用单一武将进行判断
-			alive->getActObject()->updateFrameEvent(delta);									//刷新武将帧事件
-			if (StateDispose(alive,delta))
-				continue;										
-			if (!AttackJudge(alive))
-				continue;
-			if (alive->getEnemy())
-			{
-				MonsterExcuteAI(alive,delta);
-			}else{
-				HeroExcuteAI(alive);			
-			}
+			BaseRole* tRole = iter->second;
+			if (m_Alive && tRole != m_Alive)continue;										//一次只处理一个武将播放技能的情况，若是处理多个则以武将技能状态判断，而不用单一武将进行判断
+			CostCount(tRole,pTime);															//计算我方所有武将cost值
+			tRole->excuteLogic(pTime);
 		}
-	}
-	//@@这整一个方法都是由一个入口开始的对武将的处理啊,都是调用的武将的属性
-	void CombatLogic::HeroExcuteAI( BaseRole* pAlive )
-	{
-		int ActionCode = pAlive->getActObject()->getCurrActionCode();	
-		m_SkillRange->initAttackInfo(pAlive);
-		if (pAlive->mAreaTargets.size()||pAlive->getCriAtk())
-		{
-			if (ActionCode == Walk_Index)
-			{
-				pAlive->getActObject()->setMoveState(0);
-				pAlive->getActObject()->TurnStateTo(Stand_Index);
-				pAlive->setAIState(false);
-			}
-			AliveExcuteAI(pAlive);
-		}else{		
-			//@@这些逻辑，应该都封装在武将的内部，单个武将去单独处理自身的情况
-			if (IsAutoMoveType(pAlive) || ActionCode == Walk_Index)//自动移动类,或已经开始执行AI状态
-				return;
-			if (pAlive->getCallType() != CommonType)				//只有可收控制的武将才有后续的处理(其他类型武将没有MoveObject)
-				return;
-			if (!pAlive->getCaptain()&&pAlive->getGridIndex()!=pAlive->getMoveObject()->getgrid())//武将当前是否在固定位置,如果不在则移动回固定位置(执行AI完毕状态)
-			{			
-				pAlive->setAIState(false);
-				pAlive->setMoveGrid(pAlive->getMoveObject()->getgrid());							//@@武将有一个回到初始位置的方法
-				pAlive->getActObject()->setMoveState(Walk_Index);
-			}else{
-				int grid = INVALID_GRID;
-				if (pAlive->getCaptain())
-				{
-					grid = m_SkillRange->CaptainGuard(pAlive);
-				}else{
-					grid = mGuardArea->getAliveGuard(pAlive);
-				}
-				pAlive->setAIState(true);
-				if(grid)
-				{
-					pAlive->setMoveGrid(grid);
-					pAlive->getActObject()->setMoveState(Walk_Index);
-				}else{
-					pAlive->setAIState(false);
-				}	
-			}
-		}
-	}
-	//@@自动移动的我方武将无受击目标情况处理
-	bool CombatLogic::IsAutoMoveType( BaseRole*alive )
-	{
-		if (alive->getCallType() != AutoMoveType)
-			return false;
-		if (alive->getActObject()->getMoveState()||!alive->getMove())
-			return true;
-		if (alive->getGridIndex() <= C_BEGINGRID-C_GRID_ROW*3)			
-		{
-			alive->getActObject()->AliveDie();							//超出预定范围执行死亡操作
-			return true;
-		}			
-		alive->setMoveGrid(alive->getGridIndex()-C_GRID_ROW);			//这里的移动范围是写死了的
-		alive->getActObject()->setMoveState(Walk_Index);
-		return true;
-	}
-	//@@骸兽逃跑处理
-	bool CombatLogic::monsterFlee( BaseRole* alive )
-	{
-		if (DataCenter::sharedData()->getWar()->getStageID())				//当前是为新手引导关卡,可以抽象出一个方法用于判断是否为新手关卡
-			return false;
-		if (alive->getModel() == 1056  
-			&& ((alive->getHp()*1.0f/alive->getMaxHp()) < 0.60f))					//武将需要一个得到当前血量百分比的方法
-		{
-			if (!alive->getActObject()->getMoveState())
-			{
-				alive->setMoveGrid(4);
-				alive->getActObject()->setMoveState(Walk_Index);
-				alive->setMoveSpeed(0.5f);
-				alive->setDef(1000000);
-			}
-			if (alive->getGridIndex()<= C_BEGINGRID-C_GRID_ROW*4)
-			{		
-				alive->getActObject()->AliveDie();
-				alive->getActObject()->setVisible(false);
-				NOTIFICATION->postNotification(B_ActObjectRemove,alive);		//超出预定范围执行死亡操作
-			}		
-			return true;
-		}
-		return false;
-	}
-	//@@
-	void CombatLogic::MonsterExcuteAI( BaseRole* alive,float dt )
-	{
-		if (monsterFlee(alive))											//骸兽逃跑处理,将AI执行的都放在这个地方后面好整理
-			return;
-		int ActionCode = alive->getActObject()->getCurrActionCode();
-		if (alive->getGridIndex()<C_BEGINGRID)							//@@每个怪物都有的方法
-		{
-			if (!alive->getActObject()->getMoveState() 
-				&& m_MoveRule->MonstMoveExcute(alive))
-				alive->getActObject()->setMoveState(Walk_Index);
-			return ;
-		}
-		m_SkillRange->initAttackInfo(alive);
-		if (alive->mAreaTargets.size())
-		{
-			if (ActionCode == Walk_Index)
-			{
-				alive->getActObject()->setMoveState(0);
-				alive->getActObject()->TurnStateTo(Stand_Index);
-			}
-			AliveExcuteAI(alive);
-		}else{
-			if (alive->getSkillType() == eCallAtk)
-			{
-				alive->getActObject()->setMoveState(0);
-				alive->getActObject()->TurnStateTo(Stand_Index);
-				AliveExcuteAI(alive); 
-			}else{
-				if (alive->getCriAtk())
-					alive->setCriAtk(false);			
-				if (!alive->getActObject()->getMoveState() && m_MoveRule->MonstMoveExcute(alive) )
-					alive->getActObject()->setMoveState(Walk_Index);
-			}
-		}
-	}
-
-	void CombatLogic::monsterCritEffect( BaseRole* alive)
-	{
-		alive->getActObject()->TurnStateTo(Stand_Index);		
-		m_MapLayer->DrawWarningEffect(alive->mSkillArea);						//格子预警
-		m_CombatEffect->PlayerSkill(alive);
-	}
-
-	void CombatLogic::heroCritEffect( BaseRole* alive )
-	{
-		ActObject* pActObject = alive->getActObject();
-		m_Run = false;
-		m_Alive = alive;
-		pActObject->setUserObject(CCBool::create(true));
-		pActObject->setZOrder(0);
-		for (auto tAlive:alive->mAreaTargets)
-		{
-			tAlive->getActObject()->setUserObject(CCBool::create(true));
-			tAlive->getActObject()->setZOrder(0);
-			tAlive->getActObject()->pauseSchedulerAndActions();
-			tAlive->getActObject()->setMoveState(0);
-			tAlive->getActObject()->TurnStateTo(Stand_Index);
-		}
-		m_AliveLayer->getLayerColor()->setVisible(true);
-		LGPause(m_AliveLayer);													//暂停刷新位置和zorder的值
-		m_CombatEffect->PlayerSkill(alive);
-	}
-
-	void CombatLogic::excuteCritEffect( BaseRole* alive)
-	{
-		if (alive->getEnemy())
-		{
-			monsterCritEffect(alive);
-		}else{
-			heroCritEffect(alive);
-		}
-	}
-
-	void CombatLogic::attackEffect( BaseRole*alive )
-	{
-		ActObject* pActObject = alive->getActObject();
-		const skEffectData* effect = alive->getCurrEffect();						//开始播放攻击音效攻击特效的时机可以由策划配置
-		EffectInfo* info = m_Manage->getEffData()->getEffectInfo(effect->getEffectID());
-		if (!info)
-		{
-			CCLOG("[ ERROR ] CombatLoginc::AliveExcuteAI EffectInfo NULL %d",effect->getEffectID());
-			info = m_Manage->getEffData()->getEffectInfo(10000021);
-		}
-		pActObject->setAtkEffect(info->getusEft());
-		pActObject->TurnStateTo(info->getActionID());
-	}
-
-	void CombatLogic::attackDirection( BaseRole*alive )
-	{
-		ActObject* pActObject = alive->getActObject();
-		if (!alive->getCaptain()&& alive->getOpposite())									//反向攻击处理
-		{
-			if (alive->getEnemy())
-			{
-				pActObject->setRoleDirection(Ditection_Left);
-			}else{
-				pActObject->setRoleDirection(Ditection_Right);
-			}
-		}
-	}
-	//@@
-	void CombatLogic::AliveExcuteAI(BaseRole* alive)
-	{
-		if (alive->critJudge())
-		{
-			excuteCritEffect(alive);
-			return;
-		}
-		attackDirection(alive);
-		attackEffect(alive);
 	}
 
 	void CombatLogic::BatterRecord( CCObject* ob )
 	{
 		if (m_Record)
 			m_RecordNum++;
-	}
-
-	void CombatLogic::AliveCritEnd( BaseRole* alive )
-	{
-		if (alive->getHp()>0&&alive->getBattle()&&!alive->getCaptain())				//我方武将释放技能时会扣自己血将自己击杀
-		{
-			alive->getActObject()->setMoveState(Walk_Index);	
-			alive->getActObject()->setUpdateState(true);
-			if (alive->getBaseData()->getAlertType())
-				alive->setAIState(true);
-		}
 	}
 	//在此处触发连接的大效果播放。并记录当前一共按了多少次技能,延长连击接上的判定时间
 	void CombatLogic::critComboEffect()
@@ -576,8 +338,8 @@ namespace BattleSpace{
 
 	void CombatLogic::CritAtkEnd(CCObject* ob)
 	{
-		BaseRole* alive = dynamic_cast<BaseRole*>(ob);
-		AliveCritEnd(alive);
+		BaseRole* tRole = dynamic_cast<BaseRole*>(ob);
+		tRole->AliveCritEnd();
 		m_AliveLayer->clearAlivesPauseMark();
 		m_UILayer->ResetButtonState(m_Alive);
 		m_AliveLayer->getLayerColor()->setVisible(false);
@@ -616,129 +378,12 @@ namespace BattleSpace{
 				}		
 				m_AliveLayer->initActobject(pAlive,SceneTrap);
 			}break;
-		default:break;
 		}
 		if( alive->getSortieNum() >= effect->getBatter() )
 		{
 			m_HurtCount->BuffHandleLogic(alive);									//伤害计算完成才能添加新的BUFF
 			alive->clearHitAlive();
 		}
-	}
-	//延迟出场武将
-	bool CombatLogic::delayEntrance( BaseRole* alive,float dt )
-	{
-		if (alive->getBattle())
-			return false;
-		if (((MonsterData*)alive->getBaseData())->getDelayTime())
-		{
-			if (alive->getDelaytime()<=0)
-			{
-				alive->setGridIndex(alive->getBaseData()->getInitGrid());
-				m_AliveLayer->AliveObEffect(alive->getActObject());
-				m_AliveLayer->AddActToGrid(alive->getActObject(),alive->getGridIndex());
-			}else{
-				alive->setDelaytime(dt);
-			}
-		}
-		if (alive->getAtkDelay()>0)
-			alive->setAtkDelay(alive->getAtkDelay()-dt);									//敌方武将释放必杀技攻击延迟时间
-		return true;
-	}
-	//
-	bool CombatLogic::autoSkillAlive( BaseRole* alive )
-	{
-		if ((alive->getBaseData()->getCallType() == AutoSkill || alive->getBaseData()->getMonsterType() == MST_SKILL)&&!alive->getCriAtk())						//进入战场就释放技能(陨石类)
-		{
-			if (alive->getAliveStat()==COMMONSTATE)
-			{
-				if (alive->getBaseData()->getMonsterType() == MST_SKILL)
-					alive->getBaseData()->setMonsterType(MST_COMMON);
-				alive->setCriAtk( true );
-				return true;
-			}
-		}
-		return false;
-	}
-
-	void CombatLogic::attackTime( BaseRole* alive,float dt )
-	{
-		int ActionCode = alive->getActObject()->getCurrActionCode();
-		if (ActionCode == Stand_Index	|| 
-			ActionCode == Hit_Index		|| 
-			ActionCode == Walk_Index)//怪物的技能释放是由攻击次数和时间确定的
-			alive->setAtktime(dt);
-		if (!alive->getCriAtk()&&alive->getEnemy())
-			alive->setCritTime(dt);
-		alive->getBuffManage()->upDateBuff(dt);									// BUFF应该是每一帧都自动处理的
-	}
-	//武将进行逻辑处理前状态结算
-	bool CombatLogic::StateDispose( BaseRole* alive,float dt )
-	{
-		if (alive->getCallType() == NotAttack	||								//石头类武将不做攻击判断处理
-			alive->getAliveStat() == UNATK		||
-			alive->getAliveStat() == INVINCIBLE	||							//超出边界的武将不再进行技能处理
-			alive->getDieState()				|| 
-			alive->getHp()<=0)
-			return true;
-		if (delayEntrance(alive,dt))
-			return true;
-		if (autoSkillAlive(alive))
-			return false;
-		attackTime(alive,dt);
-		return false;
-	}
-
-	bool CombatLogic::walkState( BaseRole* alive )
-	{
-		if (alive->getEnemy()||alive->getCallType()==AutoMoveType)		//我方自动移动类武将
-		{
-			return true;
-		}else{
-			if (alive->getAIState())
-			{
-				return true;
-			}else{
-				return false;
-			}
-		}
-	}
-
-	bool CombatLogic::aliveAttackState( BaseRole* alive )
-	{
-		if (alive->getSpeAtk())
-		{
-			return true;
-		}else if (alive->getNorAtk())
-		{
-			return true;
-		}else if (alive->getCriAtk()){
-			return true;
-		}else{
-			return false;
-		}
-	}
-	//武将状态判断,武将是否可攻击判断,提高效率关键方法之一
-	bool CombatLogic::AttackJudge( BaseRole* alive )
-	{
-		int ActionCode = alive->getActObject()->getCurrActionCode();
-		if (ActionCode == Walk_Index)
-			return walkState(alive);
-
-		if (ActionCode == Dizzy_Index||
-			ActionCode == Skill_Index||
-			ActionCode == SpAttack_Index||
-			ActionCode == Attack_Index||
-			ActionCode == victory_Index||
-			ActionCode == Die_Index)
-		{
-			if (alive->getCloaking())
-			{
-				alive->setCloaking(false);
-				((CCArmature*)alive->getActObject()->getArmature())->setOpacity(255);
-			}
-			return false;
-		}
-		return aliveAttackState(alive);
 	}
 
 	void CombatLogic::displayBatchWarning()
@@ -757,11 +402,12 @@ namespace BattleSpace{
 
 	void CombatLogic::displayGuide()
 	{
-		if (DataCenter::sharedData()->getWar()->getStageID() != 0)							//引导开启的情况
-			return;
-		char path[60] = {0};
-		sprintf(path,"%d_%d",0,m_CurrBatchNum+1);										//覆盖高亮区域的图片
-		DataCenter::sharedData()->getCombatGuideMg()->setGuide(path);
+		if (!m_Manage->getStageID())														//引导开启的情况
+		{
+			char path[60] = {0};
+			sprintf(path,"%d_%d",0,m_CurrBatchNum+1);										//覆盖高亮区域的图片
+			DataCenter::sharedData()->getCombatGuideMg()->setGuide(path);
+		}
 	}
 
 	void CombatLogic::NextBatch( float dt )
@@ -775,29 +421,22 @@ namespace BattleSpace{
 		displayBatchWarning();
 	}
 
-	void CombatLogic::monsterRemove( BaseRole* alive )
-	{
-		if (!alive->getLastAlive())
-			return;
-		if (m_BatchNum > m_CurrBatchNum)										//可能会出现的一个bug，两个人同时死亡的间隔太近，会多次调用这个方法。应该从逻辑处进行最后一个死亡武将的判定而不应该从这里进行处理
-		{
-			srandNum();															//设置随机种子
-			m_Manage->initMonsterByBatch(m_CurrBatchNum+1);							//初始化批次武将数据(必须马上初始化数据,但是绘制可以延迟,否则多个武将连续死亡会直接战斗胜利出现)
-			this->scheduleOnce(schedule_selector(CombatLogic::NextBatch),1);	//打下一批次延时时间
-		}else{
-			m_Run = false;
-			m_UILayer->hideUiUpPart();			//隐藏control UI的上部分
-			CCDirector::sharedDirector()->getScheduler()->setTimeScale(1);
-			m_StoryLayer->CreateStory(CCInteger::create((int)StoryType::eOverStory));
-		}
-	}
-
 	void CombatLogic::ActObjectRemove( CCObject* ob )
 	{
 		BaseRole* alive = (BaseRole*)ob;
-		if (alive->getEnemy())
+		if (alive->getEnemy() && alive->getLastAlive())
 		{
-			monsterRemove(alive);
+			if (m_BatchNum > m_CurrBatchNum)										//可能会出现的一个bug，两个人同时死亡的间隔太近，会多次调用这个方法。应该从逻辑处进行最后一个死亡武将的判定而不应该从这里进行处理
+			{
+				srandNum();															//设置随机种子
+				m_Manage->initMonsterByBatch(m_CurrBatchNum+1);							//初始化批次武将数据(必须马上初始化数据,但是绘制可以延迟,否则多个武将连续死亡会直接战斗胜利出现)
+				this->scheduleOnce(schedule_selector(CombatLogic::NextBatch),1);	//打下一批次延时时间
+			}else{
+				m_Run = false;
+				m_UILayer->hideUiUpPart();			//隐藏control UI的上部分
+				CCDirector::sharedDirector()->getScheduler()->setTimeScale(1);
+				m_StoryLayer->CreateStory(CCInteger::create((int)StoryType::eOverStory));
+			}
 		}
 	}
 
@@ -821,20 +460,20 @@ namespace BattleSpace{
 	//控制关卡进度的地方处理
 	void CombatLogic::AliveDieDispose( CCObject* ob )
 	{
-		BaseRole* alive = (BaseRole*)ob;
-		if (alive->getEnemy())
+		BaseRole* tRole = (BaseRole*)ob;
+		if (tRole->getEnemy())
 		{
-			monsterDieDispose(alive);
+			monsterDieDispose(tRole);
 		}else{
-			if (alive->getBaseData()->getCallRole() || alive->getCaptain())								//喽啰死亡不进行初始化处理
+			if (tRole->getBaseData()->getCallRole() || tRole->getCaptain())								//喽啰死亡不进行初始化处理
 				return;
-			if (alive->getCaptain())
+			if (tRole->getCaptain())
 			{
 				m_Run = false;
 				m_Assist->ActStandExcute(m_AliveLayer->getAlivesOb());
 				combatResult(nullptr);															//战斗失败
 			}else{
-				m_UILayer->AliveBattleDispose(alive);											//武将下阵	
+				m_UILayer->AliveBattleDispose(tRole);											//武将下阵	
 			}
 		}
 	}
@@ -1083,4 +722,18 @@ namespace BattleSpace{
 			m_UILayer->updateTimeCountUI(m_iGameTimeCount);									//更新计时器
 		}
 	}
+
+	void CombatLogic::rolePlyaSkill( CCObject* ob )
+	{
+		BaseRole* tRole = (BaseRole*)ob;
+		m_CombatEffect->PlayerSkill(tRole);
+		if (!tRole->getEnemy())
+		{
+			m_Run = false;
+			m_Alive = tRole;
+		}else{
+			m_MapLayer->DrawWarningEffect(tRole->mSkillArea);						//格子预警
+		}
+	}
+
 }

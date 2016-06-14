@@ -23,7 +23,7 @@ namespace BattleSpace{
 		~CombatEffect();
 		virtual bool init();
 		CREATE_FUNC(CombatEffect)
-			void AttackNull(BattleResult* Result);
+		void AttackNull(BattleResult* Result);
 		void PlayerSkill(BaseRole* alive);
 		void SkillEfHandle(CCObject* ob);
 		void SkillEfHandleForEnemy(CCObject* ob);

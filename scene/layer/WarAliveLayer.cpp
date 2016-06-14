@@ -83,7 +83,7 @@ namespace BattleSpace{
 
 	void WarAliveLayer::createActObjects()
 	{
-		Members* map_Alive = m_Manage->getMembers();
+		const Members* map_Alive = m_Manage->getMembers();
 		for (auto tPair : *map_Alive)
 		{
 			if (tPair.second->getHp()>0 && tPair.second->getEnemy())
@@ -199,6 +199,8 @@ namespace BattleSpace{
 		this->scheduleUpdate();
 		NOTIFICATION->addObserver(this,callfuncO_selector(WarAliveLayer::LayerShake),B_Shark,nullptr);
 		NOTIFICATION->addObserver(this,callfuncO_selector(WarAliveLayer::aliveEntranceBattle),B_EntranceBattle,nullptr);
+		NOTIFICATION->addObserver(this,callfuncO_selector(WarAliveLayer::roleWantIntoBattle),B_IntoBattle,nullptr);
+		NOTIFICATION->addObserver(this,callfuncO_selector(WarAliveLayer::changeLight),B_ChangeLight,nullptr);
 	}
 
 	void WarAliveLayer::onExit()
@@ -649,4 +651,24 @@ namespace BattleSpace{
 				initActobject(alive,SceneTrap);
 		}
 	}
+
+	void WarAliveLayer::roleWantIntoBattle( CCObject* ob )
+	{
+		BaseRole* tRole = (BaseRole*)ob;
+		AliveObEffect(tRole->getActObject());
+		AddActToGrid(tRole->getActObject(),tRole->getGridIndex());
+	}
+
+	void WarAliveLayer::changeLight( CCObject* ob )
+	{
+		CCBool* tLight = (CCBool*)ob;
+		getLayerColor()->setVisible(tLight->getValue());
+		if (tLight->getValue())
+		{
+			LGPause(this);
+		}else{
+
+		}
+	}
+
 };

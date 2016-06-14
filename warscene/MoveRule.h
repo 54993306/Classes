@@ -27,7 +27,7 @@ namespace BattleSpace{
 		void changeTestState(CCObject* ob);
 		int getMonsterMoveGrid(BaseRole* alive);
 
-		int getMoveGrid(BaseRole* alive,int grid);
+		int CountMoveGrid(BaseRole* alive,int grid);
 		int MoveJudge(BaseRole* alive,int grid);				//用于判断是否可以移动，多格站位处理
 		int FrontBack(BaseRole* alive,int range,bool enemy);
 		int monsterMove(BaseRole* target);

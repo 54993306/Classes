@@ -82,13 +82,13 @@ namespace BattleSpace{
 		BaseRole* targetAlive = DataCenter::sharedData()->getWar()->getAliveByGrid(grid);
 		if( targetAlive == nullptr|| targetAlive == alive ||targetAlive->getEnemy())
 		{
-			return getMoveGrid(alive,grid);	
+			return CountMoveGrid(alive,grid);	
 		}else{
 			return INVALID_GRID;
 		}
 	}
 
-	int MoveRule::getMoveGrid(BaseRole* alive,int grid)
+	int MoveRule::CountMoveGrid(BaseRole* alive,int grid)
 	{
 		if (alive->mStandGrids.size()>1)							//在判断多个格子情况
 		{

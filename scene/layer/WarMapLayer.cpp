@@ -209,9 +209,8 @@ namespace BattleSpace{
 			if (i < C_GRID_ROW+C_BEGINGRID)
 				continue;
 			CCSprite* sp = (CCSprite*)m_DisPlayArea->getChildByTag(i+map_Bg);
-			if (!sp)
-				continue;
-			if (std::find(m_Manage->getAddcostVec()->begin(),m_Manage->getAddcostVec()->end(),i) != m_Manage->getAddcostVec()->end())
+			if (!sp)continue;
+			if (m_Manage->inAddCostArea(i))
 			{
 				sp->setDisplayFrame(CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(AddMoveImg));
 			}else{
@@ -399,7 +398,7 @@ namespace BattleSpace{
 			if (!sp)continue;
 			sp->stopAllActions();
 			sp->setVisible(false);
-			if (std::find(m_Manage->getAddcostVec()->begin(),m_Manage->getAddcostVec()->end(),i) != m_Manage->getAddcostVec()->end())
+			if (m_Manage->inAddCostArea(i))
 			{
 				sp->setDisplayFrame(CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(AddMoveImg));
 				sp->setVisible(type == green);

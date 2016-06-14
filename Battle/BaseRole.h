@@ -14,14 +14,9 @@
 
 #ifndef __BattleRole__
 #define __BattleRole__
-
-//重构方向，这个类还是一样作为数据存储的存在，跟显示对象aliveObject组合构成一个完整的武将。Actobject(包含武将独立逻辑和公用逻辑的地方)
-//太多地方引用了导致整个类都不敢修改，实际上应该以接口的方式来处理的。接口修改少，但是继承接口的实现就难说了
-/******************* 战场武将数据 ********************/
 #include "cocos2d.h"
 #include "Battle/BattleMacro.h"
 #include "Battle/RoleMacro.h"
-
 using namespace cocos2d;
 using namespace std;
 namespace BattleSpace{
@@ -32,13 +27,47 @@ namespace BattleSpace{
 	class RoleSkill;
 	class skEffectData;
 	class WarManager;
+	class SkillRange;
+	class GuardArea;
 	class BaseRole:public CCObject			//定义数据的顺序结构是为了方便查看数据
 	{
 	protected:
 		BaseRole();
+		WarManager* mManage;
+		GuardArea* mGuardArea;
+		SkillRange* mSkillRange;
+	public:
+		virtual void excuteLogic(float pTime);
+		bool stateDispose(float pTime);
+		bool delayEntrance(float pTime);
+		bool autoSkillAlive();
+		void attackTime(float pTime);
+		bool AttackJudge();
+		bool walkState();
+		bool aliveAttackState();
+		void AliveExcuteAI();
+		void excuteCritEffect();
+		void attackDirection();
+		void SkillActionAndEffect(int pActionIndex,int pEffectID);
+		void AliveCritEnd();
+		/****************** Hero *********************/
+		void heroCritEffect();
+		void HeroExcuteAI();
+		bool IsAutoMoveType();
+		/******************* Monster ********************/
+		void monsterCritEffect();
+		void MonsterExcuteAI(float dt); 
+		bool monsterFlee();
+		//move Logic
+		bool MonstMoveExcute();
+		int monsterMove();
+		int getMonsterMoveGrid();
+		int MoveJudge(int grid);				//用于判断是否可以移动，多格站位处理
+		int CountMoveGrid(int grid);
 	public:
 		virtual ~BaseRole();
-		static BaseRole* create();
+		virtual bool init();
+		CREATE_FUNC(BaseRole);
 		void ResetAttackState();					//重置武将当前状态信息
 		void ExcuteNextEffect();					//重置武将下执行下一个效果状态
 		bool canSummonAlive();						//是否可以召唤武将
@@ -63,7 +92,7 @@ namespace BattleSpace{
 		std::vector<int> mSkillArea;						//存储武将当前技能区域
 		std::vector<BaseRole*> mAreaTargets;				//存储区域内目标
 		std::vector<BaseRole*> HittingAlive;				//受击目标中被击中对象				(用于做buff和受击目标死亡结算处理)
-		CC_PROPERTY_CONSTREAD(BuffManage*,m_BuffManage,BuffManage);								//(是不是应该暴露出去呢)
+		CC_SYNTHESIZE_READONLY(BuffManage*,mBuffManage,BuffManage);//(是不是应该暴露出去呢)
 		CC_SYNTHESIZE(ActObject*,m_ActObject,ActObject);
 		CC_SYNTHESIZE(MoveObject*,m_MoveObj,MoveObject);	//设置移动对象
 		CC_SYNTHESIZE(unsigned int,m_AliveID,AliveID);		//武将ID
@@ -129,8 +158,6 @@ namespace BattleSpace{
 		CC_SYNTHESIZE(E_ALIVETYPE,m_AliveType,AliveType);	//角色品质等级				目前用法是世界boss，但是有多种拓展的可能
 		CC_SYNTHESIZE(bool,m_cloaking,Cloaking);			//隐身状态
 		CC_SYNTHESIZE(bool,m_LastAlive,LastAlive);			//场上最后武将
-	protected:
-		WarManager* mManage;
 	};
 };
 #endif

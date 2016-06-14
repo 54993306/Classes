@@ -95,6 +95,9 @@ namespace BattleSpace{
 		bool callAliveJudge(vector<int>& pDestinations);
 		bool swappingRule(vector<int>& pDestinations);
 		bool vectorIntersection(vector<int>& pVector,vector<int>& ptVector);
+
+		void roleWantIntoBattle(CCObject* ob);
+		void changeLight(CCObject* ob);
 	protected:
 		BaseRole*		m_TouchAlive;		//被触摸的武将id
 		ActObject*		m_MoveActObject;		//拖拽移动对象
