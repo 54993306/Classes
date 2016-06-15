@@ -30,13 +30,31 @@
 #include "Battle/BaseRoleData.h"
 namespace BattleSpace{
 	WarAliveLayer::WarAliveLayer()
-		:m_TouchAlive(nullptr),m_grid(0),m_AliveNode(0)
+		:m_TouchAlive(nullptr),m_grid(0),m_AliveNode(0),m_testState(true)
 		,m_MoveActObject(nullptr),m_TouchAliveBtn(false),m_Manage(nullptr)
 		,m_LayerColor(nullptr),m_MoveNode(nullptr),m_TouchOffs(0,0)
 	{}
 	WarAliveLayer::~WarAliveLayer()
 	{
 		m_TouchAlive = nullptr;
+	}
+
+	void WarAliveLayer::onEnter()
+	{
+		BaseLayer::onEnter();
+		this->scheduleUpdate();
+		NOTIFICATION->addObserver(this,callfuncO_selector(WarAliveLayer::LayerShake),B_Shark,nullptr);
+		NOTIFICATION->addObserver(this,callfuncO_selector(WarAliveLayer::roleEntranceBattle),B_EntranceBattle,nullptr);
+		NOTIFICATION->addObserver(this,callfuncO_selector(WarAliveLayer::changeTestState),B_ChangeMoveState,nullptr);
+	}
+
+	void WarAliveLayer::onExit()
+	{
+		CC_SAFE_RELEASE(m_MoveActObject->getAlive());
+		this->unscheduleUpdate();
+		removeEvent();
+		NOTIFICATION->removeAllObservers(this);
+		BaseLayer::onExit();
 	}
 
 	bool WarAliveLayer::init()
@@ -112,62 +130,20 @@ namespace BattleSpace{
 		}
 	}
 
-	void WarAliveLayer::monsterSoleSprite( ActObject* aliveOb )
+	void WarAliveLayer::AddActToGrid(ActObject* pAliveOb,int grid)
 	{
-		BaseRole* alive = aliveOb->getAlive();
-		if (!alive->getEnemy())
-			return;
-		CCSprite* ef = nullptr;
-		for (int i=0;i<alive->getBaseData()->getRoleRow();i++)
-			for (int j =0;j<alive->getBaseData()->getRoleCol();j++)
-			{
-				ef = CCSprite::create("warScene/fanglandingwei.png");
-				ef->setPosition(ccp(-aliveOb->getoffs().x+(j*(GRID_WIDTH+C_GRIDOFFSET_X)),-aliveOb->getoffs().y-(i*(GRID_HEIGHT+C_GRIDOFFSET_Y))));
-				//aliveOb->addChild(ef,-1);
-			}
-	}
-
-	void WarAliveLayer::initActObjectOffs(ActObject* aliveOb,int grid)
-	{
-		BaseRole* alive = aliveOb->getAlive();
-		if (alive->getBaseData()->getRoleRow()>1)
-		{
-			if (alive->getBaseData()->getRoleRow()>2)
-			{
-				aliveOb->setPosition(ccpAdd(aliveOb->getPosition(),ccp(0,-GRID_HEIGHT/1.5f*alive->getBaseData()->getRoleRow())));	
-			}else{
-				aliveOb->setPosition(ccpAdd(aliveOb->getPosition(),ccp(0,-GRID_HEIGHT/3*alive->getBaseData()->getRoleRow())));
-			}
-		}
-		if (alive->getBaseData()->getRoleCol()>1&&!alive->getCaptain())
-			aliveOb->setPosition(ccpAdd(aliveOb->getPosition(),ccp(GRID_WIDTH/4*alive->getBaseData()->getRoleCol(),0)));
-		aliveOb->setoffs(aliveOb->getPosition()-m_map->getPoint(grid));		//算出武将偏移实际站位格子的偏移量
-	}
-
-	void WarAliveLayer::initActObjectPosition( ActObject* aliveOb,int grid )
-	{
-		if (grid == INVALID_GRID&&aliveOb->getEnemy())
+		BaseRole* alive = pAliveOb->getAlive();
+		if (alive->getDelaytime()>0)grid = 0;
+		if (grid == INVALID_GRID&&pAliveOb->getEnemy())
 		{
 			grid = CCRANDOM_0_1()*3+1;
-			aliveOb->getAlive()->setGridIndex(grid);
-			aliveOb->setPosition(m_map->getPoint(grid));
-		}else{
-			aliveOb->setPosition(m_map->getPoint(grid));
+			alive->setGridIndex(grid);
 		}
-	}
-
-	void WarAliveLayer::AddActToGrid(ActObject* aliveOb,int grid)
-	{
-		BaseRole* alive = aliveOb->getAlive();
-		if (alive->getDelaytime()>0)
-			grid = 0;
-		initActObjectPosition(aliveOb,grid);
-		initActObjectOffs(aliveOb,grid);
-		monsterSoleSprite(aliveOb);
-		if(aliveOb->getParent() == nullptr)
+		pAliveOb->countOffs(m_map->getPoint(grid));
+		if(pAliveOb->getParent() == nullptr)
 		{
-			m_AliveNode->addChild(aliveOb);
-			aliveOb->initMoveObject(m_MoveNode);
+			m_AliveNode->addChild(pAliveOb);
+			pAliveOb->initMoveObject(m_MoveNode);
 		}
 	}
 	//绘制战场武将
@@ -180,6 +156,7 @@ namespace BattleSpace{
 		}
 		ActObject* aliveOb = ActObject::create();							//创建显示的对象
 		aliveOb->setAlive(alive);											//显示对象与逻辑对象绑定
+		alive->setRoleLayer(this);
 		AliveObEffect(aliveOb,createType);
 		AddActToGrid(aliveOb,alive->getGridIndex());
 	}
@@ -191,25 +168,6 @@ namespace BattleSpace{
 		ccTouchCancelled(nullptr,nullptr);
 		removeEvent();
 		addEvent();
-	}
-
-	void WarAliveLayer::onEnter()
-	{
-		BaseLayer::onEnter();
-		this->scheduleUpdate();
-		NOTIFICATION->addObserver(this,callfuncO_selector(WarAliveLayer::LayerShake),B_Shark,nullptr);
-		NOTIFICATION->addObserver(this,callfuncO_selector(WarAliveLayer::aliveEntranceBattle),B_EntranceBattle,nullptr);
-		NOTIFICATION->addObserver(this,callfuncO_selector(WarAliveLayer::roleWantIntoBattle),B_IntoBattle,nullptr);
-		NOTIFICATION->addObserver(this,callfuncO_selector(WarAliveLayer::changeLight),B_ChangeLight,nullptr);
-	}
-
-	void WarAliveLayer::onExit()
-	{
-		CC_SAFE_RELEASE(m_MoveActObject->getAlive());
-		this->unscheduleUpdate();
-		removeEvent();
-		NOTIFICATION->removeAllObservers(this);
-		BaseLayer::onExit();
 	}
 	//不断刷新武将的Z轴值
 	void WarAliveLayer::update(float delta)
@@ -229,11 +187,11 @@ namespace BattleSpace{
 			m_MoveActObject->getParent()->reorderChild(m_MoveActObject,200);			//刷新移动武将Z值排序
 	}
 	//初始化触摸武将存储的信息。
-	void WarAliveLayer::aliveEntranceBattle(CCObject* ob)
+	void WarAliveLayer::roleEntranceBattle(CCObject* ob)
 	{
-		BaseRole* alive = (BaseRole*)ob;
-		initActobject(alive);
-		initTouchAlive(alive);
+		BaseRole* tRole = (BaseRole*)ob;
+		initActobject(tRole);
+		initTouchAlive(tRole);
 		m_TouchAliveBtn = true;
 	}
 
@@ -362,226 +320,20 @@ namespace BattleSpace{
 		NOTIFICATION->postNotification(B_CancelCostArea,nullptr);
 		lucencyActObject(false);
 		m_grid = getTouchGrid(pTouch);
-		MoveAliveToGrid();
+		m_TouchAlive->setTouchEndGrid(m_grid);
 	}
 
-	bool WarAliveLayer::guideJudge( bool nextStep/*= false*/ )
+	BaseRole* WarAliveLayer::getAliveByMoveGrid( int pGrid )
 	{
-		if (DataCenter::sharedData()->getCombatGuideMg()->IsGuide())					//引导判断
-		{
-			CombatGuideStep* step = DataCenter::sharedData()->getCombatGuideMg()->getCurrStep();
-			if (step->getType()==AliveMove_Type || step->getType() == CallAalive_Type)
-			{
-				if (m_grid != step->getFinishgrid())
-					return true;								//固定格子才算完成(在移动区域内即算完成)
-				if (nextStep)
-					DataCenter::sharedData()->getCombatGuideMg()->NextStep();
-			}
-		}
-		return false;
-	}
-	//@@
-	bool WarAliveLayer::WorldBossJudge()
-	{
-		if (!DataCenter::sharedData()->getWar()->getNormal() && m_grid < 92)		//精英关卡创建武将只能右半屏
-			return true;
-		if (DataCenter::sharedData()->getWar()->getWorldBoss())
-		{
-			if (m_TouchAlive->getMoveObject()->getgrid() > 108 && m_grid < 108)				//写死的格子数
-			{
-				return true;
-			}else if (m_TouchAlive->getMoveObject()->getgrid() < 80 && m_grid > 80)
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-	//@@
-	bool WarAliveLayer::absentInMoveArea()
-	{
-		vector<int>* canMove = m_Manage->getMoveVec();
-		if (std::find(canMove->begin(),canMove->end(),m_grid) == canMove->end())
-			return true;						//点不在可移动范围内
-		return false;
-	}
-
-	bool WarAliveLayer::unCommonAlive()
-	{
-		if (m_TouchAlive->getCallType() != CommonType && !guideJudge(false))
-		{
-			m_TouchAlive->setMoveGrid(m_grid);
-			m_TouchAlive->getActObject()->setMoveState(Walk_Index);
-			guideJudge(true);
-			return true;
-		}
-		return false;
-	}
-	//@@
-	void WarAliveLayer::MoveAliveToGrid()
-	{
-		if (unCommonAlive())
-			return;
-		if (!m_TouchAlive->getMove()		|| 
-			!m_TouchAlive->getActObject()	|| 
-			!m_TouchAlive->getMoveObject()	||
-			m_grid==m_TouchAlive->getMoveObject()->getgrid())
-			return;
-		m_TouchAlive->getActObject()->setVisible(true);
-		m_TouchAlive->getActObject()->getHp()->showHp(nullptr);
-		if (absentInMoveArea()	||
-			WorldBossJudge()	||
-			guideJudge()		||
-			!aliveMoveJudge())		//当前位置是否可以放置英雄
-			return;
-		m_TouchAlive->getActObject()->setActMoveGrid(m_grid);
-		guideJudge(true);
-		m_TouchAlive->setAIState(false);
-	}
-	//@@边界判断
-	bool WarAliveLayer::borderJudge( BaseRole* pAlive,vector<int>& pVector )
-	{
-		for (auto i : pVector)									//主帅位置不可替换
-			if (i>=C_CAPTAINGRID||i<C_GRID_ROW+C_BEGINGRID)		//我方武将边缘处理
-				return true;
-		int row = pVector.at(0)%C_GRID_ROW;						//最小格子的站位
-		if (row+pAlive->getBaseData()->getRoleRow()>C_GRID_ROW)					//武将所占格子,不能超出地图外
-			return true;
-		return false;
-	}
-	//@得到目标点集
-	vector<int> WarAliveLayer::getDestinations( BaseRole* pAlive,int pGrid )	//这个方法可以抽象出来放到武将的身上。很多地方都调用了这个方法。到某个位置后武将所站的区域点
-	{
-		vector<int> tDestinations ;
-		for (int i=0;i<pAlive->getBaseData()->getRoleRow();i++)
-			for (int j =0;j<pAlive->getBaseData()->getRoleCol();j++)
-				tDestinations.push_back(pGrid+j*C_GRID_ROW+i);
-		sort(tDestinations.begin(),tDestinations.end());
-		if (borderJudge(pAlive,tDestinations))					//做边界判断
-			tDestinations.clear();
-		return tDestinations;
-	}
-	//@@召唤新武将的情况
-	bool WarAliveLayer::callAliveJudge( vector<int>& pDestinations )
-	{
-		for (auto tGrid:pDestinations)
-		{
-			BaseRole* tDestinationAlive = getAliveByMoveGrid(tGrid);
-			if (!tDestinationAlive)
-				continue;
-			if (DataCenter::sharedData()->getCombatGuideMg()->IsGuide())
-			{
-				CombatGuideStep* step = DataCenter::sharedData()->getCombatGuideMg()->getCurrStep();
-				if (!step->getReset())
-					return false;								//重置状态我方未上阵可替换其他武将
-			}else{
-				if (tDestinationAlive->getCallType() == CommonType)
-					return false;
-			}
-		}
-		return true;
-	}
-	//@@被替换武将移动
-	void WarAliveLayer::moveSwappingAlives( vector<BaseRole*>& pVector,int pOffs )
-	{
-		for (auto tAlive:pVector)
-		{
-			int tGrid = tAlive->getMoveObject()->getgrid() + pOffs;
-			tAlive->getActObject()->setActMoveGrid(tGrid);
-		}
-	}
-
-	bool WarAliveLayer::vectorIntersection( vector<int>& pVector,vector<int>& ptVector )
-	{
-		for (auto i : pVector)
-		{
-			for (auto j: ptVector)
-			{
-				if (i==j)
-					return true;
-			}
-		}
-		return false;
-	}
-	//得到一个区域内的所有武将
-	vector<BaseRole*> WarAliveLayer::getAliveInArea( vector<int>& pAreas )
-	{
-		vector<BaseRole*> tAreaAlives;
-		for (auto tGrid:pAreas)
-		{
-			BaseRole* tAlive = getAliveByMoveGrid(tGrid);
-			if (tAlive)
-			{
-				bool tAddAlive = true;
-				for (auto atAlive:tAreaAlives)
-				{
-					if (atAlive == tAlive)
-					{
-						tAddAlive = false;
-						break;
-					}
-				}
-				if (tAddAlive)
-					tAreaAlives.push_back(tAlive);
-			}
-		}
-		return tAreaAlives;
-	}
-	//交换的规则,可以进行多种拓展,有可能每个武将不一样,但是控制会乱
-	bool WarAliveLayer::swappingRule(vector<int>& pDestination)
-	{
-		vector<BaseRole*> tAreaAlives = getAliveInArea(pDestination);
-		int tOffs = m_TouchAlive->getMoveObject()->getgrid()-m_grid;
-		for (auto tSwappingAlive:tAreaAlives)
-		{
-			if (tSwappingAlive == m_TouchAlive)
-				continue;
-			int tSwappingGrid = tSwappingAlive->getMoveObject()->getgrid()+tOffs;
-			vector<int> tAliveDes = getDestinations(tSwappingAlive,tSwappingGrid);
-			if (tAliveDes.size() && !vectorIntersection(pDestination,tAliveDes) )
-			{
-				for (auto atGrid : tAliveDes)
-				{
-					BaseRole* atAlive = getAliveByMoveGrid(atGrid);
-					if (atAlive && atAlive != m_TouchAlive && atAlive != tSwappingAlive)
-						return false;
-				}
-			}else{
-				return false;
-			}
-		}
-		moveSwappingAlives(tAreaAlives,tOffs);
-		return true;
-	}
-	//@@判断武将是否可以移动的方法
-	bool WarAliveLayer::aliveMoveJudge()
-	{
-		vector<int> tDestinations = getDestinations(m_TouchAlive,m_grid);		
-		if (!tDestinations.size())
-			return false;				//没有目标位置(超出边界)
-		if (m_TouchAlive->getBattle())
-		{
-			if (!swappingRule(tDestinations))
-				return false;	
-		}else{
-			if (!callAliveJudge(tDestinations))
-				return false;
-		}
-		return true;
-	}
-	//放到数据中心供武将调用的方法
-	BaseRole* WarAliveLayer::getAliveByMoveGrid( int grid )
-	{
-		CCArray* arr = m_MoveNode->getChildren();
 		CCObject* obj = nullptr;
-		CCARRAY_FOREACH(arr,obj)
+		CCARRAY_FOREACH(m_MoveNode->getChildren(),obj)
 		{
-			MoveObject* mo = (MoveObject*)obj;
-			for (auto i:mo->grids)
+			MoveObject* tMoveObject = (MoveObject*)obj;
+			for (auto tStandGrid:tMoveObject->grids)
 			{
-				if (i!=grid)
+				if ( tStandGrid != pGrid )
 					continue;
-				return mo->getMoveAlive();
+				return tMoveObject->getMoveAlive();
 			}
 		}
 		return nullptr;
@@ -652,22 +404,21 @@ namespace BattleSpace{
 		}
 	}
 
-	void WarAliveLayer::roleWantIntoBattle( CCObject* ob )
+	void WarAliveLayer::roleWantIntoBattle( BaseRole* pRole )
 	{
-		BaseRole* tRole = (BaseRole*)ob;
-		AliveObEffect(tRole->getActObject());
-		AddActToGrid(tRole->getActObject(),tRole->getGridIndex());
+		AliveObEffect(pRole->getActObject());
+		AddActToGrid(pRole->getActObject(),pRole->getGridIndex());
 	}
 
-	void WarAliveLayer::changeLight( CCObject* ob )
+	void WarAliveLayer::changeLight( bool pLight )
 	{
-		CCBool* tLight = (CCBool*)ob;
-		getLayerColor()->setVisible(tLight->getValue());
-		if (tLight->getValue())
+		m_LayerColor->setVisible(pLight);
+		if (pLight)
 		{
 			LGPause(this);
 		}else{
-
+			LGResume(this);
+			clearAlivesPauseMark();
 		}
 	}
 
@@ -677,4 +428,8 @@ namespace BattleSpace{
 		initActobject(tRole,SceneTrap);
 	}
 
+	void WarAliveLayer::changeTestState( CCObject* ob )
+	{
+		m_testState = !m_testState;
+	}
 };

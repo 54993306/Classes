@@ -336,10 +336,8 @@ namespace BattleSpace{
 	{
 		BaseRole* tRole = dynamic_cast<BaseRole*>(ob);
 		tRole->AliveCritEnd();
-		m_AliveLayer->clearAlivesPauseMark();
 		m_UILayer->ResetButtonState(m_Alive);
-		m_AliveLayer->getLayerColor()->setVisible(false);
-		LGResume(m_AliveLayer);
+		m_AliveLayer->changeLight(false);
 		m_Alive = nullptr;
 		critComboEffect();
 	}

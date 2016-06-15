@@ -39,7 +39,6 @@ const char B_MonsterTips[]					=	"B_MonsterTips";
 const char B_DrpItem[]						=	"Msg_DropItem";
 const char B_AliveDie[]						=	"ALIVEDIE";						//一个武将死亡
 const char B_ActObjectRemove[]				=	"ACTREMOVE";					//武将死亡移除
-const char B_EntranceBattle[]				=	"ALIVEBATTLETOUCH";				//武将上阵触摸
 const char B_ChangeSceneSpeed[]				=	"CHANGEBATTLESPEED";			//改变战斗速度
 const char B_LayerMoveEnd[]					=	"LAYERMOVEEND";					//开场层移动完毕
 const char B_AddBuff[]						=	"ADDBUFF";						//武将添加buff表现
@@ -52,9 +51,8 @@ const char B_ReturnLayer[]					=	"SHOW_PLAN_PANEL";				//显示当前关卡进度
 const char B_CritEnd[]						=	"SKILLEND";						//武将技能释放完毕
 const char B_IntoBattle[]					=	"B_IntoBattle";					//延时完成进入战场
 const char B_RoleSkill[]					=   "B_RoleSkill";					//我方武将释放技能
-const char B_ChangeLight[]					=	"B_ChangeLight";				//改变亮度
 const char B_SkillCreateRole[]				=	"B_SkillCreateRole";			//技能创建武将
 const char B_AttactNull[]					=	"B_AttactNull";					//空效果处理
 const char B_AttackResult[]					=	"B_AttackResult";				//攻击结果表现
-
+const char B_EntranceBattle[]				=	"B_EntranceBattle";				//武将触摸进入战斗
 #endif

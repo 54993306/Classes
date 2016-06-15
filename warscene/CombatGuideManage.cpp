@@ -7,7 +7,7 @@
 #include "common/CGameSound.h"
 namespace BattleSpace{
 	CombatGuideManage::CombatGuideManage()
-		:m_CurrStepIndex(0),m_IsGuide(false),m_GuideLayer(nullptr)
+		:m_CurrStepIndex(0),mGuideState(false),m_GuideLayer(nullptr)
 	{}
 
 	CombatGuideManage::~CombatGuideManage()
@@ -23,7 +23,7 @@ namespace BattleSpace{
 		if (quit)
 		{
 			m_GuideLayer = nullptr;
-			m_IsGuide = false;
+			mGuideState = false;
 		}
 	}
 
@@ -374,7 +374,7 @@ namespace BattleSpace{
 		m_CurrStepIndex = beginStep;
 		if ( ! LoadJsonFile(FilePath))			//根据剧情id加载剧情文件
 		{
-			m_IsGuide = false;
+			mGuideState = false;
 			m_GuideLayer->setTouchEnabled(false);
 			return;
 		}
@@ -390,7 +390,7 @@ namespace BattleSpace{
 			ExitGuide();
 			return;
 		}
-		m_IsGuide = true;
+		mGuideState = true;
 		m_GuideLayer->setTouchEnabled(true);
 		m_GuideLayer->setVisible(true);
 		m_GuideLayer->setGuideStep(step);
@@ -433,7 +433,7 @@ namespace BattleSpace{
 
 	void CombatGuideManage::ExitGuide()								//移除剧情层显示内容
 	{
-		m_IsGuide = false;
+		mGuideState = false;
 		m_GuideLayer->ClearGuideLayer();
 		m_GuideLayer->setTouchEnabled(false);
 	}
@@ -446,4 +446,29 @@ namespace BattleSpace{
 		}
 		return nullptr;
 	}
+
+	bool CombatGuideManage::moveGuideJudge( int pGrid,bool pNextStep /*=false*/ )
+	{
+		CombatGuideStep* tStep = getCurrStep();
+		if (tStep &&  mGuideState)
+		{
+			if ((tStep->getType()==AliveMove_Type || tStep->getType() == CallAalive_Type))
+			{
+				if (pGrid != tStep->getFinishgrid())
+					return false;								//固定格子才算完成(在移动区域内即算完成)
+				if (pNextStep)
+					NextStep();
+			}
+		}
+		return true;
+	}
+
+	bool CombatGuideManage::isRest()
+	{
+		CombatGuideStep* tStep = getCurrStep();
+		if (mGuideState && tStep &&  tStep->getReset() )
+			return true;
+		return false;
+	}
+
 }

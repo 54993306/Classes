@@ -26,8 +26,10 @@ namespace BattleSpace{
 		void addGuideStep(CombatGuideStep* step);
 		CombatGuideStep* getGuideStep(int id);
 		CombatGuideStep* getCurrStep();
+		bool moveGuideJudge(int pGrid,bool pNextStep = false);
+		bool isRest();
 		void setGuide(const char* FilePath,int beginStep = 1);	//(特殊)引导不是第一步开始走的
-		bool IsGuide(){ return m_IsGuide; }						//当前是否在引导的状态
+		bool IsGuide(){ return mGuideState; }						//当前是否在引导的状态
 		int getCurrGuideIndex(){return m_CurrStepIndex;}		//得到当前引导id
 		void EnterGuide();
 		void NextStep();
@@ -37,7 +39,7 @@ namespace BattleSpace{
 		CC_SYNTHESIZE(CombatGuideLayer*,m_GuideLayer,GuideLayer);//保存一个GuideLayer层
 	protected:
 		int m_CurrStepIndex;
-		bool m_IsGuide;											//当然是否为引导状态
+		bool mGuideState;											//当然是否为引导状态
 		MapCombatGuideData m_GuideData;							//存储引导数据信息
 	};
 };

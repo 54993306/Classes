@@ -50,9 +50,12 @@ namespace BattleSpace{
 		void playerNum(int num,int type);
 		void initTypeIconPath( char* pPath );
 		void lostHpDispose();
+		void showThis();
+		void countOffs(CCPoint pMapPoint);
+		void monsterSoleSprite();
 	public:
 		CC_SYNTHESIZE(BaseRole*,m_Alive,Alive);				//设置逻辑对象
-		CC_SYNTHESIZE(MoveObject*,m_MoveObj,MoveObject);			//设置移动对象
+		CC_SYNTHESIZE(MoveObject*,m_MoveObj,MoveObject);	//设置移动对象
 		CC_SYNTHESIZE(int,m_ID,ID);							//显示对象id
 		CC_SYNTHESIZE(bool,m_Enemy,Enemy);					//阵营
 		CC_SYNTHESIZE(int,m_Model,Model);					//角色模型ID( 子类重写 )

@@ -31,7 +31,7 @@ namespace BattleSpace{
 		bool init(){return true;}
 		CREATE_FUNC(WarManager);	
 	public:
-		void addAlive(BaseRole* alive);
+		void addBattleRole(BaseRole* alive);
 		BaseRole* getAlive(unsigned int aliveID);
 		BaseRole* getAliveByGrid(int grid);
 		BaseRole* getAliveByType(E_ALIVETYPE type,bool Monster = true);
@@ -59,11 +59,12 @@ namespace BattleSpace{
 		/*************************************************/
 		void sortArrayByGridIndex(CCArray* arr);
 		CCArray* getAlivesByCamp(bool enemy = true,bool isAlive = false,bool sort = true);
+		int getCurrRandomGrid(int grid,bool hasAlive = false);
 		void initCommonData();
 		void clearOldData();
 		void initRoleSkillInfo(int pEffectID,BaseRole* pRole);
 		bool inAddCostArea(int pGrid);
-		int getCurrRandomGrid(int grid,bool hasAlive = false);
+		bool inMoveArea(int pGrid);
 	public:
 		CC_SYNTHESIZE(int, m_iWorldBossRank, WorldBossRank);			//世界BOSS狂暴状态
 		CC_SYNTHESIZE(int,m_LoadImage,LoadImage);						//用于记录加载图片的id
@@ -73,12 +74,12 @@ namespace BattleSpace{
 		CC_SYNTHESIZE(int, m_iLastStageId, LastStageId);				//上一次关卡信息(-1标记悬赏府)
 		CC_SYNTHESIZE(int, m_StageType, StageType);						//大关卡还是小关卡
 		CC_SYNTHESIZE(bool, m_bNormal, Normal);							//精英还是普通
-		CC_PROPERTY_CONSTREAD(bool, m_BossModel, WorldBoss);			//世界BOSS模型
+		PROPERTY_CONSTREAD(bool, m_BossModel, WorldBoss);			//世界BOSS模型
 		CC_SYNTHESIZE(int, m_ChapterIndex, ChapterIndex);				//在打哪一章节
 		CC_SYNTHESIZE(int, m_ChapterCount, ChapterCount);				//章节个数
 		CC_SYNTHESIZE(int, m_BossHurtPe,BossHurtPe);					//世界boss伤害加成百分比
-		CC_PROPERTY_CONSTREAD(int, m_VerifyNum,VerifyNum);				//验证所有武将造成的伤害信息(验证伤害是否被恶意修改)
-		CC_PROPERTY_CONSTREAD(int, m_BossHurtCount,BossHurtCount);		//造成的总伤害
+		PROPERTY_CONSTREAD(int, m_VerifyNum,VerifyNum);				//验证所有武将造成的伤害信息(验证伤害是否被恶意修改)
+		PROPERTY_CONSTREAD(int, m_BossHurtCount,BossHurtCount);		//造成的总伤害
 		CC_SYNTHESIZE(bool, mBattleOver, battleOver);					//战斗结束
 		CC_SYNTHESIZE(bool, mFirstStage, FirstStage);					//首次进入关卡
 	protected:
@@ -87,7 +88,7 @@ namespace BattleSpace{
 		vector<int> m_VecBossHurt;									//服务器验证伤害,每5秒存储一次当前造成总伤害信息
 		MapSkeletonData m_MapSpineData;								//
 		vector<int> m_SpineID;										//记录spine的ID
-		Members m_members;											//战场上活着的英雄
+		Members mBattleRole;											//战场上活着的英雄
 		EffectData* m_efdata;
 		BuffConfig* mBuffData;
 		StoryData* mStoryData;

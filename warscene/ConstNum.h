@@ -30,8 +30,8 @@ const char		INVALID_GRID		= 0;
 
 
 //武将相关
-const int		C_CallHero			= 1000;				//我方英雄召唤武将
 const int		C_BatchMonst		= 2000;				//伏兵ID
+const int		C_CallHero			= 4000;				//我方英雄召唤武将
 const int		C_CallMonst			= 5000;				//敌方召唤怪物
 
 #endif

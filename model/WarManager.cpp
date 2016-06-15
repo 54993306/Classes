@@ -63,11 +63,11 @@ namespace BattleSpace{
 
 	void WarManager::BattleDataClear()
 	{
-		for (auto tRole : m_members)
+		for (auto tRole : mBattleRole)
 		{
 			CC_SAFE_RELEASE(tRole.second);
 		}
-		m_members.clear();
+		mBattleRole.clear();
 		m_Batch = -1;
 		m_StageID = -1;
 		m_Heros.clear();
@@ -118,25 +118,27 @@ namespace BattleSpace{
 
 	void WarManager::setBossHurtCount(int hurt){ m_BossHurtCount += hurt;}
 
-	void WarManager::addAlive(BaseRole* alive)
+	void WarManager::addBattleRole(BaseRole* pRole)
 	{
-		if(!alive) return;
-		BaseRole* tpAlive = getAlive(alive->getAliveID());
-		if( tpAlive == alive ) return;
-		if( tpAlive )
+		if (pRole->getAliveID() >= C_CallHero)
 		{
-			CCLOG("[ **ERROR ]WarManager::addAlive has exists AliveModel:%d",alive->getModel());
-			return;
+			pRole->setAliveID(pRole->getAliveID()+mBattleRole.size());
+		}else{
+			BaseRole* tRole = getAlive( pRole->getAliveID() );
+			if( tRole )
+			{
+				CCLOG("[ **ERROR ]WarManager::addAlive has exists AliveModel:%d",pRole->getModel());
+				return;
+			}
 		}
-		alive->retain();
-		alive->getBuffManage()->setAlive(alive);//将自己传入buf管理器
-		m_members[alive->getAliveID()] = alive;
+		pRole->retain();
+		mBattleRole[pRole->getAliveID()] = pRole;
 	}
 
 	BaseRole* WarManager::getAlive(unsigned int aliveID)
 	{
-		Members::iterator iter = m_members.find(aliveID);
-		if( iter != m_members.end() ) return iter->second;
+		Members::iterator iter = mBattleRole.find(aliveID);
+		if( iter != mBattleRole.end() ) return iter->second;
 		return nullptr;
 	}
 
@@ -174,7 +176,7 @@ namespace BattleSpace{
 			alive->setAliveID(tIndex);										//战场上武将的唯一id
 			alive->setEnemy(false);
 			alive->initAliveData();
-			addAlive(alive);
+			addBattleRole(alive);
 		}
 	}
 	//初始化关卡批次数据到战斗武将列表
@@ -200,7 +202,7 @@ namespace BattleSpace{
 				alive->setCloaking(true);
 			alive->initAliveData();
 			alive->setMove(tVector.at(tIndex)->getMoveState());
-			addAlive(alive);
+			addBattleRole(alive);
 		}
 	}
 	//冒泡排序
@@ -220,9 +222,9 @@ namespace BattleSpace{
 
 	CCArray* WarManager::getAlivesByCamp( bool enemy/*=true*/,bool isAlive/*=false*/,bool sort/*=true*/ )
 	{
-		if(m_members.empty()) return nullptr;
+		if(mBattleRole.empty()) return nullptr;
 		CCArray* arr = CCArray::create();
-		for(Members::iterator iter = m_members.begin(); iter != m_members.end();++iter)
+		for(Members::iterator iter = mBattleRole.begin(); iter != mBattleRole.end();++iter)
 		{
 			if (iter->second->getEnemy() != enemy)
 				continue;
@@ -243,7 +245,7 @@ namespace BattleSpace{
 	{
 		if (grid == INVALID_GRID)
 			return nullptr;
-		for(Members::iterator iter = m_members.begin(); iter != m_members.end();++iter)
+		for(Members::iterator iter = mBattleRole.begin(); iter != mBattleRole.end();++iter)
 		{
 			BaseRole* alive = iter->second;
 			if (alive->getHp() <= 0)
@@ -261,7 +263,7 @@ namespace BattleSpace{
 
 	BaseRole* WarManager::getAliveByType( E_ALIVETYPE type,bool Monster/* = true*/ )
 	{
-		for(Members::iterator iter = m_members.begin(); iter != m_members.end();++iter)
+		for(Members::iterator iter = mBattleRole.begin(); iter != mBattleRole.end();++iter)
 		{
 			BaseRole* alive = iter->second;
 			if (alive->getHp() <= 0 || alive->getEnemy() != Monster)
@@ -274,7 +276,7 @@ namespace BattleSpace{
 
 	bool WarManager::checkMonstOver()
 	{
-		for(Members::iterator iter = m_members.begin(); iter != m_members.end();++iter)
+		for(Members::iterator iter = mBattleRole.begin(); iter != mBattleRole.end();++iter)
 		{
 			if(iter->second->getEnemy() && !iter->second->getDieState())
 				return false;
@@ -288,7 +290,7 @@ namespace BattleSpace{
 	}
 	const Members* WarManager::getMembers() 
 	{ 
-		return &m_members; 
+		return &mBattleRole; 
 	}
 	EffectData* WarManager::getEffData() 
 	{ 
@@ -308,7 +310,7 @@ namespace BattleSpace{
 		m_Heros.clear();
 		m_Monsters.clear();
 		m_AliveRoles.clear();
-		for(Members::iterator iter = m_members.begin(); iter != m_members.end();++iter)
+		for(Members::iterator iter = mBattleRole.begin(); iter != mBattleRole.end();++iter)
 		{
 			BaseRole* tAlive = iter->second;
 			if (tAlive->getHp() <= 0||!tAlive->getBattle()||!tAlive->getActObject())
@@ -344,49 +346,6 @@ namespace BattleSpace{
 		CScene* scene = GETSCENE(LoadWar);
 		LayerManager::instance()->closeAll();
 		CSceneManager::sharedSceneManager()->replaceScene(scene);
-	}
-
-	vector<BaseRole*>* WarManager::getVecMonsters(bool pSort /*=false*/)
-	{
-		if (pSort)
-			VectorRemoveRepeat(m_Monsters);
-		return &m_Monsters;
-	}
-
-	vector<BaseRole*>* WarManager::getVecHeros(bool pSort /*=false*/)
-	{
-		if (pSort)
-			VectorRemoveRepeat(m_Heros);
-		return &m_Heros;
-	}
-
-	vector<BaseRole*>* WarManager::getAliveRoles( bool pSort /*= false*/ )
-	{
-		if (pSort)
-			VectorRemoveRepeat(m_AliveRoles);
-		return &m_AliveRoles;
-	}
-
-	void WarManager::initRoleSkillInfo( int pEffectID,BaseRole* pRole )
-	{
-		EffectInfo* tInfo = m_efdata->getEffectInfo(pEffectID);
-		if (tInfo)
-		{
-			pRole->SkillActionAndEffect(tInfo->getActionID(),tInfo->getusEft());
-		}else{
-			CCLOG("[ *ERROR ] WarManager::initRoleSkillInfo");
-			pRole->SkillActionAndEffect(Stand_Index,0);
-		}
-	}
-
-	bool WarManager::inAddCostArea( int pGrid )
-	{
-		if (std::find(m_AddCostGrid.begin(),m_AddCostGrid.end(),pGrid) != m_AddCostGrid.end())
-		{
-			return true;
-		}else{
-			return false;
-		}
 	}
 
 	int WarManager::getCurrRandomGrid( int grid,bool hasAlive /*= false*/ )
@@ -437,6 +396,56 @@ namespace BattleSpace{
 			return pGrid;
 		} while (true);
 		return pGrid;
+	}
+
+	vector<BaseRole*>* WarManager::getVecMonsters(bool pSort /*=false*/)
+	{
+		if (pSort)
+			VectorRemoveRepeat(m_Monsters);
+		return &m_Monsters;
+	}
+
+	vector<BaseRole*>* WarManager::getVecHeros(bool pSort /*=false*/)
+	{
+		if (pSort)
+			VectorRemoveRepeat(m_Heros);
+		return &m_Heros;
+	}
+
+	vector<BaseRole*>* WarManager::getAliveRoles( bool pSort /*= false*/ )
+	{
+		if (pSort)
+			VectorRemoveRepeat(m_AliveRoles);
+		return &m_AliveRoles;
+	}
+
+	void WarManager::initRoleSkillInfo( int pEffectID,BaseRole* pRole )
+	{
+		EffectInfo* tInfo = m_efdata->getEffectInfo(pEffectID);
+		if (tInfo)
+		{
+			pRole->SkillActionAndEffect(tInfo->getActionID(),tInfo->getusEft());
+		}else{
+			CCLOG("[ *ERROR ] WarManager::initRoleSkillInfo");
+			pRole->SkillActionAndEffect(Stand_Index,0);
+		}
+	}
+
+	bool WarManager::inAddCostArea( int pGrid )
+	{
+		if (std::find(m_AddCostGrid.begin(),m_AddCostGrid.end(),pGrid) != m_AddCostGrid.end())
+		{
+			return true;
+		}else{
+			return false;
+		}
+	}
+
+	bool WarManager::inMoveArea( int pGrid )
+	{
+		if (std::find(m_CantMoveGrid.begin(),m_CantMoveGrid.end(),pGrid) != m_CantMoveGrid.end())
+			return true;						//点不在可移动范围内
+		return false;
 	}
 
 }

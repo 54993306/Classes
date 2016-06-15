@@ -263,4 +263,43 @@ namespace BattleSpace{
 			NOTIFICATION->postNotification(B_Shark,nullptr);
 		}
 	}
+
+	void AliveObject::showThis()
+	{
+		this->setVisible(true);
+		m_HpObject->showHp(nullptr);
+	}
+
+	void AliveObject::countOffs( CCPoint pMapPoint )
+	{
+		setPosition(pMapPoint);
+		if (m_Alive->getBaseData()->getRoleRow()>1)
+		{
+			if (m_Alive->getBaseData()->getRoleRow()>2)
+			{
+				setPosition(ccpAdd(getPosition(),ccp(0,-GRID_HEIGHT/1.5f*m_Alive->getBaseData()->getRoleRow())));	
+			}else{
+				setPosition(ccpAdd(getPosition(),ccp(0,-GRID_HEIGHT/3*m_Alive->getBaseData()->getRoleRow())));
+			}
+		}
+		if (m_Alive->getBaseData()->getRoleCol()>1&&!m_Alive->getCaptain())
+			setPosition(ccpAdd(getPosition(),ccp(GRID_WIDTH/4*m_Alive->getBaseData()->getRoleCol(),0)));
+		setoffs(getPosition()-pMapPoint);		//算出武将偏移实际站位格子的偏移量
+		monsterSoleSprite();
+	}
+
+	void AliveObject::monsterSoleSprite()
+	{
+		if (!m_Alive->getEnemy())
+			return;
+		CCSprite* ef = nullptr;
+		for (int i=0;i<m_Alive->getBaseData()->getRoleRow();i++)
+			for (int j =0;j<m_Alive->getBaseData()->getRoleCol();j++)
+			{
+				ef = CCSprite::create("warScene/fanglandingwei.png");
+				ef->setPosition(ccp(-getoffs().x+(j*(GRID_WIDTH+C_GRIDOFFSET_X)),-getoffs().y-(i*(GRID_HEIGHT+C_GRIDOFFSET_Y))));
+				//aliveOb->addChild(ef,-1);
+			}
+	}
+
 }

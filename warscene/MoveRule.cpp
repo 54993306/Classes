@@ -7,19 +7,13 @@
 #include "scene/alive/AliveDefine.h"
 #include "Battle/BattleMessage.h"
 namespace BattleSpace{
-	MoveRule::MoveRule():m_testState(true){}
+	MoveRule::MoveRule(){}
 
 	MoveRule::~MoveRule(){NOTIFICATION->removeAllObservers(this);}
 
 	bool MoveRule::init()
 	{
-		NOTIFICATION->addObserver(this,callfuncO_selector(MoveRule::changeTestState),B_ChangeMoveState,nullptr);
 		return true;
-	}
-
-	void MoveRule::changeTestState( CCObject* ob )
-	{
-		m_testState = !m_testState;
 	}
 
 	bool MoveRule::MonstMoveExcute(BaseRole* monster)
@@ -38,10 +32,6 @@ namespace BattleSpace{
 
 	int MoveRule::monsterMove(BaseRole* alive)
 	{
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
-		if (m_testState)
-			return INVALID_GRID;
-#endif
 		//怪物的移动处理是，哪个最先返回值不是INVALID_GRID就以哪个为标准，后面的不做处理了
 		if (alive->getAliveType() == E_ALIVETYPE::eWorldBoss)
 			return INVALID_GRID;

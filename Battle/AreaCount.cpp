@@ -28,7 +28,7 @@ namespace BattleSpace{
 		for (auto tGrid : getAlive()->mStandGrids)
 		{
 			vector<int>::iterator iter = mVector.begin();
-			for (;iter != mVector.end();)
+			for (;iter != mVector.end();iter++)
 			{
 				if (tGrid == *iter)
 				{

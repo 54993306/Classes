@@ -24,9 +24,7 @@ namespace BattleSpace{
 		~MoveRule();
 		virtual bool init();
 		CREATE_FUNC(MoveRule);
-		void changeTestState(CCObject* ob);
 		int getMonsterMoveGrid(BaseRole* alive);
-
 		int CountMoveGrid(BaseRole* alive,int grid);
 		int MoveJudge(BaseRole* alive,int grid);				//用于判断是否可以移动，多格站位处理
 		int FrontBack(BaseRole* alive,int range,bool enemy);
@@ -34,7 +32,6 @@ namespace BattleSpace{
 		bool MonstMoveExcute(BaseRole* monster);
 		int getCurrRandomGrid(int grid,bool hasAlive = false);
 	private:
-		bool m_testState;
 	};
 };
 

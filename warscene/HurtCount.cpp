@@ -64,7 +64,7 @@ namespace BattleSpace{
 		int grid = MoveRule::create()->FrontBack(HitAlive,effect->getRepel(),enemy);
 		if (grid != INVALID_GRID)
 		{
-			if (grid >= C_BEGINGRID && grid<C_CAPTAINGRID)						//击退范围做一个边界处理
+			if ( grid>=C_BEGINGRID && grid<C_CAPTAINGRID )						//击退范围做一个边界处理
 				return grid;
 		}		
 		return HitAlive->getGridIndex();

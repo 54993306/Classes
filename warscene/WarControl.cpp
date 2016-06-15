@@ -607,30 +607,30 @@ namespace BattleSpace{
 	CWidgetTouchModel WarControl::AliveButtonBeginClick(CCObject* ob,CCTouch* pTouch)
 	{
 		CButton* btn = (CButton*)ob;	
-		BaseRole* alive = dynamic_cast<BaseRole*>(btn->getUserObject());			//根据点击的按钮来判断点了哪个人
+		BaseRole* tRole = dynamic_cast<BaseRole*>(btn->getUserObject());			//根据点击的按钮来判断点了哪个人
 		int cost = m_Manage->getLogicObj()->getCurrCost();
-		if (alive->getBattle()&&alive->getHp()>0)
+		if (tRole->getBattle()&&tRole->getHp()>0)
 		{
-			RoleSkill* skill = alive->getBaseData()->getActiveSkill();		//我方目前只有主动技为召唤技
+			RoleSkill* skill = tRole->getBaseData()->getActiveSkill();		//我方目前只有主动技为召唤技
 			if (skill->getSkillType() == eCallAtk&&cost >= skill->getExpendCost())
 			{
-				BaseRole* pAlive = alive->getCallAlive(skill);
-				if (!pAlive)
+				BaseRole* atRole = tRole->getCallAlive(skill);
+				if (!atRole)
 					return eWidgetTouchTransient;
 				CaptainSkill::create()->ExecuteCaptainSkill();
-				NOTIFICATION->postNotification(B_EntranceBattle,pAlive);			//召唤成功才能扣减Cost值
+				NOTIFICATION->postNotification(B_EntranceBattle,atRole);			//召唤成功才能扣减Cost值
 				return eWidgetTouchNone;
 			}	
 			return eWidgetTouchTransient;											//武将为上阵状态则触摸不传递到下层,否则将触摸传递到下层处理
 		}else{
-			if (alive->getHp()<=0)
+			if (tRole->getHp()<=0)
 			{
-				alive->initAliveData();
+				tRole->initAliveData();
 				CaptainSkill::create()->ExecuteCaptainSkill();
 			}
-			if (cost < alive->getBaseData()->getExpendCost())
+			if (cost < tRole->getBaseData()->getExpendCost())
 				return eWidgetTouchTransient;
-			NOTIFICATION->postNotification(B_EntranceBattle,alive);
+			NOTIFICATION->postNotification(B_EntranceBattle,tRole);			//召唤成功才能扣减Cost值
 			showMonsterTips(nullptr);
 			return eWidgetTouchNone;	
 		}
