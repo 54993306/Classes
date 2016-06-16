@@ -1,5 +1,5 @@
 ﻿ 
-#include "WarScene.h"
+#include "BattleScene.h"
 #include "tools/commonDef.h"
 #include "model/DataCenter.h"
 #include "model/WarManager.h"
@@ -20,36 +20,36 @@
 #include "tools/CCShake.h"
 #include "Battle/BattleMessage.h"
 namespace BattleSpace{
-	WarScene::WarScene()
+	BattleScene::BattleScene()
 		:m_MapLayer(nullptr),m_AliveLayer(nullptr),m_StoryLayer(nullptr)
 		,m_MoveLayer(nullptr),m_UILayer(nullptr),_dropItem(nullptr)
 		,m_Loginc(nullptr),m_Touch(nullptr)
 	{}
-	WarScene::~WarScene()
+	BattleScene::~BattleScene()
 	{
 		CC_SAFE_RELEASE(_dropItem);
 		_dropItem = nullptr;
 	}
-	void WarScene::onEnter()
+	void BattleScene::onEnter()
 	{
 		CScene::onEnter();
 		DataCenter::sharedData()->getUser()->setoldLevel();									//设置开始战斗前等级
 		LayerMoveEnd(CCInteger::create((int)StoryType::eBeginStory));						//这个方法不应该放在这里的发条消息也能解决的问题
 	}
 
-	void WarScene::onEnterTransitionDidFinish()
+	void BattleScene::onEnterTransitionDidFinish()
 	{
 		m_GuideLayer->initScene(this);
 	}
 
-	void WarScene::onExit()
+	void BattleScene::onExit()
 	{
 		CScene::onExit();
 		this->unscheduleUpdate();
 		RemoveEvent();
 	}
 
-	void WarScene::onCreate()
+	void BattleScene::onCreate()
 	{
 		WarMapData* mapData = DataCenter::sharedData()->getMap()->getCurrWarMap();
 		m_MoveLayer = CCNode::create();					//可以移动的节点包含地图和武将
@@ -89,7 +89,7 @@ namespace BattleSpace{
 		DataCenter::sharedData()->getWar()->setLogicObj(m_Loginc);
 	}
 	//添加事件处理监听等
-	void WarScene::AddEvent()
+	void BattleScene::AddEvent()
 	{
 		CCDirector::sharedDirector()->getTouchDispatcher()->addTargetedDelegate(this,AliveLayerPriority,true);
 		if( m_UILayer ) m_UILayer->AddEvent();
@@ -97,7 +97,7 @@ namespace BattleSpace{
 		if( m_MapLayer ) m_MapLayer->addEvent();
 	}
 	//移除事件
-	void WarScene::RemoveEvent()
+	void BattleScene::RemoveEvent()
 	{
 		CCDirector::sharedDirector()->getTouchDispatcher()->removeDelegate(this);
 		CCNotificationCenter::sharedNotificationCenter()->removeAllObservers(this);
@@ -106,7 +106,7 @@ namespace BattleSpace{
 		if( m_MapLayer ) m_MapLayer->removeEvent();
 	}
 
-	bool WarScene::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
+	bool BattleScene::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
 	{
 		if (! m_Touch)
 		{
@@ -116,7 +116,7 @@ namespace BattleSpace{
 		return true;
 	}
 	//拖动地图
-	void WarScene::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)
+	void BattleScene::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)
 	{
 #if CC_TARGET_PLATFORM != CC_PLATFORM_WIN32
 		if (!DataCenter::sharedData()->getWar()->getNormal())
@@ -151,19 +151,19 @@ namespace BattleSpace{
 		lay->setPositionX(layx-px);					
 	}
 
-	void WarScene::ccTouchCancelled( CCTouch *pTouch, CCEvent *pEvent )
+	void BattleScene::ccTouchCancelled( CCTouch *pTouch, CCEvent *pEvent )
 	{
 		if (pTouch == m_Touch)
 			m_Touch = nullptr;
 	}
 
-	void WarScene::ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent)
+	void BattleScene::ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent)
 	{
 		if (pTouch == m_Touch)
 			m_Touch = nullptr;
 	}		
 
-	CCArray* WarScene::getTaskArray()
+	CCArray* BattleScene::getTaskArray()
 	{
 		if (m_Loginc->getTaskArray())
 		{
@@ -174,7 +174,7 @@ namespace BattleSpace{
 		}
 	}
 
-	void WarScene::LayerMoveEnd(CCObject* ob)
+	void BattleScene::LayerMoveEnd(CCObject* ob)
 	{
 #if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
 		CCNotificationCenter::sharedNotificationCenter()->postNotification(B_LayerMoveEnd,ob);

@@ -443,7 +443,7 @@ void CNetClient::reconnectResult(int type, google::protobuf::Message *msg)
 			}
 			LayerManager::instance()->closeAll();
 			string name = CSceneManager::sharedSceneManager()->getRunningScene()->getClassName();
-			if (strcmp(name.c_str(),"WarScene"))
+			if (strcmp(name.c_str(),"BattleScene"))
 				CCDirector::sharedDirector()->replaceScene(GETSCENE(LoginScene));
 		}
 	}

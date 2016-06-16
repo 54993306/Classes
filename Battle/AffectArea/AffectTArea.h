@@ -22,7 +22,7 @@ namespace BattleSpace
 	public:
 		AffectTArea(){};
 		virtual ~AffectTArea(){};
-		CREATE_UNINIT(AffectTArea);
+		UNINITCREATE(AffectTArea);
 		virtual AffectType getAreaType();
 		virtual void initArea(AreaCountInfo &pInfo);
 	};

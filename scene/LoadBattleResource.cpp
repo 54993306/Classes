@@ -1,10 +1,10 @@
-﻿#include "scene/loadWar.h"
+﻿#include "Battle/BattleScene/LoadBattleResource.h"
 #include "SimpleAudioEngine.h"
 #include "Global.h"
 #include "scene/AnimationManager.h"
 #include "tools/ToolDefine.h"
 #include "model/DataCenter.h"
-#include "scene/WarScene.h"
+#include "Battle/BattleScene/BattleScene.h"
 #include "common/CommonFunction.h"
 #include "warscene/EffectData.h"
 #include "warscene/CombatGuideManage.h"
@@ -26,18 +26,18 @@
 using namespace CocosDenshion;
 //using namespace Battle;
 namespace BattleSpace{
-	LoadWar::LoadWar():m_tip(nullptr),m_currNum(0),m_publicNum(0), m_totalNum(0)
+	LoadBattleResource::LoadBattleResource():m_tip(nullptr),m_currNum(0),m_publicNum(0), m_totalNum(0)
 		,m_progress(nullptr),m_Release(false),m_SceneType(-1),m_loadResNum(0),m_Layer(nullptr)
 	{}
 
-	LoadWar::~LoadWar()
+	LoadBattleResource::~LoadBattleResource()
 	{
 		CC_SAFE_RELEASE(m_LoadSpine);
 		m_LoadSpine = nullptr;
 	}
 
 	//背景图片显示处理
-	void LoadWar::BackImage()
+	void LoadBattleResource::BackImage()
 	{
 		CCSprite* backgroundImage = (CCSprite*)m_Layer->findWidgetById("bg");
 		int newID = 0;			
@@ -67,12 +67,12 @@ namespace BattleSpace{
 			CCDirector::sharedDirector()->getScheduler()->setTimeScale(1);
 	}
 
-	void LoadWar::onEnterTransitionDidFinish()
+	void LoadBattleResource::onEnterTransitionDidFinish()
 	{
 		PlayBackgroundMusic(BGM_LoadWar,true);
 	}
 
-	void LoadWar::onCreate()
+	void LoadBattleResource::onCreate()
 	{
 		m_Layer = LoadComponent("loading.xaml");//接收来自父节点的消息
 		m_Layer->setPosition(VCENTER);
@@ -112,13 +112,13 @@ namespace BattleSpace{
 		BackImage();
 	}
 
-	void LoadWar::setRelease(bool isrelease,int sceneType)
+	void LoadBattleResource::setRelease(bool isrelease,int sceneType)
 	{
 		m_Release = isrelease;
 		m_SceneType = sceneType;
 	}
 
-	void LoadWar::onEnter()
+	void LoadBattleResource::onEnter()
 	{
 		CScene::onEnter();
 		CSVFile* file = (CSVFile*)FileUtils::sharedFileUtils()->loadCSVFile(CSV_ROOT("loadWar.csv"));
@@ -127,17 +127,17 @@ namespace BattleSpace{
 		m_totalNum = m_publicNum+total_time+50;
 		DataParse();											//得到战斗需显示的资源数据
 		updateTips(0);
-		this->schedule(schedule_selector(LoadWar::ResourceDispose));
-		this->schedule(schedule_selector(LoadWar::updateTips),2);
+		this->schedule(schedule_selector(LoadBattleResource::ResourceDispose));
+		this->schedule(schedule_selector(LoadBattleResource::updateTips),2);
 	}
-	void LoadWar::onExit()
+	void LoadBattleResource::onExit()
 	{
 		CScene::onExit();
 		FileUtils::sharedFileUtils()->releaseFile(CSV_ROOT("warTips.csv"));
 		FileUtils::sharedFileUtils()->releaseFile(CSV_ROOT("loadWar.csv"));
 		FileUtils::sharedFileUtils()->releaseFile(CSV_ROOT("preloadRes.csv"));
 	}
-	void LoadWar::updateTips(float fdetal)
+	void LoadBattleResource::updateTips(float fdetal)
 	{
 		CSVFile* file = (CSVFile*)FileUtils::sharedFileUtils()->getFile(CSV_ROOT("warTips.csv"));//从缓存中获取配置文件
 		if (!file)
@@ -147,7 +147,7 @@ namespace BattleSpace{
 		m_tip->setVisible(false);
 	}
 	//技能解析,通过技能得到加载数据
-	void LoadWar::SkillParse( const BaseRoleData* pRole,vector<int>&VecEffect,vector<int>&VecBuff )
+	void LoadBattleResource::SkillParse( const BaseRoleData* pRole,vector<int>&VecEffect,vector<int>&VecBuff )
 	{
 		vector< const RoleSkill*> VSkill;
 		VSkill.push_back(pRole->getNormalSkill());
@@ -171,7 +171,7 @@ namespace BattleSpace{
 				}
 	}
 	//数据解析
-	void LoadWar::DataParse()
+	void LoadBattleResource::DataParse()
 	{
 		const vector<HeroData*>tHeroVec = BattleData->getHeroVector();
 		const vector<MonsterData*>tMonsterVec = BattleData->getMonsterVector();
@@ -209,7 +209,7 @@ namespace BattleSpace{
 		m_WarResouse[ResourceType::Load_Buff]		= VecBuff;
 	}
 	//公共资源、地图特效技能特效一起加载、骨骼动画和骨骼动画效果一起加载
-	void LoadWar::ResourceDispose(float delta)
+	void LoadBattleResource::ResourceDispose(float delta)
 	{
 		++m_currNum;
 		CCObject* resouseID = nullptr;
@@ -245,13 +245,13 @@ namespace BattleSpace{
 			ProgressEnd();
 	}
 	//应该是抽象出一个类来对这个进行处理
-	void LoadWar::LoadCocosEffect()
+	void LoadBattleResource::LoadCocosEffect()
 	{
 		if (m_Release)
 		{
 			CCArmatureDataManager::sharedArmatureDataManager()->removeArmatureFileInfo("warScene/attack.ExportJson");
 		}else{
-			CCArmatureDataManager::sharedArmatureDataManager()->addArmatureFileInfoAsync("warScene/attack.ExportJson",this,schedule_selector(LoadWar::CocosBoneCallBack));//添加之前判断是否存在
+			CCArmatureDataManager::sharedArmatureDataManager()->addArmatureFileInfoAsync("warScene/attack.ExportJson",this,schedule_selector(LoadBattleResource::CocosBoneCallBack));//添加之前判断是否存在
 			LoadResourceInfo res;
 			res.Loadtype = LoadType::Load_CocosBone;
 			m_resVec.push_back(res);
@@ -259,7 +259,7 @@ namespace BattleSpace{
 	}
 
 	//加载角色,根据角色和是否存在技能加载释放技能所需图片
-	void LoadWar::CocosBoneThread(int ModeID)
+	void LoadBattleResource::CocosBoneThread(int ModeID)
 	{
 		char ExportJson_str[60] = {0};//"BoneAnimation/101.ExportJson"
 		sprintf(ExportJson_str,"BoneAnimation/%d.ExportJson",ModeID);
@@ -277,7 +277,7 @@ namespace BattleSpace{
 				return;
 			}
 			CCLOG("LoadWarResourse Load SKELETON = %d",ModeID);
-			CCArmatureDataManager::sharedArmatureDataManager()->addArmatureFileInfoAsync(ExportJson_str,this,schedule_selector(LoadWar::CocosBoneCallBack));//添加之前判断是否存在
+			CCArmatureDataManager::sharedArmatureDataManager()->addArmatureFileInfoAsync(ExportJson_str,this,schedule_selector(LoadBattleResource::CocosBoneCallBack));//添加之前判断是否存在
 			LoadResourceInfo res;
 			res.FileName = ToString(ModeID);
 			res.FilePath = std::string(ExportJson_str);
@@ -285,13 +285,13 @@ namespace BattleSpace{
 			m_resVec.push_back(res);
 		}
 	}
-	void LoadWar::CocosBoneCallBack( float dt )
+	void LoadBattleResource::CocosBoneCallBack( float dt )
 	{ 
 		m_loadResNum++; 
 		//CCLOG("LoadWar::CocosBoneCallBack___%d", m_loadResNum);
 	}
 
-	void LoadWar::TextureThread(const char* url, const char* model, LoadType type/*= LoadType::Load_Effect*/)
+	void LoadBattleResource::TextureThread(const char* url, const char* model, LoadType type/*= LoadType::Load_Effect*/)
 	{
 		for (auto i:m_resVec)
 		{
@@ -304,21 +304,21 @@ namespace BattleSpace{
 			return;
 		string pngStr = str.substr(0,pos);
 		pngStr = pngStr.append("png");				//将plist的后缀换成png
-		CCTextureCache::sharedTextureCache()->addImageAsync(pngStr.c_str(),this,callfuncO_selector(LoadWar::TextureThreadCallBack));
+		CCTextureCache::sharedTextureCache()->addImageAsync(pngStr.c_str(),this,callfuncO_selector(LoadBattleResource::TextureThreadCallBack));
 		LoadResourceInfo res;
 		res.FileName = model;
 		res.FilePath = url;
 		res.Loadtype = type;
 		m_resVec.push_back(res);
 	}
-	void LoadWar::TextureThreadCallBack(CCObject* pSender) 
+	void LoadBattleResource::TextureThreadCallBack(CCObject* pSender) 
 	{
 		m_loadResNum++; 
 		//CCLOG("LoadWar::TextureThreadCallBack___%d", m_loadResNum);
 	}
 
 	//加载公共资源
-	void LoadWar::LoadPublic()
+	void LoadBattleResource::LoadPublic()
 	{
 		CSVFile* file = (CSVFile*)FileUtils::sharedFileUtils()->getFile(CSV_ROOT("loadWar.csv"));			//加载战斗公共资源
 		char ExportJson_str[60] = {0};
@@ -370,7 +370,7 @@ namespace BattleSpace{
 		}
 	}
 	//加载技能特效
-	void LoadWar::LoadEffect()
+	void LoadBattleResource::LoadEffect()
 	{
 		char plist_str[60] = {0};
 		EffectData* EfData = m_Manage->getEffData();
@@ -417,7 +417,7 @@ namespace BattleSpace{
 		}
 	}
 	//地形和地形在人物身上特效
-	void LoadWar::LoadTerrain()
+	void LoadBattleResource::LoadTerrain()
 	{
 		return;
 		terData* data = nullptr/*m_Manage->getTerData()*/;
@@ -449,7 +449,7 @@ namespace BattleSpace{
 		}
 	}
 
-	void LoadWar::LoadBeingAnimation()
+	void LoadBattleResource::LoadBeingAnimation()
 	{
 		unsigned long size = 0;
 		string strPath = CCFileUtils::sharedFileUtils()->fullPathForFilename("csv/Animation/taiwen.json");
@@ -515,7 +515,7 @@ namespace BattleSpace{
 		}
 	}
 
-	void LoadWar::ProgressEnd()
+	void LoadBattleResource::ProgressEnd()
 	{
 		if (m_Release)
 		{
@@ -568,7 +568,7 @@ namespace BattleSpace{
 					AnimationManager::sharedAction()->ParseAnimation(res.FileName.c_str());
 			}
 			this->unscheduleAllSelectors();
-			CSceneManager::sharedSceneManager()->replaceScene(GETSCENE(WarScene), 0.5f);
+			CSceneManager::sharedSceneManager()->replaceScene(GETSCENE(BattleScene), 0.5f);
 		}
 	}
 

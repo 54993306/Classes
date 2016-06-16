@@ -4,7 +4,7 @@
 #include "Battle/BaseRole.h"
 #include "model/WarManager.h"
 #include "model/MapManager.h"
-#include "scene/alive/AliveDefine.h"
+#include "Battle/RoleObject/RoleObject.h"
 #include "Battle/BattleMessage.h"
 namespace BattleSpace{
 	MoveRule::MoveRule(){}

@@ -3,7 +3,6 @@
 #include "AppUI.h"
 #include "mainCityUI.h"
 #include "model/DataCenter.h"
-#include "scene/alive/ActObject.h"
 
 #include "MainCityControl.h"
 #include "task/TaskControl.h"

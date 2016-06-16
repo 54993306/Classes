@@ -4,7 +4,6 @@
 #include "netcontrol/CPlayerControl.h"
 #include "scene/layer/LayerManager.h"
 #include "model/DataCenter.h"
-#include "scene/alive/ActObject.h"
 #include "tools/UICloneMgr.h"
 #include "netcontrol/CPlayerControl.h"
 #include "common/color.h"

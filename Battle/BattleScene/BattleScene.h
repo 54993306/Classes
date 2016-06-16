@@ -50,12 +50,12 @@ namespace BattleSpace{
 		backLayer_tag,
 	};
 
-	class WarScene : public CScene,public CCTargetedTouchDelegate
+	class BattleScene : public CScene,public CCTargetedTouchDelegate
 	{
 	public:
-		WarScene();
-		virtual ~WarScene();
-		DEFINE_SCENE_CLASS(WarScene);
+		BattleScene();
+		virtual ~BattleScene();
+		DEFINE_SCENE_CLASS(BattleScene);
 		virtual void onCreate();
 		virtual void onEnter();
 		virtual void onEnterTransitionDidFinish();

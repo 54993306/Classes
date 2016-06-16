@@ -6,9 +6,9 @@
 #include "model/DataCenter.h"
 #include "model/WarManager.h"
 #include "warscene/EffectData.h"
-#include "scene/alive/HPObject.h"
-#include "scene/alive/AliveDefine.h"
-#include "scene/effect/EffectObject.h"
+#include "Battle/RoleObject/HPObject.h"
+#include "Battle/RoleObject/RoleObject.h"
+#include "Battle/EffectObject.h"
 #include "Battle/BattleMessage.h"
 #include "Battle/BuffData.h"
 namespace BattleSpace{
@@ -34,8 +34,8 @@ namespace BattleSpace{
 		BaseRole* alive = (BaseRole*)ob;
 		if (m_hpSize.equals(CCPointZero))
 		{
-			m_hpSize.x = alive->getActObject()->getHp()->getContentSize().width;
-			m_hpSize.y = alive->getActObject()->getHp()->getContentSize().height-GRID_HEIGHT/2;
+			m_hpSize.x = alive->getRoleObject()->getHp()->getContentSize().width;
+			m_hpSize.y = alive->getRoleObject()->getHp()->getContentSize().height-GRID_HEIGHT/2;
 		}
 		BuffMap* buffMap = alive->getBuffManage()->getBuffMap();
 		for (auto i:*buffMap)
@@ -47,7 +47,7 @@ namespace BattleSpace{
 			vector<CCNode*> VecEffect;
 			if (effect)
 			{
-				float scaleNum = 1/alive->getActObject()->getBody()->getScale();
+				float scaleNum = 1/alive->getRoleObject()->getBody()->getScale();
 				if (effect->getEffect_up())
 				{
 					EffectObject* ef = EffectObject::create(ToString(effect->getEffect_up()));
@@ -59,7 +59,7 @@ namespace BattleSpace{
 						VecEffect.push_back(ef);
 					}
 					ef->setPosition(ccp(0,30));
-					alive->getActObject()->getBody()->addChild(ef);
+					alive->getRoleObject()->getBody()->addChild(ef);
 				}
 				if (effect->getEffect_down())
 				{
@@ -72,17 +72,17 @@ namespace BattleSpace{
 						VecEffect.push_back(ef);
 					}
 					ef->setPosition(ccp(0,30));
-					alive->getActObject()->getBody()->addChild(ef,-1);
+					alive->getRoleObject()->getBody()->addChild(ef,-1);
 				}
 			}
 			CCSprite* smallIcon = CreateSmallIcon(i.second,VecEffect);			//创建小图标
 			alive->getBuffManage()->AddEffectVec(i.second->getBuffID(),VecEffect);	//加入到map才能刷新位置
 			if (smallIcon)
 			{
-				alive->getActObject()->getBody()->addChild(smallIcon);
+				alive->getRoleObject()->getBody()->addChild(smallIcon);
 				updatePosition(alive);											//刷新小图标位置
 			}
-			CreateBigIcon(i.second,alive->getActObject()->getBody());			//创建大图标
+			CreateBigIcon(i.second,alive->getRoleObject()->getBody());			//创建大图标
 			return;																//每一条添加消息只处理一个buff的效果
 		}
 	}
@@ -153,14 +153,14 @@ namespace BattleSpace{
 	void BufExp::updatePosition( CCObject* ob )
 	{
 		BaseRole* alive = (BaseRole*)ob;
-		float scaleNum = 1/alive->getActObject()->getBody()->getScale();
+		float scaleNum = 1/alive->getRoleObject()->getBody()->getScale();
 		if (m_hpSize.equals(CCPointZero))
 		{
-			m_hpSize.x = alive->getActObject()->getHp()->getContentSize().width;
-			m_hpSize.y = alive->getActObject()->getHp()->getContentSize().height-GRID_HEIGHT/2+3;
+			m_hpSize.x = alive->getRoleObject()->getHp()->getContentSize().width;
+			m_hpSize.y = alive->getRoleObject()->getHp()->getContentSize().height-GRID_HEIGHT/2+3;
 		}
 		BuffEffectMapList* EffectMap = alive->getBuffManage()->getEffectMap();
-		float scaleNem = 1/alive->getActObject()->getBody()->getScale();
+		float scaleNem = 1/alive->getRoleObject()->getBody()->getScale();
 		int index = 0;
 		for (auto i:*EffectMap)
 		{

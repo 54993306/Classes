@@ -3,7 +3,7 @@
 #include "netcontrol/CPlayerControl.h"
 #include "common/color.h"
 #include "net/CNetClient.h"
-#include "scene/loadWar.h"
+#include "Battle/BattleScene/LoadBattleResource.h"
 #include "warscene/WarAssist.h"
 #include "common/ProgressLabel.h"
 #include "bag/bagData.h"
@@ -217,8 +217,8 @@ void WorldBossEndLayer::onBackClick(CCNode* ob)
 	//返回章节
 	DataCenter::sharedData()->setCityActionType(CA_GoToWorldBoss);
 
-	CScene* scene = GETSCENE(LoadWar);
-	((LoadWar*)scene)->setRelease(true, SkipcityScene);
+	CScene* scene = GETSCENE(LoadBattleResource);
+	((LoadBattleResource*)scene)->setRelease(true, SkipcityScene);
 	CSceneManager::sharedSceneManager()->replaceScene(scene);
 }
 

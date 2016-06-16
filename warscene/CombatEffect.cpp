@@ -1,5 +1,4 @@
 ﻿#include "CombatEffect.h"
-#include "scene/alive/ActObject.h"
 #include "model/DataCenter.h"
 #include "common/CommonFunction.h"
 #include "scene/layer/WarAliveLayer.h"
@@ -9,18 +8,18 @@
 #include "tools/CCShake.h"
 #include "warscene/EffectData.h"
 #include "Battle/BaseRole.h"
-#include "scene/alive/ActObject.h"
+#include "Battle/RoleObject/RoleObject.h"
 #include "CombatTask.h"
-#include "scene/alive/RageObject.h"
+#include "Battle/RoleObject/RageObject.h"
 #include "scene/layer/WarMapLayer.h"
-#include "scene/effect/EffectObject.h"
+#include "Battle/EffectObject.h"
 #include "warscene/BattleResult.h"
 #include "warscene/WarControl.h"
-#include "scene/WarScene.h"
+#include "Battle/BattleScene/BattleScene.h"
 #include "model/BuffManage.h"
 #include "model/WarManager.h"
 #include "model/MapManager.h"
-#include "scene/alive/HPObject.h"
+#include "Battle/RoleObject/HPObject.h"
 #include "warscene/ComBatLogic.h"
 #include "warscene/CPlayerSkillData.h"
 #include "common/ShaderDataHelper.h"
@@ -95,7 +94,7 @@ namespace BattleSpace{
 		return true;
 	}
 
-	void CombatEffect::setScene(WarScene* scene)
+	void CombatEffect::setScene(BattleScene* scene)
 	{
 		CCSize winSize = CCDirector::sharedDirector()->getWinSize();
 		m_Scene = scene;
@@ -132,9 +131,9 @@ namespace BattleSpace{
 				{
 					BaseRole* alive = (BaseRole*)mObj;
 					if(alive->getHp()<=0 
-						&& alive->getActObject() != nullptr
+						&& alive->getRoleObject() != nullptr
 						&& !alive->getDieState())
-						alive->getActObject()->AliveDie();
+						alive->getRoleObject()->AliveDie();
 				}
 			}break;
 		default:
@@ -150,12 +149,12 @@ namespace BattleSpace{
 		vector<BaseRole*>* Vec = DataCenter::sharedData()->getWar()->getVecMonsters();
 		for (auto alive : *Vec)
 		{
-			ActObject* actObject = alive->getActObject();
+			RoleObject* actObject = alive->getRoleObject();
 			if (alive->getGridIndex() < C_BEGINGRID)
 				continue;
 			if (!actObject)
 				continue;
-			actObject->TurnStateTo(Hit_Index); 
+			actObject->TurnStateTo(E_StateCode::eHitState); 
 			int lostNum = pow(tAttackNum,2)/(tAttackNum+alive->getDef());
 			if (lostNum <= 0)
 				lostNum = 1;
@@ -226,7 +225,7 @@ namespace BattleSpace{
 	{
 		BattleResult* Result = (BattleResult*)ob;
 		BaseRole*alive = Result->getAlive();
-		ActObject* aliveOb = alive->getActObject();
+		RoleObject* aliveOb = alive->getRoleObject();
 		const skEffectData* efInfo = alive->getCurrEffect();									//状态性的数据	
 		EffectInfo* effectinfo = DataCenter::sharedData()->getWar()->getEffData()->getEffectInfo(efInfo->getEffectID());	
 		if (!effectinfo)
@@ -239,7 +238,7 @@ namespace BattleSpace{
 		for(vector<unsigned int>::iterator iter = Result->m_HitTargets.begin();iter!=Result->m_HitTargets.end();++iter)
 		{
 			BaseRole* pAlive = Result->m_Alive_s[*iter];
-			ActObject* pAliveOb = pAlive->getActObject();
+			RoleObject* pAliveOb = pAlive->getRoleObject();
 			if ( !pAlive|| !pAliveOb)continue;													
 			EffectObject* SkillEffect = EffectObject::create(ToString(effectinfo->getfoeEft()));									//受击目标播放受击特效
 			SkillEffect->setSkewing(true);
@@ -249,7 +248,7 @@ namespace BattleSpace{
 			//       
 			EffectObject* FloorEffect = EffectObject::create(ToString(effectinfo->getFloorEf()));	//受击目标播放受击特效
 			WarMapData* map = DataCenter::sharedData()->getMap()->getCurrWarMap();
-			CCPoint p = pAlive->getActObject()->getPosition();
+			CCPoint p = pAlive->getRoleObject()->getPosition();
 			CCPoint wp = m_Scene->getWarAliveLayer()->convertToWorldSpace(p);
 			CCPoint mp = m_Scene->getWarMapLayer()->convertToNodeSpace(wp);
 			FloorEffect->setSkewing(true);
@@ -261,7 +260,7 @@ namespace BattleSpace{
 				NOTIFICATION->postNotification(B_Shark,nullptr);
 			if (Result->m_LostHp[*iter].hitNum < 0)													//播放受击动作
 			{
-				pAliveOb->TurnStateTo(Hit_Index); 
+				pAliveOb->TurnStateTo(E_StateCode::eHitState); 
 				if (!alive->getEnemy())
 					NOTIFICATION->postNotification(B_ContinuousNumber);			//刷新连击处理
 			}
@@ -270,7 +269,7 @@ namespace BattleSpace{
 			if (Result->m_Repel[*iter] != pAlive->getGridIndex())
 			{
 				pAlive->setMoveGrid(Result->m_Repel[*iter]);
-				pAliveOb->setMoveState(Hit_Index);
+				pAliveOb->setMoveState(E_StateCode::eHitState);
 			}
 		}
 	}
@@ -279,7 +278,7 @@ namespace BattleSpace{
 	{
 		BattleResult* Result = (BattleResult*)ob;
 		BaseRole*alive = Result->getAlive();
-		ActObject* aliveOb = alive->getActObject();
+		RoleObject* aliveOb = alive->getRoleObject();
 		const skEffectData* efInfo = alive->getCurrEffect();
 		EffectInfo* effectinfo = DataCenter::sharedData()->getWar()->getEffData()->getEffectInfo(efInfo->getEffectID());
 		if (!effectinfo)
@@ -301,7 +300,7 @@ namespace BattleSpace{
 		CCSize size = CCDirector::sharedDirector()->getWinSize();
 		CCNode* SkillEffect = CCNode::create();
 		SkillEffect->setPosition(CCPointZero);
-		ActObject* aliveOb = alive->getActObject();
+		RoleObject* aliveOb = alive->getRoleObject();
 		CCNode* armature = aliveOb->getArmature();
 		EffectObject* crit_eff = EffectObject::create("10031");
 		crit_eff->setPosition(ccp(0,armature->getContentSize().height*0.5f));

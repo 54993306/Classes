@@ -1,7 +1,7 @@
 ﻿
 
 #include "CHeroSoundData.h"
-#include "scene/effect/EffectObject.h"
+#include "Battle/EffectObject.h"
 
 RoleConfig::RoleConfig()
 	:m_ModeID(0),m_MoveSound(542),m_ActionEffectType(0),m_ActionEffectID(0)

@@ -11,11 +11,11 @@ namespace BattleSpace{
 
 	class WarAliveLayer;
 	class WarControl;
-	class ActObject;
+	class RoleObject;
 	class BaseRole;
 	class WarAliveLayer;
 	class WarAliveLayer;
-	class WarScene;
+	class BattleScene;
 
 
 	class WarAssist : public CCObject
@@ -25,7 +25,7 @@ namespace BattleSpace{
 		~WarAssist();
 		virtual bool init();
 		CREATE_FUNC(WarAssist);
-		void setScene(WarScene* scene);
+		void setScene(BattleScene* scene);
 		void DisplayBossWarning(CCObject* ob,int model = 0);
 		void WinEffect(CCObject* ob);
 		void playerMusic(CCObject* ob);
@@ -40,7 +40,7 @@ namespace BattleSpace{
 	private:
 		WarAliveLayer* m_alive;			//用于存储战场的武将层
 		WarControl* m_ui;
-		WarScene* m_scene;
+		BattleScene* m_scene;
 	};
 };
 #endif

@@ -1,22 +1,22 @@
 ﻿#include "WarAssist.h"
-#include "scene/loadWar.h"
+#include "Battle/BattleScene/LoadBattleResource.h"
 #include "tools/ToolDefine.h"
 #include "common/CommonFunction.h"
 #include "tools/commonDef.h"
 #include "common/color.h"
 #include "tools/CCShake.h"
 #include "model/DataCenter.h"
-#include "scene/alive/ActObject.h"
+#include "Battle/RoleObject/RoleObject.h"
 #include "scene/layer/WarAliveLayer.h"
 #include "warscene/WarControl.h"
 #include "tools/ToolDefine.h"
 #include "Battle/BaseRole.h"
-#include "scene/alive/RageObject.h"
-#include "scene/effect/EffectObject.h"
-#include "scene/WarScene.h"
+#include "Battle/RoleObject/RageObject.h"
+#include "Battle/EffectObject.h"
+#include "Battle/BattleScene/BattleScene.h"
 #include "cctk/scenemanager.h"
 #include "warscene/ConstNum.h"
-#include "scene/alive/HPObject.h"
+#include "Battle/RoleObject/HPObject.h"
 #include "model/WarManager.h"
 #include "warscene/ComBatLogic.h"
 #include "common/CGameSound.h"
@@ -43,7 +43,7 @@ bool WarAssist::init()
 	return true;
 }
 
-void WarAssist::setScene(WarScene* scene)
+void WarAssist::setScene(BattleScene* scene)
 {
 	m_scene = scene;
 	m_ui = scene->getWarUI();
@@ -330,9 +330,9 @@ void WarAssist::ActStandExcute( CCArray* arr )
 		CCObject* obj= nullptr;
 		CCARRAY_FOREACH(arr,obj)
 		{
-			ActObject* act = (ActObject*)obj;
-			act->setMoveState(0);
-			act->TurnStateTo(Stand_Index);
+			RoleObject* act = (RoleObject*)obj;
+			act->setMoveState(E_StateCode::eNullState);
+			act->TurnStateTo(E_StateCode::eStandState);
 		}
 	}
 }

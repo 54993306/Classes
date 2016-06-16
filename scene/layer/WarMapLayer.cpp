@@ -3,13 +3,13 @@
 #include "tools/ToolDefine.h"
 #include "common/CommonFunction.h"
 #include "warscene/ConstNum.h"
-#include "scene/alive/ActObject.h"
+#include "Battle/RoleObject/RoleObject.h"
 #include "tools/commonDef.h"
 #include "Battle/BaseRole.h"
 #include "warscene/SkillRange.h"
 #include "scene/layer/WarAliveLayer.h"
 #include "warscene/MoveRule.h"
-#include "scene/effect/EffectObject.h"
+#include "Battle/EffectObject.h"
 #include "Global.h"
 #include "tools/CCShake.h"
 #include "model/WarManager.h"
@@ -256,7 +256,7 @@ namespace BattleSpace{
 	//in map draw skill effect
 	void WarMapLayer::DrawAtkEffect(CCObject* ob)
 	{
-		ActObject* act = (ActObject*)ob;
+		RoleObject* act = (RoleObject*)ob;
 		BaseRole* alive = act->getAlive();
 		for (auto i:alive->mSkillArea)
 		{

@@ -22,7 +22,7 @@
 #include "update/CDownloadPackage.h"
 #include "ApplicationDefine.h"
 #include "scene/AnimationManager.h"
-#include "scene/effect/EffectObject.h"
+#include "Battle/EffectObject.h"
 #include "Resources.h"
 #include "ApplicationDefine.h"
 #include "common/RollLabel.h"

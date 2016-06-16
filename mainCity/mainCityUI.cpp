@@ -23,7 +23,7 @@
 #include "mainCity/BuyResource.h"
 #include "activity/ActivityLayer.h"
 #include "tollgate/TollgatePreview.h"
-#include "scene/loadWar.h"
+#include "Battle/BattleScene/LoadBattleResource.h"
 #include "model/WarManager.h"
 #include "scene/AnimationManager.h"
 #include "common/CGameSound.h"

@@ -8,7 +8,7 @@
 #include "model/WarManager.h"
 #include "model/MapManager.h"
 #include <functional>					//sort 的降序排序使用
-#include "scene/alive/AliveDefine.h"
+#include "Battle/RoleObject/RoleObject.h"
 #include "warscene/BattleTools.h"
 #include "Battle/AreaCount.h"
 #include "Battle/RoleSkill.h"

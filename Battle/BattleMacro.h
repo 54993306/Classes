@@ -18,7 +18,7 @@ protected: varType varName;\
 public: virtual varType get##funName(void) const { return varName; }\
 public: virtual void set##funName(varType var);
 
-#define CREATE_UNINIT(__TYPE__) \
+#define UNINITCREATE(__TYPE__) \
 	static __TYPE__* create() \
 { \
 	__TYPE__ *pRet = new __TYPE__(); \

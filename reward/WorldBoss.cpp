@@ -8,10 +8,10 @@
 #include "model/DataCenter.h"
 #include "model/WarManager.h"
 #include "mainCity/MainCityControl.h"
-#include "scene/effect/EffectObject.h"
+#include "Battle/EffectObject.h"
 #include "warscene/ArmatureEventDataMgr.h"
 #include "tools/CCShake.h"
-#include "scene/alive/ActionDef.h"
+#include "Battle/ActionNameDefine.h"
 using namespace BattleSpace;
 CWorldBoss::CWorldBoss():
 m_ui(nullptr),m_pBossLayer(nullptr), m_pRuleLayer(nullptr),m_pShopLayer(nullptr),m_iType(WorldBossTabNull)

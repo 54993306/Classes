@@ -13,7 +13,7 @@
 #include "Battle/BaseRole.h"
 #include "warscene/EffectData.h"
 #include "tollgate/Chapter.h"
-#include "scene/alive/AliveDefine.h"
+#include "Battle/RoleObject/RoleObject.h"
 #include "warscene/CaptainSkill.h"
 #include "TerrainManager.h"
 #include "warscene/MoveRule.h"
@@ -313,7 +313,7 @@ namespace BattleSpace{
 		for(Members::iterator iter = mBattleRole.begin(); iter != mBattleRole.end();++iter)
 		{
 			BaseRole* tAlive = iter->second;
-			if (tAlive->getHp() <= 0||!tAlive->getBattle()||!tAlive->getActObject())
+			if (tAlive->getHp() <= 0||!tAlive->getBattle()||!tAlive->getRoleObject())
 				continue;
 			if (tAlive->getEnemy())
 			{
@@ -343,7 +343,7 @@ namespace BattleSpace{
 		mBattleOver = false;
 		mStoryData->initStoryData(m_StageID);
 
-		CScene* scene = GETSCENE(LoadWar);
+		CScene* scene = GETSCENE(LoadBattleResource);
 		LayerManager::instance()->closeAll();
 		CSceneManager::sharedSceneManager()->replaceScene(scene);
 	}
@@ -427,7 +427,7 @@ namespace BattleSpace{
 			pRole->SkillActionAndEffect(tInfo->getActionID(),tInfo->getusEft());
 		}else{
 			CCLOG("[ *ERROR ] WarManager::initRoleSkillInfo");
-			pRole->SkillActionAndEffect(Stand_Index,0);
+			pRole->SkillActionAndEffect(1,0);
 		}
 	}
 

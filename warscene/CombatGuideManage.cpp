@@ -1,7 +1,7 @@
 ﻿#include "CombatGuideManage.h"
 #include "CombatGuideData.h"
 #include "CombatGuideLayer.h"
-#include "scene/WarScene.h"
+#include "Battle/BattleScene/BattleScene.h"
 #include "scene/layer/WarAliveLayer.h"
 #include "warscene/ConstNum.h"
 #include "common/CGameSound.h"

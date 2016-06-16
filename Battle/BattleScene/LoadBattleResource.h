@@ -1,7 +1,7 @@
 ﻿#ifndef _LOADWAR_SCENE_H_
 #define _LOADWAR_SCENE_H_
 #include "AppUI.h"
-#include "LoadScene.h"
+#include "scene/LoadScene.h"
 /************************************************************************/
 /*                           
 						预加载战斗资源//  [10/30/2014 xc_lin]
@@ -41,12 +41,12 @@ namespace BattleSpace{
 	class BaseRoleData;
 	class WarManager;
 	class LoadSpineData;
-	class LoadWar : public CScene
+	class LoadBattleResource : public CScene
 	{
 	public:
-		LoadWar();
-		~LoadWar();
-		DEFINE_SCENE_CLASS(LoadWar);
+		LoadBattleResource();
+		~LoadBattleResource();
+		DEFINE_SCENE_CLASS(LoadBattleResource);
 		virtual void onCreate();
 		virtual void onEnter();
 		virtual void onExit();

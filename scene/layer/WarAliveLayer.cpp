@@ -8,15 +8,15 @@
 #include "warscene/SkillRange.h"
 #include "tools/commonDef.h"
 #include "common/color.h"
-#include "scene/alive/AliveDefine.h"
+#include "Battle/RoleObject/RoleObject.h"
 #include "warscene/MoveRule.h"
-#include "scene/effect/EffectObject.h"
+#include "Battle/EffectObject.h"
 #include "tools/CCShake.h"
 #include "model/WarManager.h"
 #include "model/MapManager.h"
 #include "warscene/CombatGuideManage.h"
 #include "warscene/CombatGuideData.h"
-#include "scene/WarScene.h"
+#include "Battle/BattleScene/BattleScene.h"
 #include "tools/ShowTexttip.h"
 #include "warscene/ComBatLogic.h"
 #include "warscene/SkillRange.h"
@@ -83,7 +83,7 @@ namespace BattleSpace{
 	{
 		BaseRole* alive = BaseRole::create();
 		alive->retain();
-		m_MoveActObject = ActObject::create();
+		m_MoveActObject = RoleObject::create();
 		m_MoveActObject->setAlive(alive);
 		m_MoveActObject->setVisible(false);
 		addChild(m_MoveActObject); 
@@ -110,7 +110,7 @@ namespace BattleSpace{
 		initActobject(m_Manage->getAliveByGrid(C_CAPTAINSTAND));
 	}
 
-	void WarAliveLayer::AliveObEffect(ActObject* aliveOb,int createType/*=DefaultCreat*/)
+	void WarAliveLayer::AliveObEffect(RoleObject* aliveOb,int createType/*=DefaultCreat*/)
 	{
 		switch (createType)
 		{
@@ -130,7 +130,7 @@ namespace BattleSpace{
 		}
 	}
 
-	void WarAliveLayer::AddActToGrid(ActObject* pAliveOb,int grid)
+	void WarAliveLayer::AddActToGrid(RoleObject* pAliveOb,int grid)
 	{
 		BaseRole* alive = pAliveOb->getAlive();
 		if (alive->getDelaytime()>0)grid = 0;
@@ -149,12 +149,12 @@ namespace BattleSpace{
 	//绘制战场武将
 	void WarAliveLayer::initActobject(BaseRole* alive,int createType)
 	{
-		if (alive->getActObject())
+		if (alive->getRoleObject())
 		{
 			CCLOG("[ *TIPS ] WarAliveLayer::createAlive alive Actobject Repeat");
 			return;
 		}
-		ActObject* aliveOb = ActObject::create();							//创建显示的对象
+		RoleObject* aliveOb = RoleObject::create();							//创建显示的对象
 		aliveOb->setAlive(alive);											//显示对象与逻辑对象绑定
 		alive->setRoleLayer(this);
 		AliveObEffect(aliveOb,createType);
@@ -176,7 +176,7 @@ namespace BattleSpace{
 		CCObject* object;
 		CCARRAY_FOREACH(arr,object)
 		{
-			ActObject* act = dynamic_cast<ActObject*>(object);
+			RoleObject* act = dynamic_cast<RoleObject*>(object);
 			if(!act || object == m_MoveActObject) continue;
 			int zorder = -act->getPositionY();
 			if(act->getParent()) 
@@ -195,7 +195,7 @@ namespace BattleSpace{
 		m_TouchAliveBtn = true;
 	}
 
-	void WarAliveLayer::initMoveActObject( ActObject* aliveOb )
+	void WarAliveLayer::initMoveActObject( RoleObject* aliveOb )
 	{
 		if (m_MoveActObject->getModel() != aliveOb->getModel())
 		{
@@ -224,7 +224,7 @@ namespace BattleSpace{
 		CCObject* obj = nullptr;
 		CCARRAY_FOREACH(ob_Arr,obj)
 		{
-			ActObject* act = (ActObject*)obj;
+			RoleObject* act = (RoleObject*)obj;
 			BaseRole* t_alive = act->getAlive();	
 			if (t_alive->getCaptain())continue;
 			setEnableRecursiveCascading(act->getArmature(),true,ccc3(255,255,255),255);
@@ -236,9 +236,9 @@ namespace BattleSpace{
 	void WarAliveLayer::initTouchAlive(BaseRole* alive)
 	{
 		m_TouchAlive = alive;
-		ActObject* aliveOb = alive->getActObject();										//指针复制，复制被触摸武将
+		RoleObject* aliveOb = alive->getRoleObject();										//指针复制，复制被触摸武将
 		alive->setTouchGrid(alive->getGridIndex());
-		aliveOb->getHp()->setVisible(true);
+		aliveOb->showThis();
 		NOTIFICATION->postNotification(B_RoleAttackCostArea, alive);
 		initMoveActObject(aliveOb);
 		if (!alive->getBattle())								//上阵武将才做透明处理
@@ -304,11 +304,8 @@ namespace BattleSpace{
 	{
 		if (!m_TouchAlive)
 			return;
-		if (m_TouchAlive->getActObject())
-		{
-			m_TouchAlive->getActObject()->setVisible(true);
-			m_TouchAlive->getActObject()->getHp()->showHp(nullptr);
-		}
+		if (m_TouchAlive->getRoleObject())
+			m_TouchAlive->getRoleObject()->showThis();
 		lucencyActObject(false);
 		m_MoveActObject->setVisible(false);
 		NOTIFICATION->postNotification(B_CancelCostArea,nullptr);
@@ -345,7 +342,7 @@ namespace BattleSpace{
 		CCArray* arrAlive = CCArray::create();
 		for(int i = 0; i < int(arr->count());++i)
 		{
-			ActObject* aliveOb = dynamic_cast<ActObject*>(arr->objectAtIndex(i));
+			RoleObject* aliveOb = dynamic_cast<RoleObject*>(arr->objectAtIndex(i));
 			if(!aliveOb || aliveOb == m_MoveActObject) 
 				continue;
 			if (AliveType == AliveType_All)
@@ -376,7 +373,7 @@ namespace BattleSpace{
 		CCObject* obj = nullptr;
 		CCARRAY_FOREACH(arr,obj)
 		{
-			ActObject* act = (ActObject*)obj;
+			RoleObject* act = (RoleObject*)obj;
 			act->setUserObject(nullptr);
 		}
 	}
@@ -387,8 +384,8 @@ namespace BattleSpace{
 		CCObject* obj = nullptr;
 		CCARRAY_FOREACH(arr,obj)
 		{
-			ActObject* act = (ActObject*)obj;
-			act->TurnStateTo(victory_Index);
+			RoleObject* act = (RoleObject*)obj;
+			act->TurnStateTo(E_StateCode::eVictoryState);
 		}
 	}
 
@@ -406,8 +403,9 @@ namespace BattleSpace{
 
 	void WarAliveLayer::roleWantIntoBattle( BaseRole* pRole )
 	{
-		AliveObEffect(pRole->getActObject());
-		AddActToGrid(pRole->getActObject(),pRole->getGridIndex());
+		AliveObEffect(pRole->getRoleObject());
+		AddActToGrid(pRole->getRoleObject(),pRole->getGridIndex());
+		pRole->roleIntoBattle();
 	}
 
 	void WarAliveLayer::changeLight( bool pLight )

@@ -20,7 +20,7 @@
 #include "scene/LoadScene.h"
 #include "scene/LoginScene.h"
 #include "scene/LogoScene.h"
-#include "scene/WarScene.h"
+#include "Battle/BattleScene/BattleScene.h"
 #include "scene/AnimationManager.h"
 #include "scene/SelectHeroScene.h"
 #include "scene/CityScene.h"
@@ -28,7 +28,7 @@
 #include "bag/BagScene.h"
 #include "scene/layer/WaitLayer.h"
 #include "scene/layer/GameTip.h"
-#include "scene/loadWar.h"
+#include "Battle/BattleScene/LoadBattleResource.h"
 
 USING_NS_CC;
 using namespace CocosDenshion;
@@ -84,8 +84,8 @@ bool AppDelegate::applicationDidFinishLaunching()
 	REGISTE_SCENE_CLASS(LogoScene);
 	REGISTE_SCENE_CLASS(LoadScene);
 	REGISTE_SCENE_CLASS(LoginScene);
-	REGISTE_SCENE_CLASS(WarScene);
-	REGISTE_SCENE_CLASS(LoadWar);
+	REGISTE_SCENE_CLASS(BattleScene);
+	REGISTE_SCENE_CLASS(LoadBattleResource);
 	REGISTE_SCENE_CLASS(SelectHeroScene);
 	REGISTE_POPUPBOX_CLASS(WaitLayer);
 	REGISTE_SCENE_CLASS(CMainScene);

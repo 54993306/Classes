@@ -4,7 +4,6 @@
 #include "netcontrol/CPlayerControl.h"
 #include "scene/layer/LayerManager.h"
 #include "model/DataCenter.h"
-#include "scene/alive/ActObject.h"
 #include "GMessage.h"
 
 #include "common/color.h"

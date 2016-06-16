@@ -22,7 +22,7 @@ namespace BattleSpace
 	public:
 		AffectFront(){};
 		virtual ~AffectFront(){};
-		CREATE_UNINIT(AffectFront);
+		UNINITCREATE(AffectFront);
 		virtual AffectType getAreaType();
 		virtual void initArea(AreaCountInfo& pInfo);
 	};
@@ -35,7 +35,7 @@ namespace BattleSpace
 	public:
 		AffectPuncture(){};
 		virtual ~AffectPuncture(){};
-		CREATE_UNINIT(AffectPuncture);
+		UNINITCREATE(AffectPuncture);
 		virtual AffectType getAreaType();
 		virtual void initArea(AreaCountInfo& pInfo);
 	};

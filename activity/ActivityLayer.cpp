@@ -10,7 +10,7 @@
 #include "reward/RewardLayer.h"
 #include "mainCity/Recruit.h"
 #include "scene/AnimationManager.h"
-#include "scene/effect/EffectObject.h"
+#include "Battle/EffectObject.h"
 #include "common/CommonFunction.h"
 #include "common/CheckMoney.h"
 #include "common/CShowToBuyResource.h"

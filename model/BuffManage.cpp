@@ -2,7 +2,9 @@
 #include "Global.h"
 #include "Battle/BaseRole.h"
 #include "DataCenter.h"
-#include "scene/alive/AliveDefine.h"
+#include "Battle/RoleObject/HPObject.h"
+#include "Battle/BaseRole.h"
+#include "Battle/RoleObject/RoleObject.h"
 #include "warscene/ConstNum.h"
 #include "Battle/BattleMessage.h"
 #include "Battle/BaseRoleData.h"
@@ -62,7 +64,7 @@ namespace BattleSpace{
 
 	void BuffManage::AddBuff(BuffData& buf)
 	{
-		if (m_alive->getHp()<=0||!m_alive->getBattle()||!m_alive->getActObject())
+		if (m_alive->getHp()<=0||!m_alive->getBattle()||!m_alive->getRoleObject())
 		{
 			CCLOG("[ TIPS ] BuffManage::AddBuff Add Faild");
 			return;											//统一的做安全性判断处理
@@ -80,7 +82,7 @@ namespace BattleSpace{
 		ExcuteBuff(tBuffinfo);									//执行buff逻辑
 		m_BuffMap[tBuffinfo->getBuffID()] = tBuffinfo;			//map添加信息的方法	
 		if (m_alive->getHp()<=0)
-			m_alive->getActObject()->AliveDie();
+			m_alive->getRoleObject()->AliveDie();
 		CCLOG("[ Tips ] BuffManage::AddBuff succeed bufID = %d",buf.getBuffID());
 		NOTIFICATION->postNotification(B_AddBuff,m_alive);
 	}
@@ -161,7 +163,7 @@ namespace BattleSpace{
 		for (auto i:RemoveFirst)					//执行移除操作
 			removeBuf(i);
 		if (m_alive->getHp()<=0)
-			m_alive->getActObject()->AliveDie();
+			m_alive->getRoleObject()->AliveDie();
 	}
 
 	//返回true表示不添加新Buf
@@ -230,9 +232,9 @@ namespace BattleSpace{
 				NOTIFICATION->postNotification(B_UpdateBuffEffect,m_alive);				//每次加减血时显示一次buff的特效
 				if (bfinfo->getIsDBuff())
 				{			
-					m_alive->getActObject()->playerNum(num,generalType);
+					m_alive->getRoleObject()->playerNum(num,generalType);
 				}else{
-					m_alive->getActObject()->playerNum(num,gainType);
+					m_alive->getRoleObject()->playerNum(num,gainType);
 				}
 			}break;
 		case BUFFTYPE::ATK:{

@@ -3,7 +3,7 @@
 #include "tools/FileUtils.h"
 #include "scene/AnimationManager.h"
 #include "scene/layer/WarMapLayer.h"
-#include "scene/effect/EffectObject.h"
+#include "Battle/EffectObject.h"
 namespace BattleSpace{
 	MapEffectData::MapEffectData()
 		:m_type(0),m_x(0),m_y(0),m_EffectID(0),m_AnchorPointx(0),m_AnchorPointy(0),m_scale(1){}

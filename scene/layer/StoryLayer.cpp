@@ -1,6 +1,6 @@
 ﻿#include "StoryLayer.h"
 #include "Global.h"
-#include "scene/WarScene.h"
+#include "Battle/BattleScene/BattleScene.h"
 #include "tools/ToolDefine.h"
 #include "model/DataCenter.h"
 #include "model/WarManager.h"

@@ -23,7 +23,7 @@ namespace BattleSpace
 	public:
 		AffectMapCenterTwoLine(){};
 		virtual ~AffectMapCenterTwoLine(){};
-		CREATE_UNINIT(AffectMapCenterTwoLine);
+		UNINITCREATE(AffectMapCenterTwoLine);
 		virtual AffectType getAreaType();
 		virtual void initArea(AreaCountInfo &pInfo);
 		
@@ -37,7 +37,7 @@ namespace BattleSpace
 	public:
 		AffectMapAnyDoubleLine(){};
 		virtual ~AffectMapAnyDoubleLine(){};
-		CREATE_UNINIT(AffectMapAnyDoubleLine);
+		UNINITCREATE(AffectMapAnyDoubleLine);
 		virtual AffectType getAreaType();
 		virtual void initArea(AreaCountInfo &pInfo);
 

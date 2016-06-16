@@ -1,5 +1,5 @@
 ﻿#include "DropItem.h"
-#include "scene/alive/AliveDefine.h"
+#include "Battle/RoleObject/RoleObject.h"
 #include "model/WarManager.h"
 #include "common/CommonFunction.h"
 #include "common/ProgressLabel.h"

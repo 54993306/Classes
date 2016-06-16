@@ -3,7 +3,6 @@
 #include "net/CNetClient.h"
 #include "scene/layer/LayerManager.h"
 #include "model/DataCenter.h"
-#include "scene/alive/ActObject.h"
 #include "tools/UICloneMgr.h"
 #include "netcontrol/CPlayerControl.h"
 #include "HeroControl.h"

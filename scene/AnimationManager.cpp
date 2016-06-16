@@ -1,9 +1,10 @@
 ﻿#include "AnimationManager.h"
-#include "alive/AliveDefine.h"
+#include "Battle/RoleObject/RoleObject.h"
 #include "tools/ToolDefine.h"
 #include "model/DataCenter.h"
 #include "model/WarManager.h"
 #include "warscene/EffectData.h"
+#include "Battle/ActionNameDefine.h"
 #define MAX_EFFECT_FRAME 40
 #define MAX_ACTION_FRAME 20
 namespace BattleSpace{

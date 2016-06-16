@@ -3,16 +3,14 @@
 #include "model/DataCenter.h"
 #include "model/WarManager.h"
 #include "model/MapManager.h"
-#include "scene/alive/AliveDefine.h"
+#include "Battle/RoleObject/RoleObject.h"
 #include "scene/layer/WarMapLayer.h"
 #include "scene/layer/WarAliveLayer.h"
 #include "CombatGuideData.h"
 #include "CombatGuideManage.h"
 #include "warscene/ConstNum.h"
-#include "scene/WarScene.h"
+#include "Battle/BattleScene/BattleScene.h"
 #include "WarControl.h"
-#include "scene/WarScene.h"
-#include <string>
 #include "common/CommonFunction.h"
 #include "Battle/LoadSpineData.h"
 #include "Battle/BattleMessage.h"
@@ -55,7 +53,7 @@ namespace BattleSpace{
 		return true;
 	}
 
-	void CombatGuideLayer::initScene( WarScene*scene )
+	void CombatGuideLayer::initScene( BattleScene*scene )
 	{
 		m_Scene = scene;
 		m_mapData = DataCenter::sharedData()->getMap()->getCurrWarMap();
@@ -313,7 +311,7 @@ namespace BattleSpace{
 		CCSprite* arrows = CCSprite::create("public/guide/arrows.png"); 
 		arrows->setAnchorPoint(ccp(0.8f,0.5f));
 		BaseRole* alive = DataCenter::sharedData()->getWar()->getAliveByGrid(C_CAPTAINSTAND);
-		CCPoint p = alive->getActObject()->getPosition();									//得到点阵图坐标
+		CCPoint p = alive->getRoleObject()->getPosition();									//得到点阵图坐标
 		CCPoint point(p.x-GRID_WIDTH,p.y+GRID_HEIGHT);										//得到偏移坐标
 		CCPoint point_offset = m_root->convertToNodeSpace(m_AliveLayer->convertToWorldSpace(point));					//在warAliveLayer上的点都会默认减去地图的一半,因此直接转化世界坐标就可以，因为m_root的关系，这里还是转为相对坐标
 		arrows->setPosition(point_offset);
@@ -333,7 +331,7 @@ namespace BattleSpace{
 					continue;
 				alive->initAliveData();
 				m_AliveLayer->initActobject(alive);
-				alive->getActObject()->setActMoveGrid(compel.grid);
+				alive->getRoleObject()->setActMoveGrid(compel.grid);
 				break;
 			}
 		}
@@ -355,17 +353,17 @@ namespace BattleSpace{
 			if (alive->getCaptain())														//重置我方数据
 				continue;
 			VecAlive.push_back(alive);
-			if (alive->getHp()<=0||!alive->getBattle()||!alive->getActObject())
+			if (alive->getHp()<=0||!alive->getBattle()||!alive->getRoleObject())
 				continue;
 			CCPoint p = m_mapData->getPoint(INVALID_GRID);
 			if (alive->getMoveObject())
 				alive->getMoveObject()->setPosition(p);										//可重构点,这些操作都应该封装在武将的内部执行的
-			alive->getActObject()->setPosition(p);											//在视野外进行死亡处理
+			alive->getRoleObject()->setPosition(p);											//在视野外进行死亡处理
 			if (!alive->getEnemy()&&alive->getCriAtk())
 				NOTIFICATION->postNotification(B_CritEnd,alive);
-			alive->getActObject()->AliveDie();
-			alive->getActObject()->setReset(true);
-			alive->setActObject(nullptr);
+			alive->getRoleObject()->AliveDie();
+			alive->getRoleObject()->setReset(true);
+			alive->setRoleObject(nullptr);
 		}
 		creaAliveByVector(VecAlive,step);
 	}

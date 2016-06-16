@@ -20,7 +20,7 @@ class CSpecialProgress;
 
 namespace BattleSpace{
 	class BaseRole;
-	class WarScene;
+	class BattleScene;
 	class WarManager;
 	class WarControl : public BaseLayer
 	{

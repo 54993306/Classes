@@ -28,10 +28,10 @@ namespace BattleSpace{
 	class MonsterData;
 	class BufExp;
 	class MoveRule;
-	class WarScene; 
+	class BattleScene; 
 	class BaseRole;
 	class WarAssist;
-	class ActObject;
+	class RoleObject;
 	class HurtCount;
 	class TerrainExp;
 	class WarControl;
@@ -116,7 +116,7 @@ namespace BattleSpace{
 		float m_fCurrentCostAdd;		//当前cost变化速度
 		BaseRole* m_Alive;				//存储释放技能的武将信息
 		BufExp* m_bufExp;
-		WarScene* m_Scene;
+		BattleScene* m_Scene;
 		TerrainExp* m_terExp;
 		WarMapData* m_MapData;
 		WarManager* m_Manage;

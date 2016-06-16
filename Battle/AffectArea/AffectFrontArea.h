@@ -23,7 +23,7 @@ namespace BattleSpace
 	public:
 		AffectFrontSingle(){};
 		virtual ~AffectFrontSingle(){};
-		CREATE_UNINIT(AffectFrontSingle);
+		UNINITCREATE(AffectFrontSingle);
 		virtual AffectType getAreaType();
 		virtual void initArea(AreaCountInfo &pInfo);
 	};
@@ -36,7 +36,7 @@ namespace BattleSpace
 	public:
 		AffectFrontDisperse(){};
 		virtual ~AffectFrontDisperse(){};
-		CREATE_UNINIT(AffectFrontDisperse);
+		UNINITCREATE(AffectFrontDisperse);
 		virtual AffectType getAreaType();
 		virtual void initArea(AreaCountInfo &pInfo);
 
@@ -50,7 +50,7 @@ namespace BattleSpace
 	public:
 		AffectFrontRow(){};
 		virtual ~AffectFrontRow(){};
-		CREATE_UNINIT(AffectFrontRow);
+		UNINITCREATE(AffectFrontRow);
 		virtual AffectType getAreaType();
 		virtual void initArea(AreaCountInfo &pInfo);
 		

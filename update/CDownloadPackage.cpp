@@ -4,7 +4,7 @@
 #include "scene/AnimationManager.h"
 #include "UserDefaultData.h"
 #include "CUpdateData.h"
-#include "scene/loadWar.h"
+#include "Battle/BattleScene/LoadBattleResource.h"
 #include "ApplicationDefine.h"
 
 #if (CC_TARGET_PLATFORM != CC_PLATFORM_WIN32)

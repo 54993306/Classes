@@ -1,5 +1,5 @@
 #include "WarFailLayer.h"
-#include "scene/loadWar.h"
+#include "Battle/BattleScene/LoadBattleResource.h"
 #include "warscene/WarAssist.h"
 #include "tools/CCShake.h"
 #include "model/DataCenter.h"
@@ -185,8 +185,8 @@ void WarFailLayer::onExitWithMode(CCNode* pSender)
 	if(isOpen)
 	{
 		DataCenter::sharedData()->setCityActionType((CityActionType)iTag);
-		CScene* scene = GETSCENE(LoadWar);
-		((LoadWar*)scene)->setRelease(true,SkipcityScene);
+		CScene* scene = GETSCENE(LoadBattleResource);
+		((LoadBattleResource*)scene)->setRelease(true,SkipcityScene);
 		CSceneManager::sharedSceneManager()->replaceScene(scene);
 	}
 	else
@@ -222,8 +222,8 @@ void WarFailLayer::onExitWait(CCNode *pSender){
 		DataCenter::sharedData()->setCityActionType(CA_GoToReward);		
 	}
 
-	CScene* scene = GETSCENE(LoadWar);
-	((LoadWar*)scene)->setRelease(true,SkipcityScene);
+	CScene* scene = GETSCENE(LoadBattleResource);
+	((LoadBattleResource*)scene)->setRelease(true,SkipcityScene);
 	CSceneManager::sharedSceneManager()->replaceScene(scene);
 }
 

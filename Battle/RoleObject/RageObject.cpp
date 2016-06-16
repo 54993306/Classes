@@ -1,8 +1,8 @@
-#include "RageObject.h"
-#include "ActObject.h"
+#include "Battle/RoleObject/RageObject.h"
+#include "Battle/RoleObject/RoleObject.h"
 #include "warscene/ConstNum.h"
 #include "common/color.h"
-#include "scene/alive/HPObject.h"
+#include "Battle/RoleObject/HPObject.h"
 #include "model/DataCenter.h"
 #include "Battle/BaseRole.h"
 namespace BattleSpace{
@@ -119,7 +119,7 @@ namespace BattleSpace{
 	{
 		if (!ob)return;
 		CCArray*arr = (CCArray*)ob;
-		ActObject* aliveOb = (ActObject*)arr->objectAtIndex(0);
+		RoleObject* aliveOb = (RoleObject*)arr->objectAtIndex(0);
 		CCInteger* killNum = (CCInteger*)arr->objectAtIndex(1);
 		string str = "label/blue.png";
 		if (aliveOb->getEnemy())str = "label/purple.png";

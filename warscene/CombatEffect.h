@@ -11,7 +11,7 @@ using namespace spine;
 class CPlayerSkillData;
 
 namespace BattleSpace{
-	class WarScene;
+	class BattleScene;
 	class BaseRole;
 	class CombatEffect : public CCObject
 	{
@@ -27,7 +27,7 @@ namespace BattleSpace{
 		void SkillEfHandleForEnemy(CCObject* ob);
 		void skillShowCallBack(CCObject* ob);
 		void BattleEffect(CCObject* ob);
-		void setScene(WarScene* scene);
+		void setScene(BattleScene* scene);
 		void armatureMovementEventCallFunc(CCArmature * pArmature, MovementEventType type, const char *data);
 		void SpineActionEnd(int trackIndex);
 		void SpineActionEvent(int trackIndex, spEvent* pEvent);
@@ -36,7 +36,7 @@ namespace BattleSpace{
 		float CountAliveAtk();
 		CC_SYNTHESIZE(int, m_PlayerNum, PlayerNum);
 	private:
-		WarScene* m_Scene;
+		BattleScene* m_Scene;
 		CCArmature* _armaturePlayerSkill;
 		SkeletonAnimation* m_skeletonNode;
 		CPlayerSkillData* _playerSkillData;

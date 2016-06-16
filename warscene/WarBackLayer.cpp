@@ -1,8 +1,8 @@
 ﻿#include "WarBackLayer.h"
 #include "scene/CPopTip.h"
-#include "scene/WarScene.h"
+#include "Battle/BattleScene/BattleScene.h"
 #include "model/DataCenter.h"
-#include "scene/loadWar.h"
+#include "Battle/BattleScene/LoadBattleResource.h"
 #include "netcontrol/CPlayerControl.h"
 #include "model/DataCenter.h"
 #include "model/WarManager.h"
@@ -124,14 +124,14 @@ void WarBackLayer::returnCity(CCObject* ob)
 		}
 
 		
-		WarScene* Wscene = (WarScene*)this->getParent();
-		CScene* scene = GETSCENE(LoadWar);
+		BattleScene* Wscene = (BattleScene*)this->getParent();
+		CScene* scene = GETSCENE(LoadBattleResource);
 		if (DataCenter::sharedData()->getWar()->getStageID())
 		{
-			((LoadWar*)scene)->setRelease(true,SkipcityScene);
+			((LoadBattleResource*)scene)->setRelease(true,SkipcityScene);
 			CPlayerControl::getInstance().sendBattleFinish(2,false,0);
 		}else{
-			((LoadWar*)scene)->setRelease(true,SkipLoginScene);
+			((LoadBattleResource*)scene)->setRelease(true,SkipLoginScene);
 		}
 		CSceneManager::sharedSceneManager()->replaceScene(scene);
 

@@ -45,7 +45,7 @@ void CPanelTips::onEnter()
 	CCArmature* pArmature = CCArmature::create("8021");
 	pArmature->setPosition(pNode->getPosition());
 	//pArmature->setScale(0.9f);
-	pArmature->getAnimation()->playByIndex(0);
+	pArmature->getAnimation()->playWithIndex(0);
 	m_ui->addChild(pArmature, -1);
 }
 

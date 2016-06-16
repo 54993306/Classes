@@ -6,7 +6,7 @@
 #include "netcontrol/CPlayerControl.h"
 #include "tools/ShowTexttip.h"
 #include "common/CommonFunction.h"
-#include "scene/alive/ActionDef.h"
+#include "Battle/ActionNameDefine.h"
 #include "friend/FriendLayer.h"
 #include "common/CGameSound.h"
 #include "Resources.h"

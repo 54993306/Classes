@@ -19,7 +19,7 @@
 #include "shop/ShopLayer.h"
 #include "task/TaskControl.h"
 
-#include "scene/loadWar.h"
+#include "Battle/BattleScene/LoadBattleResource.h"
 #include "common/CGameSound.h"
 #include "common/CommonFunction.h"
 #include "rank/RankLayer.h"

@@ -7,7 +7,7 @@
 */
 /************************************************************************/
 namespace BattleSpace{
-	class ActObject;
+	class RoleObject;
 	class BaseRole;
 	class terRound;
 
@@ -20,7 +20,7 @@ namespace BattleSpace{
 		CREATE_FUNC(TerrainExp);
 		void playerTerrainEffect(CCObject* ob);
 		float DataHandle(BaseRole* alive,float time , terRound* round,CCArray* m_task);		//对数据进行二次处理调试数据在此处进行
-		float StateHandle(ActObject* aliveOb,BaseRole* alive,float sysTime ,float lostHp ,float currHp,CCArray* m_task);	//所有的类似的对象都应该是这样的两个函数
+		float StateHandle(RoleObject* aliveOb,BaseRole* alive,float sysTime ,float lostHp ,float currHp,CCArray* m_task);	//所有的类似的对象都应该是这样的两个函数
 	private:
 
 	};

@@ -8,7 +8,7 @@ namespace BattleSpace{
 			iter->second->release();
 		m_MapCodeState.clear();
 	}
-	State* StateManager::getStateInstance(int stateCode )//根据code返回状态对象
+	State* StateManager::getStateInstance(E_StateCode stateCode )//根据code返回状态对象
 	{
 		do{
 			CodeState::iterator iter = m_MapCodeState.find(stateCode);
@@ -17,7 +17,7 @@ namespace BattleSpace{
 		} while (0);
 		return nullptr;
 	}
-	bool StateManager::isInTransitionVec(StateMachine* self,int currentState,int targetState )
+	bool StateManager::isInTransitionVec(StateMachine* self,E_StateCode currentState,E_StateCode targetState )
 	{
 		//当前状态传入状态机中得到可切换的状态list判断目标状态是否存在list中
 		StateVector list = getTransitionVec(self,currentState);
@@ -31,7 +31,7 @@ namespace BattleSpace{
 		return false;
 	}
 	//得到当前状态下可切换的状态vector
-	StateVector StateManager::getTransitionVec(StateMachine* self,int stateCode )
+	StateVector StateManager::getTransitionVec(StateMachine* self,E_StateCode stateCode )
 	{
 		return self->getTransition()->getCurrentStateTransitionVec(stateCode);		
 	}
@@ -45,8 +45,8 @@ namespace BattleSpace{
 			self->getCurrentPostureState()->entryState( this , self );	//进入状态
 			return true;
 		}else{
-			if (targetState->getCode() != Hit_Index)
-				CCLOG("[ *TIPS ]StateManager::switchPostureState State Change Fail [ %d ] ---> [ %d ]",self->getCurrentPostureState()->getCode(),targetState->getCode());
+			if (targetState->getCode() != E_StateCode::eHitState)
+				CCLOG("[ *TIPS ]StateManager::switchPostureState State Change Fail [ %d ] ---> [ %d ]",(int)self->getCurrentPostureState()->getCode(),(int)targetState->getCode());
 			return false;												
 		}
 	}
@@ -63,7 +63,7 @@ namespace BattleSpace{
 			iter->second.clear();
 		m_transitions.clear();
 	}
-	StateVector Transition::getCurrentStateTransitionVec(int stateCode)
+	StateVector Transition::getCurrentStateTransitionVec(E_StateCode stateCode)
 	{
 		StateVector transiton;
 		do{
@@ -76,12 +76,11 @@ namespace BattleSpace{
 	StateMachine::StateMachine()
 		:m_blocked(false)
 		,m_currentPostureState(nullptr)
-		,m_nextActionCode(-1)
+		,m_nextActionCode(E_StateCode::eNullState)
 		,m_stateManager(nullptr)
 		,m_transition(nullptr)
-	{
+	{}
 
-	}
 	StateMachine::~StateMachine()
 	{
 		CC_SAFE_RELEASE(m_currentPostureState);
@@ -116,7 +115,7 @@ namespace BattleSpace{
 		m_stateManager = stateManager;
 	}
 	//返回切换是否成功
-	bool StateMachine::TurnStateTo(int stateCode)
+	bool StateMachine::TurnStateTo(E_StateCode stateCode)
 	{
 		m_nextActionCode = stateCode;
 		return m_currentPostureState->ExecuteNextState(m_stateManager,this);			//可以由其他状态管理对象控制切换规则

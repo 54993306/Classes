@@ -1,5 +1,5 @@
 ﻿
-#include "scene/alive/ActObject.h"
+#include "Battle/RoleObject/RoleObject.h"
 #include "tools/StringUtil.h"
 #include "model/WarManager.h"
 #include "model/DataCenter.h"
@@ -9,27 +9,32 @@
 #include "warscene/ConstNum.h"
 #include "warscene/EffectData.h"
 #include "warscene/CombatTask.h"
-#include "scene/alive/HPObject.h"
+#include "Battle/RoleObject/HPObject.h"
 #include "common/CommonFunction.h"
 #include "scene/AnimationManager.h"
-#include "scene/effect/EffectObject.h"
+#include "Battle/EffectObject.h"
 #include "warscene/ArmatureEventDataMgr.h"
 #include "common/ShaderDataHelper.h"
 #include "Battle/BattleMessage.h"
 #include "warscene/BattleTools.h"
 #include "Battle/MoveObject.h"
 #include "Battle/BaseRoleData.h"
+#include "Battle/StateManage/GameTransition.h"
+#include "Battle/StateManage/GameStateManager.h"
+#include "Battle/StateManage/PostureState.h"
+#include "Battle/StateManage/StateManager.h"
+#include "Battle/ActionNameDefine.h"
 //#include <spine/AnimationState.h>
 namespace BattleSpace{
-	ActObject::ActObject()
+	RoleObject::RoleObject()
 		:m_MapData(nullptr),m_armatureEventData(nullptr), m_lastFrame(-1),m_Reset(false)
 	{}
 
-	ActObject::~ActObject()
+	RoleObject::~RoleObject()
 	{
 		NOTIFICATION->removeAllObservers(this);
 	}
-	bool ActObject::init()
+	bool RoleObject::init()
 	{
 		if (!AliveObject::init())
 			return false;
@@ -38,39 +43,35 @@ namespace BattleSpace{
 		return true;
 	}
 
-	void ActObject::setAlive( BaseRole* var )
+	void RoleObject::setAlive( BaseRole* pRole )
 	{
-		AliveObject::setAlive(var);
+		AliveObject::setAlive(pRole);
 		initStateManage(); 
-		if (!m_Alive->getAliveID())
+		if (!mRole->getAliveID())
 			return;															//挂在层显示拖动的目标(可以单独抽出一个方法来)
-		m_Alive->setActObject(this);										//逻辑对象与显示对象绑定
-		setEnemy(var->getEnemy());
-		setModel(m_Alive->getModel());
+		mRole->setRoleObject(this);										//逻辑对象与显示对象绑定
+		setEnemy(pRole->getEnemy());
+		setModel(mRole->getModel());
 		setHp(nullptr);
-		getBody()->setScale(m_Alive->getZoom());
-		if (m_Alive->getCloaking())											//潜行怪物处理
+		getBody()->setScale(mRole->getZoom());
+		if (mRole->getCloaking())											//潜行怪物处理
 			getArmature()->setOpacity(125);
-		if (m_Enemy)
-		{
-			m_Alive->setAliveStat(INVINCIBLE);
-			TurnStateTo(Start_Index);
-		}
+		mRole->roleIntoBattle();
 	}
 
-	void ActObject::initStateManage()
+	void RoleObject::initStateManage()
 	{
 		GameStateManager* stateManage = GameStateManager::create();						//继承实现状态管理器
 		GameStateTransition* transition = GameStateTransition::create();				//继承实现状态切换列表对象
 		this->setStateManager(stateManage);												//设置状态机的状态管理器
 		this->setTransition(transition);												//设置状态切换对象
-		transition->RoleTransition(m_Alive->getEnemy());
+		transition->RoleTransition(mRole->getEnemy());
 	}
 
-	void ActObject::setModel(int pModel)//设置人物对应模型
+	void RoleObject::setModel(int pModel)//设置人物对应模型
 	{
-		m_Model = pModel;
-		if ( m_Manage->isSpine(m_Model) )
+		mModel = pModel;
+		if ( m_Manage->isSpine(mModel) )
 		{
 			m_IsSpine = true;
 			initSpineModel();
@@ -83,7 +84,7 @@ namespace BattleSpace{
 		this->getStateManage()->initState(this);							//设置人物的初始动作为站立也可为其他						
 	}
 
-	void ActObject::setActionKey(string ActionKey)//设置人物对应动作(动作切换)然后刷新人物运行动作
+	void RoleObject::setActionKey(string ActionKey)//设置人物对应动作(动作切换)然后刷新人物运行动作
 	{
 		m_ActionKey = ActionKey;
 		if (m_ActionKey == Walk_Action)			//我方突然中断整个战斗流程的情况(玩家操纵拖动武将)
@@ -96,19 +97,19 @@ namespace BattleSpace{
 		}
 	}
 
-	void ActObject::toWlkActionDispose()
+	void RoleObject::toWlkActionDispose()
 	{
-		NOTIFICATION->postNotification(B_CancelDrawAttackArea,m_Alive);//取消绘制攻击范围(针对性的取消绘制)
-		if (m_Alive->getNorAtk()&&!m_Alive->getSpeAtk()&&!m_Alive->getCriAtk())
+		NOTIFICATION->postNotification(B_CancelDrawAttackArea,mRole);//取消绘制攻击范围(针对性的取消绘制)
+		if (mRole->getNorAtk()&&!mRole->getSpeAtk()&&!mRole->getCriAtk())
 		{
-			m_Alive->ResetAttackState();
-			m_Alive->setNorAtk(true);					//普通攻击情况下,移动不需重置攻击时间
+			mRole->ResetAttackState();
+			mRole->setNorAtk(true);					//普通攻击情况下,移动不需重置攻击时间
 		}else{
-			m_Alive->ResetAttackState();
+			mRole->ResetAttackState();
 		}
 	}
 
-	void ActObject::setSpineAction()
+	void RoleObject::setSpineAction()
 	{
 		SkeletonAnimation* Skeleton = (SkeletonAnimation*)m_Armature;
 		hideSpineEffect();
@@ -127,7 +128,7 @@ namespace BattleSpace{
 		lostAction();
 	}
 
-	void ActObject::setSpineEffectAction()
+	void RoleObject::setSpineEffectAction()
 	{
 		if ( !m_Skeleton)
 			return;
@@ -143,7 +144,7 @@ namespace BattleSpace{
 		hideSpineEffect();
 	}
 
-	void ActObject::hideSpineEffect()
+	void RoleObject::hideSpineEffect()
 	{
 		if (!m_Skeleton)
 			return;
@@ -151,22 +152,22 @@ namespace BattleSpace{
 		m_Skeleton->setVisible(false);
 	}
 
-	void ActObject::lostAction()
+	void RoleObject::lostAction()
 	{
 		if (m_ActionKey.compare(Start_Action)==0)
 		{
-			m_Alive->setAliveStat(COMMONSTATE);
+			mRole->setAliveStat(COMMONSTATE);
 		}else if ( !strcmp(m_ActionKey.c_str(),Stand_Action))
 		{
 			CCLOG("[ **ERROR ] ActObject::lostAction Lost StandAction");
 			return;
 		}else{
-			CCLOG("[ *ERROR ] ActObject::lostAction Lost Action=[%s],model=[%d]",m_ActionKey.c_str(),m_Model);
+			CCLOG("[ *ERROR ] ActObject::lostAction Lost Action=[%s],model=[%d]",m_ActionKey.c_str(),mModel);
 		}
-		this->TurnStateTo(Stand_Index);
+		this->TurnStateTo(E_StateCode::eStandState);
 	}
 
-	void ActObject::setCocosAction()
+	void RoleObject::setCocosAction()
 	{
 		CCArmature* Armature = (CCArmature*) m_Armature;
 		CCMovementData* MovementData = Armature->getAnimation()->getAnimationData()->getMovement(m_ActionKey.c_str());
@@ -178,10 +179,10 @@ namespace BattleSpace{
 		}
 	}
 
-	void ActObject::initSpineEffect()
+	void RoleObject::initSpineEffect()
 	{
 		char efName[60] = {0};
-		sprintf(efName,"%d_texiao",m_Model);
+		sprintf(efName,"%d_texiao",mModel);
 		SpData* EFdata = m_Manage->getSpineData(efName);
 		if (EFdata)
 		{
@@ -189,42 +190,42 @@ namespace BattleSpace{
 			m_Skeleton->setPosition(ccp(0,-GRID_HEIGHT/2));
 			m_Body->addChild(m_Skeleton,1);
 		}else{
-			CCLOG("[ *TIPS ]  ActObject::setModel Spine Model=%d IS NULL",m_Model); 
+			CCLOG("[ *TIPS ]  ActObject::setModel Spine Model=%d IS NULL",mModel); 
 		}
 	}
 
-	void ActObject::initSpineModel()
+	void RoleObject::initSpineModel()
 	{
-		SpData* data = m_Manage->getSpineData(ToString(m_Model));
+		SpData* data = m_Manage->getSpineData(ToString(mModel));
 		if (!data)
 		{
 			data = m_Manage->getSpineData("146");
-			CCLOG("[ *ERROR ]  ActObject::setModel Spine Model=%d IS NULL",m_Model); 
+			CCLOG("[ *ERROR ]  ActObject::setModel Spine Model=%d IS NULL",mModel); 
 		}
 		SkeletonAnimation*  Animation = SkeletonAnimation::createWithData(data->first);
 		CCAssert(Animation,"ActObject::setModel Spine NULL");
-		Animation->endListener = std::bind(&ActObject::SpineActionEnd,this,std::placeholders::_1);
-		Animation->completeListener = std::bind(&ActObject::SpineComplete,this,std::placeholders::_1,std::placeholders::_2);
-		Animation->eventListener = std::bind(&ActObject::SpineActionEvent,this,std::placeholders::_1,std::placeholders::_2);
+		Animation->endListener = std::bind(&RoleObject::SpineActionEnd,this,std::placeholders::_1);
+		Animation->completeListener = std::bind(&RoleObject::SpineComplete,this,std::placeholders::_1,std::placeholders::_2);
+		Animation->eventListener = std::bind(&RoleObject::SpineActionEvent,this,std::placeholders::_1,std::placeholders::_2);
 		m_Armature = Animation;
 		initSpineEffect();
 	}
 
-	void ActObject::initCocosModel()
+	void RoleObject::initCocosModel()
 	{
-		CCAnimationData *animationData = CCArmatureDataManager::sharedArmatureDataManager()->getAnimationData(ToString(m_Model));
+		CCAnimationData *animationData = CCArmatureDataManager::sharedArmatureDataManager()->getAnimationData(ToString(mModel));
 		if (!animationData)													//模型容错性处理
 		{
-			CCLOG("[ *ERROR ]  ActObject::setModel Animation Model=%d IS NULL",m_Model); 
-			m_Model = 516;
+			CCLOG("[ *ERROR ]  ActObject::setModel Animation Model=%d IS NULL",mModel); 
+			mModel = 516;
 		}	
-		CCArmature* Armature = CCArmature::create(ToString(m_Model));
-		Armature->getAnimation()->setMovementEventCallFunc(this, movementEvent_selector(ActObject::AnimationEvent));		//动作结束回调
+		CCArmature* Armature = CCArmature::create(ToString(mModel));
+		Armature->getAnimation()->setMovementEventCallFunc(this, movementEvent_selector(RoleObject::AnimationEvent));		//动作结束回调
 		m_Armature = Armature;
-		m_armatureEventData = m_Manage->getArmatureDataMgr()->getArmatureEventData(m_Model);
+		m_armatureEventData = m_Manage->getArmatureDataMgr()->getArmatureEventData(mModel);
 	}
 	//动作结束回调
-	void ActObject::AnimationEvent(CCArmature *armature, MovementEventType movementType, const char *movementID)
+	void RoleObject::AnimationEvent(CCArmature *armature, MovementEventType movementType, const char *movementID)
 	{
 		std::string ActionName = movementID;
 		ActionName = strRemoveSpace(ActionName);						//去空格
@@ -232,7 +233,7 @@ namespace BattleSpace{
 			ActionEnd(ActionName.c_str());
 	}
 	//在end里面set动作会崩掉所以引入了Complete方法
-	void ActObject::SpineActionEnd( int trackIndex )
+	void RoleObject::SpineActionEnd( int trackIndex )
 	{
 		spTrackEntry*TrackEntry = ((SkeletonAnimation*)m_Armature)->getCurrent(trackIndex);
 		if (TrackEntry)
@@ -244,7 +245,7 @@ namespace BattleSpace{
 		}
 	}
 	//在循环回调的时候判断动作结束处理
-	void ActObject::SpineComplete( int trackIndex,int loopCount )
+	void RoleObject::SpineComplete( int trackIndex,int loopCount )
 	{
 		spTrackEntry*TrackEntry = ((SkeletonAnimation*)m_Armature)->getCurrent(trackIndex);
 		if (TrackEntry)
@@ -260,20 +261,20 @@ namespace BattleSpace{
 		}
 	}
 
-	void ActObject::attackActionEnd()
+	void RoleObject::attackActionEnd()
 	{
-		TurnStateTo(Stand_Index);
-		if (m_Alive->getCritEffect()&&!m_Enemy)		
-			NOTIFICATION->postNotification(B_CritEnd,m_Alive);
-		if (m_Alive->getHp()<=0)
+		TurnStateTo(E_StateCode::eStandState);
+		if (mRole->getCritEffect()&&!mEnemy)		
+			NOTIFICATION->postNotification(B_CritEnd,mRole);
+		if (mRole->getHp()<=0)
 			this->AliveDie();									//释放完技能后自己死亡的情况处理
-		else if (m_Alive->getBaseData()->getCallType() == AutoSkill||
-			m_Alive->getBaseData()->getCallType() == OnlyOnce)				//陨石类释放攻击后死亡OnlyOnces
+		else if (mRole->getBaseData()->getCallType() == AutoSkill||
+			mRole->getBaseData()->getCallType() == OnlyOnce)				//陨石类释放攻击后死亡OnlyOnces
 			this->AliveDie();	
 		AtkEnd_Event();	
 	}
 
-	void ActObject::ActionEnd( const char* ActionName )
+	void RoleObject::ActionEnd( const char* ActionName )
 	{
 		if (strcmp(ActionName,Attack_Action) == 0		||			//普攻转站立
 			strcmp(ActionName,SpAttack_Action) == 0		||			//特攻转站立			
@@ -284,14 +285,14 @@ namespace BattleSpace{
 		}else if ( !strcmp(ActionName,Hit_Action) ||				//受击转站立
 			!strcmp(ActionName,Dizzy_Action)		)			//眩晕转站立
 		{
-			TurnStateTo(Stand_Index);
+			TurnStateTo(E_StateCode::eStandState);
 		}else if (!strcmp(ActionName,Die_Action))
 		{
 			dieActionEnd();
 		}else if (!strcmp(ActionName,Start_Action))
 		{
-			TurnStateTo(Stand_Index);
-			m_Alive->setAliveStat(COMMONSTATE);
+			TurnStateTo(E_StateCode::eStandState);
+			mRole->setAliveStat(COMMONSTATE);
 		}else{
 			if (strcmp(ActionName,Stand_Action)==0||strcmp(ActionName,Walk_Action)==0)
 				return;
@@ -299,7 +300,7 @@ namespace BattleSpace{
 		}
 	}
 
-	void ActObject::SpineActionEvent( int trackIndex,spEvent* Event )
+	void RoleObject::SpineActionEvent( int trackIndex,spEvent* Event )
 	{
 		switch ((E_ActionEvent)Event->intValue)
 		{
@@ -318,7 +319,7 @@ namespace BattleSpace{
 			}break;
 		case E_ActionEvent::eMask:
 			{
-				NOTIFICATION->postNotification(B_SKILL_MASK,m_Alive);
+				NOTIFICATION->postNotification(B_SKILL_MASK,mRole);
 			}break;
 		default:
 			break;
@@ -327,7 +328,7 @@ namespace BattleSpace{
 			PlaySound_Event(Event->intValue);
 	}
 
-	void ActObject::actionEvent( int pFremIndex )
+	void RoleObject::actionEvent( int pFremIndex )
 	{
 		for(unsigned int frameIndex = m_lastFrame+1; frameIndex<=pFremIndex; frameIndex++)	//防止偶尔的掉帧情况出现处理
 		{
@@ -346,14 +347,14 @@ namespace BattleSpace{
 					if(sEventName.compare(EVE_SHAKE)			==0	)
 						NOTIFICATION->postNotification(B_Shark,nullptr);
 					if (sEventName.compare(EVE_MASK)			==0 )
-						NOTIFICATION->postNotification(B_SKILL_MASK,m_Alive);
+						NOTIFICATION->postNotification(B_SKILL_MASK,mRole);
 				}
 			}
 		}
 		m_lastFrame = pFremIndex;
 	}
 
-	void ActObject::updateFrameEvent( float dt )
+	void RoleObject::updateFrameEvent( float dt )
 	{
 		if (m_IsSpine)
 			return;
@@ -368,54 +369,54 @@ namespace BattleSpace{
 		actionEvent(iCurrentFrameIndex);
 	}
 
-	void ActObject::dieActionEnd()
+	void RoleObject::dieActionEnd()
 	{
-		if (m_Alive->getCritEffect()&&!m_Enemy)					//放技能的过程中把自己炸死的特殊情况
-			NOTIFICATION->postNotification(B_CritEnd,m_Alive);
+		if (mRole->getCritEffect()&&!mEnemy)					//放技能的过程中把自己炸死的特殊情况
+			NOTIFICATION->postNotification(B_CritEnd,mRole);
 		CCFadeOut* fadeout = CCFadeOut::create(0.5f);
 		m_Armature->runAction(fadeout);
 		getHp()->setVisible(false);
 		CCDelayTime* dtime = CCDelayTime::create(0.6f);
-		CCCallFuncN* callfunc = CCCallFuncN::create(this ,callfuncN_selector(ActObject::removeAct));
+		CCCallFuncN* callfunc = CCCallFuncN::create(this ,callfuncN_selector(RoleObject::removeAct));
 		CCSequence* sqe = CCSequence::create(dtime,callfunc,NULL); 
 		this->runAction(sqe);
 	}
 
-	void ActObject::removeAct( CCNode* node )
+	void RoleObject::removeAct( CCNode* node )
 	{
-		ActObject* act = (ActObject*) node;
+		RoleObject* act = (RoleObject*) node;
 		BaseRole* alive = act->getAlive();
 		NOTIFICATION->postNotification(B_ActObjectRemove,alive);		//我方主帅死亡,战斗失败
 		if (m_Reset)
 		{
 			m_Reset = false;		
 		}else{
-			m_Alive->setActObject(nullptr);
+			mRole->setRoleObject(nullptr);
 		}
 		act->removeFromParentAndCleanup(true); 
 		if (CCDirector::sharedDirector()->getScheduler()->getTimeScale() < 1)
 			CCDirector::sharedDirector()->getScheduler()->setTimeScale(1);
 	}
 
-	void ActObject::updatePosition(float dt)
+	void RoleObject::updatePosition(float dt)
 	{
-		int ActionCode = this->getCurrActionCode();
+		E_StateCode ActionCode = this->getCurrActionCode();
 		do{
-			if (ActionCode != Walk_Index&&ActionCode!=Hit_Index)
+			if (ActionCode != E_StateCode::eWalkState&&ActionCode!=E_StateCode::eHitState)
 				break;
 			int grid = m_MapData->getGridIndex(this->getPosition() - this->getoffs());
-			if (grid == m_Alive->getGridIndex()||grid == INVALID_GRID)break;
-			m_Alive->setGridIndex(grid);
+			if (grid == mRole->getGridIndex()||grid == INVALID_GRID)break;
+			mRole->setGridIndex(grid);
 			break;
 		} while (true);
 
-		if (this->getMoveState())
+		if (getMoveState() != E_StateCode::eNullState)
 			MoveUpdate(dt);
 	}
 	//改进方向，使用像素计算速度，而不是使用格子来计算速度。格子只能用于计算距离
-	bool ActObject::isDistination(float pDt)
+	bool RoleObject::isDistination(float pDt)
 	{
-		CCPoint pPosition = m_MapData->getPoint(m_Alive->getMoveGrid());
+		CCPoint pPosition = m_MapData->getPoint(mRole->getMoveGrid());
 		CCPoint uPosition = this->getPosition() - this->getoffs();
 
 		float pLength = 0;
@@ -433,21 +434,21 @@ namespace BattleSpace{
 		return false;
 	}
 
-	void ActObject::moveEnd()
+	void RoleObject::moveEnd()
 	{
-		CCPoint tPosition = m_MapData->getPoint(m_Alive->getMoveGrid());
+		CCPoint tPosition = m_MapData->getPoint(mRole->getMoveGrid());
 		this->setPosition(tPosition+this->getoffs());
-		if (!m_Enemy&&m_Alive->getCallType()!=AutoMoveType)
-			this->TurnStateTo(Stand_Index);											//站立时会自动将武将方向调转回来
+		if (!mEnemy&&mRole->getCallType()!=AutoMoveType)
+			this->TurnStateTo(E_StateCode::eStandState);											//站立时会自动将武将方向调转回来
 		this->setSpeed(CCPointZero);
-		this->setMoveState(0);
+		this->setMoveState(E_StateCode::eNullState);
 	}
 
-	void ActObject::MoveUpdate( float dt )
+	void RoleObject::MoveUpdate( float dt )
 	{
-		if (m_Alive->getMoveGrid() == INVALID_GRID)
+		if (mRole->getMoveGrid() == INVALID_GRID)
 		{
-			this->setMoveState(0);
+			this->setMoveState(E_StateCode::eNullState);
 			return;
 		}
 		if (isDistination(dt))
@@ -458,78 +459,78 @@ namespace BattleSpace{
 		}
 	}
 
-	bool ActObject::firstBattle( CCPoint& p )
+	bool RoleObject::firstBattle( CCPoint& p )
 	{
-		if (m_Alive->getBattle() || m_Alive->getEnemy())								//第一次召唤武将处理(未上阵的武将都瞬移)
+		if (mRole->getBattle() || mRole->getEnemy())								//第一次召唤武将处理(未上阵的武将都瞬移)
 			return false;
-		m_MoveState = 0;
-		m_Alive->setAliveStat(INVINCIBLE);
-		this->TurnStateTo(Start_Index);
-		NOTIFICATION->postNotification(B_RolrLogInBattlefield,m_Alive);//武将上阵
-		m_Alive->setGridIndex(m_Alive->getMoveGrid());
+		m_MoveState = E_StateCode::eNullState;
+		mRole->setAliveStat(INVINCIBLE);
+		this->TurnStateTo(E_StateCode::eEnterState);
+		NOTIFICATION->postNotification(B_RolrLogInBattlefield,mRole);//武将上阵
+		mRole->setGridIndex(mRole->getMoveGrid());
 		this->setSpeed(CCPointZero);
 		this->setPosition(p);
 		return true;
 	}
 
-	void ActObject::setMoveState(int var /*= Walk_Index*/)
+	void RoleObject::setMoveState(E_StateCode pStateCode)
 	{
-		m_MoveState = var;
-		if (!m_MoveState)
+		m_MoveState = pStateCode;
+		if (m_MoveState == E_StateCode::eNullState)
 			return;	
-		if (!m_Alive->getMove())														//定身状态
+		if (!mRole->getMove())														//定身状态
 		{
-			this->TurnStateTo(Stand_Index);
-			m_MoveState = 0;
+			this->TurnStateTo(E_StateCode::eStandState);
+			m_MoveState = E_StateCode::eNullState;
 			return;
 		}
-		if (this->getCurrActionCode() != var)
-			this->TurnStateTo(m_MoveState);
+		if (this->getCurrActionCode() != pStateCode)
+			this->TurnStateTo(pStateCode);
 		roleMoveSpeed();
 	}
 
-	float ActObject::getMoveTime()
+	float RoleObject::getMoveTime()
 	{
-		int row = abs((m_Alive->getMoveGrid() % C_GRID_ROW) - (m_Alive->getGridIndex() % C_GRID_ROW));
-		int col = abs((m_Alive->getMoveGrid() / C_GRID_ROW) - (m_Alive->getGridIndex() / C_GRID_ROW));
-		float tMovetime = max(row,col) * m_Alive->getMoveSpeed();						//一格多少时间
-		if (m_MoveState == Hit_Index||!tMovetime)	//被击退的情况
+		int row = abs((mRole->getMoveGrid() % C_GRID_ROW) - (mRole->getGridIndex() % C_GRID_ROW));
+		int col = abs((mRole->getMoveGrid() / C_GRID_ROW) - (mRole->getGridIndex() / C_GRID_ROW));
+		float tMovetime = max(row,col) * mRole->getMoveSpeed();						//一格多少时间
+		if (m_MoveState == E_StateCode::eHitState||!tMovetime)	//被击退的情况
 		{
 			tMovetime = 0.2f;	
-			if (m_MoveState == Hit_Index&&this->getCurrActionCode() != Hit_Index)
-				m_Alive->setGridIndex(m_Alive->getMoveGrid());							//动作没有切换成功，瞬间更新受击武将位置(攻击状态无法切换受击动作,无法更新武将位置了)
+			if (m_MoveState == E_StateCode::eHitState&&this->getCurrActionCode() != E_StateCode::eHitState)
+				mRole->setGridIndex(mRole->getMoveGrid());							//动作没有切换成功，瞬间更新受击武将位置(攻击状态无法切换受击动作,无法更新武将位置了)
 		}
 		return tMovetime;
 	}
 
-	void ActObject::roleMoveSpeed()
+	void RoleObject::roleMoveSpeed()
 	{
-		int MoveGrid = m_Alive->getMoveGrid();											//格子相等的时候可能存在格子大小的误差，应以点的位置来进行判断
+		int MoveGrid = mRole->getMoveGrid();											//格子相等的时候可能存在格子大小的误差，应以点的位置来进行判断
 		if (MoveGrid == INVALID_GRID)return;
 		CCPoint p = m_MapData->getPoint(MoveGrid) + getoffs();							//目标点
 		if (firstBattle(p))
 			return ;
-		if (m_Alive->getBaseData()->getRoleRow()==1&&m_Alive->getBaseData()->getRoleCol()==1&&m_Enemy)
+		if (mRole->getBaseData()->getRoleRow()==1&&mRole->getBaseData()->getRoleCol()==1&&mEnemy)
 			p = CCPoint(p.x+CCRANDOM_0_1()*15+5,p.y);									//防止武将叠在一起
 		walkDirection(p);
 		this->setSpeed((p - getPosition())/getMoveTime());
 	}
 
-	void ActObject::walkDirection( CCPoint& p )
+	void RoleObject::walkDirection( CCPoint& p )
 	{
-		if (this->getCurrActionCode() != Walk_Index)		
+		if (this->getCurrActionCode() != E_StateCode::eWalkState)		
 			return ;	
-		if ( (m_Enemy&&getPosition().x > p.x)  || 
-			(!m_Enemy&&getPosition().x < p.x) )				//移动翻转问题
+		if ( (mEnemy&&getPosition().x > p.x)  || 
+			(!mEnemy&&getPosition().x < p.x) )				//移动翻转问题
 		{
-			if (m_Enemy)									//改变武将方向
+			if (mEnemy)									//改变武将方向
 			{
 				this->setRoleDirection(Ditection_Left);
 			}else{
 				this->setRoleDirection(Ditection_Right);
 			}
 		}else{
-			if (m_Enemy)									//改变武将方向
+			if (mEnemy)									//改变武将方向
 			{
 				this->setRoleDirection(Ditection_Right);
 			}else{
@@ -538,28 +539,35 @@ namespace BattleSpace{
 		}
 	}
 
-	void ActObject::initMoveObject( CCNode* pMoveParent )
+	void RoleObject::initMoveObject( CCNode* pMoveParent )
 	{
-		if (m_Alive->getEnemy()	||
-			m_Alive->getCaptain()||
-			m_Alive->getCallType() != CommonType)
+		if (mRole->getEnemy()	||
+			mRole->getCaptain()||
+			mRole->getCallType() != CommonType)
 			return;
 		MoveObject* tMoveObj = MoveObject::create();
-		tMoveObj->setRowCol(m_Alive->getBaseData()->getRoleRow(),m_Alive->getBaseData()->getRoleCol());
-		tMoveObj->setMoveAlive(m_Alive);
+		tMoveObj->setRowCol(mRole->getBaseData()->getRoleRow(),mRole->getBaseData()->getRoleCol());
+		tMoveObj->setMoveAlive(mRole);
 		tMoveObj->setOffs(getoffs().x,getoffs().y);
 		tMoveObj->initMoveSprite();
-		tMoveObj->setgrid(m_Alive->getGridIndex());
-		m_Alive->setMoveGrid(m_Alive->getGridIndex());
-		m_Alive->setMoveObject(tMoveObj);
+		tMoveObj->setgrid(mRole->getGridIndex());
+		mRole->setMoveGrid(mRole->getGridIndex());
+		mRole->setMoveObject(tMoveObj);
 		setMoveObject(tMoveObj);
 		pMoveParent->addChild(tMoveObj);
 	}
 
-	void ActObject::setActMoveGrid( int pGird )
+	void RoleObject::setActMoveGrid( int pGird )
 	{
 		getMoveObject()->setgrid(pGird);
-		m_Alive->setMoveGrid(pGird);
-		setMoveState(Walk_Index);
+		mRole->setMoveGrid(pGird);
+		setMoveState(E_StateCode::eWalkState);
 	}
+
+	void RoleObject::AliveDie()
+	{
+		AliveObject::AliveDie();
+		TurnStateTo(E_StateCode::eDeathState);
+	}
+
 }

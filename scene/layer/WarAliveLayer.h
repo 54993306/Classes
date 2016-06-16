@@ -19,7 +19,7 @@
 #include "AppUI.h"
 #include "scene/layer/LayerManager.h"
 namespace BattleSpace{
-	class ActObject;
+	class RoleObject;
 	class AliveObject;
 	class BaseRole;
 	class EffectObject;
@@ -59,8 +59,8 @@ namespace BattleSpace{
 		int getTouchGrid(CCTouch* pTouch);
 		void initActobject(BaseRole* alive,int createType = 0);
 		CCArray* getAlivesOb(int AliveType = AliveType_All);
-		void AddActToGrid(ActObject* alive,int grid);
-		void AliveObEffect(ActObject* alive,int createType = DefaultCreat);
+		void AddActToGrid(RoleObject* alive,int grid);
+		void AliveObEffect(RoleObject* alive,int createType = DefaultCreat);
 		void LayerShake(CCObject* ob);
 		void roleEntranceBattle(CCObject* ob);
 		void initTouchAlive(BaseRole* alive);
@@ -72,7 +72,7 @@ namespace BattleSpace{
 		void createMoveTarget();
 		void createLayerColor();
 		void createActObjects();
-		void initMoveActObject(ActObject* aliveOb);
+		void initMoveActObject(RoleObject* aliveOb);
 		void lucencyActObject(bool lucency);												//对其他武将执行透明操作
 		bool touchInAlive(int grid , CCPoint& p);
 
@@ -86,7 +86,7 @@ namespace BattleSpace{
 		CCNode*			m_MoveNode;
 		CCNode*			m_AliveNode;
 		BaseRole*		m_TouchAlive;		//被触摸的武将id
-		ActObject*		m_MoveActObject;		//拖拽移动对象
+		RoleObject*		m_MoveActObject;		//拖拽移动对象
 		WarManager*		m_Manage;
 		WarMapData*		m_map;
 		CCPoint			m_TouchOffs;		//触摸偏移

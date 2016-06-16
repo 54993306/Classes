@@ -17,7 +17,7 @@
 #include "model/DataCenter.h"
 #include "model/WarManager.h"
 #include "reward/WorldBoss.h"
-#include "scene/alive/ActionDef.h"
+#include "Battle/ActionNameDefine.h"
 #include "warscene/EffectData.h"
 using namespace BattleSpace;
 bool WBossSortWarPrize(const Prize& data1, const Prize& data2)

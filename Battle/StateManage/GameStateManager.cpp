@@ -11,7 +11,7 @@ namespace BattleSpace{
 	void GameStateManager::initState(StateMachine* self)			//初始化每一个武将的状态
 	{
 		StateManager* stateManage = self->getStateManage();
-		State* stand = getStateInstance(Stand_Index);				//根据状态id得到状态
+		State* stand = getStateInstance(E_StateCode::eStandState);				//根据状态id得到状态
 		self->setCurrentPostureState(stand);						//设置初始状态
 		stand->entryState(stateManage,self);						//进入状态,状态机其实就是显示的对象(武将)
 	}

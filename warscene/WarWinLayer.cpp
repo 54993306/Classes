@@ -3,7 +3,7 @@
 #include "netcontrol/CPlayerControl.h"
 #include "common/color.h"
 #include "net/CNetClient.h"
-#include "scene/loadWar.h"
+#include "Battle/BattleScene/LoadBattleResource.h"
 #include "warscene/WarAssist.h"
 #include "common/ProgressLabel.h"
 #include "GMessage.h"
@@ -660,8 +660,8 @@ void WarWinLayer::onBackClick(CCNode* ob)
 	{
 		DataCenter::sharedData()->setCityActionType(CA_GoToReward);		
 	}
-	CScene* scene = GETSCENE(LoadWar);
-	((LoadWar*)scene)->setRelease(true, SkipcityScene);
+	CScene* scene = GETSCENE(LoadBattleResource);
+	((LoadBattleResource*)scene)->setRelease(true, SkipcityScene);
 	CSceneManager::sharedSceneManager()->replaceScene(scene);
 }
 
@@ -677,8 +677,8 @@ void WarWinLayer::stageRestart(CCNode* pSender)
 	{
 		DataCenter::sharedData()->setCityActionType(CA_GoToReward);		
 	}
-	CScene* scene = GETSCENE(LoadWar);
-	((LoadWar*)scene)->setRelease(true, SkipcityScene);
+	CScene* scene = GETSCENE(LoadBattleResource);
+	((LoadBattleResource*)scene)->setRelease(true, SkipcityScene);
 	CSceneManager::sharedSceneManager()->replaceScene(scene);
 
 	////预请求关卡信息

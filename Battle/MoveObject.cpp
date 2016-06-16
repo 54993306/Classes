@@ -4,7 +4,7 @@
 #include "model/DataCenter.h"
 #include "model/MapManager.h"
 #include "warscene/ConstNum.h"
-#include "scene/alive/ActObject.h"
+#include "Battle/RoleObject/RoleObject.h"
 #include "Battle/BaseRoleData.h"
 namespace BattleSpace{
 	MoveObject::MoveObject()

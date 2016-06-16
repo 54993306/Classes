@@ -10,7 +10,6 @@ namespace BattleSpace{
 		CREATE_FUNC(GameStateTransition);
 		virtual bool init(){return true;};
 		void RoleTransition(bool isEnemy = true);
-		void registerChange(StateVector& state,int code);
 	public:	
 	};
 };

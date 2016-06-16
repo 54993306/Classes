@@ -11,7 +11,7 @@
 //************************************************************************/
 namespace BattleSpace{
 	class BaseRole;
-	class WarScene;
+	class BattleScene;
 	class WarMapData;
 	class WarMapLayer;
 	class WarAliveLayer;
@@ -41,7 +41,7 @@ namespace BattleSpace{
 		void UIGuide(CombatGuideStep* step);
 		void CallAlive(CombatGuideStep* step);
 		CCSprite* PointSprite(CCPoint&p,int direction,int spritetype);		
-		void initScene(WarScene*scene);
+		void initScene(BattleScene*scene);
 		void ClearGuideLayer();
 		void ImageArray(CombatGuideStep* step);
 		void spineSkeleton(ImageData& data);
@@ -59,7 +59,7 @@ namespace BattleSpace{
 		void creaAliveByVector(vector<BaseRole*>VecAlive,CombatGuideStep* step);
 	private:
 		CCNode* m_root;
-		WarScene* m_Scene;
+		BattleScene* m_Scene;
 		WarMapData* m_mapData;
 		WarMapLayer* m_MapLayer;
 		WarAliveLayer* m_AliveLayer;	

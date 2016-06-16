@@ -23,7 +23,7 @@ namespace BattleSpace
 	public:
 		AffectLowesHp(){};
 		virtual ~AffectLowesHp(){};
-		CREATE_UNINIT(AffectLowesHp);
+		UNINITCREATE(AffectLowesHp);
 		virtual AffectType getAreaType();
 		virtual void initArea(AreaCountInfo &pInfo);
 	};
@@ -36,7 +36,7 @@ namespace BattleSpace
 	public:
 		AffectLowesHpUnCaptain(){};
 		virtual ~AffectLowesHpUnCaptain(){};
-		CREATE_UNINIT(AffectLowesHpUnCaptain);
+		UNINITCREATE(AffectLowesHpUnCaptain);
 		virtual AffectType getAreaType();
 		virtual void initArea(AreaCountInfo &pInfo);
 	};

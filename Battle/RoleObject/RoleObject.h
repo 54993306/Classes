@@ -14,8 +14,7 @@
  *
  *
  *************************************************************/
-#include "scene/alive/AliveObject.h"
-#include "scene/state/StateDefine.h"
+#include "Battle/RoleObject/AliveObject.h"
 class ArmatureEventData;
 
 namespace BattleSpace{
@@ -35,17 +34,18 @@ namespace BattleSpace{
 		eScaleScene					=5,//场景缩放
 	};
 
-	class ActObject : public AliveObject,public StateMachine
+	class RoleObject : public AliveObject,public StateMachine
 	{
 	public:
-		ActObject();
-		virtual ~ActObject();
-		CREATE_FUNC(ActObject);
+		RoleObject();
+		virtual ~RoleObject();
+		CREATE_FUNC(RoleObject);
 		virtual bool init();
 		virtual void setModel(int model);						//重写父类的方法
 		virtual void setActionKey(string actionKey);			//
 		virtual void setAlive(BaseRole* var);
-		virtual void setMoveState(int var = Walk_Index);
+		virtual void setMoveState(E_StateCode pStateCode);
+		virtual void AliveDie();
 		void initStateManage();
 		void SpineActionEvent(int trackIndex,spEvent* Event);
 		void SpineActionEnd(int trackIndex);
@@ -56,7 +56,6 @@ namespace BattleSpace{
 		void updateFrameEvent(float dt);
 		void updatePosition(float dt);							//刷新武将位置
 		void MoveUpdate(float dt);
-		CC_SYNTHESIZE(bool,m_Reset,Reset);						//武将是否置空过(引导重置用)
 		bool isDistination(float pDt);
 		void moveEnd();
 		bool firstBattle(CCPoint& p);
@@ -65,6 +64,7 @@ namespace BattleSpace{
 		float getMoveTime();
 		void initMoveObject(CCNode* pMoveParent);
 		void setActMoveGrid(int pGird);
+		CC_SYNTHESIZE(bool,m_Reset,Reset);						//武将是否置空过(引导重置用)
 	private:
 		void actionEvent(int pFremIndex);
 		void dieActionEnd();

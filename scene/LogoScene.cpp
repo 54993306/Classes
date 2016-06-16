@@ -2,9 +2,9 @@
 #include "tools/commonDef.h"
 #include "AppUI.h"
 #include "Global.h"
-#include "alive/AliveDefine.h"
+#include "Battle/RoleObject/RoleObject.h"
 #include "tools/StringUtil.h"
-#include "scene/effect/EffectDefine.h"
+#include "Battle/EffectObject.h"
 #include "common/CommonFunction.h"
 #include "warscene/ArmatureEventDataMgr.h"
 #include "warscene/WarAssist.h"
@@ -15,6 +15,7 @@
 #include "Global.h"
 #include "common/CGameSound.h"
 #include "common/ShaderDataHelper.h"
+#include "Battle/ActionNameDefine.h"
 
 using namespace CocosDenshion;
 LogoScene::LogoScene():m_XmlLayer(nullptr),m_ModeIndex(0),m_PauseAction(""),m_Body(nullptr),m_InputScale(nullptr)

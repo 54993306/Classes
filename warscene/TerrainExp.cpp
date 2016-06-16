@@ -2,11 +2,11 @@
 #include "model/DataCenter.h"
 #include "CombatTask.h"
 #include "model/terrainLayer.h"
-#include "scene/alive/AliveDefine.h"
+#include "Battle/RoleObject/RoleObject.h"
 #include "Global.h"
 #include "Battle/BaseRole.h"
 #include "model/TerrainManager.h"
-#include "scene/effect/EffectDefine.h"
+#include "Battle/EffectObject.h"
 namespace BattleSpace{
 
 	TerrainExp::TerrainExp()
@@ -27,7 +27,7 @@ namespace BattleSpace{
 			int currHp = round->m_CurrHp[round->m_AliveID];
 			unsigned int currMaxHp = round->m_CurrMaxHp[round->m_AliveID];
 			CCLOG("[ %d currHp:%d currMaxHp:%d lostHp:%d ]",round->m_AliveID,currHp,currMaxHp,lostHp);	//targets受击数组,currHp受击后血量
-			ActObject* aliveOb = alive->getActObject();
+			RoleObject* aliveOb = alive->getRoleObject();
 			ptime = StateHandle(aliveOb,alive,time,lostHp,currHp,m_task);
 			CCArray* arr = CCArray::create();
 			arr->addObject(aliveOb);
@@ -41,7 +41,7 @@ namespace BattleSpace{
 		return ptime;
 	}
 
-	float TerrainExp::StateHandle(ActObject* aliveOb,BaseRole* alive,float sysTime ,float lostHp ,float currHp,CCArray* m_task)
+	float TerrainExp::StateHandle(RoleObject* aliveOb,BaseRole* alive,float sysTime ,float lostHp ,float currHp,CCArray* m_task)
 	{
 		float ptime = 0;
 		do{
@@ -59,7 +59,7 @@ namespace BattleSpace{
 	void TerrainExp::playerTerrainEffect(CCObject* ob)
 	{
 		CCArray* arr = (CCArray*)ob;
-		ActObject* act = (ActObject*)arr->objectAtIndex(0);
+		RoleObject* act = (RoleObject*)arr->objectAtIndex(0);
 		CCInteger* effectID = (CCInteger*)arr->objectAtIndex(1);
 		CCInteger* musicID = (CCInteger*)arr->objectAtIndex(2);
 		EffectObject* _Effect = EffectObject::create(ToString(effectID->getValue()));

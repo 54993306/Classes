@@ -1,5 +1,5 @@
-﻿#include "HPObject.h"
-#include "ActObject.h"
+﻿#include "Battle/RoleObject/HPObject.h"
+#include "Battle/RoleObject/RoleObject.h"
 #include "warscene/WarControl.h"
 #include "model/DataCenter.h"
 #include "warscene/ConstNum.h"

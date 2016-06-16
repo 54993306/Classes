@@ -2,7 +2,7 @@
 
 #include "GMessage.h"
 #include "model/DataDefine.h"
-#include "scene\WarScene.h"
+#include "scene\BattleScene.h"
 
 typedef enum TextFieldTypes {
 	MOVE_SPEED,

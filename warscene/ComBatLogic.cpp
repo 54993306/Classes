@@ -1,7 +1,7 @@
 ﻿
 #include "ComBatLogic.h"
-#include "scene/loadWar.h"
-#include "scene/WarScene.h"
+#include "Battle/BattleScene/LoadBattleResource.h"
+#include "Battle/BattleScene/BattleScene.h"
 #include "warscene/BufExp.h"
 #include "model/DataCenter.h"
 #include "model/WarManager.h"
@@ -25,10 +25,10 @@
 #include "warscene/BattleResult.h"
 #include "common/CommonFunction.h"
 #include "scene/layer/StoryLayer.h"
-#include "scene/alive/AliveDefine.h"
+#include "Battle/RoleObject/RoleObject.h"
 #include "scene/layer/WarMapLayer.h"
 #include "scene/layer/WarAliveLayer.h"
-#include "scene/effect/EffectObject.h"
+#include "Battle/EffectObject.h"
 #include "netcontrol/CPlayerControl.h"
 #include "warscene/CombatGuideManage.h"
 #include "warscene/WarFailLayer.h"
@@ -87,7 +87,7 @@ namespace BattleSpace{
 	void CombatLogic::onEnter()
 	{
 		CCNode::onEnter();
-		m_Scene = (WarScene*)this->getParent(); 
+		m_Scene = (BattleScene*)this->getParent(); 
 		m_Assist->setScene(m_Scene);
 		m_CombatEffect->setScene(m_Scene);
 		m_UILayer = m_Scene->getWarUI();
@@ -410,7 +410,7 @@ namespace BattleSpace{
 		}else{
 			PlayEffectSound(SFX_423);
 			m_CurrCost += alive->getInitCost();													//击杀敌方武将添加cost
-			m_UILayer->showFlyCostToBar(m_AliveLayer->convertToWorldSpace(alive->getActObject()->getPosition()));//粒子效果
+			m_UILayer->showFlyCostToBar(m_AliveLayer->convertToWorldSpace(alive->getRoleObject()->getPosition()));//粒子效果
 		}
 	}
 	//控制关卡进度的地方处理
@@ -487,8 +487,8 @@ namespace BattleSpace{
 	{
 		if(!bAnswer)
 			return;
-		CScene* scene = GETSCENE(LoadWar);
-		((LoadWar*)scene)->setRelease(true,skipSelectHero);
+		CScene* scene = GETSCENE(LoadBattleResource);
+		((LoadBattleResource*)scene)->setRelease(true,skipSelectHero);
 		CSceneManager::sharedSceneManager()->replaceScene(scene);
 	}
 
@@ -549,7 +549,7 @@ namespace BattleSpace{
 		CCDelayTime* delay = CCDelayTime::create(0.5f);
 		CCDelayTime* delay2 = CCDelayTime::create(0.3f);
 		CCMoveTo* mt = CCMoveTo::create(1.2f,ccp( MAP_MINX(m_MapData) , m_Scene->getMoveLayer()->getPositionY()));
-		CCCallFuncO* cfo = CCCallFuncO::create(this,callfuncO_selector(WarScene::LayerMoveEnd),CCInteger::create((int)StoryType::eMoveEndStory));
+		CCCallFuncO* cfo = CCCallFuncO::create(this,callfuncO_selector(BattleScene::LayerMoveEnd),CCInteger::create((int)StoryType::eMoveEndStory));
 		CCSequence* sqe = CCSequence::create(delay,mt,delay2,cfo,nullptr);
 		m_Scene->getMoveLayer()->runAction(sqe);
 	}

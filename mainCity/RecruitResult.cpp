@@ -1,5 +1,5 @@
 ﻿#include "RecruitResult.h"
-#include "scene/effect/EffectObject.h"
+#include "Battle/EffectObject.h"
 #include "GMessage.h"
 #include "common/CommonFunction.h"
 #include "bag/bagData.h"

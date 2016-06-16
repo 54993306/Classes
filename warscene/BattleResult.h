@@ -26,7 +26,7 @@ namespace BattleSpace{
 		int anger;
 	};
 	class BaseRole;
-	class ActObject;
+	class RoleObject;
 	class BattleResult : public CCObject
 	{
 	public:

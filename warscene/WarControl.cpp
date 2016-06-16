@@ -2,9 +2,9 @@
 #include "WarControl.h"
 #include "Global.h"
 #include "scene/CPopTip.h"
-#include "scene/loadWar.h"
+#include "Battle/BattleScene/LoadBattleResource.h"
 #include "tools/CCShake.h"
-#include "scene/WarScene.h"
+#include "Battle/BattleScene/BattleScene.h"
 #include "model/DataCenter.h"
 #include "Battle/BaseRole.h"
 #include "model/WarManager.h"
@@ -20,10 +20,10 @@
 #include "common/CommonFunction.h"	
 #include "warscene/ComBatLogic.h"
 #include "scene/AnimationManager.h"
-#include "scene/alive/AliveDefine.h"
+#include "Battle/RoleObject/RoleObject.h"
 #include "scene/layer/WarAliveLayer.h"
 #include "netcontrol/CPlayerControl.h"
-#include "scene/effect/EffectObject.h"
+#include "Battle/EffectObject.h"
 #include "warscene/GameEditorLayer.h"
 #include "warscene/CombatGuideManage.h"
 #include "warscene/CombatGuideData.h"
@@ -649,7 +649,7 @@ namespace BattleSpace{
 		btn->setEnabled(false);
 		if (guideStateButtonEffect(MoveLaout))
 			return;
-		alive->getActObject()->TurnStateTo(Stand_Index);
+		alive->getRoleObject()->TurnStateTo(E_StateCode::eStandState);
 		alive->ResetAttackState();																	//点击了必杀技按钮，但是武将并没有进入必杀技状态的情况,强制切换至必杀技状态
 		alive->setCriAtk(true);
 		CProgressBar* CdBar = (CProgressBar*)MoveLaout->getChildByTag(CL_HeroPro);
@@ -660,7 +660,7 @@ namespace BattleSpace{
 		if (alive->getCaptain())
 			ResetButtonState(alive);
 		else
-			alive->getActObject()->setUpdateState(false);
+			alive->getRoleObject()->setUpdateState(false);
 	}
 
 	void WarControl::ResetButtonState( CCObject* ob )

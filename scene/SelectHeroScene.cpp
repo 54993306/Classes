@@ -6,7 +6,7 @@
 #include "tools/CCShake.h"
 #include "warscene/ArmatureEventDataMgr.h"
 #include "warscene/BattleTools.h"
-#include "scene/alive/ActionDef.h"
+#include "Battle/ActionNameDefine.h"
 #include "update/CDownloadPackage.h"
 #include "scene/CPopTip.h"
 #include "tools/ShowTexttip.h"

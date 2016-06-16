@@ -21,7 +21,7 @@
 #include "model/WarManager.h"
 #include "warscene/BattleResult.h"
 #include "common/CommonFunction.h"
-#include "scene/alive/HPObject.h"
+#include "Battle/RoleObject/HPObject.h"
 #include "Battle/BuffData.h"
 #include "Battle/skEffectData.h"
 namespace BattleSpace{

@@ -45,7 +45,7 @@ void BackLayer::keyBackClicked()
 
 			return;
 		}
-		else if(LayerManager::instance()->getLayerCount()==0&&name=="WarScene")
+		else if(LayerManager::instance()->getLayerCount()==0&&name=="BattleScene")
 		{
 			CCNotificationCenter::sharedNotificationCenter()->postNotification(B_ReturnLayer);
 		}

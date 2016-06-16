@@ -2,7 +2,7 @@
 #include "terrainLayer.h"
 #include "Battle/BaseRole.h"
 #include "model/DataCenter.h"
-#include "scene/effect/EffectObject.h"
+#include "Battle/EffectObject.h"
 #include "model/MapManager.h"
 #include "model/WarManager.h"
 #include "model/TerrainManager.h"

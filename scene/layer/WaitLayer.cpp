@@ -1,6 +1,6 @@
 ﻿#include "WaitLayer.h"
 #include "common/color.h"
-#include "scene/effect/EffectObject.h"
+#include "Battle/EffectObject.h"
 using namespace BattleSpace;
 bool WaitLayer::init()
 {

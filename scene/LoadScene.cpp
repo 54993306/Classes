@@ -5,7 +5,7 @@
 #include "tools/ToolDefine.h"
 #include "model/DataCenter.h"
 #include "common/CommonFunction.h"
-#include "scene/effect/EffectObject.h"
+#include "Battle/EffectObject.h"
 #include "model/DataCenter.h"
 #include "model/WarManager.h"
 
