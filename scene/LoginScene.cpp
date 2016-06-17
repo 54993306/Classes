@@ -21,7 +21,7 @@
 #include "UserDefaultData.h"
 #include "update/CDownloadPackage.h"
 #include "ApplicationDefine.h"
-#include "scene/AnimationManager.h"
+#include "Battle/AnimationManager.h"
 #include "Battle/EffectObject.h"
 #include "Resources.h"
 #include "ApplicationDefine.h"

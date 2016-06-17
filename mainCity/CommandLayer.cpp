@@ -11,7 +11,7 @@
 
 #include "common/color.h"
 #include "tools/ShowTexttip.h"
-#include "scene/AnimationManager.h"
+#include "Battle/AnimationManager.h"
 #include "common/color.h"
 
 #include "tools/StringUtil.h"

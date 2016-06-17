@@ -14,7 +14,7 @@
 #include "model/DataCenter.h"
 #include "common/CShowToBuyResource.h"
 #include "common/CheckMoney.h"
-#include "scene/AnimationManager.h"
+#include "Battle/AnimationManager.h"
 
 #include "common/CGameSound.h"
 #include "Resources.h"

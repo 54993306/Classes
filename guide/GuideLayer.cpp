@@ -3,7 +3,7 @@
 #include "net/CNetClient.h"
 #include "GuideManager.h"
 #include "mainCity/RecruitResult.h"
-#include "scene/AnimationManager.h"
+#include "Battle/AnimationManager.h"
 #include "CCTK/scenemanager.h"
 #include "GMessage.h"
 #include "tools/UICloneMgr.h"

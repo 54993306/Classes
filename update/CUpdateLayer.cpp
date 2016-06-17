@@ -2,7 +2,7 @@
 #include "jni/CJniHelper.h"
 #include "protos/gate_protocol.pb.h"
 #include "tools/ShowTexttip.h"
-#include "scene/AnimationManager.h"
+#include "Battle/AnimationManager.h"
 #include "UserDefaultData.h"
 #include "common/CommonFunction.h"
 #include "ApplicationDefine.h"

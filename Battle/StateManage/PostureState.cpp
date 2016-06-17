@@ -3,7 +3,7 @@
 #include "Global.h"
 #include "PostureState.h"
 #include "Battle/BaseRole.h"
-#include "warscene/ConstNum.h"
+#include "Battle/ConstNum.h"
 #include "common/CommonFunction.h"
 #include "Battle/ActionNameDefine.h"
 #include "Battle/RoleObject/RoleObject.h"

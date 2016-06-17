@@ -7,7 +7,7 @@
 #include "mainCity/QuickProduct.h"
 #include "common/color.h"
 #include "tools/ShowTexttip.h"
-#include "scene/AnimationManager.h"
+#include "Battle/AnimationManager.h"
 #include "common/CommonFunction.h"
 #include "GMessage.h"
 #include "model/DataDefine.h"

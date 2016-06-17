@@ -3,7 +3,7 @@
 #include "Battle/BaseRole.h"
 #include "model/DataCenter.h"
 #include "model/MapManager.h"
-#include "warscene/ConstNum.h"
+#include "Battle/ConstNum.h"
 #include "Battle/RoleObject/RoleObject.h"
 #include "Battle/BaseRoleData.h"
 namespace BattleSpace{

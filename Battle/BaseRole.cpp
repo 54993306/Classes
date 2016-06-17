@@ -14,12 +14,12 @@
 #include "model/WarManager.h"
 #include "model/BuffManage.h"
 #include "Battle/RoleObject/RoleObject.h"
-#include "warscene/ConstNum.h"
-#include "warscene/SkillRange.h"
-#include "warscene/BattleTools.h"
-#include "warscene/HurtCount.h"
-#include "warscene/CombatGuideManage.h"
-#include "scene/layer/WarAliveLayer.h"
+#include "Battle/ConstNum.h"
+#include "Battle/SkillRange.h"
+#include "Battle/BattleTools.h"
+#include "Battle/HurtCount.h"
+#include "Battle/CombatGuideManage.h"
+#include "Battle/BattleLayer/BattleRoleLayer.h"
 
 namespace BattleSpace{
 	BaseRole::BaseRole()

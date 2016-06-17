@@ -12,7 +12,7 @@
 #include "mainCity/MainCityControl.h"
 #include "ShopBuy.h"
 #include "scene/CPopTip.h"
-#include "scene/AnimationManager.h"
+#include "Battle/AnimationManager.h"
 #include "common/CShowToBuyResource.h"
 #include "common/CheckMoney.h"
 

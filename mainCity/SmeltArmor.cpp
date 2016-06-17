@@ -8,7 +8,7 @@
 #include "StrengthenItem.h"
 
 #include "tools/ShowTexttip.h"
-#include "scene/AnimationManager.h"
+#include "Battle/AnimationManager.h"
 #include "common/CheckMoney.h"
 #include "Resources.h"
 #include "tools/CCShake.h"

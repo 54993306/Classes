@@ -15,7 +15,7 @@
 #include "mainCity/Strengthen.h"
 #include "sign/PopItem.h"
 #include "scene/CPopTip.h"
-#include "scene/AnimationManager.h"
+#include "Battle/AnimationManager.h"
 #include "mainCity/MainCityControl.h"
 
 #include "common/CGameSound.h"

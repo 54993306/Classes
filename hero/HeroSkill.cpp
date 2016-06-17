@@ -10,7 +10,7 @@
 #include "tools/ShowTexttip.h"
 #include "common/CGameSound.h"
 #include "Resources.h"
-#include "scene/AnimationManager.h"
+#include "Battle/AnimationManager.h"
 using namespace BattleSpace;
 bool CHeroSkill::init()
 {

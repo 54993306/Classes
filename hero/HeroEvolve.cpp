@@ -13,7 +13,7 @@
 #include "tollgate/SelectArmy.h"
 #include "common/CommonFunction.h"
 #include "mainCity/CCompaseLayer.h"
-#include "scene/AnimationManager.h"
+#include "Battle/AnimationManager.h"
 #include "Global.h"
 #include "netcontrol/CPlayerControl.h"
 #include "scene/UITools.h"

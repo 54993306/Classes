@@ -1,8 +1,8 @@
 #include "Battle/GuardArea.h"
 #include "Battle/BaseRole.h"
 #include "Battle/BaseRoleData.h"
-#include "warscene/ConstNum.h"
-#include "warscene/BattleTools.h"
+#include "Battle/ConstNum.h"
+#include "Battle/BattleTools.h"
 #include "model/WarManager.h"
 namespace BattleSpace{
 	GuardArea::GuardArea(WarManager* pManage)

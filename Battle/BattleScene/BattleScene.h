@@ -17,8 +17,8 @@ namespace BattleSpace{
  *
  *************************************************************/
 	class StoryLayer;
-	class WarMapLayer;
-	class WarAliveLayer;
+	class BattleMapLayer;
+	class BattleRoleLayer;
 	class TerrainLayer;
 	class CombatGuideLayer;
 	class CombatLogic;
@@ -69,8 +69,8 @@ namespace BattleSpace{
 		virtual void ccTouchCancelled(CCTouch *pTouch, CCEvent *pEvent);
 	public:
 		CC_SYNTHESIZE(CCNode*,m_MoveLayer,MoveLayer);
-		CC_SYNTHESIZE(WarMapLayer*,m_MapLayer,WarMapLayer);
-		CC_SYNTHESIZE(WarAliveLayer*,m_AliveLayer,WarAliveLayer);
+		CC_SYNTHESIZE(BattleMapLayer*,m_MapLayer,BattleMapLayer);
+		CC_SYNTHESIZE(BattleRoleLayer*,m_AliveLayer,BattleRoleLayer);
 		CC_SYNTHESIZE(TerrainLayer*,m_TerrainLayer,TerrainLayer);
 		CC_SYNTHESIZE(WarControl*,m_UILayer,WarUI);
 		CC_SYNTHESIZE(StoryLayer*,m_StoryLayer,StoryLayer);

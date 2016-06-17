@@ -11,7 +11,7 @@
 #include "Global.h"
 #include "common/CGameSound.h"
 #include "tools/ShowTexttip.h"
-#include "scene/AnimationManager.h"
+#include "Battle/AnimationManager.h"
 #include "tools/CCShake.h"
 #include "common/ShaderDataHelper.h"
 

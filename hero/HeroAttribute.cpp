@@ -16,7 +16,7 @@
 #include "HeroControl.h"
 #include "mainCity/StrengthenItem.h"
 #include "tools/ShowTexttip.h"
-#include "scene/AnimationManager.h"
+#include "Battle/AnimationManager.h"
 #include "HeroBreak.h"
 #include "Global.h"
 #include "common/CommonFunction.h"

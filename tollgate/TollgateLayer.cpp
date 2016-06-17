@@ -11,7 +11,7 @@
 #include "Sweep.h"
 #include "TollgatePreview.h"
 #include "sign/PopItem.h"
-#include "scene/AnimationManager.h"
+#include "Battle/AnimationManager.h"
 #include "GMessage.h"
 #include "guide/GuideManager.h"
 #include "tools/ShowTexttip.h"

@@ -1,7 +1,7 @@
 ﻿#include "HeroControl.h"
 #include "tools/ShowTexttip.h"
 #include "netcontrol/CPlayerControl.h"
-#include "scene/AnimationManager.h"
+#include "Battle/AnimationManager.h"
 
 #include "GMessage.h"
 #include "HeroPromote.h"

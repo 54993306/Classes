@@ -4,7 +4,7 @@
 #include "model/CWholeBodyShowData.h"
 #include "model/DataCenter.h"
 #include "GMessage.h"
-#include "scene/AnimationManager.h"
+#include "Battle/AnimationManager.h"
 
 CNewHero::CNewHero():m_ui(nullptr),m_pEffect(nullptr),m_bEvolve(false),m_bShowing(false)
 {

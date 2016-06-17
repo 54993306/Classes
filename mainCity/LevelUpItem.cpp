@@ -16,7 +16,7 @@
 
 #include "common/color.h"
 #include "common/CheckMoney.h"
-#include "scene/AnimationManager.h"
+#include "Battle/AnimationManager.h"
 #include "Resources.h"
 #include "tools/CCShake.h"
 #include "common/CGameSound.h"

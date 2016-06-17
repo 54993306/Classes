@@ -6,7 +6,7 @@
 #include "model/DataCenter.h"
 #include "GMessage.h"
 #include "tools/UICloneMgr.h"
-#include "scene/AnimationManager.h"
+#include "Battle/AnimationManager.h"
 #include "common/CommonFunction.h"
 
 bool CHeroBreak::init()

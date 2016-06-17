@@ -4,19 +4,19 @@
 #include "model/DataCenter.h"
 #include "model/WarManager.h"
 #include "model/MapManager.h"
-#include "warscene/DropItem.h"
+#include "Battle/DropItem.h"
 #include "model/terrainLayer.h"
-#include "warscene/WarControl.h"
+#include "Battle/WarControl.h"
 #include "scene/layer/BackLayer.h"
-#include "warscene/ComBatLogic.h"
-#include "scene/layer/StoryLayer.h"
-#include "scene/layer/WarMapLayer.h"
-#include "scene/layer/WarAliveLayer.h"
-#include "warscene/CombatGuideData.h"
-#include "warscene/CombatGuideLayer.h"
-#include "warscene/CombatGuideManage.h"
+#include "Battle/ComBatLogic.h"
+#include "Battle/BattleLayer/StoryLayer.h"
+#include "Battle/BattleLayer/BattleMapLayer.h"
+#include "Battle/BattleLayer/BattleRoleLayer.h"
+#include "Battle/CombatGuideData.h"
+#include "Battle/CombatGuideLayer.h"
+#include "Battle/CombatGuideManage.h"
 #include "common/CommonFunction.h"
-#include "warscene/EffectData.h"
+#include "Battle/EffectData.h"
 #include "tools/CCShake.h"
 #include "Battle/BattleMessage.h"
 namespace BattleSpace{
@@ -55,13 +55,13 @@ namespace BattleSpace{
 		m_MoveLayer = CCNode::create();					//可以移动的节点包含地图和武将
 		addChild(m_MoveLayer);
 
-		m_MapLayer = WarMapLayer::create();
+		m_MapLayer = BattleMapLayer::create();
 		m_MoveLayer->addChild(m_MapLayer);
 
 		m_TerrainLayer = TerrainLayer::create();
 		m_MoveLayer->addChild(m_TerrainLayer);
 
-		m_AliveLayer = WarAliveLayer::create();
+		m_AliveLayer = BattleRoleLayer::create();
 		m_MoveLayer->addChild(m_AliveLayer);
 
 		m_UILayer = WarControl::create();

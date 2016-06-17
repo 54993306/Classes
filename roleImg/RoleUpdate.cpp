@@ -20,7 +20,7 @@
 
 #include "common/CGameSound.h"
 #include "Resources.h"
-#include "scene/AnimationManager.h"
+#include "Battle/AnimationManager.h"
 
 CRoleUpdate::CRoleUpdate()
 {

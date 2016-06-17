@@ -9,7 +9,7 @@
 #include "model/WarManager.h"
 #include "mainCity/MainCityControl.h"
 #include "Battle/EffectObject.h"
-#include "warscene/ArmatureEventDataMgr.h"
+#include "Battle/ArmatureEventDataMgr.h"
 #include "tools/CCShake.h"
 #include "Battle/ActionNameDefine.h"
 using namespace BattleSpace;

@@ -11,7 +11,7 @@
 *
 *
 *************************************************************/
-
+ 
 #ifndef __BattleRole__
 #define __BattleRole__
 #include "cocos2d.h"
@@ -30,7 +30,7 @@ namespace BattleSpace{
 	class SkillRange;
 	class GuardArea;
 	class HurtCount;
-	class WarAliveLayer;
+	class BattleRoleLayer;
 	class CombatGuideManage;
 	class BaseRole:public CCObject			//定义数据的顺序结构是为了方便查看数据
 	{
@@ -120,7 +120,7 @@ namespace BattleSpace{
 		CC_SYNTHESIZE_READONLY(BuffManage*,mBuffManage,BuffManage);		//(是不是应该暴露出去呢)
 		CC_SYNTHESIZE(RoleObject*,mRoleObject,RoleObject);
 		CC_SYNTHESIZE(MoveObject*,mMoveObject,MoveObject);				//设置移动对象
-		CC_SYNTHESIZE(WarAliveLayer*,mRoleLayer,RoleLayer);				//显示对象层
+		CC_SYNTHESIZE(BattleRoleLayer*,mRoleLayer,RoleLayer);				//显示对象层
 		CC_SYNTHESIZE(unsigned int,m_AliveID,AliveID);					//武将ID
 		PROPERTY_CONSTREAD(bool,m_NorAtk,NorAtk);						//普通攻击状态
 		CC_SYNTHESIZE(bool,m_SpecialAtk,SpeAtk);						//特殊攻击

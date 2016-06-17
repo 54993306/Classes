@@ -9,7 +9,7 @@
 #include "netControl/CPlayerControl.h"
 #include "GMessage.h"
 #include "net/CNetClient.h"
-#include "scene/AnimationManager.h"
+#include "Battle/AnimationManager.h"
 #include "guide/GuideManager.h"
 #include "Resources.h"
 #include "common/CGameSound.h"

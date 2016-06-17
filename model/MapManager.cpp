@@ -1,6 +1,6 @@
 ﻿#include "MapManager.h"
 #include "Global.h"
-#include "warscene/ConstNum.h"
+#include "Battle/ConstNum.h"
 //#include "DataCenter.h"
 namespace BattleSpace{
 	BaseMapData::BaseMapData()

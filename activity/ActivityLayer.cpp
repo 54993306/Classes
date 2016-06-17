@@ -9,7 +9,7 @@
 #include "GMessage.h"
 #include "reward/RewardLayer.h"
 #include "mainCity/Recruit.h"
-#include "scene/AnimationManager.h"
+#include "Battle/AnimationManager.h"
 #include "Battle/EffectObject.h"
 #include "common/CommonFunction.h"
 #include "common/CheckMoney.h"

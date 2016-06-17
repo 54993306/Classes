@@ -3,8 +3,8 @@
 #include <spine/spine-cocos2dx.h>
 #include "model/DataCenter.h"
 #include "model/WarManager.h"
-#include "warscene/EffectData.h"
-#include "warscene/BattleTools.h"
+#include "Battle/EffectData.h"
+#include "Battle/BattleTools.h"
 using namespace spine;
 using namespace cocos2d;
 using namespace std;

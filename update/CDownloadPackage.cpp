@@ -1,7 +1,7 @@
 ﻿#include "CDownloadPackage.h"
 #include "jni/CJniHelper.h"
 #include "tools/ShowTexttip.h"
-#include "scene/AnimationManager.h"
+#include "Battle/AnimationManager.h"
 #include "UserDefaultData.h"
 #include "CUpdateData.h"
 #include "Battle/BattleScene/LoadBattleResource.h"

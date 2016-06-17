@@ -1,8 +1,8 @@
 #include "battle/AreaCount.h"
 #include "Battle/BaseRole.h"
-#include "warscene/ConstNum.h"
+#include "Battle/ConstNum.h"
 #include "Battle/skEffectData.h"
-#include "warscene/BattleTools.h"
+#include "Battle/BattleTools.h"
 
 using namespace cocos2d;
 namespace BattleSpace{

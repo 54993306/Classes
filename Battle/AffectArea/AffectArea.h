@@ -18,7 +18,7 @@
 #include "Battle/BattleMacro.h"
 #include "Battle/AreaCount.h"
 #include "Battle/BaseRole.h"
-#include "warscene/ConstNum.h"
+#include "Battle/ConstNum.h"
 #include "Battle/skEffectData.h"
 namespace BattleSpace{
 	enum struct AffectType 

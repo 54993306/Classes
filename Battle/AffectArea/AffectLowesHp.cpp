@@ -13,7 +13,7 @@
  *************************************************************/
 
 #include "Battle/AffectArea/AffectLowesHp.h"
-#include "warscene/BattleTools.h"
+#include "Battle/BattleTools.h"
 
 namespace BattleSpace
 {

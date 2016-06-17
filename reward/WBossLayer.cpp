@@ -10,7 +10,7 @@
 #include "hero/SkillDesc.h"
 #include "common/CheckMoney.h"
 #include "common/CShowToBuyResource.h"
-#include "scene/layer/StoryLayer.h"
+#include "Battle/BattleLayer/StoryLayer.h"
 #include "reward/SkillInfo.h"
 #include "tollgate/SelectArmy.h"
 #include "netcontrol/CPlayerControl.h"
@@ -18,7 +18,7 @@
 #include "model/WarManager.h"
 #include "reward/WorldBoss.h"
 #include "Battle/ActionNameDefine.h"
-#include "warscene/EffectData.h"
+#include "Battle/EffectData.h"
 using namespace BattleSpace;
 bool WBossSortWarPrize(const Prize& data1, const Prize& data2)
 {

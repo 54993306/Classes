@@ -10,7 +10,7 @@
 #include "Recruit.h"
 #include "GMessage.h"
 #include "CommandLayer.h"
-#include "scene/AnimationManager.h"
+#include "Battle/AnimationManager.h"
 #include "netcontrol/CPlayerControl.h"
 #include "tools/ShowTexttip.h"
 #include "guide/GuideManager.h"

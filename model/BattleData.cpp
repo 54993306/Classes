@@ -1,7 +1,7 @@
 ﻿
 #include "BattleData.h"
 #include "bag/bagData.h"
-#include "warscene/ConstNum.h"
+#include "Battle/ConstNum.h"
 
 CSkill::CSkill()
 	:id(0)			//英雄技能ID(唯一)

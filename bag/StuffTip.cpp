@@ -11,7 +11,7 @@
 
 #include "mainCity/MainCityControl.h"
 #include "model/DataCenter.h"
-#include "scene/AnimationManager.h"
+#include "Battle/AnimationManager.h"
 #include "common/CommonFunction.h"
 
 #include "common/CGameSound.h"

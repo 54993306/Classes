@@ -1,7 +1,7 @@
 ﻿#include "scene/LoadScene.h"
 #include "SimpleAudioEngine.h"
 #include "Global.h"
-#include "scene/AnimationManager.h"
+#include "Battle/AnimationManager.h"
 #include "tools/ToolDefine.h"
 #include "model/DataCenter.h"
 #include "common/CommonFunction.h"

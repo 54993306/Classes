@@ -22,7 +22,7 @@
 #include "mainCity/BuyResource.h"
 #include "tools/ShowTexttip.h"
 #include "scene/CPopTip.h"
-#include "scene/AnimationManager.h"
+#include "Battle/AnimationManager.h"
 #include "common/CGameSound.h"
 
 bool CTopLayer::init()

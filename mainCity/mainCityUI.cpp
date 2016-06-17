@@ -25,7 +25,7 @@
 #include "tollgate/TollgatePreview.h"
 #include "Battle/BattleScene/LoadBattleResource.h"
 #include "model/WarManager.h"
-#include "scene/AnimationManager.h"
+#include "Battle/AnimationManager.h"
 #include "common/CGameSound.h"
 #include "guide/GuideManager.h"
 #include "common/ShaderDataHelper.h"

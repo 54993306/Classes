@@ -5,7 +5,7 @@
 #include "Battle/RoleObject/HPObject.h"
 #include "Battle/BaseRole.h"
 #include "Battle/RoleObject/RoleObject.h"
-#include "warscene/ConstNum.h"
+#include "Battle/ConstNum.h"
 #include "Battle/BattleMessage.h"
 #include "Battle/BaseRoleData.h"
 #include "Battle/skEffectData.h"
