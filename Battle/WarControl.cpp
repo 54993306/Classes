@@ -38,6 +38,7 @@
 #include "Battle/skEffectData.h"
 #include "Battle/BaseRole.h"
 #include "Battle/BaseRoleData.h"
+#include "Battle/BattleDataCenter.h"
 
 namespace BattleSpace{
 	WarControl::WarControl()
@@ -424,6 +425,7 @@ namespace BattleSpace{
 		{
 			CCLOG("[ *ERROR ] WarControl::initAliveBar Lost Img %s",ptr);
 			sprintf(ptr,"headIcon/NewIcon/146.png"); 
+			sp->initWithFile(ptr);
 		}else{
 			sp->setVisible(true);
 		}
@@ -434,6 +436,20 @@ namespace BattleSpace{
 		CdBar->setDirection(eProgressBarDirectionBottomToTop);
 		CdBar->setOnProgressEndedListener(this,ccw_progressended_selector(WarControl::AliveBarFullCallBack));
 	}
+
+	void WarControl::initCaptinButtonBar( CCNode* Layout,BaseRole* pRole )
+	{
+		const RoleSkill* tSkill = pRole->getBaseData()->getActiveSkill();
+		const skEffectData* tEffect = tSkill->getSummonEffect();
+		BaseRoleData* tBaseData = BattleData->getCallRoleData(tEffect->getTargetType());
+		if ( !tBaseData)
+		{
+			CCLOG("[ *ERROR ]WarControl::initCaptinButton  CallId =%d ",tEffect->getTargetType());
+			return;
+		}
+		initAliveButtonBar(Layout,tBaseData->getRoleModel());
+	}
+
 	//根据按钮上的bar来控制按钮的状态。
 	void WarControl::AliveBarFullCallBack(CCObject* ob)
 	{
@@ -449,29 +465,30 @@ namespace BattleSpace{
 		int index = 0;
 		CCARRAY_FOREACH(arr,obj)
 		{
-			BaseRole* alive = (BaseRole*)obj;
+			BaseRole* tRole = (BaseRole*)obj;
 			CLayout* MoveLaout = nullptr;	
-			if (alive->getCaptain())
+			if (tRole->getCaptain())
 			{
-				alive->setUiLayout(CL_BtnLayout1);
+				tRole->setUiLayout(CL_BtnLayout1);
 				CLayout*BtnLay = (CLayout*)m_ControLayer->getChildByTag(CL_BtnLayout1);
 				BtnLay->setVisible(true);
 				CLabel* NeedCost = (CLabel*)BtnLay->getChildByTag(CL_NeedCost);
-				const RoleSkill* skill = alive->getBaseData()->getActiveSkill();
+				const RoleSkill* skill = tRole->getBaseData()->getActiveSkill();
 				NeedCost->setString(ToString(skill->getExpendCost()));									//初始化值为技能消耗cost
 				MoveLaout = (CLayout*)BtnLay->getChildByTag(CL_HeroNode);
+				initCaptinButtonBar(MoveLaout,tRole);
 			}else{
-				alive->setUiLayout(CL_BtnLayout2+index);
+				tRole->setUiLayout(CL_BtnLayout2+index);
 				CLayout* BtnLay = (CLayout*)m_ControLayer->getChildByTag(CL_BtnLayout2+index);
 				BtnLay->setVisible(true);
 				CLabel* NeedCost = (CLabel*)BtnLay->getChildByTag(CL_NeedCost);
-				NeedCost->setString(ToString(alive->getBaseData()->getExpendCost()));						//初始化值为上阵消耗cost
+				NeedCost->setString(ToString(tRole->getBaseData()->getExpendCost()));						//初始化值为上阵消耗cost
 				MoveLaout = (CLayout*)BtnLay->getChildByTag(CL_HeroNode);
 				MoveLaout->setPosition(ccpAdd(MoveLaout->getPosition(),ccp(0,-30)));
+				initAliveButtonBar(MoveLaout,tRole->getModel());
 				index++;
 			}
-			initAliveButton(MoveLaout,alive);
-			initAliveButtonBar(MoveLaout,alive->getModel());
+			initAliveButton(MoveLaout,tRole);
 		}
 	}
 	//cost变化数字

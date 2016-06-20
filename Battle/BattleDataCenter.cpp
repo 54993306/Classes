@@ -39,7 +39,6 @@ namespace BattleSpace{
 			CC_SAFE_RELEASE(tData);
 		}
 		mMonsterVec.clear();
-		mCallRole.clear();
 	}
 
 	void BattleDataCenter::initBattleData( const google::protobuf::Message *pResponse,bool pWorldBoss /*=false*/ )
@@ -82,18 +81,15 @@ namespace BattleSpace{
 		mMonsterVec.push_back(tMonsterData);
 	}
 
-	const vector<MonsterData*>& BattleDataCenter::getCallRoleVector()
+	BaseRoleData* BattleDataCenter::getCallRoleData( int pRoleID ) const 
 	{
-		if (mCallRole.empty())
+		for (auto tRole : mMonsterVec)
 		{
-			for (auto tRole : mMonsterVec)
-			{
-				if (tRole->getCallRole())
-					mCallRole.push_back(tRole);
-			}
-		}		
-		return mCallRole;
+			if (tRole->getCallRole() && tRole->getMonsterID() == pRoleID)
+				return tRole;
+		}
 	}
+
 
 	void BattleDataCenter::initWordBossStage( const google::protobuf::Message *pResponse )
 	{

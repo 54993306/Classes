@@ -87,6 +87,8 @@ namespace BattleSpace{
 
 		void initAliveButtonBar(CCNode* Layout,int model);			//init role bar
 
+		void initCaptinButtonBar(CCNode* Layout,BaseRole* pRole);
+
 		void initButtonBackImage(CButton* button,int index );		//reason call number init button back image
 
 		void updateCostNumber(int cost);							//update cost number

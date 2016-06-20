@@ -32,6 +32,7 @@ using namespace std;
 namespace BattleSpace{
 	class HeroData;
 	class MonsterData;
+	class BaseRoleData;
 	class BattleDataCenter
 	{
 	public:
@@ -43,14 +44,13 @@ namespace BattleSpace{
 		void initNormalStage( const google::protobuf::Message *pResponse );
 		const  vector<HeroData*>&  getHeroVector()const	;
 		const vector<MonsterData*>& getMonsterVector()const;
-		const vector<MonsterData*>& getCallRoleVector();
+		BaseRoleData* getCallRoleData(int pRoleID) const;
 	private:
 		void initMonsterData(const protos::common::Monster* pData);
 		void initHeroData(const protos::common::Hero* pData);
 	private:
 		vector<HeroData*> mHeroVec;
 		vector<MonsterData*>mMonsterVec;
-		vector<MonsterData*>mCallRole;
 		BattleDataCenter();
 		static BattleDataCenter* mDataControl;
 		class SingletonDestroy

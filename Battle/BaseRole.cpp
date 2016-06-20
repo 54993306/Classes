@@ -931,53 +931,51 @@ namespace BattleSpace{
 			return alive;
 		if (captainCallNumberJudge())
 			return nullptr;
-		const skEffectData* effect = skill->getSummonEffect();
-		if (!effect)
+		const skEffectData* tEffect = skill->getSummonEffect();
+		if (!tEffect)
 		{
 			CCLOG("[ *ERROR ] WarManager::getCallAlive Skill Effect NULL");
 			return nullptr;
 		}
-		return getNewCallAlive(effect->getTargetType());
+		return getNewCallAlive(tEffect->getTargetType());
 	}
 
-	BaseRole* BaseRole::getNewCallAlive( int CallId )
+	BaseRole* BaseRole::getNewCallAlive( int pRoleID )
 	{
-		const vector<MonsterData*>tVector = BattleData->getCallRoleVector();
-		for (MonsterData*tBaseData :  tVector )
+		MonsterData* tBaseData = (MonsterData*)BattleData->getCallRoleData(pRoleID);
+		if ( !tBaseData)
 		{
-			if (tBaseData->getCallID() != CallId)
-				continue;
-			BaseRole* child = BaseRole::create();
-			child->setBaseData(tBaseData);
-			child->setCallType(tBaseData->getCallType());
-			child->setEnemy(getEnemy());
-			if ( getEnemy() )
-			{
-				child->setAliveID(C_CallMonst);
-				if (child->getBaseData()->getMonsterType() == MST_HIDE)
-					child->setCloaking(true);
-				child->setDelaytime(tBaseData->getDelayTime());
-				if (tBaseData->getInitGrid())
-				{
-					CallAliveByFixRange(this,child);
-				}else{
-					int ran = CCRANDOM_0_1()*(mStandGrids.size()-1);
-					int grid = mManage->getCurrRandomGrid(mStandGrids.at(ran));	//得到当前武将格子的附近范围格子
-					child->setGridIndex(grid);
-				}
-				child->setMstType(child->getBaseData()->getMonsterType());
-				child->setMove(tBaseData->getMoveState());
-			}else{
-				child->setAliveID(C_CallHero);
-				child->setGridIndex(INVALID_GRID);
-			}
-			child->initAliveByFather(this);
-			mManage->addBattleRole(child);
-			child->setFatherID(getAliveID());
-			return child;
+			CCLOG("[ *ERROR ]WarManager::getNewCallAlive  CallId =%d ",pRoleID);
+			return nullptr;
 		}
-		CCLOG("[ *ERROR ]WarManager::getNewCallAlive  CallId =%d ",CallId);
-		return nullptr;
+		BaseRole* child = BaseRole::create();
+		child->setBaseData(tBaseData);
+		child->setCallType(tBaseData->getCallType());
+		child->setEnemy(getEnemy());
+		if ( getEnemy() )
+		{
+			child->setAliveID(C_CallMonst);
+			if (child->getBaseData()->getMonsterType() == MST_HIDE)
+				child->setCloaking(true);
+			child->setDelaytime(tBaseData->getDelayTime());
+			if (tBaseData->getInitGrid())
+			{
+				CallAliveByFixRange(this,child);
+			}else{
+				int ran = CCRANDOM_0_1()*(mStandGrids.size()-1);
+				int grid = mManage->getCurrRandomGrid(mStandGrids.at(ran));	//得到当前武将格子的附近范围格子
+				child->setGridIndex(grid);
+			}
+			child->setMstType(child->getBaseData()->getMonsterType());
+			child->setMove(tBaseData->getMoveState());
+		}else{
+			child->setAliveID(C_CallHero);
+			child->setGridIndex(INVALID_GRID);
+		}
+		child->initAliveByFather(this);
+		mManage->addBattleRole(child);
+		child->setFatherID(getAliveID());
+		return child;
 	}
 
 	void BaseRole::attackEventLogic()

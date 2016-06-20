@@ -45,7 +45,6 @@ namespace BattleSpace{
 		this->setAttackSpeed(monster->atkinterval());
 		this->setMonsterType(monster->buff());
 		this->setCallType(monster->foe());
-		this->setCallID(monster->monsterid());
 		this->setCritTime(CCRANDOM_0_1()*(monster->maxround()- monster->minround()) +  monster->minround());
 		this->setDelayTime(monster->delay());
 		this->setBossMonster(monster->isboss());

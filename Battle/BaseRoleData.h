@@ -56,7 +56,6 @@ namespace BattleSpace{
 		CC_SYNTHESIZE(float,mMoveSpeed,MoveSpeed);						//移动速度(格/S)
 		CC_SYNTHESIZE(float,mAttackSpeed,AttackSpeed);					//攻击速度(秒/次)
 		CC_SYNTHESIZE(int,mCallType,CallType);							//召唤类型(Control)
-		CC_SYNTHESIZE(int,mCallID,CallID);								//召唤的武将ID
 		CC_SYNTHESIZE(float,mDelayTime,DelayTime);						//出现延迟时间
 		CC_SYNTHESIZE(E_RoleNature,mRoleNature,RoleNature)				//角色种类(后续接口)
 	public:
