@@ -1,12 +1,7 @@
-#include "Battle/HeroData.h"
 #include "Battle/BattleDataCenter.h"
 #include "Battle/BaseRoleData.h"
-#include "Battle/MonsterData.h"
 #include <protos/stage_protocol.pb.h>
 #include <protos/boss_protocol.pb.h>
-
-
-
 
 /******************************************************/
 #include "model/DataCenter.h"
@@ -56,43 +51,50 @@ namespace BattleSpace{
 		DataCenter::sharedData()->getWar()->initCommonData();
 	}
 
-	const vector<HeroData*>& BattleDataCenter::getHeroVector() const
+	const vector<BaseRoleData*>& BattleDataCenter::getHeroVector() const
 	{
 		return mHeroVec;
 	}
 
-	const vector<MonsterData*>& BattleDataCenter::getMonsterVector() const
+	const vector<BaseRoleData*>& BattleDataCenter::getMonsterVector() const
 	{
 		return mMonsterVec;
 	}
 
-	void BattleDataCenter::initHeroData( const protos::common::Hero* pData )
+	const vector<BaseRoleData*>& BattleDataCenter::getCallRoleVector()const
+	{		
+		return mCallRole;
+	}
+
+	void BattleDataCenter::addCallRole( BaseRoleData* pBaseData )
 	{
-		HeroData* tHeroData = HeroData::create();
-		tHeroData->readData(pData);
+		for (auto tData : mCallRole)
+		{
+			if ( tData == pBaseData )
+			{
+#if CC_PLATFORM_WIN32 == CC_TARGET_PLATFORM
+				CCAssert(false,"BattleDataCenter::addCallRole( BaseRoleData* pBaseData )");
+#else
+				CCLOG("[ *ERROR ]BattleDataCenter::addCallRole");
+				return;
+#endif
+			}
+		}
+		mCallRole.push_back(pBaseData);
+	}
+
+	void BattleDataCenter::initHeroData( const google::protobuf::Message *pResponse )
+	{
+		BaseRoleData* tHeroData = BaseRoleData::create(sDataType::eHero,pResponse);
 		tHeroData->retain();
 		mHeroVec.push_back(tHeroData);
 	}
 
-	void BattleDataCenter::initMonsterData( const protos::common::Monster* pData )
+	void BattleDataCenter::initMonsterData( const google::protobuf::Message *pResponse )
 	{
-		MonsterData* tMonsterData = MonsterData::create();
-		tMonsterData->readData(pData);
+		BaseRoleData* tMonsterData = BaseRoleData::create(sDataType::eMonster,pResponse);
 		tMonsterData->retain();
 		mMonsterVec.push_back(tMonsterData);
-	}
-
-	const vector<MonsterData*>& BattleDataCenter::getCallRoleVector()
-	{
-		if (mCallRole.empty())
-		{
-			for (auto tRole : mMonsterVec)
-			{
-				if (tRole->getCallRole())
-					mCallRole.push_back(tRole);
-			}
-		}		
-		return mCallRole;
 	}
 
 	void BattleDataCenter::initWordBossStage( const google::protobuf::Message *pResponse )
@@ -125,4 +127,5 @@ namespace BattleSpace{
 		DataCenter::sharedData()->getWar()->setStageID(tData->stageid());
 		DataCenter::sharedData()->getMap()->initMap(tData->stageid()); 
 	}
+
 }

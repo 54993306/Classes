@@ -14,15 +14,20 @@
 
 #ifndef __HeroRole_H_
 #define __HeroRole_H_
-
-namespace BattleSpace{
-	class HeroRole 
+#include "Battle/BaseRole.h"
+namespace BattleSpace
+{
+	class HeroData;
+	class HeroRole : public BaseRole
 	{
 	public:
-		HeroRole();
-		~HeroRole();
+		HeroRole(BaseRoleData* pData);
+		virtual ~HeroRole();
+		static HeroRole* create(BaseRoleData* pData);
+		virtual sRoleType getRoleType();
+	protected:
+		HeroData* mHeroData;
+		HeroData* mLogicData;
 	};
 };
-
-
 #endif

@@ -14,13 +14,20 @@
 
 #ifndef __MonsterRole_H_
 #define __MonsterRole_H_
-
-namespace BattleSpace{
-	class MonsterRole 
+#include "Battle/BaseRole.h"
+namespace BattleSpace
+{
+	class MonsterData;
+	class MonsterRole : public BaseRole
 	{
 	public:
-		MonsterRole();
-		~MonsterRole();
+		MonsterRole(BaseRoleData* pData);
+		virtual ~MonsterRole();
+		static MonsterRole* create(BaseRoleData* pData);
+		virtual sRoleType getRoleType();
+	protected:
+		MonsterData* mMonsterData;
+		MonsterData* mLogicData;
 	};
 };
 

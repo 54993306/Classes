@@ -16,6 +16,7 @@
 *
 *************************************************************/
 #include "cocos2d.h"
+#include "Battle/RoleMacro.h"
 using namespace cocos2d;
 namespace protos{
 	namespace common{
@@ -38,7 +39,7 @@ namespace BattleSpace{
 		CC_SYNTHESIZE(float,m_BuffDuration,BuffDuration);	//buff持续时间
 		CC_SYNTHESIZE(int,m_BuffTarget,BuffTarget);			//目标，1：自己，2：受击目标，3：敌方目标
 		CC_SYNTHESIZE(int,m_BuffLevel,BuffLevel);			//buff等级
-		CC_SYNTHESIZE(int,m_TargetType,TargetType);			//种族限制(火1,木2,水3,0是不限制)
+		CC_SYNTHESIZE(sAttribute,mAttribute,TargetType);			//属性限制(火1,木2,水3,0是不限制)
 		CC_SYNTHESIZE(std::string,m_BuffDes,BuffDes);		//buff名称
 		void readData(const protos::common::Buff* buff);
 	protected:

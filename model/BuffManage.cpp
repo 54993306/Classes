@@ -225,7 +225,7 @@ namespace BattleSpace{
 		case BUFFTYPE::FIRING:
 		case BUFFTYPE::BLEED:
 			{
-				if (m_alive->getAliveType() == E_ALIVETYPE::eWorldBoss)
+				if (m_alive->getAliveType() == sMonsterSpecies::eWorldBoss)
 					return;			//世界boss免疫buff效果
 				int num = bufCurrHpHandle(bfinfo,handel);							/*1当前血量*/		
 				if (!num)break;

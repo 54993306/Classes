@@ -301,7 +301,8 @@ namespace BattleSpace{
 	void CombatLogic::ExcuteAI(float pTime)
 	{
 		const Members* map_Alive = m_Manage->getMembers();
-		for (Members::const_iterator iter = map_Alive->begin();iter != map_Alive->end(); iter++)
+		Members::const_iterator iter = map_Alive->begin();
+		for (;iter != map_Alive->end(); iter++)
 		{
 			BaseRole* tRole = iter->second;
 			if (m_Alive && tRole != m_Alive)continue;										//一次只处理一个武将播放技能的情况，若是处理多个则以武将技能状态判断，而不用单一武将进行判断
@@ -344,9 +345,9 @@ namespace BattleSpace{
 
 	void CombatLogic::displayBatchWarning()
 	{
-		if (m_Manage->getAliveByType(E_ALIVETYPE::eBoss))
+		if (m_Manage->getAliveByType(sMonsterSpecies::eBoss))
 		{
-			BaseRole* boss = m_Manage->getAliveByType(E_ALIVETYPE::eBoss);
+			BaseRole* boss = m_Manage->getAliveByType(sMonsterSpecies::eBoss);
 			m_Assist->DisplayBossWarning(m_UILayer,boss->getModel());							//第一波就出现超大boss的情况	
 			m_AliveLayer->removeMessage();														//释放掉触摸消息
 		}else if(m_BatchNum == m_CurrBatchNum)

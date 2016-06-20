@@ -17,9 +17,10 @@
 #include "cocos2d.h"
 #include "Battle/BattleMacro.h"
 #include "Battle/RoleMacro.h"
-using namespace cocos2d;
 using namespace std;
-namespace BattleSpace{
+using namespace cocos2d;
+namespace BattleSpace
+{
 	class BuffManage;
 	class RoleObject;
 	class MoveObject;
@@ -42,7 +43,6 @@ namespace BattleSpace{
 		HurtCount* mHurtCount;
 		CombatGuideManage* mGuideManage;
 	public:
-		virtual void excuteLogic(float pTime);
 		bool stateDispose(float pTime);
 		bool delayEntrance(float pTime);
 		bool autoSkillAlive();
@@ -60,39 +60,12 @@ namespace BattleSpace{
 		BaseRole* getNewCallAlive(int CallId);
 		void attackEventLogic();
 		bool soriteNumberEnd();
-		/****************** Hero *********************/
-		void heroCritEffect();
-		void HeroExcuteAI();
-		bool IsAutoMoveType();
-		/******************* Monster ********************/
-		void monsterCritEffect();
-		void MonsterExcuteAI(float dt); 
-		bool monsterFlee();
-		void roleIntoBattle();
-		//monster move Logic
-		bool MonstMoveExcute();
-		int monsterMove();
-		int getMonsterMoveGrid();
-		int MoveJudge(int grid);										//用于判断是否可以移动，多格站位处理
-		int CountMoveGrid(int grid);
-		//hero touch move
-		void moveToTouchEndGrid();
-		bool unCommonAlive();
-		bool movePrecondition();
-		bool WorldBossJudge();
-		bool aliveMoveJudge();
-		vector<int> getDestinations(BaseRole* pAlive,int pGrid);
-		bool borderJudge(BaseRole* pAlive,vector<int>& pVector);
-		bool swappingRule(vector<int>& pDestinations);
-		vector<BaseRole*> getAliveInArea(vector<int>& pAreas);
-		bool vectorIntersection(vector<int>& pVector,vector<int>& ptVector);
-		void moveSwappingAlives(vector<BaseRole*>& pVector,int pOffs);
-		bool callAliveJudge(vector<int>& pDestinations);
-		PROPERTY_CONSTREAD(int,mTouchEndGrid,TouchEndGrid);				//触	摸结束点
 	public:
 		virtual ~BaseRole();
-		virtual bool init();
-		CREATE_FUNC(BaseRole);
+		virtual sRoleType getRoleType();
+		static BaseRole* create(BaseRoleData* pData);
+		static BaseRole* createCallRole(BaseRoleData* pData,BaseRole* pRole);
+		virtual void excuteLogic(float pTime);
 		void ResetAttackState();										//重置武将当前状态信息
 		void ExcuteNextEffect();										//重置武将下执行下一个效果状态
 		bool canSummonAlive();											//是否可以召唤武将
@@ -109,10 +82,40 @@ namespace BattleSpace{
 		void initAliveData();
 		void initAliveByFather(BaseRole*pFather);
 		vector<BaseRole*>* getSkillTargets();
-	public:
-		//public
+		/****************** Hero *********************/
+		void heroCritEffect();
+		void HeroExcuteAI();
+		bool IsAutoMoveType();
+		//hero touch move
+		void moveToTouchEndGrid();
+		bool unCommonAlive();
+		bool movePrecondition();
+		bool WorldBossJudge();
+		bool aliveMoveJudge();
+
+		vector<int> getDestinations(BaseRole* pAlive,int pGrid);
+		bool borderJudge(BaseRole* pAlive,vector<int>& pVector);
+		bool swappingRule(vector<int>& pDestinations);
+		vector<BaseRole*> getAliveInArea(vector<int>& pAreas);
+		bool vectorIntersection(vector<int>& pVector,vector<int>& ptVector);
+		void moveSwappingAlives(vector<BaseRole*>& pVector,int pOffs);
+		bool callAliveJudge(vector<int>& pDestinations);
+		PROPERTY_CONSTREAD(int,mTouchEndGrid,TouchEndGrid);				//触	摸结束点
+		/******************* Monster ********************/
+		void monsterCritEffect();
+		void MonsterExcuteAI(float dt); 
+		bool monsterFlee();
+		void roleIntoBattle();
+		//monster move Logic
+		bool MonstMoveExcute();
+		int monsterMove();
+		int getMonsterMoveGrid();
+		int MoveJudge(int grid);										//用于判断是否可以移动，多格站位处理
+		int CountMoveGrid(int grid);
 		CC_SYNTHESIZE(BaseRoleData*,mBaseData,BaseData);
 		CC_SYNTHESIZE(BaseRoleData*,mLogicData,LogicData);
+	public:
+		//public
 		std::vector<int> mStandGrids;									//多格子站位
 		std::vector<int> mSkillArea;									//存储武将当前技能区域
 		std::vector<BaseRole*> mAreaTargets;							//存储区域内目标
@@ -120,19 +123,19 @@ namespace BattleSpace{
 		CC_SYNTHESIZE_READONLY(BuffManage*,mBuffManage,BuffManage);		//(是不是应该暴露出去呢)
 		CC_SYNTHESIZE(RoleObject*,mRoleObject,RoleObject);
 		CC_SYNTHESIZE(MoveObject*,mMoveObject,MoveObject);				//设置移动对象
-		CC_SYNTHESIZE(BattleRoleLayer*,mRoleLayer,RoleLayer);				//显示对象层
+		CC_SYNTHESIZE(BattleRoleLayer*,mRoleLayer,RoleLayer);			//显示对象层
 		CC_SYNTHESIZE(unsigned int,m_AliveID,AliveID);					//武将ID
 		PROPERTY_CONSTREAD(bool,m_NorAtk,NorAtk);						//普通攻击状态
 		CC_SYNTHESIZE(bool,m_SpecialAtk,SpeAtk);						//特殊攻击
 		CC_SYNTHESIZE(bool,m_CritSkill,CriAtk);							//必杀技
 		CC_SYNTHESIZE(bool,m_Enemy,Enemy);								//怪物(武将类型)应该在数据基类中存在，或是逻辑中根据情况来赋值也可以
-		PROPERTY_CONSTREAD(int,m_CallType,CallType);					//武将召唤类型(我方武将均为召唤类型武将)
+		PROPERTY_CONSTREAD(sCallType,m_CallType,CallType);					//武将召唤类型(我方武将均为召唤类型武将)
 		CC_SYNTHESIZE(bool,m_DieState,DieState);						//武将阵亡
 		PROPERTY_CONSTREAD(int,m_GridIndex,GridIndex);					//位置
 		PROPERTY_CONSTREAD(int,m_MoveGrid,MoveGrid);					//移动目标格子
 		CC_SYNTHESIZE(float,m_MoveSpeed,MoveSpeed);						//移动速度(格/S)
 		CC_SYNTHESIZE(float,m_Delaytime,Delaytime);						//武将出现延迟时间
-		PROPERTY_CONSTREAD(int,m_AliveState,AliveStat);					//武将逻辑状态				(关于它的逻辑可以全放在武将的内部进行处理)
+		CC_SYNTHESIZE(sLogicState,mLogicState,AliveStat);				//武将逻辑状态				(关于它的逻辑可以全放在武将的内部进行处理)
 		PROPERTY_CONSTREAD(float,m_Atktime,Atktime);					//攻击间隔时间
 		CC_SYNTHESIZE(float,m_AtkInterval,AtkInterval);					//攻速(次/秒)
 		PROPERTY_CONSTREAD(int,m_AtkNum,AtkNum);						//记录攻击次数(3次释放特殊攻击)
@@ -181,7 +184,7 @@ namespace BattleSpace{
 		CC_SYNTHESIZE(int,m_MstType,MstType);							//怪物类型
 		PROPERTY_CONSTREAD(float,m_CritTime,CritTime);					//必杀技时间
 		CC_SYNTHESIZE(int,m_Batch,Batch);								//批次
-		CC_SYNTHESIZE(E_ALIVETYPE,m_AliveType,AliveType);				//角色品质等级				目前用法是世界boss，但是有多种拓展的可能
+		CC_SYNTHESIZE(sMonsterSpecies,m_AliveType,AliveType);			//角色品质等级				目前用法是世界boss，但是有多种拓展的可能
 		CC_SYNTHESIZE(bool,m_cloaking,Cloaking);						//隐身状态
 		CC_SYNTHESIZE(bool,m_LastAlive,LastAlive);						//场上最后武将
 	};

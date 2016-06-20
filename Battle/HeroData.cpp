@@ -1,12 +1,19 @@
 #include "Battle/HeroData.h"
 #include "Battle/RoleSkill.h"
 #include <protos/common/hero_common.pb.h>
-namespace BattleSpace{
-	HeroData::HeroData(){}
-
-	HeroData* HeroData::create()
+namespace BattleSpace
+{
+	HeroData::HeroData(const google::protobuf::Message* pMessage/*=nullptr*/)
+	:mCostSpeed(0),mMaxCost(0),mColdDown(0),mExpendCost(0),mCaptain(false)
+	,mAlertRange(0),mAlertType(0),mInitCost(0)
 	{
-		HeroData* tRole = new HeroData();
+		if (pMessage)
+			parseData(pMessage);
+	}
+
+	HeroData* HeroData::create(const google::protobuf::Message* pMessage/*=nullptr*/)
+	{
+		HeroData* tRole = new HeroData(pMessage);
 		if (tRole)
 		{
 			tRole->autorelease();
@@ -17,41 +24,44 @@ namespace BattleSpace{
 			return NULL;
 		}
 	}
-	void HeroData::readData(const protos::common::Hero* hero)
+
+	void HeroData::parseData(const google::protobuf::Message* pMessage)
 	{
-		this->setServerID(hero->id());
-		this->setRoleModel(hero->thumb());
-		this->setRoleType(hero->herotype());
-		if (hero->posy())
-			this->setRoleRow(hero->posy());
-		if (hero->posx())
-			this->setRoleCol(hero->posx());
-		this->setRoleHp(hero->hp());
-		this->setRoleAttack(hero->atk());
-		this->setRoleDefense(hero->def());
-		this->setRoleCrit(hero->crit());
-		this->setRoleHit(hero->hit());
-		this->setRoleDodge(hero->dodge());
-		this->setRoleAgility(hero->dex());
-		this->setRoleRegain(hero->renew());
-		this->setRoleZoom(hero->zoom());
-		this->setMoveSpeed(hero->movespeed());
-		this->setAttackSpeed(hero->atkinterval());
-		this->setAlertType(hero->alert());
-		this->setAlertRange(hero->alertrange());
-		this->setColdDown(hero->colddown());
-		this->setInitCost(hero->initcost());
-		this->setExpendCost(hero->usecost());
-		this->setCostSpeed(hero->addcost());
-		this->setMaxCost(hero->maxcost());
-		this->setCaptain(hero->battle());
-		if (hero->has_skill1())
-			this->mNormalSkill->readData(&hero->skill1());
-		if (hero->has_skill2())		//has判断是否为真
-			this->mSpecialSkill->readData(&hero->skill2());	//skill2取得对象传入解析
-		if (hero->has_skill3())
-			this->mActiveSkill->readData(&hero->skill3());
-		if (hero->has_skill4())
-			this->mCaptainSkill->readData(&hero->skill4()); 
+		protos::common::Hero* tHeroData = (protos::common::Hero*)pMessage;
+		this->setServerID(tHeroData->id());
+		this->setRoleModel(tHeroData->thumb());
+		this->setAttribute((sAttribute)tHeroData->herotype());
+		if (tHeroData->posy())
+			this->setRoleRow(tHeroData->posy());
+		if (tHeroData->posx())
+			this->setRoleCol(tHeroData->posx());
+		this->setRoleHp(tHeroData->hp());
+		this->setRoleAttack(tHeroData->atk());
+		this->setRoleDefense(tHeroData->def());
+		this->setRoleCrit(tHeroData->crit());
+		this->setRoleHit(tHeroData->hit());
+		this->setRoleDodge(tHeroData->dodge());
+		this->setRoleAgility(tHeroData->dex());
+		this->setRoleRegain(tHeroData->renew());
+		this->setRoleZoom(tHeroData->zoom());
+		this->setMoveSpeed(tHeroData->movespeed());
+		this->setAttackSpeed(tHeroData->atkinterval());
+		this->setAlertType(tHeroData->alert());
+		this->setAlertRange(tHeroData->alertrange());
+		this->setColdDown(tHeroData->colddown());
+		this->setInitCost(tHeroData->initcost());
+		this->setExpendCost(tHeroData->usecost());
+		this->setCostSpeed(tHeroData->addcost());
+		this->setMaxCost(tHeroData->maxcost());
+		this->setCaptain(tHeroData->battle());
+		if (tHeroData->has_skill1())
+			this->mNormalSkill->readData(&tHeroData->skill1());
+		if (tHeroData->has_skill2())	
+			this->mSpecialSkill->readData(&tHeroData->skill2());	//skill2取得对象传入解析
+		if (tHeroData->has_skill3())
+			this->mActiveSkill->readData(&tHeroData->skill3());
+		if (tHeroData->has_skill4())
+			this->mCaptainSkill->readData(&tHeroData->skill4()); 
 	}
+
 }

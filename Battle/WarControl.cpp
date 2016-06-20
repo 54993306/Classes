@@ -200,7 +200,7 @@ namespace BattleSpace{
 	//初始化界面上部分
 	void WarControl::initUIAbove()
 	{
-		BaseRole* boss = m_Manage->getAliveByType(E_ALIVETYPE::eWorldBoss);
+		BaseRole* boss = m_Manage->getAliveByType(sMonsterSpecies::eWorldBoss);
 		if (boss)
 		{
 			m_ControLayer->findWidgetById("layer_up_boss")->setVisible(true);
@@ -275,7 +275,7 @@ namespace BattleSpace{
 	//update word boss damage
 	void WarControl::updateWorldBossDamage()
 	{
-		BaseRole* boss = m_Manage->getAliveByType(E_ALIVETYPE::eWorldBoss);
+		BaseRole* boss = m_Manage->getAliveByType(sMonsterSpecies::eWorldBoss);
 		int num = m_Manage->getBossHurtCount();
 		m_pAllDamage->runAction(CCRollLabelAction::create(0.3f, atoi(m_pAllDamage->getString()), num, m_pAllDamage));
 		m_pAllDamage->runAction(CCSequence::createWithTwoActions(CCScaleTo::create(0.1f, 1.5f), CCScaleTo::create(0.05f, 1.0f)));
@@ -760,10 +760,10 @@ namespace BattleSpace{
 		BaseRole* alive = (BaseRole*)ob;
 		if (alive->getEnemy())
 			return;
-		if (alive->getBaseData()->getRoleType() == FireType)
+		if ((sAttribute)alive->getBaseData()->isAttribute(sAttribute::eFire))
 		{
 			m_LayerColor->setColor(ccc3(206,17,0));
-		}else if (alive->getBaseData()->getRoleType() == WaterType)
+		}else if ((sAttribute)alive->getBaseData()->isAttribute(sAttribute::eWater))
 		{
 			m_LayerColor->setColor(ccc3(30,69,218));
 		}else{

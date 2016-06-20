@@ -173,12 +173,12 @@ namespace BattleSpace{
 	//数据解析
 	void LoadBattleResource::DataParse()
 	{
-		const vector<HeroData*>tHeroVec = BattleData->getHeroVector();
-		const vector<MonsterData*>tMonsterVec = BattleData->getMonsterVector();
+		const vector<BaseRoleData*>tHeroVec = BattleData->getHeroVector();
+		const vector<BaseRoleData*>tMonsterVec = BattleData->getMonsterVector();
 		vector<int> VecRole;
 		vector<int> VecEffect;
 		vector<int> VecBuff;
-		for (HeroData* tMonster: tHeroVec)
+		for (BaseRoleData* tMonster: tHeroVec)
 		{
 			if (m_Manage->isSpine(tMonster->getRoleModel()))
 			{
@@ -191,7 +191,7 @@ namespace BattleSpace{
 		m_LoadSpine->AddRoleSpineID(146);
 		m_LoadSpine->AddRoleSpineID(9999);
 		VecRole.push_back(516);
-		for (MonsterData* tMonster: tMonsterVec)
+		for (BaseRoleData* tMonster: tMonsterVec)
 		{
 			if (m_Manage->isSpine(tMonster->getRoleModel()))
 			{

@@ -168,41 +168,39 @@ namespace BattleSpace{
 	//添加我方武将
 	void WarManager::initHeroData()
 	{
-		const vector<HeroData*>tVector = BattleData->getHeroVector();
-		for (int tIndex = 1 ;tIndex<=tVector.size(); tIndex++)
+		const vector<BaseRoleData*>tVector = BattleData->getHeroVector();
+		for (int tIndex=0 ;tIndex<tVector.size(); tIndex++)
 		{
-			BaseRole* alive = BaseRole::create();							//创建数据对象
-			alive->setBaseData(tVector.at(tIndex-1));
-			alive->setAliveID(tIndex);										//战场上武将的唯一id
+			BaseRole* alive = BaseRole::create(tVector.at(tIndex));			//创建数据对象
+			alive->setAliveID(tIndex+1);										//战场上武将的唯一id
 			alive->setEnemy(false);
 			alive->initAliveData();
 			addBattleRole(alive);
 		}
 	}
 	//初始化关卡批次数据到战斗武将列表
-	void WarManager::initMonsterByBatch( int batch )
+	void WarManager::initMonsterByBatch( int pBatch )
 	{
-		const vector<MonsterData*>tVector = BattleData->getMonsterVector();
+		const vector<BaseRoleData*>tVector = BattleData->getMonsterVector();
 		for (int tIndex=0 ;tIndex < tVector.size(); tIndex++)
 		{
-			if (tVector.at(tIndex)->getCallRole() ||
-				tVector.at(tIndex)->getBatchNumber()!=batch)
-				continue;
-			BaseRole* alive = BaseRole::create();								//创建数据对象
-			if (tVector.at(tIndex)->getBossMonster())							//大怪物提示
-				if (m_BossModel)
-					alive->setAliveType(E_ALIVETYPE::eWorldBoss);				//世界boss
-				else
-					alive->setAliveType(E_ALIVETYPE::eBoss);					//一般类型大boss
-			alive->setBaseData(tVector.at(tIndex));
-			alive->setAliveID(C_BatchMonst+tIndex+batch*100);
-			alive->setEnemy(true);
-			alive->setMstType(alive->getBaseData()->getMonsterType());
-			if (alive->getBaseData()->getMonsterType() == MST_HIDE)
-				alive->setCloaking(true);
-			alive->initAliveData();
-			alive->setMove(tVector.at(tIndex)->getMoveState());
-			addBattleRole(alive);
+			if (((MonsterData*)tVector.at(tIndex))->currBatchRole(pBatch))
+			{
+				BaseRole* alive = BaseRole::create(tVector.at(tIndex));				//创建数据对象
+				if (tVector.at(tIndex)->getBossMonster())							//大怪物提示
+					if (m_BossModel)
+						alive->setAliveType(sMonsterSpecies::eWorldBoss);				//世界boss
+					else
+						alive->setAliveType(sMonsterSpecies::eBoss);						//一般类型大boss
+				alive->setAliveID(C_BatchMonst+tIndex+pBatch*100);
+				alive->setEnemy(true);
+				alive->setMstType(alive->getBaseData()->getBehavior());
+				if (alive->getBaseData()->getBehavior() == sBehavior::eHide)
+					alive->setCloaking(true);
+				alive->initAliveData();
+				alive->setMove(tVector.at(tIndex)->getMoveState());
+				addBattleRole(alive);
+			}
 		}
 	}
 	//冒泡排序
@@ -261,7 +259,7 @@ namespace BattleSpace{
 		return nullptr;
 	}
 
-	BaseRole* WarManager::getAliveByType( E_ALIVETYPE type,bool Monster/* = true*/ )
+	BaseRole* WarManager::getAliveByType( sMonsterSpecies type,bool Monster/* = true*/ )
 	{
 		for(Members::iterator iter = mBattleRole.begin(); iter != mBattleRole.end();++iter)
 		{
