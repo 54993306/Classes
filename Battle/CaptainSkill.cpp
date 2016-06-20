@@ -115,15 +115,15 @@ namespace BattleSpace{
 					{
 						if (!type)
 						{
-							type = alive->getBaseData()->getAttribute();
+							type = alive->getBaseData()->getRoleType();
 							continue;
 						}
-						type2 = alive->getBaseData()->getAttribute();
+						type2 = alive->getBaseData()->getRoleType();
 						continue;
 					}
 					if (type&&type2)
 					{
-						if (alive->getBaseData()->getAttribute() != type&&alive->getBaseData()->getAttribute()!=type2)
+						if (alive->getBaseData()->getRoleType() != type&&alive->getBaseData()->getRoleType()!=type2)
 						{
 							aliveArr = arr;
 							break;
@@ -160,10 +160,10 @@ namespace BattleSpace{
 			if (alive->getExecuteCap())continue;
 			if (exclude)
 			{
-				if (alive->getBaseData()->getAttribute() == type)continue;
+				if (alive->getBaseData()->getRoleType() == type)continue;
 				targetArr->addObject(obj);
 			}else{
-				if (alive->getBaseData()->getAttribute() != type)continue;
+				if (alive->getBaseData()->getRoleType() != type)continue;
 				targetArr->addObject(obj);
 			}
 		}
@@ -176,10 +176,10 @@ namespace BattleSpace{
 			BaseRole* alive = (BaseRole*)obj;
 			if (!secondType)
 			{
-				secondType = alive->getBaseData()->getAttribute();
+				secondType = alive->getBaseData()->getRoleType();
 				continue;
 			}
-			if (secondType&&secondType!=alive->getBaseData()->getAttribute())
+			if (secondType&&secondType!=alive->getBaseData()->getRoleType())
 			{
 				fail = false;
 				break;

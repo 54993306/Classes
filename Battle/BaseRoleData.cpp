@@ -1,17 +1,16 @@
 
 
+#include <vector>
 #include "Battle/BaseRoleData.h"
 #include "Battle/RoleSkill.h"
-#include "Battle/HeroData.h"
-#include "Battle/MonsterData.h"
-namespace BattleSpace
-{
+using namespace std;
+namespace BattleSpace{
+
 	BaseRoleData::BaseRoleData()
-	:mServerID(0),mRoleModel(0),mAttribute(sAttribute::eNull),mRoleHp(0)
-	,mInitGrid(0),mRoleRow(1),mRoleCol(1),mRoleZoom(0),mRoleDodge(0),mRoleAttack(0)
-	,mMoveSpeed(0),mCallID(0),mCallRoleType(sCallType::eCommon),mRoleHit(0),mRoleCrit(0)
-	,mAttackSpeed(0),mDelayTime(0),mRoleRegain(0),mRoleAgility(0),mRoleDefense(0)
-	,mBehavior(sBehavior::eNormal)
+		:mServerID(0),mRoleModel(0),mRoleType(0),mRoleHp(0),mRoleAttack(0),mRoleDefense(0),mRoleCrit(0),mRoleHit(0),mRoleDodge(0)
+		,mCostSpeed(0),mMaxCost(0),mInitGrid(0),mRoleRow(1),mRoleCol(1),mRoleZoom(0),mRoleDrop(0),mColdDown(0),mExpendCost(0)
+		,mCritTime(0),mMoveSpeed(0),mCallRole(false),mCallID(0),mAlertRange(0),mCallType(0),mMonsterType(0),mRoleNature(E_RoleNature::eNULL)
+		,mMaxHp(0),mAttackSpeed(0),mCaptain(false),mDelayTime(0),mAlertType(0),mRoleRegain(0),mRoleAgility(0),mInitCost(0)
 	{
 		mNormalSkill = RoleSkill::create();
 		mNormalSkill->retain();
@@ -34,38 +33,6 @@ namespace BattleSpace
 		CC_SAFE_RELEASE(mCaptainSkill);
 		mCaptainSkill = nullptr;
 	}
-
-	BattleSpace::sDataType BaseRoleData::getDataType()
-	{
-		return sDataType::eBase;
-	}
-
-	BaseRoleData* BaseRoleData::create( sDataType pType,const google::protobuf::Message* pMessage )
-	{
-		switch (pType)
-		{
-		case BattleSpace::sDataType::eHero:
-			{
-				return HeroData::create(pMessage);
-			}break;
-		case BattleSpace::sDataType::eMonster:
-			{
-				return MonsterData::create(pMessage);
-			}break;
-		}
-		CCLOG("[ *ERROR ] BaseRoleData::create( E_RoleNature pNature ) ");
-		BaseRoleData* pData = new BaseRoleData();
-		if (pData)
-		{
-			pData->autorelease();
-			return pData;
-		}else{
-			delete pData;
-			pData = nullptr;
-			return nullptr;
-		}
-	}
-
 
 	bool BaseRoleData::hasSpecialSkill() const
 	{
@@ -114,44 +81,4 @@ namespace BattleSpace
 	{
 		return mCaptainSkill;
 	}
-
-	bool BaseRoleData::isAttribute( sAttribute pType )
-	{
-		if (pType == getAttribute())
-			return true;
-		return false;
-	}
-
-	float BaseRoleData::judgeAttribute( sAttribute pType )			//»ð1>Ä¾3; Ä¾3>Ë®2; Ë®2>»ð1
-	{
-		if (getAttribute() == pType)
-		{
-			return 1.0f;
-		}else if ( getAttribute() == sAttribute::eFire )
-		{
-			if (pType == sAttribute::eWood)
-				return 1.3f;
-			if (pType == sAttribute::eWater)
-				return 0.7f;
-		}else if ( getAttribute() == sAttribute::eWood )
-		{
-			if (pType == sAttribute::eWater)
-				return 1.3f;
-			if (pType == sAttribute::eFire)
-				return 0.7f;
-		}else if( getAttribute() == sAttribute::eWater )
-		{
-			if (pType == sAttribute::eFire)
-				return 1.3f;
-			if (pType == sAttribute::eWood)
-				return 0.7f;
-		}
-		return 1.0f;
-	}
-
-	void BaseRoleData::copySelf( BaseRoleData* pData )
-	{
-		*this = *pData;
-	}
-
 }

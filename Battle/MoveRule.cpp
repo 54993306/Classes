@@ -18,7 +18,7 @@ namespace BattleSpace{
 
 	bool MoveRule::MonstMoveExcute(BaseRole* monster)
 	{
-		if (!monster->getMove()||monster->getAliveStat() == sLogicState::eInvincible)
+		if (!monster->getMove()||monster->getAliveStat() == INVINCIBLE)
 			return false;
 		int grid = monsterMove(monster);
 		if( grid!= INVALID_GRID && grid < C_CAPTAINGRID)	
@@ -33,7 +33,7 @@ namespace BattleSpace{
 	int MoveRule::monsterMove(BaseRole* alive)
 	{
 		//怪物的移动处理是，哪个最先返回值不是INVALID_GRID就以哪个为标准，后面的不做处理了
-		if (alive->getAliveType() == sMonsterSpecies::eWorldBoss)
+		if (alive->getAliveType() == E_ALIVETYPE::eWorldBoss)
 			return INVALID_GRID;
 		int index = alive->getGridIndex();
 		if (index/C_GRID_ROW >= C_GRID_COL-1)

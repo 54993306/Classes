@@ -251,7 +251,7 @@ namespace BattleSpace{
 		vector<BaseRole*>* Vec = m_Manage->getVecHeros();
 		for (auto i : *Vec)
 		{
-			if (i->getCallType()!=sCallType::eCommon)continue;
+			if (i->getCallType()!=CommonType)continue;
 			MoveObject* mo = i->getMoveObject();
 			if (!mo)continue;
 			for (auto j :mo->grids)

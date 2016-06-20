@@ -18,10 +18,11 @@
 #include <spine/spine-cocos2dx.h>
 #include "Battle/StateManage/StateManager.h"
 #include "cocos-ext.h"
-using namespace cocos2d;
+USING_NS_CC;
+USING_NS_CC_EXT;
 using namespace std;
 using namespace spine; 
-using namespace cocos2d::extension;
+   
 namespace BattleSpace{
 	class HPObject;
 	class EffectObject;

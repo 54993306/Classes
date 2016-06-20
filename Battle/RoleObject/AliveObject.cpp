@@ -86,7 +86,7 @@ namespace BattleSpace{
 		const HeroInfoData *c_data = DataCenter::sharedData()->getHeroInfo()->getCfg(mRole->getBaseData()->getRoleModel());
 		if(c_data)
 		{
-			sprintf(pPath,"common/type_%d_%d.png", mRole->getBaseData()->getAttribute(), c_data->iType2);
+			sprintf(pPath,"common/type_%d_%d.png", mRole->getBaseData()->getRoleType(), c_data->iType2);
 		}else{
 			sprintf(pPath,"common/type_1_1.png");
 			CCLOG("[ *ERROR ] AliveObject::initAliveTypeIcon %d",mRole->getBaseData()->getRoleModel());
@@ -244,7 +244,7 @@ namespace BattleSpace{
 			return	;
 		}
 		m_HpObject->playChangeNumber(num,type);
-		if (mRole->getAliveType() == sMonsterSpecies::eWorldBoss)														//boss的情况处理应该在血量条的内部,自己进行。
+		if (mRole->getAliveType() == E_ALIVETYPE::eWorldBoss)														//boss的情况处理应该在血量条的内部,自己进行。
 			NOTIFICATION->postNotification(B_WorldBoss_HurtUpdate,CCInteger::create(m_HpObject->getHpNumber()));	
 		if (type > gainType)
 			lostHpDispose();

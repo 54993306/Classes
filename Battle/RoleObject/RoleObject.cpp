@@ -156,7 +156,7 @@ namespace BattleSpace{
 	{
 		if (m_ActionKey.compare(Start_Action)==0)
 		{
-			mRole->setAliveStat(sLogicState::eNormal);
+			mRole->setAliveStat(COMMONSTATE);
 		}else if ( !strcmp(m_ActionKey.c_str(),Stand_Action))
 		{
 			CCLOG("[ **ERROR ] ActObject::lostAction Lost StandAction");
@@ -264,12 +264,12 @@ namespace BattleSpace{
 	void RoleObject::attackActionEnd()
 	{
 		TurnStateTo(E_StateCode::eStandState);
+		if (mRole->getCritEffect()&&!mEnemy)		
+			NOTIFICATION->postNotification(B_CritEnd,mRole);
 		if (mRole->getHp()<=0)
 			this->AliveDie();									//释放完技能后自己死亡的情况处理
-		if (mRole->getCritEffect() && !mEnemy)		
-			NOTIFICATION->postNotification(B_CritEnd,mRole);
-		else if (mRole->getBaseData()->getCallRoleType() == sCallType::eAutoSkill||
-			mRole->getBaseData()->getCallRoleType() == sCallType::eOnlyOnce)				//陨石类释放攻击后死亡OnlyOnces
+		else if (mRole->getBaseData()->getCallType() == AutoSkill||
+			mRole->getBaseData()->getCallType() == OnlyOnce)				//陨石类释放攻击后死亡OnlyOnces
 			this->AliveDie();	
 		AtkEnd_Event();	
 	}
@@ -292,7 +292,7 @@ namespace BattleSpace{
 		}else if (!strcmp(ActionName,Start_Action))
 		{
 			TurnStateTo(E_StateCode::eStandState);
-			mRole->setAliveStat(sLogicState::eNormal);
+			mRole->setAliveStat(COMMONSTATE);
 		}else{
 			if (strcmp(ActionName,Stand_Action)==0||strcmp(ActionName,Walk_Action)==0)
 				return;
@@ -438,7 +438,7 @@ namespace BattleSpace{
 	{
 		CCPoint tPosition = m_MapData->getPoint(mRole->getMoveGrid());
 		this->setPosition(tPosition+this->getoffs());
-		if (!mEnemy&&mRole->getCallType()!=sCallType::eAutoMove)
+		if (!mEnemy&&mRole->getCallType()!=AutoMoveType)
 			this->TurnStateTo(E_StateCode::eStandState);											//站立时会自动将武将方向调转回来
 		this->setSpeed(CCPointZero);
 		this->setMoveState(E_StateCode::eNullState);
@@ -464,7 +464,7 @@ namespace BattleSpace{
 		if (mRole->getBattle() || mRole->getEnemy())								//第一次召唤武将处理(未上阵的武将都瞬移)
 			return false;
 		m_MoveState = E_StateCode::eNullState;
-		mRole->setAliveStat(sLogicState::eInvincible);
+		mRole->setAliveStat(INVINCIBLE);
 		this->TurnStateTo(E_StateCode::eEnterState);
 		NOTIFICATION->postNotification(B_RolrLogInBattlefield,mRole);//武将上阵
 		mRole->setGridIndex(mRole->getMoveGrid());
@@ -543,7 +543,7 @@ namespace BattleSpace{
 	{
 		if (mRole->getEnemy()	||
 			mRole->getCaptain()||
-			mRole->getCallType() != sCallType::eCommon)
+			mRole->getCallType() != CommonType)
 			return;
 		MoveObject* tMoveObj = MoveObject::create();
 		tMoveObj->setRowCol(mRole->getBaseData()->getRoleRow(),mRole->getBaseData()->getRoleCol());

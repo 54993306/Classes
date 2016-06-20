@@ -21,10 +21,17 @@ namespace google {
 		class Message;
 	}
 }
+namespace protos{
+	namespace common{
+		class Monster;
+		class Hero;
+	}
+}
 using namespace std;
 #define BattleData BattleSpace::BattleDataCenter::ShareBattleDataCenter()
 namespace BattleSpace{
-	class BaseRoleData;
+	class HeroData;
+	class MonsterData;
 	class BattleDataCenter
 	{
 	public:
@@ -34,17 +41,16 @@ namespace BattleSpace{
 		void initBattleData( const google::protobuf::Message *pResponse,bool pWorldBoss = false );
 		void initWordBossStage( const google::protobuf::Message *pResponse );
 		void initNormalStage( const google::protobuf::Message *pResponse );
-		const vector<BaseRoleData*>& getHeroVector()const;
-		const vector<BaseRoleData*>& getMonsterVector()const;
-		const vector<BaseRoleData*>& getCallRoleVector()const;
-		void addCallRole(BaseRoleData* pBaseData);
+		const  vector<HeroData*>&  getHeroVector()const	;
+		const vector<MonsterData*>& getMonsterVector()const;
+		const vector<MonsterData*>& getCallRoleVector();
 	private:
-		void initMonsterData(const google::protobuf::Message *pResponse);
-		void initHeroData(const google::protobuf::Message *pResponse);
+		void initMonsterData(const protos::common::Monster* pData);
+		void initHeroData(const protos::common::Hero* pData);
 	private:
-		vector<BaseRoleData*> mHeroVec;
-		vector<BaseRoleData*>mMonsterVec;
-		vector<BaseRoleData*>mCallRole;
+		vector<HeroData*> mHeroVec;
+		vector<MonsterData*>mMonsterVec;
+		vector<MonsterData*>mCallRole;
 		BattleDataCenter();
 		static BattleDataCenter* mDataControl;
 		class SingletonDestroy

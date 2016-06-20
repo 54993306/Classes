@@ -56,8 +56,8 @@ namespace BattleSpace{
 				if ( pAlive->hasAliveByTargets(tAlive) || 
 					!tAlive->standInGrid(tGrid) )
 					continue;												//受击数组已存在该武将
-				if (tAlive->getAliveStat() == sLogicState::eInvincible || 
-					tAlive->getAliveStat() == sLogicState::eUnHit )
+				if (tAlive->getAliveStat() == INVINCIBLE || 
+					tAlive->getAliveStat() == UNHIT )
 					break;
 				pAlive->mAreaTargets.push_back(tAlive);
 				break;

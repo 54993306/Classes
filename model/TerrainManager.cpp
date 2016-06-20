@@ -280,9 +280,9 @@ void TerrainManager::AttributeDispose(BaseRole* alive,Terrain* ter)
 	}
 	if(!atbType)return;
 
-	switch ((sProperty)atbType)
+	switch (atbType)
 	{
-	case sProperty::eAttack:
+	case atb_attak:
 		{
 			if (dispose)
 			{
@@ -292,7 +292,7 @@ void TerrainManager::AttributeDispose(BaseRole* alive,Terrain* ter)
 			}
 		}
 		break;
-	case sProperty::eDefense:
+	case atb_def:
 		{
 			if (dispose)
 			{
@@ -302,7 +302,7 @@ void TerrainManager::AttributeDispose(BaseRole* alive,Terrain* ter)
 			}
 		}
 		break;
-	case sProperty::eBlood:
+	case atb_hp:
 		{
 			if (dispose)
 			{
@@ -312,7 +312,7 @@ void TerrainManager::AttributeDispose(BaseRole* alive,Terrain* ter)
 			}
 		}
 		break;
-	case sProperty::eHit:
+	case atb_hit:
 		{
 			if (dispose)
 			{
@@ -322,7 +322,7 @@ void TerrainManager::AttributeDispose(BaseRole* alive,Terrain* ter)
 			}
 		}
 		break;
-	case sProperty::eCrit:
+	case atb_crit:
 		{
 			if (dispose)
 			{
@@ -330,6 +330,32 @@ void TerrainManager::AttributeDispose(BaseRole* alive,Terrain* ter)
 			}else{
 				alive->setCrit(alive->getCrit() - atbTypeNum);
 			}
+		}
+		break;
+	case atb_move:		
+		{
+			/*if (dispose)
+			{
+			if (!usType)alive->setMove(alive->getMove() + atbTypeNum);
+			}else{
+			alive->setMove(alive->getMove() - atbTypeNum);
+			}*/
+		}
+		break;
+	case atb_addhrt:
+	case atb_cuther:
+		{
+			if (dispose)
+			{
+				if (!usType)alive->setHrt(alive->getHrt() + atbTypeNum);
+			}else{
+				alive->setHrt(alive->getHrt() - atbTypeNum);
+			}
+		}
+		break;
+	case atb_hp_recover:
+		{
+			if (dispose)alive->setHp(alive->getHp() + atbTypeNum);
 		}
 		break;
 	default:

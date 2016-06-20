@@ -1,5 +1,7 @@
 ﻿#ifndef _BUFF_MANAGER_H_
 #define _BUFF_MANAGER_H_
+#include "AppUI.h"
+#include <map>
 
 /************************************************************* 
  *
@@ -14,11 +16,7 @@
  *
  *
  *************************************************************/
-#include "cocos2d.h"
-#include <map>
 using namespace std;
-using namespace cocos2d;
-
 namespace BattleSpace{
 	class BaseRole;
 	class BuffData;

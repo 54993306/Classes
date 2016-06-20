@@ -3,8 +3,8 @@
 namespace BattleSpace{
 	BuffData::BuffData()
 		:m_BuffID(0),m_BuffType(0),m_BuffDes(""),m_ChangeNum(0),m_Precent(0)
-		,m_TriggerRate(0),m_IsDBuff(false),mAttribute(sAttribute::eNull)
-		,m_BuffTarget(0),m_BuffLevel(0),m_BuffDuration(0)
+		,m_TriggerRate(0),m_IsDBuff(false),m_TargetType(0),m_BuffDuration(0)
+		,m_BuffTarget(0),m_BuffLevel(0)
 	{}
 	BuffData* BuffData::create()
 	{
@@ -31,7 +31,7 @@ namespace BattleSpace{
 		this->setBuffDuration(buff->duration());
 		this->setBuffTarget(buff->target());
 		this->setBuffLevel(buff->level());
-		this->setTargetType((sAttribute)buff->element());
+		this->setTargetType(buff->element());
 		this->setBuffDes(buff->name());	
 		//this->durative = buf.durative();	//来自atbType 属性影响类型，僵尸/道士/神将
 	}

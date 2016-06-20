@@ -24,6 +24,8 @@ namespace BattleSpace{
 		bool res;
 		int roundNum;
 	};
+
+	class MonsterData;
 	class BufExp;
 	class MoveRule;
 	class BattleScene; 

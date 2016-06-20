@@ -51,9 +51,9 @@ namespace BattleSpace{
 	//多人打击的情况有返回值才能确定具体移动
 	int HurtCount::ChangeLocation(BaseRole* AtcAlive , BaseRole* HitAlive)
 	{
-		if (HitAlive->getCallType() == sCallType::eFixedlyCantFly 
-			|| HitAlive->getCallType() == sCallType::eNotAttack||HitAlive->getCaptain()
-			|| HitAlive->getAliveType() == sMonsterSpecies::eWorldBoss)//不可被击飞类型武将
+		if (HitAlive->getCallType() == FixedlyCantFlyType 
+			|| HitAlive->getCallType() == NotAttack||HitAlive->getCaptain()
+			|| HitAlive->getAliveType() == E_ALIVETYPE::eWorldBoss)//不可被击飞类型武将
 			return HitAlive->getGridIndex();
 		const skEffectData* effect = AtcAlive->getCurrEffect();
 		if (effect->getBatter() != AtcAlive->getSortieNum() || !effect->getRepel())
@@ -120,7 +120,7 @@ namespace BattleSpace{
 
 	void HurtCount::woldBossHurt( BaseRole* pAlive,float pHurt )
 	{
-		if (pAlive->getAliveType() == sMonsterSpecies::eWorldBoss)							//世界boss受击
+		if (pAlive->getAliveType() == E_ALIVETYPE::eWorldBoss)							//世界boss受击
 		{
 			pHurt *= (1+m_Manage->getBossHurtPe()*0.01f);								//鼓舞效果
 			m_Manage->setBossHurtCount(pHurt);
@@ -170,7 +170,7 @@ namespace BattleSpace{
 		addNum = base_hp + hurt;
 		str.hitType = gainType;											//加血只显示一种字体
 		str.hitNum = addNum;		
-		if (HitTarget->getCallType() != sCallType::eUNAddHP)						//不可被加血类型武将
+		if (HitTarget->getCallType() != UNAddHP)						//不可被加血类型武将
 			HitTarget->setHp(HitTarget->getHp() + str.hitNum);			//血量实际变化的位置
 		return str;
 	}
@@ -274,25 +274,25 @@ namespace BattleSpace{
 	{
 		const skEffectData* effect = AtcTarget->getCurrEffect();
 		//属性影响类型*属性影响频率
-		switch ((sProperty)effect->getImpactType())
+		switch (effect->getImpactType())
 		{
-		case sProperty::eAttack:
+		case atb_attak:
 			{
 				return AtcTarget->getAtk() * effect->getImpactRate() *0.01f;
 			}break;
-		case sProperty::eDefense:
+		case atb_def:
 			{
 				return AtcTarget->getDef() * effect->getImpactRate()*0.01f;
 			}break;
-		case sProperty::eBlood:
+		case atb_hp:
 			{
 				return AtcTarget->getHp() * effect->getImpactRate()*0.01f;
 			}break;
-		case sProperty::eHit:
+		case atb_hit:
 			{
 				return AtcTarget->getHit() * effect->getImpactRate()*0.01f;
 			}break;
-		case sProperty::eCrit:
+		case atb_crit:
 			{
 				return AtcTarget->getCrit() * effect->getImpactRate()*0.01f;
 			}break;
@@ -326,13 +326,13 @@ namespace BattleSpace{
 				if (buff->getBuffTarget() == usTargetType)					//自己
 				{
 					//CCLOG("\nAtcTargetID = %d ,AddBuff ID: %d",AtcTarget->getAliveID(),buff.buffId);
-					if (buff->getTargetType() != sAttribute::eNull	 && buff->getTargetType()!=pAlive->getBaseData()->getAttribute())//判断buf的限定种族
+					if (buff->getTargetType()&&buff->getTargetType()!=pAlive->getBaseData()->getRoleType())//判断buf的限定种族
 						continue;
 					AtcbufManege->AddBuff(*buff);
 				}else if (buff->getBuffTarget() == hitTargetType && tAlive)				//受击目标
 				{
 					BuffManage* HitbufManege = tAlive->getBuffManage();
-					if (buff->getTargetType() != sAttribute::eNull	 &&buff->getTargetType()!=tAlive->getBaseData()->getAttribute())
+					if (buff->getTargetType()&&buff->getTargetType()!=tAlive->getBaseData()->getRoleType())
 						continue;
 					//CCLOG("\nHitTargetID = %d ,AddBuff ID: %d",HitTarget->getAliveID(),buff.buffId);
 					HitbufManege->AddBuff(*buff);
@@ -346,7 +346,31 @@ namespace BattleSpace{
 	float HurtCount::raceDispose(BaseRole* AtcTarget , BaseRole* HitTarget)
 	{
 		return 1;
-		sAttribute hitType = HitTarget->getBaseData()->getAttribute();
-		return AtcTarget->getBaseData()->judgeAttribute(hitType);
+		//火1>木3; 木3>水2; 水2>火1
+		int atkType = AtcTarget->getBaseData()->getRoleType();
+		int hitType = HitTarget->getBaseData()->getRoleType();
+		if (atkType == hitType)
+		{
+			return 1.0f;
+		}else if ( atkType == FireType )
+		{
+			if (hitType == WoodType)
+				return 1.3f;
+			if (hitType == WaterType)
+				return 0.7f;
+		}else if ( atkType == WoodType )
+		{
+			if (hitType == WaterType)
+				return 1.3f;
+			if (hitType == FireType)
+				return 0.7f;
+		}else if( atkType == WaterType )
+		{
+			if (hitType == FireType)
+				return 1.3f;
+			if (hitType == WoodType)
+				return 0.7f;
+		}
+		return 1.0f;
 	}
 };
