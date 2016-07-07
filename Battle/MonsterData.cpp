@@ -31,7 +31,7 @@ namespace BattleSpace{
 
 		this->setRoleModel(monster->thumb());
 		this->setCallRole(monster->iscall());				//召唤类的武将都放在怪物列表中传输过来
-		this->setRoleType(monster->monstertype());
+		this->setProperty(monster->monstertype());
 		this->setRoleHp(monster->hp());
 		this->setRoleAttack(monster->atk());
 		this->setRoleDefense(monster->def());
@@ -43,8 +43,8 @@ namespace BattleSpace{
 		this->setRoleDrop(monster->hasitem());
 		this->setMoveSpeed(monster->movespeed());
 		this->setAttackSpeed(monster->atkinterval());
-		this->setMonsterType(monster->buff());
-		this->setCallType(monster->foe());
+		this->setBehavior((sBehavior)monster->buff());
+		this->setCallType((sCallType)monster->foe());
 		this->setCritTime(CCRANDOM_0_1()*(monster->maxround()- monster->minround()) +  monster->minround());
 		this->setDelayTime(monster->delay());
 		this->setBossMonster(monster->isboss());

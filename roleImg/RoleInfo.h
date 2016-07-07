@@ -6,8 +6,9 @@
 #include "scene/layer/LayerManager.h"
 #include "bag/bagData.h"
 #include "model/DataCenter.h"
+#include "activity/HttpLoadImage.h"
 
-class CRoleInfo: public BaseLayer
+class CRoleInfo: public BaseLayer, public HttpLoadImageDelegate
 {
 public:
 	CREATE_LAYER(CRoleInfo);
@@ -22,7 +23,6 @@ public:
 	void setRoleInfoVal(UserData *data);
 
 	void recoverTime(UserData * data, CLabel * acttime);
-	
 
 	bool ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent);
 protected:
@@ -36,10 +36,12 @@ protected:
 	void hide(CCObject* pObj);
 	void show(CCObject* pObj);
 	CCSprite* maskedSprite(CCSprite *textureSprite);
+	void imageLoadSuccessCallBack(string sTag, vector<char>* pBuffer);
 private:
 	CLayout *m_ui;
 	UserData *m_data;
 	
 };
+
 
 #endif

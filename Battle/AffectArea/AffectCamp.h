@@ -23,7 +23,7 @@ namespace BattleSpace
 		AffectEnemy(){};
 		virtual ~AffectEnemy(){};
 		UNINITCREATE(AffectEnemy);
-		virtual AffectType getAreaType();
+		virtual sAffectType getAreaType();
 		virtual void initArea(AreaCountInfo &pInfo);
 	};
 
@@ -35,7 +35,7 @@ namespace BattleSpace
 		AffectOur(){};
 		virtual ~AffectOur(){};
 		UNINITCREATE(AffectOur);
-		virtual AffectType getAreaType();
+		virtual sAffectType getAreaType();
 	};
 
 	/***************************************************************************/
@@ -46,7 +46,7 @@ namespace BattleSpace
 		AffectAllArea(){};
 		virtual ~AffectAllArea(){};
 		UNINITCREATE(AffectAllArea);
-		virtual AffectType getAreaType();
+		virtual sAffectType getAreaType();
 	};
 };
 #endif

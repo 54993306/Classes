@@ -1,5 +1,11 @@
-#ifndef __HttpGetImg__
-#define __HttpGetImg__
+#pragma once
+
+/******************************************************
+*文件名称:	HttpLoadImage.h
+*编写日期:	2016-6-14-11:36
+*编写作者:	YPF
+*功能描述:	加载网络图片
+*******************************************************/
 
 #include "cocos2d.h"
 #include "network/HttpRequest.h"
@@ -49,5 +55,3 @@ private:
 	static HttpLoadImage* m_instance;
 	HttpLoadImageDelegate* m_pTarget;
 };
-
-#endif /* HttpGetImg */

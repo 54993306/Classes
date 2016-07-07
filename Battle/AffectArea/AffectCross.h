@@ -23,7 +23,7 @@ namespace BattleSpace
 		AffectCross(){};
 		virtual ~AffectCross(){};
 		UNINITCREATE(AffectCross);
-		virtual AffectType getAreaType();
+		virtual sAffectType getAreaType();
 		virtual void initArea(AreaCountInfo &pInfo);
 	};
 };

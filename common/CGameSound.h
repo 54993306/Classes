@@ -1,8 +1,15 @@
 #pragma once
 
+/******************************************************
+*文件名称:	CGameSound.h
+*编写日期:	2016-6-14-11:37
+*编写作者:	YPF
+*功能描述:	声音播放管理
+*******************************************************/
+
 #include "cocos2d.h"
 #include "SimpleAudioEngine.h"
-
+#include "Resources.h"
 using namespace cocos2d;
 using namespace std;
 

@@ -35,13 +35,14 @@ void protobuf_AssignDesc_common_2fprize_5fcommon_2eproto() {
       "common/prize_common.proto");
   GOOGLE_CHECK(file != NULL);
   Prize_descriptor_ = file->message_type(0);
-  static const int Prize_offsets_[6] = {
+  static const int Prize_offsets_[7] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Prize, type_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Prize, id_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Prize, num_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Prize, quality_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Prize, thumb_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Prize, color_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Prize, param_),
   };
   Prize_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -85,10 +86,11 @@ void protobuf_AddDesc_common_2fprize_5fcommon_2eproto() {
 
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
     "\n\031common/prize_common.proto\022\rprotos.comm"
-    "on\"]\n\005Prize\022\014\n\004type\030\001 \001(\005\022\n\n\002id\030\002 \001(\005\022\013\n"
+    "on\"l\n\005Prize\022\014\n\004type\030\001 \001(\005\022\n\n\002id\030\002 \001(\005\022\013\n"
     "\003num\030\003 \001(\005\022\017\n\007quality\030\004 \001(\005\022\r\n\005thumb\030\005 \001"
-    "(\005\022\r\n\005color\030\006 \001(\005B5\n$dass.server.gameser"
-    "ver.protos.commonB\013PrizeCommonH\001", 192);
+    "(\005\022\r\n\005color\030\006 \001(\005\022\r\n\005param\030\007 \001(\005B5\n$dass"
+    ".server.gameserver.protos.commonB\013PrizeC"
+    "ommonH\001", 207);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "common/prize_common.proto", &protobuf_RegisterTypes);
   Prize::default_instance_ = new Prize();
@@ -112,6 +114,7 @@ const int Prize::kNumFieldNumber;
 const int Prize::kQualityFieldNumber;
 const int Prize::kThumbFieldNumber;
 const int Prize::kColorFieldNumber;
+const int Prize::kParamFieldNumber;
 #endif  // !_MSC_VER
 
 Prize::Prize()
@@ -136,6 +139,7 @@ void Prize::SharedCtor() {
   quality_ = 0;
   thumb_ = 0;
   color_ = 0;
+  param_ = 0;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -177,6 +181,7 @@ void Prize::Clear() {
     quality_ = 0;
     thumb_ = 0;
     color_ = 0;
+    param_ = 0;
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
@@ -279,6 +284,22 @@ bool Prize::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(56)) goto parse_param;
+        break;
+      }
+
+      // optional int32 param = 7;
+      case 7: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_param:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &param_)));
+          set_has_param();
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -331,6 +352,11 @@ void Prize::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt32(6, this->color(), output);
   }
 
+  // optional int32 param = 7;
+  if (has_param()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(7, this->param(), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -367,6 +393,11 @@ void Prize::SerializeWithCachedSizes(
   // optional int32 color = 6;
   if (has_color()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(6, this->color(), target);
+  }
+
+  // optional int32 param = 7;
+  if (has_param()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(7, this->param(), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -422,6 +453,13 @@ int Prize::ByteSize() const {
           this->color());
     }
 
+    // optional int32 param = 7;
+    if (has_param()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->param());
+    }
+
   }
   if (!unknown_fields().empty()) {
     total_size +=
@@ -467,6 +505,9 @@ void Prize::MergeFrom(const Prize& from) {
     if (from.has_color()) {
       set_color(from.color());
     }
+    if (from.has_param()) {
+      set_param(from.param());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -496,6 +537,7 @@ void Prize::Swap(Prize* other) {
     std::swap(quality_, other->quality_);
     std::swap(thumb_, other->thumb_);
     std::swap(color_, other->color_);
+    std::swap(param_, other->param_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

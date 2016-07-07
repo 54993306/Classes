@@ -35,7 +35,7 @@ void protobuf_AssignDesc_common_2frole_5fcommon_2eproto() {
       "common/role_common.proto");
   GOOGLE_CHECK(file != NULL);
   Role_descriptor_ = file->message_type(0);
-  static const int Role_offsets_[22] = {
+  static const int Role_offsets_[25] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Role, roleid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Role, rolename_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Role, rolelv_),
@@ -46,10 +46,12 @@ void protobuf_AssignDesc_common_2frole_5fcommon_2eproto() {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Role, fbid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Role, roleexp_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Role, nextexp_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Role, rolemoney_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Role, rolecoin_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Role, rolegold_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Role, rolefood_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Role, rolefcoin_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Role, rolepoints_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Role, roleaction_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Role, actionlimit_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Role, actiontime_),
@@ -58,6 +60,7 @@ void protobuf_AssignDesc_common_2frole_5fcommon_2eproto() {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Role, mobileshop_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Role, invitefriend_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Role, firstlogin_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Role, goolebilling_),
   };
   Role_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -101,18 +104,19 @@ void protobuf_AddDesc_common_2frole_5fcommon_2eproto() {
 
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
     "\n\030common/role_common.proto\022\rprotos.commo"
-    "n\"\221\003\n\004Role\022\016\n\006roleId\030\001 \002(\005\022\020\n\010roleName\030\002"
+    "n\"\316\003\n\004Role\022\016\n\006roleId\030\001 \002(\005\022\020\n\010roleName\030\002"
     " \001(\t\022\016\n\006roleLv\030\003 \001(\005\022\022\n\nroleNation\030\004 \001(\005"
     "\022\013\n\003vip\030\021 \001(\005\022\016\n\006combat\030\020 \001(\005\022\r\n\005thumb\030\024"
     " \001(\005\022\014\n\004fbId\030\005 \001(\t\022\017\n\007roleExp\030\n \001(\005\022\017\n\007n"
-    "extExp\030\014 \001(\005\022\020\n\010roleCoin\030\013 \001(\005\022\020\n\010roleGo"
-    "ld\030\016 \001(\005\022\020\n\010roleFood\030\017 \001(\005\022\021\n\troleFCoin\030"
-    "\022 \001(\005\022\022\n\nroleAction\030\r \001(\005\022\023\n\013actionLimit"
-    "\030\023 \001(\005\022\022\n\nactionTime\030\025 \001(\006\022\020\n\010interval\030\027"
-    " \001(\005\022\021\n\tnewerStep\030\030 \001(\005\022\022\n\nmobileShop\030\031 "
-    "\001(\010\022\024\n\014inviteFriend\030\032 \001(\005\022\022\n\nfirstLogin\030"
-    "\033 \001(\010B4\n$dass.server.gameserver.protos.c"
-    "ommonB\nRoleCommonH\001", 499);
+    "extExp\030\014 \001(\005\022\021\n\troleMoney\030\006 \001(\005\022\020\n\010roleC"
+    "oin\030\013 \001(\005\022\020\n\010roleGold\030\016 \001(\005\022\020\n\010roleFood\030"
+    "\017 \001(\005\022\021\n\troleFCoin\030\022 \001(\005\022\022\n\nrolePoints\030\026"
+    " \001(\005\022\022\n\nroleAction\030\r \001(\005\022\023\n\013actionLimit\030"
+    "\023 \001(\005\022\022\n\nactionTime\030\025 \001(\006\022\020\n\010interval\030\027 "
+    "\001(\005\022\021\n\tnewerStep\030\030 \001(\005\022\022\n\nmobileShop\030\031 \001"
+    "(\010\022\024\n\014inviteFriend\030\032 \001(\005\022\022\n\nfirstLogin\030\033"
+    " \001(\010\022\024\n\014gooleBilling\030\034 \001(\010B4\n$dass.serve"
+    "r.gameserver.protos.commonB\nRoleCommonH\001", 560);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "common/role_common.proto", &protobuf_RegisterTypes);
   Role::default_instance_ = new Role();
@@ -140,10 +144,12 @@ const int Role::kThumbFieldNumber;
 const int Role::kFbIdFieldNumber;
 const int Role::kRoleExpFieldNumber;
 const int Role::kNextExpFieldNumber;
+const int Role::kRoleMoneyFieldNumber;
 const int Role::kRoleCoinFieldNumber;
 const int Role::kRoleGoldFieldNumber;
 const int Role::kRoleFoodFieldNumber;
 const int Role::kRoleFCoinFieldNumber;
+const int Role::kRolePointsFieldNumber;
 const int Role::kRoleActionFieldNumber;
 const int Role::kActionLimitFieldNumber;
 const int Role::kActionTimeFieldNumber;
@@ -152,6 +158,7 @@ const int Role::kNewerStepFieldNumber;
 const int Role::kMobileShopFieldNumber;
 const int Role::kInviteFriendFieldNumber;
 const int Role::kFirstLoginFieldNumber;
+const int Role::kGooleBillingFieldNumber;
 #endif  // !_MSC_VER
 
 Role::Role()
@@ -180,10 +187,12 @@ void Role::SharedCtor() {
   fbid_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   roleexp_ = 0;
   nextexp_ = 0;
+  rolemoney_ = 0;
   rolecoin_ = 0;
   rolegold_ = 0;
   rolefood_ = 0;
   rolefcoin_ = 0;
+  rolepoints_ = 0;
   roleaction_ = 0;
   actionlimit_ = 0;
   actiontime_ = GOOGLE_ULONGLONG(0);
@@ -192,6 +201,7 @@ void Role::SharedCtor() {
   mobileshop_ = false;
   invitefriend_ = 0;
   firstlogin_ = false;
+  goolebilling_ = false;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -253,20 +263,25 @@ void Role::Clear() {
   if (_has_bits_[8 / 32] & (0xffu << (8 % 32))) {
     roleexp_ = 0;
     nextexp_ = 0;
+    rolemoney_ = 0;
     rolecoin_ = 0;
     rolegold_ = 0;
     rolefood_ = 0;
     rolefcoin_ = 0;
-    roleaction_ = 0;
-    actionlimit_ = 0;
+    rolepoints_ = 0;
   }
   if (_has_bits_[16 / 32] & (0xffu << (16 % 32))) {
+    roleaction_ = 0;
+    actionlimit_ = 0;
     actiontime_ = GOOGLE_ULONGLONG(0);
     interval_ = 0;
     newerstep_ = 0;
     mobileshop_ = false;
     invitefriend_ = 0;
     firstlogin_ = false;
+  }
+  if (_has_bits_[24 / 32] & (0xffu << (24 % 32))) {
+    goolebilling_ = false;
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
@@ -352,6 +367,22 @@ bool Role::MergePartialFromCodedStream(
           ::google::protobuf::internal::WireFormat::VerifyUTF8String(
             this->fbid().data(), this->fbid().length(),
             ::google::protobuf::internal::WireFormat::PARSE);
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(48)) goto parse_roleMoney;
+        break;
+      }
+
+      // optional int32 roleMoney = 6;
+      case 6: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_roleMoney:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &rolemoney_)));
+          set_has_rolemoney();
         } else {
           goto handle_uninterpreted;
         }
@@ -547,6 +578,22 @@ bool Role::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(176)) goto parse_rolePoints;
+        break;
+      }
+
+      // optional int32 rolePoints = 22;
+      case 22: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_rolePoints:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &rolepoints_)));
+          set_has_rolepoints();
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectTag(184)) goto parse_interval;
         break;
       }
@@ -627,6 +674,22 @@ bool Role::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(224)) goto parse_gooleBilling;
+        break;
+      }
+
+      // optional bool gooleBilling = 28;
+      case 28: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_gooleBilling:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
+                 input, &goolebilling_)));
+          set_has_goolebilling();
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -680,6 +743,11 @@ void Role::SerializeWithCachedSizes(
       ::google::protobuf::internal::WireFormat::SERIALIZE);
     ::google::protobuf::internal::WireFormatLite::WriteString(
       5, this->fbid(), output);
+  }
+
+  // optional int32 roleMoney = 6;
+  if (has_rolemoney()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(6, this->rolemoney(), output);
   }
 
   // optional int32 roleExp = 10;
@@ -742,6 +810,11 @@ void Role::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteFixed64(21, this->actiontime(), output);
   }
 
+  // optional int32 rolePoints = 22;
+  if (has_rolepoints()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(22, this->rolepoints(), output);
+  }
+
   // optional int32 interval = 23;
   if (has_interval()) {
     ::google::protobuf::internal::WireFormatLite::WriteInt32(23, this->interval(), output);
@@ -765,6 +838,11 @@ void Role::SerializeWithCachedSizes(
   // optional bool firstLogin = 27;
   if (has_firstlogin()) {
     ::google::protobuf::internal::WireFormatLite::WriteBool(27, this->firstlogin(), output);
+  }
+
+  // optional bool gooleBilling = 28;
+  if (has_goolebilling()) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(28, this->goolebilling(), output);
   }
 
   if (!unknown_fields().empty()) {
@@ -808,6 +886,11 @@ void Role::SerializeWithCachedSizes(
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
         5, this->fbid(), target);
+  }
+
+  // optional int32 roleMoney = 6;
+  if (has_rolemoney()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(6, this->rolemoney(), target);
   }
 
   // optional int32 roleExp = 10;
@@ -870,6 +953,11 @@ void Role::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteFixed64ToArray(21, this->actiontime(), target);
   }
 
+  // optional int32 rolePoints = 22;
+  if (has_rolepoints()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(22, this->rolepoints(), target);
+  }
+
   // optional int32 interval = 23;
   if (has_interval()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(23, this->interval(), target);
@@ -893,6 +981,11 @@ void Role::SerializeWithCachedSizes(
   // optional bool firstLogin = 27;
   if (has_firstlogin()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(27, this->firstlogin(), target);
+  }
+
+  // optional bool gooleBilling = 28;
+  if (has_goolebilling()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(28, this->goolebilling(), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -978,6 +1071,13 @@ int Role::ByteSize() const {
           this->nextexp());
     }
 
+    // optional int32 roleMoney = 6;
+    if (has_rolemoney()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->rolemoney());
+    }
+
     // optional int32 roleCoin = 11;
     if (has_rolecoin()) {
       total_size += 1 +
@@ -1006,6 +1106,15 @@ int Role::ByteSize() const {
           this->rolefcoin());
     }
 
+    // optional int32 rolePoints = 22;
+    if (has_rolepoints()) {
+      total_size += 2 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->rolepoints());
+    }
+
+  }
+  if (_has_bits_[16 / 32] & (0xffu << (16 % 32))) {
     // optional int32 roleAction = 13;
     if (has_roleaction()) {
       total_size += 1 +
@@ -1020,8 +1129,6 @@ int Role::ByteSize() const {
           this->actionlimit());
     }
 
-  }
-  if (_has_bits_[16 / 32] & (0xffu << (16 % 32))) {
     // optional fixed64 actionTime = 21;
     if (has_actiontime()) {
       total_size += 2 + 8;
@@ -1055,6 +1162,13 @@ int Role::ByteSize() const {
 
     // optional bool firstLogin = 27;
     if (has_firstlogin()) {
+      total_size += 2 + 1;
+    }
+
+  }
+  if (_has_bits_[24 / 32] & (0xffu << (24 % 32))) {
+    // optional bool gooleBilling = 28;
+    if (has_goolebilling()) {
       total_size += 2 + 1;
     }
 
@@ -1117,6 +1231,9 @@ void Role::MergeFrom(const Role& from) {
     if (from.has_nextexp()) {
       set_nextexp(from.nextexp());
     }
+    if (from.has_rolemoney()) {
+      set_rolemoney(from.rolemoney());
+    }
     if (from.has_rolecoin()) {
       set_rolecoin(from.rolecoin());
     }
@@ -1129,14 +1246,17 @@ void Role::MergeFrom(const Role& from) {
     if (from.has_rolefcoin()) {
       set_rolefcoin(from.rolefcoin());
     }
+    if (from.has_rolepoints()) {
+      set_rolepoints(from.rolepoints());
+    }
+  }
+  if (from._has_bits_[16 / 32] & (0xffu << (16 % 32))) {
     if (from.has_roleaction()) {
       set_roleaction(from.roleaction());
     }
     if (from.has_actionlimit()) {
       set_actionlimit(from.actionlimit());
     }
-  }
-  if (from._has_bits_[16 / 32] & (0xffu << (16 % 32))) {
     if (from.has_actiontime()) {
       set_actiontime(from.actiontime());
     }
@@ -1154,6 +1274,11 @@ void Role::MergeFrom(const Role& from) {
     }
     if (from.has_firstlogin()) {
       set_firstlogin(from.firstlogin());
+    }
+  }
+  if (from._has_bits_[24 / 32] & (0xffu << (24 % 32))) {
+    if (from.has_goolebilling()) {
+      set_goolebilling(from.goolebilling());
     }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
@@ -1189,10 +1314,12 @@ void Role::Swap(Role* other) {
     std::swap(fbid_, other->fbid_);
     std::swap(roleexp_, other->roleexp_);
     std::swap(nextexp_, other->nextexp_);
+    std::swap(rolemoney_, other->rolemoney_);
     std::swap(rolecoin_, other->rolecoin_);
     std::swap(rolegold_, other->rolegold_);
     std::swap(rolefood_, other->rolefood_);
     std::swap(rolefcoin_, other->rolefcoin_);
+    std::swap(rolepoints_, other->rolepoints_);
     std::swap(roleaction_, other->roleaction_);
     std::swap(actionlimit_, other->actionlimit_);
     std::swap(actiontime_, other->actiontime_);
@@ -1201,6 +1328,7 @@ void Role::Swap(Role* other) {
     std::swap(mobileshop_, other->mobileshop_);
     std::swap(invitefriend_, other->invitefriend_);
     std::swap(firstlogin_, other->firstlogin_);
+    std::swap(goolebilling_, other->goolebilling_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

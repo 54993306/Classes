@@ -14,20 +14,20 @@ enum LoadResType
 	LOAD_EFFECT_SND = 3,
 	LOAD_FONT = 4
 };
-enum struct LoadType
+enum struct sLoadType
 {
-	LoadNuLL,
-	Load_FrameAnimation,
-	Load_Effect,
-	Load_CocosBone,
-	Load_Spine,
+	eNuLL,
+	eFrameAnimation,
+	eEffect,
+	eCocosBone,
+	eSpine,
 };
 struct LoadResourceInfo
 {
 	string FileName;
 	string FilePath;
-	LoadType Loadtype;
-	LoadResourceInfo():Loadtype(LoadType::LoadNuLL),FileName(""),FilePath(""){}
+	sLoadType Loadtype;
+	LoadResourceInfo():Loadtype(sLoadType::eNuLL),FileName(""),FilePath(""){}
 };
 
 class LoadScene : public CScene

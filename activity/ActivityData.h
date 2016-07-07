@@ -1,13 +1,18 @@
-﻿
-#ifndef __ACTIVITY_DATA_
-#define __ACTIVITY_DATA_
+﻿#pragma once
+
+/******************************************************
+*文件名称:	ActivityData.h
+*编写日期:	2016-6-14-11:35
+*编写作者:	YPF
+*功能描述:	活动数据
+*******************************************************/
 
 #include "protos/protocol.h"
 #include "protos/act_protocol.pb.h"
 
-#define activity_select_panel "activity/button_06_on.png"    //"activity/button_06_on.png"
-#define activity_unselect_panel "activity/button_06_off.png" //"activity/button_06_off.png"
-#define default_activity_show_sprite "activity/eventbanner_01.jpg"
+#define activity_select_panel "activity/button_event_on.png"
+#define activity_unselect_panel "activity/button_event_off.png"
+#define default_activity_show_sprite "activity/pattern_64_2.png"
 #define default_activity_icon_sprite "activity/eventtitle_001.png"
 
 enum ActivityTabType
@@ -44,7 +49,6 @@ struct CActivity
 	string		sIconFile;		//活动图标
 	string		sInfoFile;		//描述图片
 	int			iExtraParam;				//其他参数，可能是价格
+	google::protobuf::RepeatedPtrField< ::protos::ExList >	 exlist;				//额外列表数据，用于收集活动
 	void read(const Activity& activity);
 };
-
-#endif

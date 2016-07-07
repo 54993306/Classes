@@ -13,7 +13,6 @@
 #include "mainCity/MainCityControl.h"
 #include "common/CommonFunction.h"
 
-
 CMonsterInfo::CMonsterInfo()
 {
 
@@ -57,6 +56,9 @@ void CMonsterInfo::setMonster(CMonster *monster)
 	level->setString(CCString::createWithFormat("%d",monster->level)->getCString());
 
 	CLabel *desc = (CLabel*)(m_ui->findWidgetById("desc"));
+	
+	CCSprite *mask = (CCSprite *)m_ui->findWidgetById("mask");
+
 	if (data)
 	{
 		if(data->heroName.size()>0)
@@ -74,11 +76,13 @@ void CMonsterInfo::setMonster(CMonster *monster)
 		{
 			desc->setFontSize(m_iBaseDescFontSize-3);
 		}
+
+		mask->setTexture(SetRectColor(data->iType1));
 	}
 
 	CButton *headbg = (CButton *)m_ui->findWidgetById("head");
-	CCSprite *mask = (CCSprite *)m_ui->findWidgetById("mask");
-	mask->setTexture(setItemQualityTexture(monster->quality));
+	
+	
 
 	CCSprite *head = CCSprite::create(getImageName(monster).c_str());
 	if (!head)
@@ -99,6 +103,9 @@ void CMonsterInfo::setHero( CHero* pHero )
 	const HeroInfoData *data = DataCenter::sharedData()->getHeroInfo()->getCfg(pHero->thumb);
 	CLabel *name = (CLabel*)(m_ui->findWidgetById("name"));
 	CLabel *desc = (CLabel*)(m_ui->findWidgetById("desc"));
+	
+	CCSprite *mask = (CCSprite *)m_ui->findWidgetById("mask");
+
 	if (data)
 	{
 		if(data->heroName.size()>0)
@@ -116,6 +123,7 @@ void CMonsterInfo::setHero( CHero* pHero )
 		{
 			desc->setFontSize(m_iBaseDescFontSize-3);
 		}
+		mask->setTexture(SetRectColor(data->iType1));
 	}
 
 
@@ -123,8 +131,8 @@ void CMonsterInfo::setHero( CHero* pHero )
 	level->setString(CCString::createWithFormat("%d",pHero->level)->getCString());
 
 	CButton *headbg = (CButton *)m_ui->findWidgetById("head");
-	CCSprite *mask = (CCSprite *)m_ui->findWidgetById("mask");
-	mask->setTexture(setItemQualityTexture(pHero->iColor));
+	
+
 
 	CCSprite *head = CCSprite::create(getImageName(pHero).c_str());
 	if (!head)

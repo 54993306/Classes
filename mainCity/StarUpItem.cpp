@@ -152,9 +152,12 @@ void CStarUpItem::onEnter()
 	item3->setEnabled(false);
 
 
+	//旋转圈
 	CImageView *circleFire = (CImageView*)(m_ui->findWidgetById("fire_circle"));
-	circleFire->setScale(1.65f);
+	circleFire->setScale(1.95f);
 	circleFire->runAction(CCRepeatForever::create(CCRotateBy::create(1.0f, 60)));
+	circleFire->runAction(CCRepeatForever::create(CCSequence::createWithTwoActions(CCScaleTo::create(1.2f, 2.1f), CCScaleTo::create(1.2f, 1.95f))));
+
 
 	GetTcpNet->registerMsgHandler(RisingDataRequestMsg, this, CMsgHandler_selector(CStarUpItem::strengthenResponse));
 	GetTcpNet->registerMsgHandler(RisingRequestMsg, this, CMsgHandler_selector(CStarUpItem::strengthenResponse));
@@ -214,6 +217,12 @@ void CStarUpItem::onGoldStrengthen(CCObject* pSender)
 	if(isMaxStar())
 	{
 		ShowPopTextTip(GETLANGSTR(1199));
+		return;
+	}
+
+	if(m_strengthItem.gold<=0)
+	{
+		ShowPopTextTip(CCString::createWithFormat(GETLANGSTR(2003), 8)->getCString());
 		return;
 	}
 
@@ -589,8 +598,13 @@ void CStarUpItem::updateStrengthenItem()
 	CCNode* pGoldIcon = dynamic_cast<CCNode*>(m_ui->findWidgetById("gold_icon"));
 	if(m_strengthItem.gold<=0)
 	{
-		strength1->setVisible(false);
-		strength1Text->setVisible(false);
+		//strength1->setVisible(false);
+		//strength1Text->setVisible(false);
+		if(pGold->isVisible())
+		{
+			strength1Text->setPositionX(strength1Text->getPositionX()-35);
+		}
+		
 		pGold->setVisible(false);
 		pGoldIcon->setVisible(false);
 	}

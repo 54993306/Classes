@@ -26,7 +26,7 @@ WarFailLayer::~WarFailLayer(void)
 
 bool WarFailLayer::init(){
 	bool res = BaseLayer::init();
-	PlayBackgroundMusic(SFX_Fail,false);
+	PlayEffectSound(SFX_Fail);
 	setVisible(true);
 
 	CCSize size = CCDirector::sharedDirector()->getWinSize();
@@ -104,7 +104,7 @@ bool WarFailLayer::init(){
 	}
 
 	//Ñ¡Ôñ°´Å¥
-	for(unsigned int i=0; i<4; i++)
+	for(unsigned int i=0; i<3; i++)
 	{
 		CButton * hint = (CButton*)m_ui->findWidgetById(CCString::createWithFormat("hint%d", i+1)->getCString());
 		hint->setOnClickListener(this,ccw_click_selector(WarFailLayer::onHintClick));
@@ -138,7 +138,7 @@ void WarFailLayer::updateNewStep(const TMessage& tMsg)
 	int step = DataCenter::sharedData()->getUser()->getUserData()->getNewStep();
 	if (step>0&&step<100)
 	{
-		for(unsigned int i=0; i<4; i++)
+		for(unsigned int i=0; i<3; i++)
 		{
 			CButton * hint = (CButton*)m_ui->findWidgetById(CCString::createWithFormat("hint%d", i+1)->getCString());
 			hint->setEnabled(false);

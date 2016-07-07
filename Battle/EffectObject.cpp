@@ -8,13 +8,13 @@
 #include "Battle/BattleMessage.h"
 namespace BattleSpace{
 	EffectObject::EffectObject()
-		:m_effect(nullptr),m_TotalTime(0),m_Playtime(0),m_Type(PLAYERTYPE::once),m_Music(0)
+		:m_effect(nullptr),m_TotalTime(0),m_Playtime(0),m_Type(sPlayType::eOnce),m_Music(0)
 		,m_model(""),m_skewing(false),m_bIsNullEffect(false),m_Delaytime(0),m_LoopNum(1)
 		,m_DurationTime(0),m_Shake(false),m_LoopInterval(0)
 	{}
 	EffectObject::~EffectObject(){}
 
-	EffectObject* EffectObject::create(const char* model,PLAYERTYPE type /*=EffectType::once*/)
+	EffectObject* EffectObject::create(const char* model,sPlayType type /*=EffectType::once*/)
 	{
 		EffectObject* pRet = new EffectObject();
 		if( pRet && pRet->init() )
@@ -75,30 +75,30 @@ namespace BattleSpace{
 		CCAnimate* animate = CCAnimate::create(Animation);
 		switch (m_Type)
 		{
-		case PLAYERTYPE::once:
+		case sPlayType::eOnce:
 			{
 				this->scheduleUpdate();
-				animate->setTag((int)PLAYERTYPE::Repeat);
+				animate->setTag((int)sPlayType::eRepeat);
 				m_effect->runAction(animate);
 				if (m_Music)
 					playeEffectMusic(m_Music);
 				m_TotalTime = Animation->getDuration();
 			}break;
-		case PLAYERTYPE::Repeat:
+		case sPlayType::eRepeat:
 			{
 				CCAction* Action = CCRepeatForever::create(animate);
-				Action->setTag((int)PLAYERTYPE::Repeat);
+				Action->setTag((int)sPlayType::eRepeat);
 				m_effect->runAction(Action);
 			}break;
-		case PLAYERTYPE::RepeatNum:
+		case sPlayType::eRepeatNum:
 			{
 				this->scheduleUpdate();
 				CCAction* Action = CCRepeat::create(animate,m_LoopNum);
-				Action->setTag((int)PLAYERTYPE::Repeat);
+				Action->setTag((int)sPlayType::eRepeat);
 				m_effect->runAction(Action);
 				m_TotalTime = Animation->getDuration()*m_LoopNum;
 			}break;
-		case PLAYERTYPE::Delay:
+		case sPlayType::eDelay:
 			{
 				CCDelayTime* delay = CCDelayTime::create(m_Delaytime);
 				CCAction* seq = nullptr;
@@ -113,14 +113,14 @@ namespace BattleSpace{
 					CCSequence* pSeq = CCSequence::create(animate,Interval,nullptr);
 					seq = CCSequence::create(delay,CCRepeat::create(pSeq,m_LoopNum),CCRemoveSelf::create(),nullptr);
 				}
-				seq->setTag((int)PLAYERTYPE::Repeat);
+				seq->setTag((int)sPlayType::eRepeat);
 				m_effect->runAction(seq);
 				m_TotalTime = Animation->getDuration()*m_LoopNum+m_Delaytime;
 			}break;
-		case PLAYERTYPE::Duration:
+		case sPlayType::eDuration:
 			{
 				CCAction* Action = CCRepeatForever::create(animate);
-				Action->setTag((int)PLAYERTYPE::Repeat);
+				Action->setTag((int)sPlayType::eRepeat);
 				m_effect->runAction(Action);
 				m_TotalTime = m_DurationTime;
 				this->scheduleUpdate();
@@ -134,7 +134,7 @@ namespace BattleSpace{
 	{
 		m_Playtime += dt;
 		if (this->isActionDone() || m_bIsNullEffect ||
-			(m_Type == PLAYERTYPE::Duration && m_Playtime >= m_DurationTime))
+			(m_Type == sPlayType::eDuration && m_Playtime >= m_DurationTime))
 		{
 			m_effect->stopAllActions();
 			this->unscheduleAllSelectors();
@@ -151,9 +151,9 @@ namespace BattleSpace{
 				CCLOG("ERROR:EffectObject::isDone()  m_effect IS NULL");
 				return true;
 			}
-			if (m_Type == PLAYERTYPE::Repeat)
+			if (m_Type == sPlayType::eRepeat)
 				return done;
-			CCAction* Action = m_effect->getActionByTag((int)PLAYERTYPE::Repeat);
+			CCAction* Action = m_effect->getActionByTag((int)sPlayType::eRepeat);
 			if(!Action || Action->isDone())		//CCAction的isDone方法被它的不同子类重写过
 			{
 				done = true;

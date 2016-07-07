@@ -1,18 +1,18 @@
 ﻿#ifndef _WARCONTROL_
 #define _WARCONTROL_
 /************************************************************* 
- *
- *
- *		Data : 2016.5.13
- *	
- *		Name : 
- *
- *		Author : Lin_Xiancheng
- *
- *		Description : 可分为几个部分进行处理，按钮的特效，其他连击效果的显示，UI上半部分的处理可拆分为多个类，将tag的定义抽出到共用的位置进行处理，创建一个ui的文件夹管理相关的类
- *
- *
- *************************************************************/
+*
+*
+*		Data : 2016.5.13
+*	
+*		Name : 
+*
+*		Author : Lin_Xiancheng
+*
+*		Description : 可分为几个部分进行处理，按钮的特效，其他连击效果的显示，UI上半部分的处理可拆分为多个类，将tag的定义抽出到共用的位置进行处理，创建一个ui的文件夹管理相关的类
+*
+*
+*************************************************************/
 #include "AppUI.h"
 #include "Global.h"
 #include "scene/layer/LayerManager.h"
@@ -32,8 +32,8 @@ namespace BattleSpace{
 		virtual void onEnter();
 		virtual void onExit();
 	public:												//
-		void AddEvent();
-		void RemoveEvent();
+		void AddEvent(CCObject* ob = nullptr);
+		void RemoveEvent(CCObject* ob = nullptr);
 		CLayout* getLaout();
 		void initAliveButtons();
 		void showMonsterTips(CCObject* ob);
@@ -47,25 +47,25 @@ namespace BattleSpace{
 		void upContinuousNumber(CCObject* ob);				//
 		void AliveBarFullCallBack(CCObject* ob);
 		void AliveBattleDispose(CCObject* ob);
-		void CallAliveEntranceBattle(BaseRole*alive);
+		void CallRoleEntranceBattle(BaseRole*alive);
 
 		CWidgetTouchModel AliveButtonBeginClick(CCObject* ob,CCTouch* pTouch);
+		CWidgetTouchModel onTouchBegin(CCObject* ob,CCTouch* pTouch);
 		void AliveButtonClick(CCObject* ob);
 		void CaptainHit(CCObject* ob);
 		void SkillMask(CCObject* ob);
 
-		void showFlyCostToBar(CCPoint pStartPos);
 		void showFlyCostToBarCallBack(CCNode* pSender);
 
 		void ResetButtonState(CCObject* ob);
 		void updateTimeCountUI(int iCount);
-
+		 
 		void iniCaptainHurtTips();
 
 		/*******************************************************************************************************************/
 		CCNode* getMoveLayout(int index);							//get role button move part
 
-		void hideUiUpPart();										//hide ui panel above part
+		void hideUiUpPart(CCObject* ob);							//hide ui panel above part
 
 		void iniTestUi();											//init use to test button
 
@@ -91,23 +91,30 @@ namespace BattleSpace{
 
 		void initButtonBackImage(CButton* button,int index );		//reason call number init button back image
 
-		void updateCostNumber(int cost);							//update cost number
+		void updateCostNumber();									//update cost number
 
-		void updateCostSpeed(int iCostChange);						//update cost speed
+		void updateCostSpeed(float dt);										//update cost speed
 
 		void updateAliveButtonEffect();								//update role button effect
 
-		bool guideStateButtonEffect(CCNode* layout);				//guide state button dispose
+		bool guideStateButtonEffect(CCNode* layout,bool pClick);	//guide state button dispose
 
 		void AliveBattlefield(BaseRole* alive);						//role log in battlefield or leave
 
 		void updateBatchNumber(int currbatch);						//update batch number
 
+		void postButtonState(CCObject* ob);
+
+		void changeSpeed();
+
+		void upAutoSkillState(float dt);
+
+		void showFlyCostToBar(CCObject* ob);
 		CC_SYNTHESIZE(CCPoint, m_goldIconPos, GoldIconPos);
 		CC_SYNTHESIZE(CCPoint, m_boxIconPos, BoxIconPos);
 		CC_SYNTHESIZE(CCSpriteBatchNode*, m_batchNodeEffect, BatchNodeEffect);
 	protected:
-		WarManager* m_Manage;
+		WarManager* mManage;
 		CLayout*	m_ControLayer;
 		CCNode*		m_warLayer;
 		float		m_fdetal;
@@ -121,13 +128,11 @@ namespace BattleSpace{
 		CCLayerColor* m_LayerColor;
 		CCArmature* m_ArmatureTips;
 	private:
-		float		m_interval;
 		int			m_boxNum;
 		int			m_goldNum;
 		int			m_ContinuousNum;
-		bool		m_openEye;
-		bool		m_WindResume;
-		int m_iAimCost;
+		int			m_iAimCost;
+		bool		mAutoState;
 	};
 	enum TrapResumeType
 	{
@@ -168,10 +173,12 @@ namespace BattleSpace{
 		CL_TipsEffect2,
 		CL_TipsEffect3,
 		CL_TipsEffect4,
+		CL_AutoPlay,
 		GU_openGuide = 250,		//引导测试按钮
 		TEST_BattleData,		//重载关卡数据按钮
 		TEST_MoveState,
-		CL_OpenGameEditorBtn =300,
+		TEST_Tips,
+		TEST_Role,
 	};
 };
 #endif

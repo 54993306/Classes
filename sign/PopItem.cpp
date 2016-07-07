@@ -18,12 +18,15 @@
 
 #include "common/CGameSound.h"
 #include "Resources.h"
-
+#include "battle/AnimationManager.h"
+using namespace BattleSpace;
 CPopItem::CPopItem()
 	:m_pMonsterInfo(nullptr)
 	,m_pItemInfo(nullptr)
 	,m_pNewHeroEffect(nullptr)
 	,m_iIndexForFindNewHero(0)
+	,m_pTargetCallBack(nullptr)
+	,m_pTargetFun(nullptr)
 {
 
 }
@@ -86,6 +89,7 @@ void CPopItem::onEnter()
 void CPopItem::onExit()
 {
 	BaseLayer::onExit();
+	doCallBack();
 }
 
 
@@ -144,18 +148,14 @@ void CPopItem::addTableCell(unsigned int uIdx, CTableViewCell* pCell)
 		case 2:
 			{
 				CImageView *mask= (CImageView *)child;
-				mask->setTexture(setItemQualityTexture(prize.color));
-
+				SmartSetRectPrizeColor(mask, &prize);
 				mask->setUserData(&prize);
 				mask->setTouchEnabled(true);
 				mask->setOnPressListener(this, ccw_press_selector(CPopItem::onPress));
 
 				//添加星星
-				if(prize.quality > 0)
-				{
-					CLayout* pStarLayout = getStarLayout(prize.quality);
-					mask->addChild(pStarLayout);
-				}
+				CLayout* pStarLayout = SmartGetStarLayout(&prize);
+				mask->addChild(pStarLayout);
 			}
 			break;
 		case 3:
@@ -219,7 +219,7 @@ void CPopItem::signPrize(CPrize *prize)
 		bg->addChild(itemSpr);
 	}
 
-	mask->setTexture(setItemQualityTexture(prize->color));
+	SmartSetRectPrizeColor(mask, prize);
 
 	clearPrizeSave();
 	
@@ -234,7 +234,7 @@ void CPopItem::signPrize(CPrize *prize)
 	//添加星星
 	if(pPrize->quality > 0)
 	{
-		CLayout* pStarLayout = getStarLayout(prize->quality);
+		CLayout* pStarLayout = SmartGetStarLayout(prize);
 		mask->addChild(pStarLayout);
 	}
 
@@ -245,6 +245,25 @@ void CPopItem::signPrize(CPrize *prize)
 		data.thumb = prize->thumb;
 		data.quality = prize->quality;
 		m_pNewHeroEffect->showNewHeroEffect(&data);
+	}
+	else
+	{
+		CCAnimation *lightAnim = AnimationManager::sharedAction()->getAnimation("8042");
+		CCSprite *light = CCSprite::create("skill/8042.png");
+		light->setPosition(VCENTER);
+		light->runAction(CCSequence::createWithTwoActions(CCAnimate::create(lightAnim),CCRemoveSelf::create()));
+		light->setScale(1138/light->getContentSize().width);
+		m_ui->addChild(light);
+
+		{
+			CCAnimation *lightAnim = AnimationManager::sharedAction()->getAnimation("8050");
+			lightAnim->setDelayPerUnit(0.05f);
+			CCSprite *light = CCSprite::create("skill/8050.png");
+			light->setPosition(VCENTER);
+			light->setScale(2.2f);
+			light->runAction(CCRepeatForever::create(CCAnimate::create(lightAnim)->reverse()));
+			m_ui->addChild(light);
+		}
 	}
 }
 
@@ -307,7 +326,7 @@ void CPopItem::popItemList(const vector<CItem>& itemList)
 		//添加星星
 		if(prize->quality > 0)
 		{
-			CLayout* pStarLayout = getStarLayout(prize->quality);
+			CLayout* pStarLayout = SmartGetStarLayout(prize);
 			mask->addChild(pStarLayout);
 		}
 
@@ -394,6 +413,23 @@ void CPopItem::popPrizeRes(CGetPrizeRes *prizeRes)
 			m_tableView->setContentOffsetInDuration(m_tableView->getMinOffset(), (cellCount-4)*0.5f);
 		}
 		break;
+	}
+
+	CCAnimation *lightAnim = AnimationManager::sharedAction()->getAnimation("8042");
+	CCSprite *light = CCSprite::create("skill/8042.png");
+	light->setPosition(VCENTER);
+	light->runAction(CCSequence::createWithTwoActions(CCAnimate::create(lightAnim),CCRemoveSelf::create()));
+	light->setScale(1138/light->getContentSize().width);
+	m_ui->addChild(light);
+
+	{
+		CCAnimation *lightAnim = AnimationManager::sharedAction()->getAnimation("8050");
+		lightAnim->setDelayPerUnit(0.05f);
+		CCSprite *light = CCSprite::create("skill/8050.png");
+		light->setPosition(VCENTER);
+		light->setScale(2.2f);
+		light->runAction(CCRepeatForever::create(CCAnimate::create(lightAnim)->reverse()));
+		m_ui->addChild(light);
 	}
 } 
 
@@ -517,4 +553,20 @@ void CPopItem::clearPrizeSave()
 		CC_SAFE_DELETE(m_prizeSave[i]);
 	}
 	m_prizeSave.clear();
+}
+
+void CPopItem::doCallBack()
+{
+	if(m_pTargetCallBack != nullptr && m_pTargetFun!=nullptr)
+	{
+		(m_pTargetCallBack->*m_pTargetFun)();
+	}
+	m_pTargetCallBack = nullptr;
+	m_pTargetFun = nullptr;
+}
+
+void CPopItem::bindTargetCallBack( CCObject* pObj, PopItemCallBack pFun )
+{
+	m_pTargetCallBack = pObj;
+	m_pTargetFun = pFun;
 }

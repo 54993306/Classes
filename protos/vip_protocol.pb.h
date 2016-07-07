@@ -34,6 +34,10 @@ void  protobuf_AddDesc_vip_5fprotocol_2eproto();
 void protobuf_AssignDesc_vip_5fprotocol_2eproto();
 void protobuf_ShutdownFile_vip_5fprotocol_2eproto();
 
+class RechargeReq;
+class RechargeRes;
+class ValidateBilling;
+class ValidateRes;
 class VipInfoRes;
 class VipPrivReq;
 class VipShopRes;
@@ -43,6 +47,484 @@ class VipData;
 class GoldCard;
 
 // ===================================================================
+
+class RechargeReq : public ::google::protobuf::Message {
+ public:
+  RechargeReq();
+  virtual ~RechargeReq();
+
+  RechargeReq(const RechargeReq& from);
+
+  inline RechargeReq& operator=(const RechargeReq& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const RechargeReq& default_instance();
+
+  void Swap(RechargeReq* other);
+
+  // implements Message ----------------------------------------------
+
+  RechargeReq* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const RechargeReq& from);
+  void MergeFrom(const RechargeReq& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // optional int32 ctype = 1;
+  inline bool has_ctype() const;
+  inline void clear_ctype();
+  static const int kCtypeFieldNumber = 1;
+  inline ::google::protobuf::int32 ctype() const;
+  inline void set_ctype(::google::protobuf::int32 value);
+
+  // optional int32 money = 8;
+  inline bool has_money() const;
+  inline void clear_money();
+  static const int kMoneyFieldNumber = 8;
+  inline ::google::protobuf::int32 money() const;
+  inline void set_money(::google::protobuf::int32 value);
+
+  // optional string mobileNo = 3;
+  inline bool has_mobileno() const;
+  inline void clear_mobileno();
+  static const int kMobileNoFieldNumber = 3;
+  inline const ::std::string& mobileno() const;
+  inline void set_mobileno(const ::std::string& value);
+  inline void set_mobileno(const char* value);
+  inline void set_mobileno(const char* value, size_t size);
+  inline ::std::string* mutable_mobileno();
+  inline ::std::string* release_mobileno();
+  inline void set_allocated_mobileno(::std::string* mobileno);
+
+  // optional string smsNo = 4;
+  inline bool has_smsno() const;
+  inline void clear_smsno();
+  static const int kSmsNoFieldNumber = 4;
+  inline const ::std::string& smsno() const;
+  inline void set_smsno(const ::std::string& value);
+  inline void set_smsno(const char* value);
+  inline void set_smsno(const char* value, size_t size);
+  inline ::std::string* mutable_smsno();
+  inline ::std::string* release_smsno();
+  inline void set_allocated_smsno(::std::string* smsno);
+
+  // optional int32 step = 5;
+  inline bool has_step() const;
+  inline void clear_step();
+  static const int kStepFieldNumber = 5;
+  inline ::google::protobuf::int32 step() const;
+  inline void set_step(::google::protobuf::int32 value);
+
+  // optional string cardNo = 6;
+  inline bool has_cardno() const;
+  inline void clear_cardno();
+  static const int kCardNoFieldNumber = 6;
+  inline const ::std::string& cardno() const;
+  inline void set_cardno(const ::std::string& value);
+  inline void set_cardno(const char* value);
+  inline void set_cardno(const char* value, size_t size);
+  inline ::std::string* mutable_cardno();
+  inline ::std::string* release_cardno();
+  inline void set_allocated_cardno(::std::string* cardno);
+
+  // optional string cardPwd = 7;
+  inline bool has_cardpwd() const;
+  inline void clear_cardpwd();
+  static const int kCardPwdFieldNumber = 7;
+  inline const ::std::string& cardpwd() const;
+  inline void set_cardpwd(const ::std::string& value);
+  inline void set_cardpwd(const char* value);
+  inline void set_cardpwd(const char* value, size_t size);
+  inline ::std::string* mutable_cardpwd();
+  inline ::std::string* release_cardpwd();
+  inline void set_allocated_cardpwd(::std::string* cardpwd);
+
+  // @@protoc_insertion_point(class_scope:protos.RechargeReq)
+ private:
+  inline void set_has_ctype();
+  inline void clear_has_ctype();
+  inline void set_has_money();
+  inline void clear_has_money();
+  inline void set_has_mobileno();
+  inline void clear_has_mobileno();
+  inline void set_has_smsno();
+  inline void clear_has_smsno();
+  inline void set_has_step();
+  inline void clear_has_step();
+  inline void set_has_cardno();
+  inline void clear_has_cardno();
+  inline void set_has_cardpwd();
+  inline void clear_has_cardpwd();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::int32 ctype_;
+  ::google::protobuf::int32 money_;
+  ::std::string* mobileno_;
+  ::std::string* smsno_;
+  ::std::string* cardno_;
+  ::std::string* cardpwd_;
+  ::google::protobuf::int32 step_;
+
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(7 + 31) / 32];
+
+  friend void  protobuf_AddDesc_vip_5fprotocol_2eproto();
+  friend void protobuf_AssignDesc_vip_5fprotocol_2eproto();
+  friend void protobuf_ShutdownFile_vip_5fprotocol_2eproto();
+
+  void InitAsDefaultInstance();
+  static RechargeReq* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class RechargeRes : public ::google::protobuf::Message {
+ public:
+  RechargeRes();
+  virtual ~RechargeRes();
+
+  RechargeRes(const RechargeRes& from);
+
+  inline RechargeRes& operator=(const RechargeRes& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const RechargeRes& default_instance();
+
+  void Swap(RechargeRes* other);
+
+  // implements Message ----------------------------------------------
+
+  RechargeRes* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const RechargeRes& from);
+  void MergeFrom(const RechargeRes& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required int32 result = 1;
+  inline bool has_result() const;
+  inline void clear_result();
+  static const int kResultFieldNumber = 1;
+  inline ::google::protobuf::int32 result() const;
+  inline void set_result(::google::protobuf::int32 value);
+
+  // optional string errorCode = 2;
+  inline bool has_errorcode() const;
+  inline void clear_errorcode();
+  static const int kErrorCodeFieldNumber = 2;
+  inline const ::std::string& errorcode() const;
+  inline void set_errorcode(const ::std::string& value);
+  inline void set_errorcode(const char* value);
+  inline void set_errorcode(const char* value, size_t size);
+  inline ::std::string* mutable_errorcode();
+  inline ::std::string* release_errorcode();
+  inline void set_allocated_errorcode(::std::string* errorcode);
+
+  // optional int32 roleMoney = 3;
+  inline bool has_rolemoney() const;
+  inline void clear_rolemoney();
+  static const int kRoleMoneyFieldNumber = 3;
+  inline ::google::protobuf::int32 rolemoney() const;
+  inline void set_rolemoney(::google::protobuf::int32 value);
+
+  // optional string desc = 4;
+  inline bool has_desc() const;
+  inline void clear_desc();
+  static const int kDescFieldNumber = 4;
+  inline const ::std::string& desc() const;
+  inline void set_desc(const ::std::string& value);
+  inline void set_desc(const char* value);
+  inline void set_desc(const char* value, size_t size);
+  inline ::std::string* mutable_desc();
+  inline ::std::string* release_desc();
+  inline void set_allocated_desc(::std::string* desc);
+
+  // @@protoc_insertion_point(class_scope:protos.RechargeRes)
+ private:
+  inline void set_has_result();
+  inline void clear_has_result();
+  inline void set_has_errorcode();
+  inline void clear_has_errorcode();
+  inline void set_has_rolemoney();
+  inline void clear_has_rolemoney();
+  inline void set_has_desc();
+  inline void clear_has_desc();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::std::string* errorcode_;
+  ::google::protobuf::int32 result_;
+  ::google::protobuf::int32 rolemoney_;
+  ::std::string* desc_;
+
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
+
+  friend void  protobuf_AddDesc_vip_5fprotocol_2eproto();
+  friend void protobuf_AssignDesc_vip_5fprotocol_2eproto();
+  friend void protobuf_ShutdownFile_vip_5fprotocol_2eproto();
+
+  void InitAsDefaultInstance();
+  static RechargeRes* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class ValidateBilling : public ::google::protobuf::Message {
+ public:
+  ValidateBilling();
+  virtual ~ValidateBilling();
+
+  ValidateBilling(const ValidateBilling& from);
+
+  inline ValidateBilling& operator=(const ValidateBilling& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const ValidateBilling& default_instance();
+
+  void Swap(ValidateBilling* other);
+
+  // implements Message ----------------------------------------------
+
+  ValidateBilling* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const ValidateBilling& from);
+  void MergeFrom(const ValidateBilling& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required string inapp_purchase_data = 1;
+  inline bool has_inapp_purchase_data() const;
+  inline void clear_inapp_purchase_data();
+  static const int kInappPurchaseDataFieldNumber = 1;
+  inline const ::std::string& inapp_purchase_data() const;
+  inline void set_inapp_purchase_data(const ::std::string& value);
+  inline void set_inapp_purchase_data(const char* value);
+  inline void set_inapp_purchase_data(const char* value, size_t size);
+  inline ::std::string* mutable_inapp_purchase_data();
+  inline ::std::string* release_inapp_purchase_data();
+  inline void set_allocated_inapp_purchase_data(::std::string* inapp_purchase_data);
+
+  // required string inapp_data_signature = 2;
+  inline bool has_inapp_data_signature() const;
+  inline void clear_inapp_data_signature();
+  static const int kInappDataSignatureFieldNumber = 2;
+  inline const ::std::string& inapp_data_signature() const;
+  inline void set_inapp_data_signature(const ::std::string& value);
+  inline void set_inapp_data_signature(const char* value);
+  inline void set_inapp_data_signature(const char* value, size_t size);
+  inline ::std::string* mutable_inapp_data_signature();
+  inline ::std::string* release_inapp_data_signature();
+  inline void set_allocated_inapp_data_signature(::std::string* inapp_data_signature);
+
+  // @@protoc_insertion_point(class_scope:protos.ValidateBilling)
+ private:
+  inline void set_has_inapp_purchase_data();
+  inline void clear_has_inapp_purchase_data();
+  inline void set_has_inapp_data_signature();
+  inline void clear_has_inapp_data_signature();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::std::string* inapp_purchase_data_;
+  ::std::string* inapp_data_signature_;
+
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+
+  friend void  protobuf_AddDesc_vip_5fprotocol_2eproto();
+  friend void protobuf_AssignDesc_vip_5fprotocol_2eproto();
+  friend void protobuf_ShutdownFile_vip_5fprotocol_2eproto();
+
+  void InitAsDefaultInstance();
+  static ValidateBilling* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class ValidateRes : public ::google::protobuf::Message {
+ public:
+  ValidateRes();
+  virtual ~ValidateRes();
+
+  ValidateRes(const ValidateRes& from);
+
+  inline ValidateRes& operator=(const ValidateRes& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const ValidateRes& default_instance();
+
+  void Swap(ValidateRes* other);
+
+  // implements Message ----------------------------------------------
+
+  ValidateRes* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const ValidateRes& from);
+  void MergeFrom(const ValidateRes& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required bool result = 1;
+  inline bool has_result() const;
+  inline void clear_result();
+  static const int kResultFieldNumber = 1;
+  inline bool result() const;
+  inline void set_result(bool value);
+
+  // optional int32 money = 2;
+  inline bool has_money() const;
+  inline void clear_money();
+  static const int kMoneyFieldNumber = 2;
+  inline ::google::protobuf::int32 money() const;
+  inline void set_money(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:protos.ValidateRes)
+ private:
+  inline void set_has_result();
+  inline void clear_has_result();
+  inline void set_has_money();
+  inline void clear_has_money();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  bool result_;
+  ::google::protobuf::int32 money_;
+
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+
+  friend void  protobuf_AddDesc_vip_5fprotocol_2eproto();
+  friend void protobuf_AssignDesc_vip_5fprotocol_2eproto();
+  friend void protobuf_ShutdownFile_vip_5fprotocol_2eproto();
+
+  void InitAsDefaultInstance();
+  static ValidateRes* default_instance_;
+};
+// -------------------------------------------------------------------
 
 class VipInfoRes : public ::google::protobuf::Message {
  public:
@@ -386,72 +868,17 @@ class BuyCardReq : public ::google::protobuf::Message {
   inline ::google::protobuf::int32 cardid() const;
   inline void set_cardid(::google::protobuf::int32 value);
 
-  // optional string deviceId = 2;
-  inline bool has_deviceid() const;
-  inline void clear_deviceid();
-  static const int kDeviceIdFieldNumber = 2;
-  inline const ::std::string& deviceid() const;
-  inline void set_deviceid(const ::std::string& value);
-  inline void set_deviceid(const char* value);
-  inline void set_deviceid(const char* value, size_t size);
-  inline ::std::string* mutable_deviceid();
-  inline ::std::string* release_deviceid();
-  inline void set_allocated_deviceid(::std::string* deviceid);
-
-  // optional string mobileNo = 3;
-  inline bool has_mobileno() const;
-  inline void clear_mobileno();
-  static const int kMobileNoFieldNumber = 3;
-  inline const ::std::string& mobileno() const;
-  inline void set_mobileno(const ::std::string& value);
-  inline void set_mobileno(const char* value);
-  inline void set_mobileno(const char* value, size_t size);
-  inline ::std::string* mutable_mobileno();
-  inline ::std::string* release_mobileno();
-  inline void set_allocated_mobileno(::std::string* mobileno);
-
-  // optional string smsNo = 4;
-  inline bool has_smsno() const;
-  inline void clear_smsno();
-  static const int kSmsNoFieldNumber = 4;
-  inline const ::std::string& smsno() const;
-  inline void set_smsno(const ::std::string& value);
-  inline void set_smsno(const char* value);
-  inline void set_smsno(const char* value, size_t size);
-  inline ::std::string* mutable_smsno();
-  inline ::std::string* release_smsno();
-  inline void set_allocated_smsno(::std::string* smsno);
-
-  // optional int32 step = 5;
-  inline bool has_step() const;
-  inline void clear_step();
-  static const int kStepFieldNumber = 5;
-  inline ::google::protobuf::int32 step() const;
-  inline void set_step(::google::protobuf::int32 value);
-
   // @@protoc_insertion_point(class_scope:protos.BuyCardReq)
  private:
   inline void set_has_cardid();
   inline void clear_has_cardid();
-  inline void set_has_deviceid();
-  inline void clear_has_deviceid();
-  inline void set_has_mobileno();
-  inline void clear_has_mobileno();
-  inline void set_has_smsno();
-  inline void clear_has_smsno();
-  inline void set_has_step();
-  inline void clear_has_step();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
-  ::std::string* deviceid_;
-  ::std::string* mobileno_;
   ::google::protobuf::int32 cardid_;
-  ::google::protobuf::int32 step_;
-  ::std::string* smsno_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(5 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
 
   friend void  protobuf_AddDesc_vip_5fprotocol_2eproto();
   friend void protobuf_AssignDesc_vip_5fprotocol_2eproto();
@@ -523,18 +950,6 @@ class BuyCardRes : public ::google::protobuf::Message {
   inline ::google::protobuf::int32 result() const;
   inline void set_result(::google::protobuf::int32 value);
 
-  // optional string errorCode = 6;
-  inline bool has_errorcode() const;
-  inline void clear_errorcode();
-  static const int kErrorCodeFieldNumber = 6;
-  inline const ::std::string& errorcode() const;
-  inline void set_errorcode(const ::std::string& value);
-  inline void set_errorcode(const char* value);
-  inline void set_errorcode(const char* value, size_t size);
-  inline ::std::string* mutable_errorcode();
-  inline ::std::string* release_errorcode();
-  inline void set_allocated_errorcode(::std::string* errorcode);
-
   // optional int32 roleGold = 2;
   inline bool has_rolegold() const;
   inline void clear_rolegold();
@@ -567,8 +982,6 @@ class BuyCardRes : public ::google::protobuf::Message {
  private:
   inline void set_has_result();
   inline void clear_has_result();
-  inline void set_has_errorcode();
-  inline void clear_has_errorcode();
   inline void set_has_rolegold();
   inline void clear_has_rolegold();
   inline void set_has_viplevel();
@@ -580,7 +993,6 @@ class BuyCardRes : public ::google::protobuf::Message {
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
-  ::std::string* errorcode_;
   ::google::protobuf::int32 result_;
   ::google::protobuf::int32 rolegold_;
   ::google::protobuf::int32 viplevel_;
@@ -588,7 +1000,7 @@ class BuyCardRes : public ::google::protobuf::Message {
   ::google::protobuf::int32 nextexp_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(6 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(5 + 31) / 32];
 
   friend void  protobuf_AddDesc_vip_5fprotocol_2eproto();
   friend void protobuf_AssignDesc_vip_5fprotocol_2eproto();
@@ -879,6 +1291,736 @@ class GoldCard : public ::google::protobuf::Message {
 
 // ===================================================================
 
+// RechargeReq
+
+// optional int32 ctype = 1;
+inline bool RechargeReq::has_ctype() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void RechargeReq::set_has_ctype() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void RechargeReq::clear_has_ctype() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void RechargeReq::clear_ctype() {
+  ctype_ = 0;
+  clear_has_ctype();
+}
+inline ::google::protobuf::int32 RechargeReq::ctype() const {
+  return ctype_;
+}
+inline void RechargeReq::set_ctype(::google::protobuf::int32 value) {
+  set_has_ctype();
+  ctype_ = value;
+}
+
+// optional int32 money = 8;
+inline bool RechargeReq::has_money() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void RechargeReq::set_has_money() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void RechargeReq::clear_has_money() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void RechargeReq::clear_money() {
+  money_ = 0;
+  clear_has_money();
+}
+inline ::google::protobuf::int32 RechargeReq::money() const {
+  return money_;
+}
+inline void RechargeReq::set_money(::google::protobuf::int32 value) {
+  set_has_money();
+  money_ = value;
+}
+
+// optional string mobileNo = 3;
+inline bool RechargeReq::has_mobileno() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void RechargeReq::set_has_mobileno() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void RechargeReq::clear_has_mobileno() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void RechargeReq::clear_mobileno() {
+  if (mobileno_ != &::google::protobuf::internal::kEmptyString) {
+    mobileno_->clear();
+  }
+  clear_has_mobileno();
+}
+inline const ::std::string& RechargeReq::mobileno() const {
+  return *mobileno_;
+}
+inline void RechargeReq::set_mobileno(const ::std::string& value) {
+  set_has_mobileno();
+  if (mobileno_ == &::google::protobuf::internal::kEmptyString) {
+    mobileno_ = new ::std::string;
+  }
+  mobileno_->assign(value);
+}
+inline void RechargeReq::set_mobileno(const char* value) {
+  set_has_mobileno();
+  if (mobileno_ == &::google::protobuf::internal::kEmptyString) {
+    mobileno_ = new ::std::string;
+  }
+  mobileno_->assign(value);
+}
+inline void RechargeReq::set_mobileno(const char* value, size_t size) {
+  set_has_mobileno();
+  if (mobileno_ == &::google::protobuf::internal::kEmptyString) {
+    mobileno_ = new ::std::string;
+  }
+  mobileno_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* RechargeReq::mutable_mobileno() {
+  set_has_mobileno();
+  if (mobileno_ == &::google::protobuf::internal::kEmptyString) {
+    mobileno_ = new ::std::string;
+  }
+  return mobileno_;
+}
+inline ::std::string* RechargeReq::release_mobileno() {
+  clear_has_mobileno();
+  if (mobileno_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = mobileno_;
+    mobileno_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+inline void RechargeReq::set_allocated_mobileno(::std::string* mobileno) {
+  if (mobileno_ != &::google::protobuf::internal::kEmptyString) {
+    delete mobileno_;
+  }
+  if (mobileno) {
+    set_has_mobileno();
+    mobileno_ = mobileno;
+  } else {
+    clear_has_mobileno();
+    mobileno_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  }
+}
+
+// optional string smsNo = 4;
+inline bool RechargeReq::has_smsno() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void RechargeReq::set_has_smsno() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void RechargeReq::clear_has_smsno() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void RechargeReq::clear_smsno() {
+  if (smsno_ != &::google::protobuf::internal::kEmptyString) {
+    smsno_->clear();
+  }
+  clear_has_smsno();
+}
+inline const ::std::string& RechargeReq::smsno() const {
+  return *smsno_;
+}
+inline void RechargeReq::set_smsno(const ::std::string& value) {
+  set_has_smsno();
+  if (smsno_ == &::google::protobuf::internal::kEmptyString) {
+    smsno_ = new ::std::string;
+  }
+  smsno_->assign(value);
+}
+inline void RechargeReq::set_smsno(const char* value) {
+  set_has_smsno();
+  if (smsno_ == &::google::protobuf::internal::kEmptyString) {
+    smsno_ = new ::std::string;
+  }
+  smsno_->assign(value);
+}
+inline void RechargeReq::set_smsno(const char* value, size_t size) {
+  set_has_smsno();
+  if (smsno_ == &::google::protobuf::internal::kEmptyString) {
+    smsno_ = new ::std::string;
+  }
+  smsno_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* RechargeReq::mutable_smsno() {
+  set_has_smsno();
+  if (smsno_ == &::google::protobuf::internal::kEmptyString) {
+    smsno_ = new ::std::string;
+  }
+  return smsno_;
+}
+inline ::std::string* RechargeReq::release_smsno() {
+  clear_has_smsno();
+  if (smsno_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = smsno_;
+    smsno_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+inline void RechargeReq::set_allocated_smsno(::std::string* smsno) {
+  if (smsno_ != &::google::protobuf::internal::kEmptyString) {
+    delete smsno_;
+  }
+  if (smsno) {
+    set_has_smsno();
+    smsno_ = smsno;
+  } else {
+    clear_has_smsno();
+    smsno_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  }
+}
+
+// optional int32 step = 5;
+inline bool RechargeReq::has_step() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void RechargeReq::set_has_step() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void RechargeReq::clear_has_step() {
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline void RechargeReq::clear_step() {
+  step_ = 0;
+  clear_has_step();
+}
+inline ::google::protobuf::int32 RechargeReq::step() const {
+  return step_;
+}
+inline void RechargeReq::set_step(::google::protobuf::int32 value) {
+  set_has_step();
+  step_ = value;
+}
+
+// optional string cardNo = 6;
+inline bool RechargeReq::has_cardno() const {
+  return (_has_bits_[0] & 0x00000020u) != 0;
+}
+inline void RechargeReq::set_has_cardno() {
+  _has_bits_[0] |= 0x00000020u;
+}
+inline void RechargeReq::clear_has_cardno() {
+  _has_bits_[0] &= ~0x00000020u;
+}
+inline void RechargeReq::clear_cardno() {
+  if (cardno_ != &::google::protobuf::internal::kEmptyString) {
+    cardno_->clear();
+  }
+  clear_has_cardno();
+}
+inline const ::std::string& RechargeReq::cardno() const {
+  return *cardno_;
+}
+inline void RechargeReq::set_cardno(const ::std::string& value) {
+  set_has_cardno();
+  if (cardno_ == &::google::protobuf::internal::kEmptyString) {
+    cardno_ = new ::std::string;
+  }
+  cardno_->assign(value);
+}
+inline void RechargeReq::set_cardno(const char* value) {
+  set_has_cardno();
+  if (cardno_ == &::google::protobuf::internal::kEmptyString) {
+    cardno_ = new ::std::string;
+  }
+  cardno_->assign(value);
+}
+inline void RechargeReq::set_cardno(const char* value, size_t size) {
+  set_has_cardno();
+  if (cardno_ == &::google::protobuf::internal::kEmptyString) {
+    cardno_ = new ::std::string;
+  }
+  cardno_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* RechargeReq::mutable_cardno() {
+  set_has_cardno();
+  if (cardno_ == &::google::protobuf::internal::kEmptyString) {
+    cardno_ = new ::std::string;
+  }
+  return cardno_;
+}
+inline ::std::string* RechargeReq::release_cardno() {
+  clear_has_cardno();
+  if (cardno_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = cardno_;
+    cardno_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+inline void RechargeReq::set_allocated_cardno(::std::string* cardno) {
+  if (cardno_ != &::google::protobuf::internal::kEmptyString) {
+    delete cardno_;
+  }
+  if (cardno) {
+    set_has_cardno();
+    cardno_ = cardno;
+  } else {
+    clear_has_cardno();
+    cardno_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  }
+}
+
+// optional string cardPwd = 7;
+inline bool RechargeReq::has_cardpwd() const {
+  return (_has_bits_[0] & 0x00000040u) != 0;
+}
+inline void RechargeReq::set_has_cardpwd() {
+  _has_bits_[0] |= 0x00000040u;
+}
+inline void RechargeReq::clear_has_cardpwd() {
+  _has_bits_[0] &= ~0x00000040u;
+}
+inline void RechargeReq::clear_cardpwd() {
+  if (cardpwd_ != &::google::protobuf::internal::kEmptyString) {
+    cardpwd_->clear();
+  }
+  clear_has_cardpwd();
+}
+inline const ::std::string& RechargeReq::cardpwd() const {
+  return *cardpwd_;
+}
+inline void RechargeReq::set_cardpwd(const ::std::string& value) {
+  set_has_cardpwd();
+  if (cardpwd_ == &::google::protobuf::internal::kEmptyString) {
+    cardpwd_ = new ::std::string;
+  }
+  cardpwd_->assign(value);
+}
+inline void RechargeReq::set_cardpwd(const char* value) {
+  set_has_cardpwd();
+  if (cardpwd_ == &::google::protobuf::internal::kEmptyString) {
+    cardpwd_ = new ::std::string;
+  }
+  cardpwd_->assign(value);
+}
+inline void RechargeReq::set_cardpwd(const char* value, size_t size) {
+  set_has_cardpwd();
+  if (cardpwd_ == &::google::protobuf::internal::kEmptyString) {
+    cardpwd_ = new ::std::string;
+  }
+  cardpwd_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* RechargeReq::mutable_cardpwd() {
+  set_has_cardpwd();
+  if (cardpwd_ == &::google::protobuf::internal::kEmptyString) {
+    cardpwd_ = new ::std::string;
+  }
+  return cardpwd_;
+}
+inline ::std::string* RechargeReq::release_cardpwd() {
+  clear_has_cardpwd();
+  if (cardpwd_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = cardpwd_;
+    cardpwd_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+inline void RechargeReq::set_allocated_cardpwd(::std::string* cardpwd) {
+  if (cardpwd_ != &::google::protobuf::internal::kEmptyString) {
+    delete cardpwd_;
+  }
+  if (cardpwd) {
+    set_has_cardpwd();
+    cardpwd_ = cardpwd;
+  } else {
+    clear_has_cardpwd();
+    cardpwd_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  }
+}
+
+// -------------------------------------------------------------------
+
+// RechargeRes
+
+// required int32 result = 1;
+inline bool RechargeRes::has_result() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void RechargeRes::set_has_result() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void RechargeRes::clear_has_result() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void RechargeRes::clear_result() {
+  result_ = 0;
+  clear_has_result();
+}
+inline ::google::protobuf::int32 RechargeRes::result() const {
+  return result_;
+}
+inline void RechargeRes::set_result(::google::protobuf::int32 value) {
+  set_has_result();
+  result_ = value;
+}
+
+// optional string errorCode = 2;
+inline bool RechargeRes::has_errorcode() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void RechargeRes::set_has_errorcode() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void RechargeRes::clear_has_errorcode() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void RechargeRes::clear_errorcode() {
+  if (errorcode_ != &::google::protobuf::internal::kEmptyString) {
+    errorcode_->clear();
+  }
+  clear_has_errorcode();
+}
+inline const ::std::string& RechargeRes::errorcode() const {
+  return *errorcode_;
+}
+inline void RechargeRes::set_errorcode(const ::std::string& value) {
+  set_has_errorcode();
+  if (errorcode_ == &::google::protobuf::internal::kEmptyString) {
+    errorcode_ = new ::std::string;
+  }
+  errorcode_->assign(value);
+}
+inline void RechargeRes::set_errorcode(const char* value) {
+  set_has_errorcode();
+  if (errorcode_ == &::google::protobuf::internal::kEmptyString) {
+    errorcode_ = new ::std::string;
+  }
+  errorcode_->assign(value);
+}
+inline void RechargeRes::set_errorcode(const char* value, size_t size) {
+  set_has_errorcode();
+  if (errorcode_ == &::google::protobuf::internal::kEmptyString) {
+    errorcode_ = new ::std::string;
+  }
+  errorcode_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* RechargeRes::mutable_errorcode() {
+  set_has_errorcode();
+  if (errorcode_ == &::google::protobuf::internal::kEmptyString) {
+    errorcode_ = new ::std::string;
+  }
+  return errorcode_;
+}
+inline ::std::string* RechargeRes::release_errorcode() {
+  clear_has_errorcode();
+  if (errorcode_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = errorcode_;
+    errorcode_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+inline void RechargeRes::set_allocated_errorcode(::std::string* errorcode) {
+  if (errorcode_ != &::google::protobuf::internal::kEmptyString) {
+    delete errorcode_;
+  }
+  if (errorcode) {
+    set_has_errorcode();
+    errorcode_ = errorcode;
+  } else {
+    clear_has_errorcode();
+    errorcode_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  }
+}
+
+// optional int32 roleMoney = 3;
+inline bool RechargeRes::has_rolemoney() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void RechargeRes::set_has_rolemoney() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void RechargeRes::clear_has_rolemoney() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void RechargeRes::clear_rolemoney() {
+  rolemoney_ = 0;
+  clear_has_rolemoney();
+}
+inline ::google::protobuf::int32 RechargeRes::rolemoney() const {
+  return rolemoney_;
+}
+inline void RechargeRes::set_rolemoney(::google::protobuf::int32 value) {
+  set_has_rolemoney();
+  rolemoney_ = value;
+}
+
+// optional string desc = 4;
+inline bool RechargeRes::has_desc() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void RechargeRes::set_has_desc() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void RechargeRes::clear_has_desc() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void RechargeRes::clear_desc() {
+  if (desc_ != &::google::protobuf::internal::kEmptyString) {
+    desc_->clear();
+  }
+  clear_has_desc();
+}
+inline const ::std::string& RechargeRes::desc() const {
+  return *desc_;
+}
+inline void RechargeRes::set_desc(const ::std::string& value) {
+  set_has_desc();
+  if (desc_ == &::google::protobuf::internal::kEmptyString) {
+    desc_ = new ::std::string;
+  }
+  desc_->assign(value);
+}
+inline void RechargeRes::set_desc(const char* value) {
+  set_has_desc();
+  if (desc_ == &::google::protobuf::internal::kEmptyString) {
+    desc_ = new ::std::string;
+  }
+  desc_->assign(value);
+}
+inline void RechargeRes::set_desc(const char* value, size_t size) {
+  set_has_desc();
+  if (desc_ == &::google::protobuf::internal::kEmptyString) {
+    desc_ = new ::std::string;
+  }
+  desc_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* RechargeRes::mutable_desc() {
+  set_has_desc();
+  if (desc_ == &::google::protobuf::internal::kEmptyString) {
+    desc_ = new ::std::string;
+  }
+  return desc_;
+}
+inline ::std::string* RechargeRes::release_desc() {
+  clear_has_desc();
+  if (desc_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = desc_;
+    desc_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+inline void RechargeRes::set_allocated_desc(::std::string* desc) {
+  if (desc_ != &::google::protobuf::internal::kEmptyString) {
+    delete desc_;
+  }
+  if (desc) {
+    set_has_desc();
+    desc_ = desc;
+  } else {
+    clear_has_desc();
+    desc_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  }
+}
+
+// -------------------------------------------------------------------
+
+// ValidateBilling
+
+// required string inapp_purchase_data = 1;
+inline bool ValidateBilling::has_inapp_purchase_data() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void ValidateBilling::set_has_inapp_purchase_data() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void ValidateBilling::clear_has_inapp_purchase_data() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void ValidateBilling::clear_inapp_purchase_data() {
+  if (inapp_purchase_data_ != &::google::protobuf::internal::kEmptyString) {
+    inapp_purchase_data_->clear();
+  }
+  clear_has_inapp_purchase_data();
+}
+inline const ::std::string& ValidateBilling::inapp_purchase_data() const {
+  return *inapp_purchase_data_;
+}
+inline void ValidateBilling::set_inapp_purchase_data(const ::std::string& value) {
+  set_has_inapp_purchase_data();
+  if (inapp_purchase_data_ == &::google::protobuf::internal::kEmptyString) {
+    inapp_purchase_data_ = new ::std::string;
+  }
+  inapp_purchase_data_->assign(value);
+}
+inline void ValidateBilling::set_inapp_purchase_data(const char* value) {
+  set_has_inapp_purchase_data();
+  if (inapp_purchase_data_ == &::google::protobuf::internal::kEmptyString) {
+    inapp_purchase_data_ = new ::std::string;
+  }
+  inapp_purchase_data_->assign(value);
+}
+inline void ValidateBilling::set_inapp_purchase_data(const char* value, size_t size) {
+  set_has_inapp_purchase_data();
+  if (inapp_purchase_data_ == &::google::protobuf::internal::kEmptyString) {
+    inapp_purchase_data_ = new ::std::string;
+  }
+  inapp_purchase_data_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* ValidateBilling::mutable_inapp_purchase_data() {
+  set_has_inapp_purchase_data();
+  if (inapp_purchase_data_ == &::google::protobuf::internal::kEmptyString) {
+    inapp_purchase_data_ = new ::std::string;
+  }
+  return inapp_purchase_data_;
+}
+inline ::std::string* ValidateBilling::release_inapp_purchase_data() {
+  clear_has_inapp_purchase_data();
+  if (inapp_purchase_data_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = inapp_purchase_data_;
+    inapp_purchase_data_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+inline void ValidateBilling::set_allocated_inapp_purchase_data(::std::string* inapp_purchase_data) {
+  if (inapp_purchase_data_ != &::google::protobuf::internal::kEmptyString) {
+    delete inapp_purchase_data_;
+  }
+  if (inapp_purchase_data) {
+    set_has_inapp_purchase_data();
+    inapp_purchase_data_ = inapp_purchase_data;
+  } else {
+    clear_has_inapp_purchase_data();
+    inapp_purchase_data_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  }
+}
+
+// required string inapp_data_signature = 2;
+inline bool ValidateBilling::has_inapp_data_signature() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void ValidateBilling::set_has_inapp_data_signature() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void ValidateBilling::clear_has_inapp_data_signature() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void ValidateBilling::clear_inapp_data_signature() {
+  if (inapp_data_signature_ != &::google::protobuf::internal::kEmptyString) {
+    inapp_data_signature_->clear();
+  }
+  clear_has_inapp_data_signature();
+}
+inline const ::std::string& ValidateBilling::inapp_data_signature() const {
+  return *inapp_data_signature_;
+}
+inline void ValidateBilling::set_inapp_data_signature(const ::std::string& value) {
+  set_has_inapp_data_signature();
+  if (inapp_data_signature_ == &::google::protobuf::internal::kEmptyString) {
+    inapp_data_signature_ = new ::std::string;
+  }
+  inapp_data_signature_->assign(value);
+}
+inline void ValidateBilling::set_inapp_data_signature(const char* value) {
+  set_has_inapp_data_signature();
+  if (inapp_data_signature_ == &::google::protobuf::internal::kEmptyString) {
+    inapp_data_signature_ = new ::std::string;
+  }
+  inapp_data_signature_->assign(value);
+}
+inline void ValidateBilling::set_inapp_data_signature(const char* value, size_t size) {
+  set_has_inapp_data_signature();
+  if (inapp_data_signature_ == &::google::protobuf::internal::kEmptyString) {
+    inapp_data_signature_ = new ::std::string;
+  }
+  inapp_data_signature_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* ValidateBilling::mutable_inapp_data_signature() {
+  set_has_inapp_data_signature();
+  if (inapp_data_signature_ == &::google::protobuf::internal::kEmptyString) {
+    inapp_data_signature_ = new ::std::string;
+  }
+  return inapp_data_signature_;
+}
+inline ::std::string* ValidateBilling::release_inapp_data_signature() {
+  clear_has_inapp_data_signature();
+  if (inapp_data_signature_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = inapp_data_signature_;
+    inapp_data_signature_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+inline void ValidateBilling::set_allocated_inapp_data_signature(::std::string* inapp_data_signature) {
+  if (inapp_data_signature_ != &::google::protobuf::internal::kEmptyString) {
+    delete inapp_data_signature_;
+  }
+  if (inapp_data_signature) {
+    set_has_inapp_data_signature();
+    inapp_data_signature_ = inapp_data_signature;
+  } else {
+    clear_has_inapp_data_signature();
+    inapp_data_signature_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  }
+}
+
+// -------------------------------------------------------------------
+
+// ValidateRes
+
+// required bool result = 1;
+inline bool ValidateRes::has_result() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void ValidateRes::set_has_result() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void ValidateRes::clear_has_result() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void ValidateRes::clear_result() {
+  result_ = false;
+  clear_has_result();
+}
+inline bool ValidateRes::result() const {
+  return result_;
+}
+inline void ValidateRes::set_result(bool value) {
+  set_has_result();
+  result_ = value;
+}
+
+// optional int32 money = 2;
+inline bool ValidateRes::has_money() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void ValidateRes::set_has_money() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void ValidateRes::clear_has_money() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void ValidateRes::clear_money() {
+  money_ = 0;
+  clear_has_money();
+}
+inline ::google::protobuf::int32 ValidateRes::money() const {
+  return money_;
+}
+inline void ValidateRes::set_money(::google::protobuf::int32 value) {
+  set_has_money();
+  money_ = value;
+}
+
+// -------------------------------------------------------------------
+
 // VipInfoRes
 
 // optional int32 level = 1;
@@ -1066,238 +2208,6 @@ inline void BuyCardReq::set_cardid(::google::protobuf::int32 value) {
   cardid_ = value;
 }
 
-// optional string deviceId = 2;
-inline bool BuyCardReq::has_deviceid() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
-}
-inline void BuyCardReq::set_has_deviceid() {
-  _has_bits_[0] |= 0x00000002u;
-}
-inline void BuyCardReq::clear_has_deviceid() {
-  _has_bits_[0] &= ~0x00000002u;
-}
-inline void BuyCardReq::clear_deviceid() {
-  if (deviceid_ != &::google::protobuf::internal::kEmptyString) {
-    deviceid_->clear();
-  }
-  clear_has_deviceid();
-}
-inline const ::std::string& BuyCardReq::deviceid() const {
-  return *deviceid_;
-}
-inline void BuyCardReq::set_deviceid(const ::std::string& value) {
-  set_has_deviceid();
-  if (deviceid_ == &::google::protobuf::internal::kEmptyString) {
-    deviceid_ = new ::std::string;
-  }
-  deviceid_->assign(value);
-}
-inline void BuyCardReq::set_deviceid(const char* value) {
-  set_has_deviceid();
-  if (deviceid_ == &::google::protobuf::internal::kEmptyString) {
-    deviceid_ = new ::std::string;
-  }
-  deviceid_->assign(value);
-}
-inline void BuyCardReq::set_deviceid(const char* value, size_t size) {
-  set_has_deviceid();
-  if (deviceid_ == &::google::protobuf::internal::kEmptyString) {
-    deviceid_ = new ::std::string;
-  }
-  deviceid_->assign(reinterpret_cast<const char*>(value), size);
-}
-inline ::std::string* BuyCardReq::mutable_deviceid() {
-  set_has_deviceid();
-  if (deviceid_ == &::google::protobuf::internal::kEmptyString) {
-    deviceid_ = new ::std::string;
-  }
-  return deviceid_;
-}
-inline ::std::string* BuyCardReq::release_deviceid() {
-  clear_has_deviceid();
-  if (deviceid_ == &::google::protobuf::internal::kEmptyString) {
-    return NULL;
-  } else {
-    ::std::string* temp = deviceid_;
-    deviceid_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
-    return temp;
-  }
-}
-inline void BuyCardReq::set_allocated_deviceid(::std::string* deviceid) {
-  if (deviceid_ != &::google::protobuf::internal::kEmptyString) {
-    delete deviceid_;
-  }
-  if (deviceid) {
-    set_has_deviceid();
-    deviceid_ = deviceid;
-  } else {
-    clear_has_deviceid();
-    deviceid_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
-  }
-}
-
-// optional string mobileNo = 3;
-inline bool BuyCardReq::has_mobileno() const {
-  return (_has_bits_[0] & 0x00000004u) != 0;
-}
-inline void BuyCardReq::set_has_mobileno() {
-  _has_bits_[0] |= 0x00000004u;
-}
-inline void BuyCardReq::clear_has_mobileno() {
-  _has_bits_[0] &= ~0x00000004u;
-}
-inline void BuyCardReq::clear_mobileno() {
-  if (mobileno_ != &::google::protobuf::internal::kEmptyString) {
-    mobileno_->clear();
-  }
-  clear_has_mobileno();
-}
-inline const ::std::string& BuyCardReq::mobileno() const {
-  return *mobileno_;
-}
-inline void BuyCardReq::set_mobileno(const ::std::string& value) {
-  set_has_mobileno();
-  if (mobileno_ == &::google::protobuf::internal::kEmptyString) {
-    mobileno_ = new ::std::string;
-  }
-  mobileno_->assign(value);
-}
-inline void BuyCardReq::set_mobileno(const char* value) {
-  set_has_mobileno();
-  if (mobileno_ == &::google::protobuf::internal::kEmptyString) {
-    mobileno_ = new ::std::string;
-  }
-  mobileno_->assign(value);
-}
-inline void BuyCardReq::set_mobileno(const char* value, size_t size) {
-  set_has_mobileno();
-  if (mobileno_ == &::google::protobuf::internal::kEmptyString) {
-    mobileno_ = new ::std::string;
-  }
-  mobileno_->assign(reinterpret_cast<const char*>(value), size);
-}
-inline ::std::string* BuyCardReq::mutable_mobileno() {
-  set_has_mobileno();
-  if (mobileno_ == &::google::protobuf::internal::kEmptyString) {
-    mobileno_ = new ::std::string;
-  }
-  return mobileno_;
-}
-inline ::std::string* BuyCardReq::release_mobileno() {
-  clear_has_mobileno();
-  if (mobileno_ == &::google::protobuf::internal::kEmptyString) {
-    return NULL;
-  } else {
-    ::std::string* temp = mobileno_;
-    mobileno_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
-    return temp;
-  }
-}
-inline void BuyCardReq::set_allocated_mobileno(::std::string* mobileno) {
-  if (mobileno_ != &::google::protobuf::internal::kEmptyString) {
-    delete mobileno_;
-  }
-  if (mobileno) {
-    set_has_mobileno();
-    mobileno_ = mobileno;
-  } else {
-    clear_has_mobileno();
-    mobileno_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
-  }
-}
-
-// optional string smsNo = 4;
-inline bool BuyCardReq::has_smsno() const {
-  return (_has_bits_[0] & 0x00000008u) != 0;
-}
-inline void BuyCardReq::set_has_smsno() {
-  _has_bits_[0] |= 0x00000008u;
-}
-inline void BuyCardReq::clear_has_smsno() {
-  _has_bits_[0] &= ~0x00000008u;
-}
-inline void BuyCardReq::clear_smsno() {
-  if (smsno_ != &::google::protobuf::internal::kEmptyString) {
-    smsno_->clear();
-  }
-  clear_has_smsno();
-}
-inline const ::std::string& BuyCardReq::smsno() const {
-  return *smsno_;
-}
-inline void BuyCardReq::set_smsno(const ::std::string& value) {
-  set_has_smsno();
-  if (smsno_ == &::google::protobuf::internal::kEmptyString) {
-    smsno_ = new ::std::string;
-  }
-  smsno_->assign(value);
-}
-inline void BuyCardReq::set_smsno(const char* value) {
-  set_has_smsno();
-  if (smsno_ == &::google::protobuf::internal::kEmptyString) {
-    smsno_ = new ::std::string;
-  }
-  smsno_->assign(value);
-}
-inline void BuyCardReq::set_smsno(const char* value, size_t size) {
-  set_has_smsno();
-  if (smsno_ == &::google::protobuf::internal::kEmptyString) {
-    smsno_ = new ::std::string;
-  }
-  smsno_->assign(reinterpret_cast<const char*>(value), size);
-}
-inline ::std::string* BuyCardReq::mutable_smsno() {
-  set_has_smsno();
-  if (smsno_ == &::google::protobuf::internal::kEmptyString) {
-    smsno_ = new ::std::string;
-  }
-  return smsno_;
-}
-inline ::std::string* BuyCardReq::release_smsno() {
-  clear_has_smsno();
-  if (smsno_ == &::google::protobuf::internal::kEmptyString) {
-    return NULL;
-  } else {
-    ::std::string* temp = smsno_;
-    smsno_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
-    return temp;
-  }
-}
-inline void BuyCardReq::set_allocated_smsno(::std::string* smsno) {
-  if (smsno_ != &::google::protobuf::internal::kEmptyString) {
-    delete smsno_;
-  }
-  if (smsno) {
-    set_has_smsno();
-    smsno_ = smsno;
-  } else {
-    clear_has_smsno();
-    smsno_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
-  }
-}
-
-// optional int32 step = 5;
-inline bool BuyCardReq::has_step() const {
-  return (_has_bits_[0] & 0x00000010u) != 0;
-}
-inline void BuyCardReq::set_has_step() {
-  _has_bits_[0] |= 0x00000010u;
-}
-inline void BuyCardReq::clear_has_step() {
-  _has_bits_[0] &= ~0x00000010u;
-}
-inline void BuyCardReq::clear_step() {
-  step_ = 0;
-  clear_has_step();
-}
-inline ::google::protobuf::int32 BuyCardReq::step() const {
-  return step_;
-}
-inline void BuyCardReq::set_step(::google::protobuf::int32 value) {
-  set_has_step();
-  step_ = value;
-}
-
 // -------------------------------------------------------------------
 
 // BuyCardRes
@@ -1324,85 +2234,15 @@ inline void BuyCardRes::set_result(::google::protobuf::int32 value) {
   result_ = value;
 }
 
-// optional string errorCode = 6;
-inline bool BuyCardRes::has_errorcode() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
-}
-inline void BuyCardRes::set_has_errorcode() {
-  _has_bits_[0] |= 0x00000002u;
-}
-inline void BuyCardRes::clear_has_errorcode() {
-  _has_bits_[0] &= ~0x00000002u;
-}
-inline void BuyCardRes::clear_errorcode() {
-  if (errorcode_ != &::google::protobuf::internal::kEmptyString) {
-    errorcode_->clear();
-  }
-  clear_has_errorcode();
-}
-inline const ::std::string& BuyCardRes::errorcode() const {
-  return *errorcode_;
-}
-inline void BuyCardRes::set_errorcode(const ::std::string& value) {
-  set_has_errorcode();
-  if (errorcode_ == &::google::protobuf::internal::kEmptyString) {
-    errorcode_ = new ::std::string;
-  }
-  errorcode_->assign(value);
-}
-inline void BuyCardRes::set_errorcode(const char* value) {
-  set_has_errorcode();
-  if (errorcode_ == &::google::protobuf::internal::kEmptyString) {
-    errorcode_ = new ::std::string;
-  }
-  errorcode_->assign(value);
-}
-inline void BuyCardRes::set_errorcode(const char* value, size_t size) {
-  set_has_errorcode();
-  if (errorcode_ == &::google::protobuf::internal::kEmptyString) {
-    errorcode_ = new ::std::string;
-  }
-  errorcode_->assign(reinterpret_cast<const char*>(value), size);
-}
-inline ::std::string* BuyCardRes::mutable_errorcode() {
-  set_has_errorcode();
-  if (errorcode_ == &::google::protobuf::internal::kEmptyString) {
-    errorcode_ = new ::std::string;
-  }
-  return errorcode_;
-}
-inline ::std::string* BuyCardRes::release_errorcode() {
-  clear_has_errorcode();
-  if (errorcode_ == &::google::protobuf::internal::kEmptyString) {
-    return NULL;
-  } else {
-    ::std::string* temp = errorcode_;
-    errorcode_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
-    return temp;
-  }
-}
-inline void BuyCardRes::set_allocated_errorcode(::std::string* errorcode) {
-  if (errorcode_ != &::google::protobuf::internal::kEmptyString) {
-    delete errorcode_;
-  }
-  if (errorcode) {
-    set_has_errorcode();
-    errorcode_ = errorcode;
-  } else {
-    clear_has_errorcode();
-    errorcode_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
-  }
-}
-
 // optional int32 roleGold = 2;
 inline bool BuyCardRes::has_rolegold() const {
-  return (_has_bits_[0] & 0x00000004u) != 0;
+  return (_has_bits_[0] & 0x00000002u) != 0;
 }
 inline void BuyCardRes::set_has_rolegold() {
-  _has_bits_[0] |= 0x00000004u;
+  _has_bits_[0] |= 0x00000002u;
 }
 inline void BuyCardRes::clear_has_rolegold() {
-  _has_bits_[0] &= ~0x00000004u;
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline void BuyCardRes::clear_rolegold() {
   rolegold_ = 0;
@@ -1418,13 +2258,13 @@ inline void BuyCardRes::set_rolegold(::google::protobuf::int32 value) {
 
 // optional int32 vipLevel = 3;
 inline bool BuyCardRes::has_viplevel() const {
-  return (_has_bits_[0] & 0x00000008u) != 0;
+  return (_has_bits_[0] & 0x00000004u) != 0;
 }
 inline void BuyCardRes::set_has_viplevel() {
-  _has_bits_[0] |= 0x00000008u;
+  _has_bits_[0] |= 0x00000004u;
 }
 inline void BuyCardRes::clear_has_viplevel() {
-  _has_bits_[0] &= ~0x00000008u;
+  _has_bits_[0] &= ~0x00000004u;
 }
 inline void BuyCardRes::clear_viplevel() {
   viplevel_ = 0;
@@ -1440,13 +2280,13 @@ inline void BuyCardRes::set_viplevel(::google::protobuf::int32 value) {
 
 // optional int32 vipExp = 4;
 inline bool BuyCardRes::has_vipexp() const {
-  return (_has_bits_[0] & 0x00000010u) != 0;
+  return (_has_bits_[0] & 0x00000008u) != 0;
 }
 inline void BuyCardRes::set_has_vipexp() {
-  _has_bits_[0] |= 0x00000010u;
+  _has_bits_[0] |= 0x00000008u;
 }
 inline void BuyCardRes::clear_has_vipexp() {
-  _has_bits_[0] &= ~0x00000010u;
+  _has_bits_[0] &= ~0x00000008u;
 }
 inline void BuyCardRes::clear_vipexp() {
   vipexp_ = 0;
@@ -1462,13 +2302,13 @@ inline void BuyCardRes::set_vipexp(::google::protobuf::int32 value) {
 
 // optional int32 nextExp = 5;
 inline bool BuyCardRes::has_nextexp() const {
-  return (_has_bits_[0] & 0x00000020u) != 0;
+  return (_has_bits_[0] & 0x00000010u) != 0;
 }
 inline void BuyCardRes::set_has_nextexp() {
-  _has_bits_[0] |= 0x00000020u;
+  _has_bits_[0] |= 0x00000010u;
 }
 inline void BuyCardRes::clear_has_nextexp() {
-  _has_bits_[0] &= ~0x00000020u;
+  _has_bits_[0] &= ~0x00000010u;
 }
 inline void BuyCardRes::clear_nextexp() {
   nextexp_ = 0;

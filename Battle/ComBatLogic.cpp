@@ -1,5 +1,5 @@
 ﻿
-#include "ComBatLogic.h"
+#include "Battle/ComBatLogic.h"
 #include "Battle/BattleScene/LoadBattleResource.h"
 #include "Battle/BattleScene/BattleScene.h"
 #include "Battle/BufExp.h"
@@ -8,23 +8,17 @@
 #include "model/BuffManage.h"
 #include "model/MapManager.h"
 #include "tools/ShowTexttip.h"
-#include "Battle/MoveRule.h"
 #include "Battle/ConstNum.h"
-#include "model/terrainLayer.h"
-#include "Battle/HurtCount.h"
 #include "Battle/WarAssist.h"
 #include "Battle/MapEffect.h"
-#include "Battle/TerrainExp.h"
 #include "Battle/CombatTask.h"
 #include "Battle/EffectData.h"
 #include "Battle/WarControl.h"
-#include "model/TerrainManager.h"
 #include "Battle/WarBackLayer.h"
 #include "Battle/CaptainSkill.h"
 #include "Battle/CombatEffect.h"
 #include "Battle/BattleResult.h"
 #include "common/CommonFunction.h"
-#include "Battle/BattleLayer/StoryLayer.h"
 #include "Battle/RoleObject/RoleObject.h"
 #include "Battle/BattleLayer/BattleMapLayer.h"
 #include "Battle/BattleLayer/BattleRoleLayer.h"
@@ -44,83 +38,63 @@
 #include "Battle/RoleSkill.h"
 #include "Battle/BaseRoleData.h"
 #include "Battle/MonsterData.h"
-namespace BattleSpace{
+#include "Battle/Strategy/TotalStrategy.h"
+namespace BattleSpace
+{
 	CombatLogic::CombatLogic()
-		:m_time(0),m_Assist(nullptr),m_task(nullptr),m_CombatEffect(nullptr),m_bufExp(nullptr),m_terExp(nullptr)
-		,m_BatchNum(0),m_CurrBatchNum(0),m_FiratBatch(true),m_Scene(nullptr),m_UILayer(nullptr)
-		,m_MapLayer(nullptr),m_AliveLayer(nullptr),m_TerrainLayer(nullptr),m_StoryLayer(nullptr)
-		,m_GuideLayer(nullptr),m_Run(false),m_Manage(nullptr),m_MaxCost(0)
-		,m_CurrCost(0),m_speed(1),m_Alive(nullptr),m_bRecvFinish(false),m_fCurrentCostAdd(0),
-		m_iGameTimeCount(0), m_bCountDown(false),m_Record(true),m_RecordNum(0),m_PlayerNum(0)
+	:mTime(0),mAssist(nullptr),mTask(nullptr),mCombatEffect(nullptr)
+	,m_CurrBatchNum(0),m_FiratBatch(true),mBattleScene(nullptr)
+	,mMapLayer(nullptr),mRoleLayer(nullptr),mControlLayer(nullptr)
+	,mManage(nullptr),mTotalStrategy(nullptr),mGuideManage(nullptr)
+	,mCritRole(nullptr),m_bRecvFinish(false),m_PlayerNum(0),mbufExp(nullptr)
+	,m_iGameTimeCount(0), m_bCountDown(false),m_Record(true),m_RecordNum(0)
 	{}
 
 	CombatLogic::~CombatLogic()
 	{
-		CC_SAFE_RELEASE(m_Assist);
-		m_Assist = nullptr;
-		CC_SAFE_RELEASE(m_task);
-		m_task = nullptr;
-		CC_SAFE_RELEASE(m_terExp);
-		m_terExp = nullptr;
-		CC_SAFE_RELEASE(m_bufExp);
-		m_bufExp = nullptr;
-		CC_SAFE_RELEASE(m_CombatEffect);
-		m_CombatEffect = nullptr;
+		CC_SAFE_RELEASE(mAssist);
+		mAssist = nullptr;
+		CC_SAFE_RELEASE(mTask);
+		mTask = nullptr;
+		CC_SAFE_RELEASE(mbufExp);
+		mbufExp = nullptr;
+		CC_SAFE_RELEASE(mCombatEffect);
+		mCombatEffect = nullptr;
+		CC_SAFE_RELEASE(mTotalStrategy);
+		mTotalStrategy = nullptr;
 
-		m_Scene = nullptr;
-		m_UILayer = nullptr;
-		m_MapLayer = nullptr;
-		m_AliveLayer = nullptr;
-		m_TerrainLayer = nullptr;
-		m_StoryLayer = nullptr;
-		m_GuideLayer = nullptr;
-		m_Manage = nullptr;
+		mBattleScene = nullptr;
+		mControlLayer = nullptr;
+		mMapLayer = nullptr;
+		mRoleLayer = nullptr;
+		mManage = nullptr;
 	}
 
 	void CombatLogic::onExit()
 	{
 		CCNode::onExit();
-		NOTIFICATION->removeAllObservers(this);
+		bNotification->removeAllObservers(this);
 		this->unscheduleAllSelectors();
 	}
 
 	void CombatLogic::onEnter()
 	{
 		CCNode::onEnter();
-		m_Scene = (BattleScene*)this->getParent(); 
-		m_Assist->setScene(m_Scene);
-		m_CombatEffect->setScene(m_Scene);
-		m_UILayer = m_Scene->getWarUI();
-		m_UILayer->setVisible(false);
-		m_MapLayer = m_Scene->getBattleMapLayer();
-		m_StoryLayer = m_Scene->getStoryLayer();
-		m_AliveLayer = m_Scene->getBattleRoleLayer();
-		m_TerrainLayer = m_Scene->getTerrainLayer();
-		m_GuideLayer = m_Scene->getCombatGuideLayer();
-		m_BatchNum = m_Manage->getBatch();
-
+		mBattleScene = (BattleScene*)this->getParent(); 
+		mAssist->setScene(mBattleScene);
+		mCombatEffect->setScene(mBattleScene);
+		mControlLayer = mBattleScene->getWarUI();
+		mControlLayer->setVisible(false);
+		mMapLayer = mBattleScene->getBattleMapLayer();
+		mRoleLayer = mBattleScene->getBattleRoleLayer();
 		addEvent();
-		initCost();
 		initMapBackground();
 		initWordBossTime();
 	}
 
-	void CombatLogic::initCost()
-	{
-		CCObject* obj = nullptr;
-		CCArray* arr = m_Manage->getAlivesByCamp(false,true);
-		CCARRAY_FOREACH(arr,obj)
-		{
-			BaseRole* alive = (BaseRole*)obj;
-			m_MaxCost += alive->getCostmax();
-			if (alive->getCaptain())
-				m_CurrCost += alive->getInitCost();
-		}
-	}
-
 	void CombatLogic::initWordBossTime()
 	{
-		if (m_Manage->getWorldBoss())
+		if (mManage->getWorldBoss())
 		{
 			m_iGameTimeCount = 180;			//世界boss打180s,3min
 			m_bCountDown = true;
@@ -129,102 +103,59 @@ namespace BattleSpace{
 
 	bool CombatLogic::init()
 	{
-		m_task = CCArray::create();
-		m_task->retain();
-		m_bufExp = BufExp::create();
-		m_bufExp->retain();
-		m_terExp = TerrainExp::create();
-		m_terExp->retain();
-		m_Assist = WarAssist::create();
-		m_Assist->retain();
-		m_CombatEffect = CombatEffect::create();
-		m_CombatEffect->retain();
+		mTask = CCArray::create();
+		mTask->retain();
+		mbufExp = BufExp::create();
+		mbufExp->retain();
+		mAssist = WarAssist::create();
+		mAssist->retain();
+		mCombatEffect = CombatEffect::create();
+		mCombatEffect->retain();
+		mTotalStrategy  = TotalStrategy::create();
+		mTotalStrategy->retain();
 
-		m_Manage = DataCenter::sharedData()->getWar();
+		mGuideManage = DataCenter::sharedData()->getCombatGuideMg();
+		mManage = DataCenter::sharedData()->getWar();
 		m_MapData = DataCenter::sharedData()->getMap()->getCurrWarMap();
 		return true;
 	}
 
 	void CombatLogic::addEvent()
 	{
-		NOTIFICATION->addObserver(this,callfuncO_selector(CombatLogic::StoryEndEvent),B_StoryOver,nullptr);
-		NOTIFICATION->addObserver(this,callfuncO_selector(CombatLogic::RoundStart),B_RoundStart,nullptr);
-		NOTIFICATION->addObserver(this,callfuncO_selector(CombatLogic::changeSpeed),B_ChangeSceneSpeed,nullptr);
-		NOTIFICATION->addObserver(this,callfuncO_selector(CombatLogic::ActObjectRemove),B_ActObjectRemove,nullptr);
-		NOTIFICATION->addObserver(this,callfuncO_selector(CombatLogic::CritAtkEnd),B_CritEnd,nullptr);
-		NOTIFICATION->addObserver(this,callfuncO_selector(CombatLogic::AliveDieDispose),B_AliveDie,nullptr);
-		NOTIFICATION->addObserver(this,callfuncO_selector(CombatLogic::cReturnLayer),B_ReturnLayer,nullptr);
-		NOTIFICATION->addObserver(this,callfuncO_selector(CombatLogic::changeCost),B_ChangeCostNumber,nullptr);
-		NOTIFICATION->addObserver(this,callfuncO_selector(CombatLogic::BatterRecord),B_RecordContinuousSkill,nullptr);
-		NOTIFICATION->addObserver(this,callfuncO_selector(CombatLogic::rolePlyaSkill),B_RoleSkill,nullptr);
+		bNotification->addObserver(this,callfuncO_selector(CombatLogic::StoryEndEvent),MsgStorOver,nullptr);
+		bNotification->addObserver(this,callfuncO_selector(CombatLogic::ActObjectRemove),B_ActObjectRemove,nullptr);
+		bNotification->addObserver(this,callfuncO_selector(CombatLogic::CritAtkEnd),B_CritEnd,nullptr);
+		bNotification->addObserver(this,callfuncO_selector(CombatLogic::AliveDieDispose),MsgRoleDie,nullptr);
+		bNotification->addObserver(this,callfuncO_selector(CombatLogic::cReturnLayer),B_ReturnLayer,nullptr);
+		bNotification->addObserver(this,callfuncO_selector(CombatLogic::BatterRecord),B_RecordContinuousSkill,nullptr);
+		bNotification->addObserver(this,callfuncO_selector(CombatLogic::rolePlyaSkill),B_RoleSkill,nullptr);
+		bNotification->addObserver(this,callfuncO_selector(CombatLogic::combatResult),MsgWordBossExit,nullptr);
 		CNetClient::getShareInstance()->registerMsgHandler(ExitStage,this,CMsgHandler_selector(CombatLogic::OnBattleFinish));
 		CNetClient::getShareInstance()->registerMsgHandler(BossFinishReqMsg,this,CMsgHandler_selector(CombatLogic::onWordBossFinish));
 	}
 
 	void CombatLogic::initMapBackground() 
 	{ 
-		if (m_MapLayer->getBackgroundManage())
+		if (mMapLayer->getBackgroundManage())
 		{
-			m_MapLayer->getBackgroundManage()->setMap(m_MapLayer);
-			m_MapLayer->getBackgroundManage()->initWithStage(m_Manage->getStageID());
+			mMapLayer->getBackgroundManage()->setMap(mMapLayer);
+			mMapLayer->getBackgroundManage()->initWithStage(mManage->getStageID());
 		}
-		m_UILayer->updateBatchNumber(1);
-	}
-	//测试用
-	void CombatLogic::RoundStart(CCObject* ob)
-	{
-		m_Run = !m_Run;
-		CCLabelTTF* lab = (CCLabelTTF*)m_UILayer->getChildByTag(10000);
-		if (!lab)
-		{
-			lab = CCLabelTTF::create("STOP","Arial",50);
-			lab->setColor(ccc3(255,0,0));
-			lab->setPosition(ccp(180,100));
-			m_UILayer->addChild(lab,1,10000);
-		}
-		if (m_Run)
-		{
-			lab->setString(" RUN ");
-		}else{
-			lab->setString(" STOP ");
-		}
-	}
-
-	void CombatLogic::changeSpeed(CCObject* ob)
-	{
-		if (m_speed > 1)
-		{
-			m_speed = 1;
-		}else{
-			m_speed = 2;
-		}
-		CCDirector::sharedDirector()->getScheduler()->setTimeScale(m_speed);
-	}
-
-	void CombatLogic::update(float delta)
-	{
-		m_time += delta;
-		showRound();
-		updateTask();
-		m_bufExp->ResetInterval(delta);
-		runLogic(delta);
-		m_UILayer->updateCostNumber(m_CurrCost);
-		m_UILayer->updateCostSpeed(m_fCurrentCostAdd);
-		m_fCurrentCostAdd = 0;
+		mControlLayer->updateBatchNumber(1);
 	}
 
 	void CombatLogic::displayRoundTips()
 	{
-		CCLabelAtlas* labAt = CCLabelAtlas::create(ToString(m_CurrBatchNum+1),"label/47_44.png",47,44,'0');
-		ShowTexttip(labAt,RGB_GREEN,ROUNDNUM,CCPointZero,0,0,0,200);
-		NOTIFICATION->postNotification(B_MonsterTips);
+		CCLabelAtlas* labAt = CCLabelAtlas::create(ToString(m_CurrBatchNum+1),"label/wave_number.png", 81, 84, '0');
+		ShowTexttip(labAt, ccc3(255, 255, 255), ROUNDNUM, CCPointZero, 0, 0, 0, 200);
+		bNotification->postNotification(B_MonsterTips);
 	}
 
 	void CombatLogic::showRound()
 	{
-		if (m_time >= 0.8f && m_FiratBatch && !DataCenter::sharedData()->getCombatGuideMg()->IsGuide())
+		if (mTime >= 0.8f && m_FiratBatch && !mGuideManage->IsGuide())
 		{
-			m_Run = true;	
+			mManage->setLogicState(true);
 			m_FiratBatch = false;
 			displayRoundTips();
 		}
@@ -233,78 +164,70 @@ namespace BattleSpace{
 	void CombatLogic::updateTask()
 	{
 		CCObject* object = nullptr;
-		CCArray* findRs = CCArray::create();		//维护一个任务队列
-		CCARRAY_FOREACH(m_task,object)
+		CCArray* tFinishs = CCArray::create();		//维护一个任务队列
+		CCARRAY_FOREACH(mTask,object)
 		{
-			CombatTask* task = (CombatTask*) object;
-			if(!task) continue;
-			if(m_time > task->getInterval())
+			CombatTask* tTask = (CombatTask*) object;
+			if(!tTask) continue;
+			if(mTime > tTask->getInterval())
 			{
-				SEL_CallFuncO fun = task->getFun();
-				(task->getPtarget()->*fun)(task->getParam());		//函数指针解引用传入参数
-				findRs->addObject(object);
+				SEL_CallFuncO fun = tTask->getFun();
+				(tTask->getPtarget()->*fun)(tTask->getParam());		//函数指针解引用传入参数
+				tFinishs->addObject(object);
 			}
 		}
-		CCARRAY_FOREACH(findRs,object)
+		CCARRAY_FOREACH(tFinishs,object)
 		{
-			m_task->removeObject(object);
+			mTask->removeObject(object);
 		}
-		findRs->removeAllObjects();					//可以执行其他对象中需要一直循环判断的方法
+		tFinishs->removeAllObjects();					//可以执行其他对象中需要一直循环判断的方法
+	}
+
+	void CombatLogic::update(float delta)
+	{
+		mTime += delta;
+		showRound();
+		updateTask();
+		mbufExp->ResetInterval(delta);
+		runLogic(delta);
+		mControlLayer->updateCostNumber();
+		mControlLayer->updateCostSpeed(delta);
+		mManage->setCostSpeed(0);
 	}
 
 	void CombatLogic::runLogic(float delta)
 	{
-		if (!m_Run || DataCenter::sharedData()->getCombatGuideMg()->IsGuide())
+		if ( !mManage->getLogicState() || 
+			 mGuideManage->IsGuide())
 			return;
-		m_Manage->updateAlive();				//更新武将信息
+		mManage->updateAlive();							//更新武将信息
 		ExcuteAI(delta);
-		costUpdate(delta);
-	}
-
-	void CombatLogic::changeCost( CCObject* ob ) 
-	{ 
-		m_CurrCost += ((CCInteger*)ob)->getValue(); 
-		costUpdate(0);
-	}
-
-	void CombatLogic::costUpdate(float delta)
-	{
-		if (m_CurrCost < m_MaxCost && !m_Alive)	//放必杀技时cost不发生改变
+		if ( !mCritRole )
 		{
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
-			m_CurrCost += delta * 100;				//系统一直增加cost
-			m_fCurrentCostAdd += 1;
-#else
-			m_CurrCost += delta;
-			m_fCurrentCostAdd += delta;
-#endif	
-		}
-		if ( m_CurrCost <= 0 ) //武将移动回我方半屏
-		{
-			m_CurrCost = 0;
-		}else if(m_CurrCost >= m_MaxCost){
-			m_CurrCost = m_MaxCost;
+			mManage->costUpdate(delta);
+			mTotalStrategy->excuteStrategy(delta);		//我方释放必杀技是不做AI处理
 		}
 	}
 	//cost 计算(帧)或以秒为单位进行计算、位置实时更新
 	void CombatLogic::CostCount(BaseRole* tRole,float dt)
 	{
-		if ( tRole->getEnemy() || tRole->getFatherID() || m_Alive)			
+		if ( tRole->getEnemy() || tRole->getFatherID() || mCritRole)			
 			return;
-		if (m_Manage->inAddCostArea(tRole->getGridIndex()))
+		if (mManage->inAddCostArea(tRole->getGridIndex()))
 		{
-			m_CurrCost += tRole->getAddCost() * dt;					//怒气值每帧变化率
-			m_fCurrentCostAdd += tRole->getAddCost();
+			float tSpeed = mManage->getCostSpeed() + (tRole->getAddCost()* dt);
+			mManage->setCostSpeed(tSpeed);
 		}
 	}
 	//每一帧都判断每个武将的信息                   
 	void CombatLogic::ExcuteAI(float pTime)
 	{
-		const Members* map_Alive = m_Manage->getMembers();
-		for (Members::const_iterator iter = map_Alive->begin();iter != map_Alive->end(); iter++)
+		const RolesMap* tMapRole = mManage->getRolesMap();
+		RolesMap::const_iterator iter = tMapRole->begin();
+		for (;iter != tMapRole->end(); iter++)
 		{
 			BaseRole* tRole = iter->second;
-			if (m_Alive && tRole != m_Alive)continue;										//一次只处理一个武将播放技能的情况，若是处理多个则以武将技能状态判断，而不用单一武将进行判断
+			if (mCritRole && tRole != mCritRole)continue;									//一次只处理一个武将播放技能的情况，若是处理多个则以武将技能状态判断，而不用单一武将进行判断
 			CostCount(tRole,pTime);															//计算我方所有武将cost值
 			tRole->excuteLogic(pTime);
 		}
@@ -320,14 +243,14 @@ namespace BattleSpace{
 	{
 		m_Record = false;
 		m_PlayerNum++;
-		m_CombatEffect->setPlayerNum(m_PlayerNum);
+		mCombatEffect->setPlayerNum(m_PlayerNum);
 		if (m_PlayerNum >= m_RecordNum)
 		{
-			m_Run = false;
-			m_CombatEffect->BatterSpine(m_RecordNum);
+			mManage->setLogicState(false);
+			mCombatEffect->BatterSpine(m_RecordNum);
 			m_PlayerNum = 0; 
 			m_RecordNum = 0;
-			m_CombatEffect->setPlayerNum(m_PlayerNum);
+			mCombatEffect->setPlayerNum(m_PlayerNum);
 			m_Record = true;
 		}
 	}
@@ -336,45 +259,32 @@ namespace BattleSpace{
 	{
 		BaseRole* tRole = dynamic_cast<BaseRole*>(ob);
 		tRole->AliveCritEnd();
-		m_UILayer->ResetButtonState(m_Alive);
-		m_AliveLayer->changeLight(false);
-		m_Alive = nullptr;
+		mControlLayer->ResetButtonState(mCritRole);
+		mRoleLayer->changeLight(false);
+		mCritRole = nullptr;
 		critComboEffect();
-	}
-
-	void CombatLogic::displayBatchWarning()
-	{
-		if (m_Manage->getAliveByType(E_ALIVETYPE::eBoss))
-		{
-			BaseRole* boss = m_Manage->getAliveByType(E_ALIVETYPE::eBoss);
-			m_Assist->DisplayBossWarning(m_UILayer,boss->getModel());							//第一波就出现超大boss的情况	
-			m_AliveLayer->removeMessage();														//释放掉触摸消息
-		}else if(m_BatchNum == m_CurrBatchNum)
-		{
-			m_Assist->DisplayBossWarning(m_UILayer);
-			m_AliveLayer->removeMessage();														//释放掉触摸消息
-		}
 	}
 
 	void CombatLogic::displayGuide()
 	{
-		if (!m_Manage->getStageID())														//引导开启的情况
+		if (!mManage->getStageID())															//引导开启的情况
 		{
 			char path[60] = {0};
 			sprintf(path,"%d_%d",0,m_CurrBatchNum+1);										//覆盖高亮区域的图片
-			DataCenter::sharedData()->getCombatGuideMg()->setGuide(path);
+			mGuideManage->setGuide(path);
 		}
 	}
 
 	void CombatLogic::NextBatch( float dt )
 	{
 		m_CurrBatchNum++;
-		m_UILayer->updateBatchNumber(m_CurrBatchNum+1);
-		m_AliveLayer->createBatchMonster(m_CurrBatchNum);
-		if (m_CurrBatchNum < m_BatchNum)
+		mControlLayer->updateBatchNumber(m_CurrBatchNum+1);
+		mRoleLayer->createBatchMonster(m_CurrBatchNum);
+		if (m_CurrBatchNum < mManage->getBatch())
 			displayRoundTips();
 		displayGuide();
-		displayBatchWarning();
+		if(mManage->getBatch() == m_CurrBatchNum && !mManage->getAliveByType(sMonsterSpecies::eBoss))
+			mAssist->displayBossWarningBegin();
 	}
 
 	void CombatLogic::ActObjectRemove( CCObject* ob )
@@ -382,38 +292,40 @@ namespace BattleSpace{
 		BaseRole* alive = (BaseRole*)ob;
 		if (alive->getEnemy() && alive->getLastAlive())
 		{
-			if (m_BatchNum > m_CurrBatchNum)										//可能会出现的一个bug，两个人同时死亡的间隔太近，会多次调用这个方法。应该从逻辑处进行最后一个死亡武将的判定而不应该从这里进行处理
+			if (mManage->getBatch() > m_CurrBatchNum)										//可能会出现的一个bug，两个人同时死亡的间隔太近，会多次调用这个方法。应该从逻辑处进行最后一个死亡武将的判定而不应该从这里进行处理
 			{
-				srandNum();															//设置随机种子
-				m_Manage->initMonsterByBatch(m_CurrBatchNum+1);							//初始化批次武将数据(必须马上初始化数据,但是绘制可以延迟,否则多个武将连续死亡会直接战斗胜利出现)
-				this->scheduleOnce(schedule_selector(CombatLogic::NextBatch),1);	//打下一批次延时时间
+				srandNum();																	//设置随机种子
+				mManage->initMonsterByBatch(m_CurrBatchNum+1);								//初始化批次武将数据(必须马上初始化数据,但是绘制可以延迟,否则多个武将连续死亡会直接战斗胜利出现)
+				this->scheduleOnce(schedule_selector(CombatLogic::NextBatch),1);				//打下一批次延时时间
 			}else{
-				m_Run = false;
-				m_UILayer->hideUiUpPart();			//隐藏control UI的上部分
+				mManage->setLogicState(false);
+				bNotification->postNotification(MsgHideControlUp);
 				CCDirector::sharedDirector()->getScheduler()->setTimeScale(1);
-				m_StoryLayer->CreateStory(CCInteger::create((int)StoryType::eOverStory));
+				bNotification->postNotification(MsgCreateStory,CCInteger::create((int)StoryType::eOverStory));
 			}
 		}
 	}
 
-	void CombatLogic::monsterDieDispose( BaseRole* alive )
+	void CombatLogic::monsterDieDispose( BaseRole* pRole )
 	{
-		if (m_Manage->checkMonstOver())
+		if (mManage->checkMonstOver())
 		{
-			alive->setLastAlive(true);
-			if (m_BatchNum > m_CurrBatchNum)				//判断最后一回合
+			pRole->setLastAlive(true);
+			if (mManage->getBatch() > m_CurrBatchNum)				//判断最后一回合
 				return;
-			m_Run = false;
-			m_UILayer->RemoveEvent();															//最后一个怪物死亡不能再释放技能了
-			CCDirector::sharedDirector()->getScheduler()->setTimeScale(0.3f);
-			DataCenter::sharedData()->getWar()->setbattleOver(true);
+			mManage->setLogicState(false);
+			mControlLayer->RemoveEvent();															//最后一个怪物死亡不能再释放技能了
+			if (mManage->getStageID())
+				CCDirector::sharedDirector()->getScheduler()->setTimeScale(0.3f);
+			mManage->setbattleOver(true);
 		}else{
 			PlayEffectSound(SFX_423);
-			m_CurrCost += alive->getInitCost();													//击杀敌方武将添加cost
-			m_UILayer->showFlyCostToBar(m_AliveLayer->convertToWorldSpace(alive->getRoleObject()->getPosition()));//粒子效果
+			mManage->changeCost(pRole->getInitCost());												//击杀敌方武将添加cost
+			bNotification->postNotification(MsgMonsterDie,pRole->getRoleObject());
+			mControlLayer->showFlyCostToBar(pRole->getRoleObject());									//粒子效果
 		}
 	}
-	//控制关卡进度的地方处理
+	//控制关卡进度的地方处理( 抽出来到战斗结果判断对象中去进行。)
 	void CombatLogic::AliveDieDispose( CCObject* ob )
 	{
 		BaseRole* tRole = (BaseRole*)ob;
@@ -421,15 +333,15 @@ namespace BattleSpace{
 		{
 			monsterDieDispose(tRole);
 		}else{
-			if (tRole->getBaseData()->getCallRole() || tRole->getCaptain())								//喽啰死亡不进行初始化处理
+			if ( tRole->getFatherID() )								//喽啰死亡不进行初始化处理
 				return;
 			if (tRole->getCaptain())
 			{
-				m_Run = false;
-				m_Assist->ActStandExcute(m_AliveLayer->getAlivesOb());
-				combatResult(nullptr);															//战斗失败
+				bNotification->postNotification(MsgRoleStand);
+				mManage->setLogicState(false);
+				combatResult(nullptr);												//战斗失败
 			}else{
-				m_UILayer->AliveBattleDispose(tRole);											//武将下阵	
+				bNotification->postNotification(MsgRoleBattleState,tRole);
 			}
 		}
 	}
@@ -437,7 +349,7 @@ namespace BattleSpace{
 	void CombatLogic::battleWin()
 	{
 		PlayBackgroundMusic(SFX_Win,false);	
-		BaseRole* alive = m_Manage->getAliveByGrid(C_CAPTAINGRID);	
+		BaseRole* alive = mManage->getAliveByGrid(C_CAPTAINGRID);	
 		int hp = alive->getHp();
 		if (hp>alive->getBaseData()->getRoleHp())
 			hp = alive->getBaseData()->getRoleHp();
@@ -472,14 +384,14 @@ namespace BattleSpace{
 	{
 		if(m_bRecvFinish)
 			return;
-		int hurt = m_Manage->getBossHurtCount();
-		int checkNum = m_Manage->getVerifyNum();
+		int hurt = mManage->getBossHurtCount();
+		int checkNum = mManage->getVerifyNum();
 		if ((checkNum + hurt) != 97231000)
 		{
 			CCLOG("[ *ERROR ] CombatLoginc::scheduleForRequesBossFinish");				//验证造成的伤害是否被修改内存
 			return;
 		}
-		vector<int>* vec= m_Manage->getBossHurtVec();
+		vector<int>* vec= mManage->getBossHurtVec();
 		CPlayerControl::getInstance().sendWorldBossFinish(hurt, checkNum, *vec);
 	}
 
@@ -494,7 +406,7 @@ namespace BattleSpace{
 
 	void CombatLogic::wordBossFinish()
 	{
-		DataCenter::sharedData()->getWar()->setbattleOver(true);
+		mManage->setbattleOver(true);
 		scheduleForRequesBossFinish();
 		this->runAction(
 			CCRepeatForever::create(CCSequence::createWithTwoActions(
@@ -504,12 +416,12 @@ namespace BattleSpace{
 
 	void CombatLogic::combatResult(CCObject* ob)
 	{
-		if (m_Manage->getWorldBoss())
+		if (mManage->getWorldBoss())
 		{
 			wordBossFinish();						//世界boss结束情况
 			return;
 		}
-		if ( m_Manage->getStageID() )
+		if ( mManage->getStageID() )
 		{
 			if( ob )				
 			{
@@ -524,13 +436,13 @@ namespace BattleSpace{
 
 	void CombatLogic::beginStageFloorEffect()
 	{
-		if (m_Manage->getStageID())
+		if (mManage->getStageID())
 			return;
 		CCSize size  = CCDirector::sharedDirector()->getWinSize();
 		int grids[4] = {78,89,102,117};
 		for (int i=0;i<4;i++)
 		{
-			EffectObject*ef  = EffectObject::create("121",PLAYERTYPE::Delay); 
+			EffectObject*ef  = EffectObject::create("121",sPlayType::eDelay); 
 			ef->setMusic(525);
 			ef->setShake(true);
 			ef->setDelaytime(i*0.35f);
@@ -538,7 +450,7 @@ namespace BattleSpace{
 			ef->setLoopNum(2);
 			ef->setPosition(m_MapData->getPoint(grids[i]));
 			ef->setZOrder(10);
-			m_MapLayer->addChild(ef);
+			mMapLayer->addChild(ef);
 		}
 	}
 
@@ -548,29 +460,28 @@ namespace BattleSpace{
 		PlayEffectSound(SFX_413);	
 		CCDelayTime* delay = CCDelayTime::create(0.5f);
 		CCDelayTime* delay2 = CCDelayTime::create(0.3f);
-		CCMoveTo* mt = CCMoveTo::create(1.2f,ccp( MAP_MINX(m_MapData) , m_Scene->getMoveLayer()->getPositionY()));
+		CCMoveTo* mt = CCMoveTo::create(1.2f,ccp( MAP_MINX(m_MapData) , mBattleScene->getMoveLayer()->getPositionY()));
 		CCCallFuncO* cfo = CCCallFuncO::create(this,callfuncO_selector(BattleScene::LayerMoveEnd),CCInteger::create((int)StoryType::eMoveEndStory));
 		CCSequence* sqe = CCSequence::create(delay,mt,delay2,cfo,nullptr);
-		m_Scene->getMoveLayer()->runAction(sqe);
+		mBattleScene->getMoveLayer()->runAction(sqe);
 	}
 
 	void CombatLogic::moveStoryEnd()
 	{
-		m_UILayer->setVisible(true);
-		m_Scene->AddEvent();																	//场景移动动画结束，添加事件响应
+		mControlLayer->setVisible(true);
+		mBattleScene->AddEvent();																//场景移动动画结束，添加事件响应
 		scheduleUpdate();																		//开启游戏主循环
 		if(m_bCountDown)
 			schedule(schedule_selector(CombatLogic::updateOneSecond), 1.0f);
 		PlayBackgroundMusic(BGM_Battle,true);
 		displayGuide(); 
-		if (DataCenter::sharedData()->getWar()->getStageID() == 301)
-			DataCenter::sharedData()->getCombatGuideMg()->setGuide("CostGuide");
-		displayBatchWarning();																	//第一波出现超大boss的情况
+		if (mManage->getStageID() == 301)
+			mGuideManage->setGuide("CostGuide");
 	}
 
 	void CombatLogic::StoryEndEvent(CCObject* ob)
 	{
-		switch ((StoryType)m_StoryLayer->getSType())
+		switch ((StoryType)((CCInteger*)ob)->getValue())
 		{
 		case StoryType::eBeginStory:
 			{
@@ -582,33 +493,33 @@ namespace BattleSpace{
 			}break;
 		case StoryType::eOverStory:
 			{
-				m_AliveLayer->heroWinAction();
-				m_task->addObject(CombatTask::create(m_Assist,callfuncO_selector(WarAssist::WinEffect),m_time+1));
+				mRoleLayer->heroWinAction();
+				mTask->addObject(CombatTask::create(mAssist,callfuncO_selector(WarAssist::WinEffect),mTime+1));
 			}break;
 		}
 	}
 	//显示返回层
 	void CombatLogic::cReturnLayer(CCObject* ob)
 	{
-		if(DataCenter::sharedData()->getWar()->getbattleOver())
+		if(mManage->getbattleOver())
 		{
-			m_Scene->removeChildByTag(backLayer_tag);
+			mBattleScene->removeChildByTag(backLayer_tag);
 			return;
 		}
-		if (m_Scene->getChildByTag(backLayer_tag))
+		if (mBattleScene->getChildByTag(backLayer_tag))						//默认创建出来，放到warScene中去
 		{
-			if (m_Scene->getChildByTag(backLayer_tag)->isVisible())
+			if (mBattleScene->getChildByTag(backLayer_tag)->isVisible())
 			{
-				((WarBackLayer*)m_Scene->getChildByTag(backLayer_tag))->hide();
+				((WarBackLayer*)mBattleScene->getChildByTag(backLayer_tag))->hide();
 				onResume();
 			}else{
-				((WarBackLayer*)m_Scene->getChildByTag(backLayer_tag))->show();
+				((WarBackLayer*)mBattleScene->getChildByTag(backLayer_tag))->show();
 				onPause();
 			}
 		}else{
 			WarBackLayer* blayer = WarBackLayer::create();
 			blayer->setTag(backLayer_tag);
-			m_Scene->addChild(blayer, 100);
+			mBattleScene->addChild(blayer, 100);
 			blayer->show();
 			onPause();
 		}
@@ -619,10 +530,10 @@ namespace BattleSpace{
 		if(type != BossFinishReqMsg)
 			return;
 		m_bRecvFinish = true;
-		m_Scene->removeChildByTag(backLayer_tag);
+		mBattleScene->removeChildByTag(backLayer_tag);
 		BattleFinishRep *res = (BattleFinishRep*)msg;
 		WorldBossEndLayer * layer = WorldBossEndLayer::create();
-		m_Scene->addChild(layer);
+		mBattleScene->addChild(layer);
 		layer->processBattleFinish(type, msg);
 	}
 	//结算信息返回
@@ -631,23 +542,23 @@ namespace BattleSpace{
 		if(type != ExitStage)
 			return;
 		m_bRecvFinish = true;
-		m_Scene->removeChildByTag(backLayer_tag);
+		mBattleScene->removeChildByTag(backLayer_tag);
 		BattleFinishRep *res = (BattleFinishRep*)msg;
 		if (res->win())
 		{
 			WarWinLayer *layer = WarWinLayer::create();
-			m_Scene->addChild(layer);
+			mBattleScene->addChild(layer);
 			layer->processBattleFinish(type, msg);
 		}else{
 			WarFailLayer *layer = WarFailLayer::create();
-			m_Scene->addChild(layer);
+			mBattleScene->addChild(layer);
 		}
 	}
 
 	void CombatLogic::onPause()
 	{
 		this->pauseSchedulerAndActions();
-		if (m_Manage->getWorldBoss())			//停掉主循环,打boss时间继续计算
+		if (mManage->getWorldBoss())			//停掉主循环,打boss时间继续计算
 		{
 			unschedule(schedule_selector(CombatLogic::updateOneSecond));
 			schedule(schedule_selector(CombatLogic::updateOneSecond), 1.0f);
@@ -665,28 +576,28 @@ namespace BattleSpace{
 			return;
 		m_iGameTimeCount--;
 		if (m_iGameTimeCount%5 == 0)
-			m_Manage->getBossHurtVec()->push_back(m_Manage->getBossHurtCount());			//每隔5秒存储一次世界boss伤害值
+			mManage->getBossHurtVec()->push_back(mManage->getBossHurtCount());			//每隔5秒存储一次世界boss伤害值
 		if(m_iGameTimeCount<0)
 		{
 			unschedule(schedule_selector(CombatLogic::updateOneSecond));
-			m_Run = false;
+			mManage->setLogicState(false);
 			PlayBackgroundMusic(SFX_Win,false);
 			combatResult(nullptr);															//结算
 		}else{
-			m_UILayer->updateTimeCountUI(m_iGameTimeCount);									//更新计时器
+			mControlLayer->updateTimeCountUI(m_iGameTimeCount);									//更新计时器
 		}
 	}
 
 	void CombatLogic::rolePlyaSkill( CCObject* ob )
 	{
 		BaseRole* tRole = (BaseRole*)ob;
-		m_CombatEffect->PlayerSkill(tRole);
+		mCombatEffect->PlayerSkill(tRole);
 		if (!tRole->getEnemy())
 		{
-			m_Run = false;
-			m_Alive = tRole;
+			mManage->setLogicState(false);
+			mCritRole = tRole;
 		}else{
-			m_MapLayer->DrawWarningEffect(tRole->mSkillArea);						//格子预警
+			mMapLayer->DrawWarningEffect(tRole->mSkillArea);						//格子预警
 		}
 	}
 

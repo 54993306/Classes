@@ -20,7 +20,7 @@ namespace BattleSpace{
 	{
 		WarMapData* map = DataCenter::sharedData()->getMap()->getCurrWarMap();
 		const CCPoint& p = map->getPoint(grid);
-		EffectObject* eff = EffectObject::create(ToString(terrainID),PLAYERTYPE::Repeat);
+		EffectObject* eff = EffectObject::create(ToString(terrainID),sPlayType::eRepeat);
 		eff->setPosition(p);
 		eff->setScale(0.5f);
 		eff->setTag(grid);

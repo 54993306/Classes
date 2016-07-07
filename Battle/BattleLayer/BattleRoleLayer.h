@@ -50,17 +50,16 @@ namespace BattleSpace{
 	public:
 		void addEvent();
 		void removeEvent();
-		void removeMessage();
+		void removeMessage(CCObject* ob);
 		virtual bool ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent);
 		virtual void ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent);
 		virtual void ccTouchCancelled(CCTouch *pTouch, CCEvent *pEvent);
 		virtual void ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent); 
 	public:
 		int getTouchGrid(CCTouch* pTouch);
-		void initActobject(BaseRole* alive,int createType = 0);
+		void initActobject(CCObject* ob);
 		CCArray* getAlivesOb(int AliveType = AliveType_All);
 		void AddActToGrid(RoleObject* alive,int grid);
-		void AliveObEffect(RoleObject* alive,int createType = DefaultCreat);
 		void LayerShake(CCObject* ob);
 		void roleEntranceBattle(CCObject* ob);
 		void initTouchAlive(BaseRole* alive);
@@ -74,20 +73,20 @@ namespace BattleSpace{
 		void createActObjects();
 		void initMoveActObject(RoleObject* aliveOb);
 		void lucencyActObject(bool lucency);												//对其他武将执行透明操作
-		bool touchInAlive(int grid , CCPoint& p);
+		bool touchInAlive(int grid , const CCPoint& p);
 
-		void roleWantIntoBattle(BaseRole* pRole);
 		void changeLight(bool pLight);
 		void SkillCreateRole(CCObject* ob);
 		void changeTestState(CCObject* ob);
-		CC_SYNTHESIZE_READONLY(bool,m_testState,testState);
+		void roleStand(CCObject* ob);
+		CC_SYNTHESIZE_READONLY(bool,mtestState,testState);
 	protected:
 		CCLayerColor*	m_LayerColor;
 		CCNode*			m_MoveNode;
 		CCNode*			m_AliveNode;
 		BaseRole*		m_TouchAlive;		//被触摸的武将id
 		RoleObject*		m_MoveActObject;		//拖拽移动对象
-		WarManager*		m_Manage;
+		WarManager*		mManage;
 		WarMapData*		m_map;
 		CCPoint			m_TouchOffs;		//触摸偏移
 		int				m_grid;				//记录移动对象的格子位置

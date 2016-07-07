@@ -23,6 +23,7 @@
 #include "Battle/BattleDataCenter.h"
 #include "Battle/MonsterData.h"
 #include "Battle/HeroData.h"
+#include "scene/LoginScene.h"
 using namespace CocosDenshion;
 //using namespace Battle;
 namespace BattleSpace{
@@ -60,7 +61,7 @@ namespace BattleSpace{
 		sprintf(path,"warScene/LoadImage/%d.png",newID);
 		if (!backgroundImage->initWithFile(path))
 		{
-			CCLOG("[ *ERROR ] LoadWar::BackImage BMG initWithFile Fail");
+			CCLOG("[ *ERROR ] LoadBattleResource::BackImage BMG initWithFile Fail");
 			backgroundImage->initWithFile("warScene/LoadImage/0.jpg");			//容错性处理
 		}
 		if (CCDirector::sharedDirector()->getScheduler()->getTimeScale() != 1)
@@ -173,37 +174,26 @@ namespace BattleSpace{
 	//数据解析
 	void LoadBattleResource::DataParse()
 	{
-		const vector<HeroData*>tHeroVec = BattleData->getHeroVector();
-		const vector<MonsterData*>tMonsterVec = BattleData->getMonsterVector();
+		const vector<BaseRoleData*> tRoleDatas = BattleData->getRoleDatas();
 		vector<int> VecRole;
 		vector<int> VecEffect;
 		vector<int> VecBuff;
-		for (HeroData* tMonster: tHeroVec)
+		for (auto tRoleData: tRoleDatas)
 		{
-			if (m_Manage->isSpine(tMonster->getRoleModel()))
+			if (m_Manage->isSpine(tRoleData->getRoleModel()))
 			{
-				m_LoadSpine->AddRoleSpineID(tMonster->getRoleModel());
+				m_LoadSpine->AddRoleSpineID(tRoleData->getRoleModel());
 			}else{
-				VecRole.push_back(tMonster->getRoleModel());
+				VecRole.push_back(tRoleData->getRoleModel());
 			}
-			SkillParse(tMonster,VecEffect,VecBuff);	
+			SkillParse(tRoleData,VecEffect,VecBuff);	
 		}
 		m_LoadSpine->AddRoleSpineID(146);
 		m_LoadSpine->AddRoleSpineID(9999);
 		VecRole.push_back(516);
-		for (MonsterData* tMonster: tMonsterVec)
-		{
-			if (m_Manage->isSpine(tMonster->getRoleModel()))
-			{
-				m_LoadSpine->AddRoleSpineID(tMonster->getRoleModel());
-			}else{
-				VecRole.push_back(tMonster->getRoleModel());
-			}
-			SkillParse(tMonster,VecEffect,VecBuff);	
-		}
-		VectorRemoveRepeat(VecRole);
-		VectorRemoveRepeat(VecEffect);
-		VectorRemoveRepeat(VecBuff);
+		VectorUnique(VecRole);
+		VectorUnique(VecEffect);
+		VectorUnique(VecBuff);
 		m_WarResouse[ResourceType::Load_Role]		= VecRole;
 		m_WarResouse[ResourceType::Load_Effect]		= VecEffect;
 		m_WarResouse[ResourceType::Load_Buff]		= VecBuff;
@@ -253,7 +243,7 @@ namespace BattleSpace{
 		}else{
 			CCArmatureDataManager::sharedArmatureDataManager()->addArmatureFileInfoAsync("warScene/attack.ExportJson",this,schedule_selector(LoadBattleResource::CocosBoneCallBack));//添加之前判断是否存在
 			LoadResourceInfo res;
-			res.Loadtype = LoadType::Load_CocosBone;
+			res.Loadtype = sLoadType::eCocosBone;
 			m_resVec.push_back(res);
 		}
 	}
@@ -267,13 +257,13 @@ namespace BattleSpace{
 		if (m_Release)
 		{
 			CCLOG("Release WarResourse SKELETON = %d",ModeID);
-			if (outPutERRORMsg("LoadWar::LoadRole can not find animationData",animationData))
+			if (outPutERRORMsg("LoadBattleResource::LoadRole can not find animationData",animationData))
 				return;
 			CCArmatureDataManager::sharedArmatureDataManager()->removeArmatureFileInfo(ExportJson_str);
 		}else{
 			if (animationData)
 			{
-				CCLOG("[ *TIPS ] LoadWar::LoadRole The Role Have Again");
+				CCLOG("[ *TIPS ] LoadBattleResource::LoadRole The Role Have Again");
 				return;
 			}
 			CCLOG("LoadWarResourse Load SKELETON = %d",ModeID);
@@ -281,17 +271,17 @@ namespace BattleSpace{
 			LoadResourceInfo res;
 			res.FileName = ToString(ModeID);
 			res.FilePath = std::string(ExportJson_str);
-			res.Loadtype = LoadType::Load_CocosBone;
+			res.Loadtype = sLoadType::eCocosBone;
 			m_resVec.push_back(res);
 		}
 	}
 	void LoadBattleResource::CocosBoneCallBack( float dt )
 	{ 
 		m_loadResNum++; 
-		//CCLOG("LoadWar::CocosBoneCallBack___%d", m_loadResNum);
+		//CCLOG("LoadBattleResource::CocosBoneCallBack___%d", m_loadResNum);
 	}
 
-	void LoadBattleResource::TextureThread(const char* url, const char* model, LoadType type/*= LoadType::Load_Effect*/)
+	void LoadBattleResource::TextureThread(const char* url, const char* model, sLoadType type/*= LoadType::Load_Effect*/)
 	{
 		for (auto i:m_resVec)
 		{
@@ -314,7 +304,7 @@ namespace BattleSpace{
 	void LoadBattleResource::TextureThreadCallBack(CCObject* pSender) 
 	{
 		m_loadResNum++; 
-		//CCLOG("LoadWar::TextureThreadCallBack___%d", m_loadResNum);
+		//CCLOG("LoadBattleResource::TextureThreadCallBack___%d", m_loadResNum);
 	}
 
 	//加载公共资源
@@ -338,7 +328,7 @@ namespace BattleSpace{
 						AnimationManager::sharedAction()->ReleaseAnimation(model);
 						CCSpriteFrameCache::sharedSpriteFrameCache()->removeSpriteFramesFromFile(url);		//根据路径下的文件释放资源
 					}else{
-						TextureThread(url, model, LoadType::Load_Effect);
+						TextureThread(url, model, sLoadType::eEffect);
 						CCLOG("Load Public Effect %s",model);
 					}
 				}break;
@@ -386,9 +376,9 @@ namespace BattleSpace{
 					CCInteger* efid = (CCInteger*)obj;
 					VecEffectID.push_back(efid->getValue());
 				}
-			}else{ CCLOG("[ ERROE ]: LoadWar::loadWarResourse in load skil Effect id =%d",id); }
+			}else{ CCLOG("[ ERROE ]: LoadBattleResource::loadWarResourse in load skil Effect id =%d",id); }
 		}
-		VectorRemoveRepeat(VecEffectID);
+		VectorUnique(VecEffectID);
 		for(auto i:VecEffectID)
 		{
 			sprintf(plist_str,"skill/%d.plist",i);
@@ -544,11 +534,14 @@ namespace BattleSpace{
 				}break;
 			case skipSelectHero:
 				{
-					CSceneManager::sharedSceneManager()->replaceScene(GETSCENE(SelectHeroScene), 0.5f);			
+					CSceneManager::sharedSceneManager()->replaceScene(GETSCENE(SelectHeroScene), 0.5f);	
+// 					LoginScene *scene =  (LoginScene*)GETSCENE(LoginScene);
+// 					scene->setIsCreateRole(true);
+// 					CSceneManager::sharedSceneManager()->replaceScene(scene, 0.5f);		
 				}break;
 			default:	
 				{
-					CCLOG("[ ERROR ]: LoadWar::loadWarResourse()  Skip Scene Fail ");	
+					CCLOG("[ ERROR ]: LoadBattleResource::loadWarResourse()  Skip Scene Fail ");	
 				}break;
 			}
 		}else if ( m_loadResNum>=m_resVec.size())
@@ -558,13 +551,13 @@ namespace BattleSpace{
 			for (int i=0; i<m_resVec.size();++i)
 			{
 				LoadResourceInfo &res = m_resVec.at(i);
-				if (res.Loadtype>LoadType::Load_Effect)
+				if (res.Loadtype>sLoadType::eEffect)
 					continue;
 				CCSpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile(res.FilePath.c_str());//将plist文件加载进入缓存
 				CCLOG("ProgressEnd addSpriteFramesWithFile mode1 %s ",res.FileName.c_str());
-				if(res.Loadtype == LoadType::Load_FrameAnimation)
+				if(res.Loadtype == sLoadType::eFrameAnimation)
 					AnimationManager::sharedAction()->ParseAnimation(res.FileName.c_str(),eFrameRole);
-				else if(res.Loadtype == LoadType::Load_Effect)
+				else if(res.Loadtype == sLoadType::eEffect)
 					AnimationManager::sharedAction()->ParseAnimation(res.FileName.c_str());
 			}
 			this->unscheduleAllSelectors();

@@ -119,10 +119,7 @@ void CJniHelper::jniResult( int iReqCode, int iResult )
 
 void CJniHelper::setJniListener( CJniListener* pListener )
 {
-	if(pListener!=nullptr)
-	{
-		m_pJniResultListener = pListener;
-	}
+	m_pJniResultListener = pListener;
 }
 
 void CJniHelper::startVibrator( int iMsec )
@@ -137,5 +134,41 @@ void CJniHelper::stopVibrator()
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 	c_stop_vibrator();
 #endif
+}
+
+int CJniHelper::getCountryType()
+{
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+	return c_get_country_type();
+#endif
+	CCAssert(false, "Wrong : should be call on android platform!");
+	return 4;
+}
+
+std::string CJniHelper::getGateServerIp()
+{
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+	return c_get_gate_server_ip();
+#endif
+	CCAssert(false, "Wrong : should be call on android platform!");
+	return "";
+}
+
+int CJniHelper::getGateServerPort()
+{
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+	return c_get_gate_server_port();
+#endif
+	CCAssert(false, "Wrong : should be call on android platform!");
+	return 8888;
+}
+
+bool CJniHelper::isNeedDownloadPackage()
+{
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+	return c_is_need_download_package();
+#endif
+	CCAssert(false, "Wrong : should be call on android platform!");
+	return true;
 }
 

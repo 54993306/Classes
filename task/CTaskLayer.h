@@ -22,6 +22,8 @@ public:
 
 	void showTaskTip(TaskListResponse * res);
 
+	void showReadAll(bool isVisible);
+
 	void popItemPrize(PrizeResponse* res);
 	int  getTaskType();
 protected:
@@ -43,7 +45,7 @@ protected:
 
 private:
 	void showNoTaskTip(bool bShow, const char* sInfo);
-
+	void onReadAllMail(CCObject* pSender);
 private:
 	CLayout *m_ui;
 	int  m_selectHero;

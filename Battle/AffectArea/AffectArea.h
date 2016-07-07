@@ -21,7 +21,7 @@
 #include "Battle/ConstNum.h"
 #include "Battle/skEffectData.h"
 namespace BattleSpace{
-	enum struct AffectType 
+	enum struct sAffectType 
 	{
 		eNullArea						= 0,
 		eFront							= 1,//前方格子类型				
@@ -60,18 +60,19 @@ namespace BattleSpace{
 	class AffectArea : public CCObject
 	{
 	public:
-		AffectArea(){};
+		AffectArea():mAffectType(sAffectType::eNullArea){};
 		virtual ~AffectArea(){};
 		static AffectArea* create(int pAffectType);
-		void setEffectData(skEffectData* pData){mEffectData = pData;}
-		virtual AffectType getAreaType(){return AffectType::eNullArea;}
-		virtual void commonHandle();
+		void setEffectData(skEffectData* pData);
+		virtual sAffectType getAreaType(){return sAffectType::eNullArea;}
+		virtual void commonHandle(AreaCountInfo& pInfo);
 		virtual void initArea(AreaCountInfo& pInfo){};
 	protected:
 		void initValidGrids(BaseRole* pRole,vector<int>& pValids);				//初始化有效判断格子
 		virtual void moriGridRole(BaseRole* pRole,vector<int>& pValids);
 	protected:
 		skEffectData* mEffectData;
+		sAffectType mAffectType;
 	};
 };
 

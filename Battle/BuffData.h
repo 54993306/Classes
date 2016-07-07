@@ -60,24 +60,22 @@ namespace BattleSpace{
 		CC_SYNTHESIZE(bool,m_AddFirst,AddFirst);			//是否为第一次添加
 	};
 	//遵循等级替换规则
-	enum struct BUFFTYPE
+	enum struct sBuffType
 	{
-		CLEBF			=0,					//清除减益BF  ctrl+shift+u小写转大写，ctrl+u大写转小写
-		CURRHP			=1,					//持续型血量变化		1
-		ATK				=2,					//攻击				2
-		DEF				=3,					//防御				3
-		CRI				=4,					//暴击				4
-		DOGE			=5,					//闪避				5
-		HIT				=6,					//命中				6
-		MOVESPEED		=7,					//移动速度			7
-		ATKSPEED		=8,					//攻击速度			8
-		FIRING			=9,					//灼烧				9
-		BLEED			=10,				//流血
-
-		CONTROL_ONE		=100,				//定身
-		/*未使用*/
-		HRT				=1000,				//伤害				
-		HPMAX			=1001,				//改变最大血量		
+		eClearDebuff							=0,//清除减益Buff
+		eCurrBlood								=1,//持续型血量变化		
+		eAttack									=2,//攻击				
+		eDefense								=3,//防御				
+		eCrit									=4,//暴击				
+		eDodge									=5,//闪避				
+		eHit									=6,//命中
+		eMoveSpeed								=7,//移动速度			
+		eAttackSpeed							=8,//攻击速度
+		eFiring									=9,//灼烧
+		eBleed									=10,//流血
+		eUnMove									=100,//定身
+		eHurt									=1000,//伤害				
+		eMaxBlood								=1001,//改变最大血量		
 	};
 };
 

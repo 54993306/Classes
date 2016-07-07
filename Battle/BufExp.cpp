@@ -55,7 +55,7 @@ namespace BattleSpace{
 					ef->setScale(scaleNum);
 					if (effect->getup_Loop())						//定身类的效果需要持续显示
 					{
-						ef->setPlayerType(PLAYERTYPE::Repeat);
+						ef->setPlayerType(sPlayType::eRepeat);
 						VecEffect.push_back(ef);
 					}
 					ef->setPosition(ccp(0,30));
@@ -68,7 +68,7 @@ namespace BattleSpace{
 					ef->setScale(scaleNum);
 					if (effect->getdown_Loop())						//定身类的效果需要持续显示
 					{
-						ef->setPlayerType(PLAYERTYPE::Repeat);
+						ef->setPlayerType(sPlayType::eRepeat);
 						VecEffect.push_back(ef);
 					}
 					ef->setPosition(ccp(0,30));
@@ -101,7 +101,7 @@ namespace BattleSpace{
 			Vec.push_back(smallIcon);
 			return smallIcon;
 		}else{
-			if ((BUFFTYPE)info->getBuffType() > BUFFTYPE::CURRHP )
+			if ((sBuffType)info->getBuffType() > sBuffType::eCurrBlood )
 				CCLOG("[ ERROR ] BufExp::CreateSmallIcon Lost Small Icon type=%d",info->getBuffType());
 		}
 		return NULL;
@@ -128,7 +128,7 @@ namespace BattleSpace{
 				bigIcon->runAction(CCSequence::create(dely,spa,CCRemoveSelf::create(),NULL));
 				body->addChild(bigIcon,100-m_interval*10);
 			}else{
-				if ((BUFFTYPE)info->getBuffType() > BUFFTYPE::CURRHP )
+				if ((sBuffType)info->getBuffType() > sBuffType::eCurrBlood )
 					CCLOG("[ ERROR ] BufExp::CreateBigIcon Lost Big Icon type=%d",info->getBuffType());
 			}
 		}else{
@@ -144,7 +144,7 @@ namespace BattleSpace{
 				bigIcon->runAction(CCSequence::create(dely,spa,CCRemoveSelf::create(),NULL));
 				body->addChild(bigIcon,100-m_interval*10);
 			}else{
-				if ((BUFFTYPE)info->getBuffType() > BUFFTYPE::CURRHP )
+				if ((sBuffType)info->getBuffType() > sBuffType::eCurrBlood )
 					CCLOG("[ ERROR ] BufExp::CreateBigIcon Lost Big Icon type=%d",info->getBuffType());
 			}
 		}

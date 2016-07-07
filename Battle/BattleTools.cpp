@@ -154,7 +154,7 @@ namespace BattleSpace{
 		}
 	}
 
-	void PlaySound_Event( int id )
+	void PlaySound( int id )
 	{
 		char str[60] = {0};
 #if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
@@ -199,37 +199,68 @@ namespace BattleSpace{
 	}
 	//SortAliveHp(VecAlive,0,VecAlive->size()-1);			//快速排序得出血量百分比由小到大的数组
 
-	void VectorRemoveRepeat( vector<int>& pVector )
+	void VectorUnique( vector<int>& pVector )
 	{
 		sort(pVector.begin(),pVector.end());
 		pVector.erase(unique(pVector.begin(),pVector.end()),pVector.end());
 	}
 	//升序
-	bool sortAliveGrid(const BaseRole*apAlive,const BaseRole*bpAlive)	
+	bool sortGrid(const BaseRole*apAlive,const BaseRole*bpAlive)	
 	{ 
 		return  apAlive->getGridIndex() < bpAlive->getGridIndex(); 
 	}
 
-	void VectorRemoveRepeat( vector<BaseRole*> &pVector )
+	void VectorUnique( vector<BaseRole*> &pVector )
 	{
 		vector<BaseRole*>::iterator pos;
 		pos = unique(pVector.begin(),pVector.end());		//得到重复元素开始的位置
 		pVector.erase(pos,pVector.end());
-		sort(pVector.begin(),pVector.end(),sortAliveGrid);
+		sort(pVector.begin(),pVector.end(),sortGrid);
 	}
 
-	bool sortAliveHp(const BaseRole* apAlive,const BaseRole* bpAlive)
+	bool sortHp(const BaseRole* apAlive,const BaseRole* bpAlive)
 	{
 		float atHpPerent = (float)apAlive->getHp()/apAlive->getMaxHp();
 		float btHpPerent = (float)bpAlive->getHp()/bpAlive->getMaxHp();
 		return atHpPerent < btHpPerent;
 	}
 
-	void VectorSortAliveHp( vector<BaseRole*> &pVector )
+	void SortRoleHp( vector<BaseRole*> &pVector )
 	{
 		vector<BaseRole*>::iterator pos;
 		pos = unique(pVector.begin(),pVector.end());		//得到重复元素开始的位置
 		pVector.erase(pos,pVector.end());
-		sort(pVector.begin(),pVector.end(),sortAliveHp);
+		sort(pVector.begin(),pVector.end(),sortHp);
 	}
+
+	bool VectorHasInt( vector<int> &pVec , int pGrid )
+	{
+		for (auto tGrid : pVec)
+		{
+			if (tGrid == pGrid)
+				return true;
+		}
+		return false;
+	}
+
+	bool VectorHasObject( vector<CCObject*> &pVec, CCObject* ob )
+	{
+		for (auto tObject : pVec)
+		{
+			if (tObject == ob)
+				return true;
+		}
+		return false;
+	}
+
+	int converRow( int pGrid )
+	{
+		return pGrid%C_GRID_ROW;
+	}
+
+	int converCol( int pGrid )
+	{
+		return pGrid/C_GRID_ROW;
+	}
+
 }

@@ -19,7 +19,8 @@
 #include "Battle/RoleMacro.h"
 using namespace cocos2d;
 using namespace std;
-namespace BattleSpace{
+namespace BattleSpace
+{
 	class BuffManage;
 	class RoleObject;
 	class MoveObject;
@@ -55,40 +56,37 @@ namespace BattleSpace{
 		void attackDirection();
 		void SkillActionAndEffect(int pActionIndex,int pEffectID);
 		void AliveCritEnd();
-		BaseRole* getAbsentCallAlive();
-		BaseRole* getCallAlive( RoleSkill* skill );
-		BaseRole* getNewCallAlive(int CallId);
+		BaseRole* getAbsentCallRole();
+		BaseRole* getCallRole( RoleSkill* skill );
+		BaseRole* createCallRole(int CallId);
 		void attackEventLogic();
 		bool soriteNumberEnd();
+		void initContainGrid(int pGrid,vector<int>& pVector);
+		bool singleGrid();
 		/****************** Hero *********************/
 		void heroCritEffect();
 		void HeroExcuteAI();
+		void heroGuard();
 		bool IsAutoMoveType();
 		/******************* Monster ********************/
 		void monsterCritEffect();
 		void MonsterExcuteAI(float dt); 
 		bool monsterFlee();
-		void roleIntoBattle();
 		//monster move Logic
 		bool MonstMoveExcute();
-		int monsterMove();
-		int getMonsterMoveGrid();
-		int MoveJudge(int grid);										//用于判断是否可以移动，多格站位处理
-		int CountMoveGrid(int grid);
+		int getMonsterMove();
 		//hero touch move
-		void moveToTouchEndGrid();
+		bool moveToTouchEndGrid();
 		bool unCommonAlive();
 		bool movePrecondition();
-		bool WorldBossJudge();
-		bool aliveMoveJudge();
-		vector<int> getDestinations(BaseRole* pAlive,int pGrid);
-		bool borderJudge(BaseRole* pAlive,vector<int>& pVector);
+		bool moveJudge();
+		bool borderJudge(vector<int>& pVector);
 		bool swappingRule(vector<int>& pDestinations);
 		vector<BaseRole*> getAliveInArea(vector<int>& pAreas);
 		bool vectorIntersection(vector<int>& pVector,vector<int>& ptVector);
 		void moveSwappingAlives(vector<BaseRole*>& pVector,int pOffs);
 		bool callAliveJudge(vector<int>& pDestinations);
-		PROPERTY_CONSTREAD(int,mTouchEndGrid,TouchEndGrid);				//触	摸结束点
+		PROPERTY_CONSTREAD(int,mCommandGrid,CommandGrid);				//触	摸结束点
 	public:
 		virtual ~BaseRole();
 		virtual bool init();
@@ -104,7 +102,9 @@ namespace BattleSpace{
 		bool captainCallNumberJudge();
 		bool hasAliveByTargets(BaseRole* pAlive);
 		void cloakingTarget();											//判断受击目标内是否全为隐身对象
-		bool standInGrid(int pGrid);
+		bool inStandGrid(int pGrid);
+		bool inStandVector(vector<int>& pGrids);
+		void createRoleObject();
 		bool critJudge();
 		void initAliveData();
 		void initAliveByFather(BaseRole*pFather);
@@ -120,25 +120,27 @@ namespace BattleSpace{
 		CC_SYNTHESIZE_READONLY(BuffManage*,mBuffManage,BuffManage);		//(是不是应该暴露出去呢)
 		CC_SYNTHESIZE(RoleObject*,mRoleObject,RoleObject);
 		CC_SYNTHESIZE(MoveObject*,mMoveObject,MoveObject);				//设置移动对象
-		CC_SYNTHESIZE(BattleRoleLayer*,mRoleLayer,RoleLayer);				//显示对象层
+		CC_SYNTHESIZE(BattleRoleLayer*,mRoleLayer,RoleLayer);			//显示对象层
 		CC_SYNTHESIZE(unsigned int,m_AliveID,AliveID);					//武将ID
 		PROPERTY_CONSTREAD(bool,m_NorAtk,NorAtk);						//普通攻击状态
 		CC_SYNTHESIZE(bool,m_SpecialAtk,SpeAtk);						//特殊攻击
 		CC_SYNTHESIZE(bool,m_CritSkill,CriAtk);							//必杀技
+		CC_SYNTHESIZE(bool,mHasTarget,HasTarget);						//存在受击目标
 		CC_SYNTHESIZE(bool,m_Enemy,Enemy);								//怪物(武将类型)应该在数据基类中存在，或是逻辑中根据情况来赋值也可以
-		PROPERTY_CONSTREAD(int,m_CallType,CallType);					//武将召唤类型(我方武将均为召唤类型武将)
-		CC_SYNTHESIZE(bool,m_DieState,DieState);						//武将阵亡
-		PROPERTY_CONSTREAD(int,m_GridIndex,GridIndex);					//位置
-		PROPERTY_CONSTREAD(int,m_MoveGrid,MoveGrid);					//移动目标格子
+		PROPERTY_CONSTREAD(sCallType,mCallType,CallType);				//武将召唤类型(我方武将均为召唤类型武将)
+		CC_SYNTHESIZE(bool,mAliveState,AliveState);						//存活状态
+		PROPERTY_CONSTREAD(int,mGridIndex,GridIndex);					//位置
+		ROLE_READONLY(int,mMaxGrid,MaxGrid);							//最大位置
+		CC_SYNTHESIZE(int,m_MoveGrid,MoveGrid);							//移动目标格子
 		CC_SYNTHESIZE(float,m_MoveSpeed,MoveSpeed);						//移动速度(格/S)
-		CC_SYNTHESIZE(float,m_Delaytime,Delaytime);						//武将出现延迟时间
-		PROPERTY_CONSTREAD(int,m_AliveState,AliveStat);					//武将逻辑状态				(关于它的逻辑可以全放在武将的内部进行处理)
+		CC_SYNTHESIZE(float,mDelaytime,Delaytime);						//武将出现延迟时间
+		CC_SYNTHESIZE(sLogicState,mLogicState,LogicState);				//武将逻辑状态				(关于它的逻辑可以全放在武将的内部进行处理)
 		PROPERTY_CONSTREAD(float,m_Atktime,Atktime);					//攻击间隔时间
 		CC_SYNTHESIZE(float,m_AtkInterval,AtkInterval);					//攻速(次/秒)
 		PROPERTY_CONSTREAD(int,m_AtkNum,AtkNum);						//记录攻击次数(3次释放特殊攻击)
 		CC_SYNTHESIZE(int,m_GroupIndex,GroupIndex);						//效果组
 		CC_SYNTHESIZE(int,m_EffectIndex,EffIndex);						//效果Index
-		CC_SYNTHESIZE(bool,m_Battle,Battle);							//上阵状态
+		CC_PROPERTY(bool,mBattle,Battle);								//上阵状态
 		CC_SYNTHESIZE(int,m_SortieNum,SortieNum);						//当前回造成伤害次数
 		CC_SYNTHESIZE(int,m_FatherID,FatherID);							//被召唤武将存储父武将ID
 		CC_SYNTHESIZE(bool,m_CritEffect,CritEffect);					//必杀技播放过特效
@@ -176,12 +178,13 @@ namespace BattleSpace{
 		CC_SYNTHESIZE(bool,m_Captain,Captain);							//是否为队长
 		CC_SYNTHESIZE(bool,m_ExecuteCap,ExecuteCap);					//队长技执行标记
 		CC_SYNTHESIZE(bool,m_Opposite,Opposite);						//标记是否转向攻击
+		CC_SYNTHESIZE(bool,mAutoState,AutoState);						//自动战斗状态
 	public:
 		//monster
-		CC_SYNTHESIZE(int,m_MstType,MstType);							//怪物类型
+		CC_SYNTHESIZE(sBehavior,mBehavior,Behavior);					//怪物类型
 		PROPERTY_CONSTREAD(float,m_CritTime,CritTime);					//必杀技时间
 		CC_SYNTHESIZE(int,m_Batch,Batch);								//批次
-		CC_SYNTHESIZE(E_ALIVETYPE,m_AliveType,AliveType);				//角色品质等级				目前用法是世界boss，但是有多种拓展的可能
+		CC_SYNTHESIZE(sMonsterSpecies,mMonsterSpecies,MonsterSpecies);	//角色品质等级				目前用法是世界boss，但是有多种拓展的可能
 		CC_SYNTHESIZE(bool,m_cloaking,Cloaking);						//隐身状态
 		CC_SYNTHESIZE(bool,m_LastAlive,LastAlive);						//场上最后武将
 	};

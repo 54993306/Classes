@@ -9,6 +9,7 @@ struct HeroInfoData
 	string heroDesc;
 	int iType1;	//神将，僵尸，道士
 	int iType2;//近战，远战，坦克，辅助
+	int iType3;//天煞僵尸，地煞僵尸
 	string heroStory;	//英雄故事
 };
 

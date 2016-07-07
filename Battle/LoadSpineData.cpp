@@ -45,7 +45,7 @@ namespace BattleSpace{
 	//  id + 类型  得到加载文件名   当前有3种，角色，角色特效，剧情spine
 	void LoadSpineData::LoadVecRoleData()
 	{
-		VectorRemoveRepeat(m_VecRole);
+		VectorUnique(m_VecRole);
 		for (auto i : m_VecRole)
 			LoadRoleData(i);
 	}
@@ -72,7 +72,7 @@ namespace BattleSpace{
 			for (auto j:i.second)
 				if (j->getSpine()&&j->getRoleID())
 					m_VecStory.push_back(j->getRoleID());
-		VectorRemoveRepeat(m_VecStory);
+		VectorUnique(m_VecStory);
 	}
 
 	void LoadSpineData::LoadVecStoryData()
@@ -135,7 +135,7 @@ namespace BattleSpace{
 		//std::function<void()> Fun = std::bind(&LoadSpineData::LoadSpineAction,this,m_VecSpine);
 		//std::thread LoadThread(Fun);
 		//LoadThread.detach();
-		//std::function<bool(vector<int>&,bool)> Fun = std::bind(&LoadWar::SpineThread,this,std::placeholders::_1,std::placeholders::_2);
+		//std::function<bool(vector<int>&,bool)> Fun = std::bind(&LoadBattleResource::SpineThread,this,std::placeholders::_1,std::placeholders::_2);
 		//std::packaged_task<bool(vector<int>&,bool)>dTask(Fun);		//spine异步加载处理
 		//pFuture = dTask.get_future();
 		//std::thread cthread(std::move(dTask),m_WarResouse.find(ResourceType::Load_Spine)->second,true);
@@ -176,7 +176,7 @@ namespace BattleSpace{
 	{
 		if (m_Manage->getSpineData(key))
 		{
-			CCLOG("[ *Tips ] LoadWar::RealLoadAction Load Spine Repeat =%s",key);
+			CCLOG("[ *Tips ] LoadBattleResource::RealLoadAction Load Spine Repeat =%s",key);
 			return;
 		}
 		std::string strFullPath = CCFileUtils::sharedFileUtils()->fullPathForFilename(c_json);

@@ -21,7 +21,7 @@ namespace BattleSpace{
 	class StandState:public PostureState
 	{
 	public:
-		StandState(){m_stateCode = E_StateCode::eStandState;};
+		StandState(){m_stateCode = sStateCode::eStandState;};
 		virtual ~StandState(){};
 		CREATE_FUNC(StandState);
 		virtual void entryState(StateManager* actor,StateMachine* self);
@@ -31,7 +31,7 @@ namespace BattleSpace{
 	class WalkState:public PostureState
 	{
 	public:
-		WalkState(){m_stateCode = E_StateCode::eWalkState;};
+		WalkState(){m_stateCode = sStateCode::eWalkState;};
 		virtual ~WalkState(){};
 		CREATE_FUNC(WalkState);
 		virtual void entryState(StateManager* actor,StateMachine* self);
@@ -41,7 +41,7 @@ namespace BattleSpace{
 	class HitState:public PostureState
 	{
 	public:
-		HitState(){m_stateCode = E_StateCode::eHitState;};
+		HitState(){m_stateCode = sStateCode::eHitState;};
 		virtual ~HitState(){};
 		CREATE_FUNC(HitState);
 		virtual void entryState(StateManager* actor,StateMachine* self);
@@ -51,7 +51,7 @@ namespace BattleSpace{
 	class DizzyState:public PostureState
 	{
 	public:
-		DizzyState(){m_stateCode = E_StateCode::eDizzyState;};
+		DizzyState(){m_stateCode = sStateCode::eDizzyState;};
 		virtual ~DizzyState(){};
 		CREATE_FUNC(DizzyState);
 		virtual void entryState(StateManager* actor,StateMachine* self);
@@ -61,7 +61,7 @@ namespace BattleSpace{
 	class AttackState:public PostureState
 	{
 	public:
-		AttackState(){m_stateCode = E_StateCode::eNormalAttackState;};
+		AttackState(){m_stateCode = sStateCode::eNormalAttackState;};
 		virtual ~AttackState(){};
 		CREATE_FUNC(AttackState);
 		virtual void entryState(StateManager* actor,StateMachine* self);
@@ -71,7 +71,7 @@ namespace BattleSpace{
 	class SpecialAttackState:public PostureState
 	{
 	public:
-		SpecialAttackState(){m_stateCode = E_StateCode::eSpecialAttackState;};
+		SpecialAttackState(){m_stateCode = sStateCode::eSpecialAttackState;};
 		virtual ~SpecialAttackState(){};
 		CREATE_FUNC(SpecialAttackState);
 		virtual void entryState(StateManager* actor,StateMachine* self);
@@ -81,7 +81,7 @@ namespace BattleSpace{
 	class SkillState:public PostureState
 	{
 	public:
-		SkillState(){m_stateCode = E_StateCode::eActiveAttackState;};
+		SkillState(){m_stateCode = sStateCode::eActiveAttackState;};
 		virtual ~SkillState(){};
 		CREATE_FUNC(SkillState);
 		virtual void entryState(StateManager* actor,StateMachine* self);
@@ -91,7 +91,7 @@ namespace BattleSpace{
 	class VictoryState:public PostureState
 	{
 	public:
-		VictoryState(){m_stateCode = E_StateCode::eVictoryState;};
+		VictoryState(){m_stateCode = sStateCode::eVictoryState;};
 		virtual ~VictoryState(){};
 		CREATE_FUNC(VictoryState);
 		virtual void entryState(StateManager* actor,StateMachine* self);
@@ -101,7 +101,7 @@ namespace BattleSpace{
 	class DiedState:public PostureState
 	{
 	public:
-		DiedState(){m_stateCode = E_StateCode::eDeathState;};
+		DiedState(){m_stateCode = sStateCode::eDeathState;};
 		virtual ~DiedState(){};
 		CREATE_FUNC(DiedState);
 		virtual void entryState(StateManager* actor,StateMachine* self);
@@ -111,7 +111,7 @@ namespace BattleSpace{
 	class StartState:public PostureState
 	{
 	public:
-		StartState(){m_stateCode = E_StateCode::eEnterState;};
+		StartState(){m_stateCode = sStateCode::eEnterState;};
 		virtual ~StartState(){};
 		CREATE_FUNC(StartState);
 		virtual void entryState(StateManager* actor,StateMachine* self);

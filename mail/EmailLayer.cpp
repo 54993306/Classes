@@ -333,12 +333,12 @@ void CMailLayer::addTableCell(unsigned int uIdx, CTableViewCell* pCell)
 		case 2:
 			{
 				CCSprite *mask= (CCSprite *)child;
-				mask->setTexture(setItemQualityTexture(prize->color));
+				SmartSetRectPrizeColor(mask, prize);
 
 				//添加星星
 				if(prize->quality > 0)
 				{
-					CLayout* pStarLayout = getStarLayout(prize->quality);
+					CLayout* pStarLayout = SmartGetStarLayout(prize);
 					mask->addChild(pStarLayout);
 				}
 			}

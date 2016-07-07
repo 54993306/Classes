@@ -30,10 +30,6 @@ bool CExchangeCode::init()
 		lay->setContentSize(CCSizeMake(2824,640));
 		LayerManager::instance()->push(lay);
 		lay->setVisible(false);
-
-		m_ui = LoadComponent("ExchangeCode.xaml");  //  SelectSkill
-		m_ui->setPosition(VCENTER);
-		this->addChild(m_ui);
 		
 		this->setIsShowBlack(false);
 		this->setVisible(true);
@@ -44,13 +40,48 @@ bool CExchangeCode::init()
 	return false;
 
 }
-
+void CExchangeCode::loadExchangeByType(int type)
+{
+	m_type = type;
+	if (type==ExCode)
+	{
+		m_ui = LoadComponent("ExchangeCode.xaml");  
+		m_ui->setPosition(VCENTER);
+	}
+	else
+	{
+		m_ui = LoadComponent("ExchangeReward.xaml");  
+		m_ui->setPosition(VCENTER);
+	}
+	this->addChild(m_ui);
+}
 
 void CExchangeCode::onExchange(CCObject* pSender)
 {
-	if (m_textFieldName->getTextInput()&&strcmp(m_textFieldName->getTextInput()->c_str(),"")!=0)
-	{  
-		CPlayerControl::getInstance().sendExchangeCode(m_textFieldName->getTextInput()->c_str());
+	if (m_type==ExCode)
+	{
+		if (strcmp(m_textFieldName->getTextInput()->c_str(),"")==0)
+		{
+			ShowPopTextTip(GETLANGSTR(1176));
+			return;
+		}
+		else
+		{  
+			CPlayerControl::getInstance().sendExchangeCode(m_textFieldName->getTextInput()->c_str());
+		} 
+	}
+	else if (m_type == CBCode)
+	{
+		if (m_textFieldName->getTextInput()&&strcmp(m_textFieldName->getTextInput()->c_str(),"")!=0
+			&&m_textFieldPwd->getTextInput()&&strcmp(m_textFieldPwd->getTextInput()->c_str(),"")!=0)
+		{
+			CPlayerControl::getInstance().sendCbExchange(m_textFieldName->getTextInput()->c_str(),m_textFieldPwd->getTextInput()->c_str());
+		}
+		else
+		{
+			ShowPopTextTip(GETLANGSTR(1176));
+			return;
+		}
 	}
 	LayerManager::instance()->pop();
 	LayerManager::instance()->pop();
@@ -59,7 +90,7 @@ void CExchangeCode::onExchange(CCObject* pSender)
 void CExchangeCode::onEnter()
 {
 	BaseLayer::onEnter();
-	m_textFieldName = CursorTextField::textFieldWithPlaceHolder(GETLANGSTR(277), FONT_NAME, 20, CCSizeMake(300,35),ccWHITE); 
+	m_textFieldName = CursorTextField::textFieldWithPlaceHolder("", FONT_NAME, 20, CCSizeMake(300,35),ccWHITE); 
 	CCNode *node = (CCNode *)m_ui->findWidgetById("input");
 	m_textFieldName->setPosition(ccp(node->getPositionX()-106,node->getPositionY()));
 	m_textFieldName->setLimitNum(20);
@@ -80,6 +111,17 @@ void CExchangeCode::onEnter()
 	//pClose->setOnClickListener(this,ccw_click_selector(CExchangeCode::onClose));
 	//this->addChild(pClose, 999);
 
+	if (m_type==2)
+	{
+		m_textFieldPwd = CursorTextField::textFieldWithPlaceHolder("", FONT_NAME, 20, CCSizeMake(300,35),ccWHITE); 
+		CCNode *node = (CCNode *)m_ui->findWidgetById("input1");
+		m_textFieldPwd->setPosition(ccp(node->getPositionX()-106,node->getPositionY()));
+		m_textFieldPwd->setLimitNum(20);
+		m_textFieldPwd->setPriority(this->getTouchPriority());
+		m_textFieldPwd->setAnchorPoint(ccp(0,0.5));
+		m_ui->addChild(m_textFieldPwd);
+	}
+	
 	NOTIFICATION->postNotification(SET_LAYER_HIDE);
 
 }

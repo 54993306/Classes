@@ -23,7 +23,17 @@ typedef void (CCObject::*handlerFunc)(int type, google::protobuf::Message *msg);
 
 #define CMsgHandler_selector(_selector) (handlerFunc)(&_selector)
 
-class CNetClient: public CCNode, public CNetBean, public CLooper
+class NoCopy
+{
+protected:
+	NoCopy(){}
+	~NoCopy(){}
+private:
+	NoCopy(const NoCopy&);
+	const NoCopy& operator=(const NoCopy&);
+};
+
+class CNetClient: public CCNode, public CNetBean, public CLooper,public NoCopy
 {
 public:
 	

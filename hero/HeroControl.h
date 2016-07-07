@@ -14,7 +14,7 @@
 #include "HeroDetail.h"
 #include "HeroMove.h"
 #include "HeroEvolve.h"
-#include "hero/HeroData.h"
+#include "HeroData.h"
 #include "HeroExp.h"
 USING_NS_CC;
 
@@ -32,11 +32,12 @@ public:
 private:
 };
 
-class CHeroControl: public CCNode ,public CHeroDelegate
+class CHeroControl: public BaseLayer ,public CHeroDelegate
 {
 public:
 	CHeroControl();
-	CREATE_FUNC(CHeroControl);
+	CREATE_LAYER(CHeroControl);
+	virtual bool init();
 	void processMessage(int type, google::protobuf::Message *msg);
 
 	void updateHeroValue(CHero * hero);

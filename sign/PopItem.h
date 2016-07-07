@@ -14,6 +14,9 @@ class CMonsterInfo;
 class CItemInfo;
 class CNewHero;
 
+typedef void (CCObject::*PopItemCallBack)(void);
+#define popitem_selector(FUN) (PopItemCallBack)(&FUN)
+
 class CPopItem: public BaseLayer
 {
 public:
@@ -32,10 +35,14 @@ public:
 	void setBtnHandler( CCObject *pSender, SEL_ClickHandler pHandler);
 	void setDescVisiable(bool isVisible);
 
+	void bindTargetCallBack(CCObject* pObj, PopItemCallBack pFun);
+
 private:
 	void addTableCell(unsigned int uIdx, CTableViewCell* pCell);
 	CCObject* tableviewDataSource(CCObject* pConvertCell, unsigned int uIdx);
 	void onPress(CCObject* pSender, CTouchPressState iState);
+
+	void doCallBack();
 
 private:
 	int getNewHeroIndex(int iStart);
@@ -51,7 +58,8 @@ private:
 	CNewHero* m_pNewHeroEffect;
 	vector<CPrize*> m_prizeSave;
 	int m_iIndexForFindNewHero;
-
+	CCObject* m_pTargetCallBack;
+	PopItemCallBack m_pTargetFun;
 };
 
 #endif

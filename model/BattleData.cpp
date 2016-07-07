@@ -99,6 +99,7 @@ void CSkill::readData(const protos::common::Skill &skill)
 	this->pro_type = skill.pro_type();
 	this->coldDown = skill.colddown();
 	this->maxLevel = skill.maxlevel();
+	this->star = skill.activequality();
 }
 
 void CMonster::readData(const protos::common::Monster &monster)
@@ -217,15 +218,15 @@ void CHero::readData(const protos::common::Hero &hero)
 		this->row = hero.posy();
 	if (hero.posx())
 		this->col = hero.posx();
-	if (hero.has_skill1())
+	//if (hero.has_skill1())
 		this->skill1.readData(hero.skill1());
-	if (hero.has_skill2())		//has判断是否为真
+	//if (hero.has_skill2())		//has判断是否为真
 		this->skill2.readData(hero.skill2());	//skill2取得对象传入解析
-	if (hero.has_skill3())
+	//if (hero.has_skill3())
 		this->skill3.readData(hero.skill3());
-	if (hero.has_skill4())
+	//if (hero.has_skill4())
 		this->skill4.readData(hero.skill4()); 
-	if (hero.has_skill5())
+	//if (hero.has_skill5())
 		this->skill5.readData(hero.skill5());
 	this->quality = hero.quality();
 	this->coin = hero.coin();
@@ -241,6 +242,10 @@ void CHero::readData(const protos::common::Hero &hero)
 	if (hero.has_armor4())
 	{
 		this->armor4.read(hero.armor4());
+	}
+	if (hero.has_armor5())
+	{
+		this->armor5.read(hero.armor5());
 	}
 	this->dodge = hero.dodge();
 	this->itemId = hero.itemid();

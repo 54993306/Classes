@@ -17,15 +17,15 @@
 namespace BattleSpace
 {
 	//随机固定武将
-	AffectType AffectAnyAlive::getAreaType()
+	sAffectType AffectAnyAlive::getAreaType()
 	{
-		return AffectType::eAnyFixAlive;
+		return sAffectType::eAnyFixAlive;
 	}
 
 	void AffectAnyAlive::initArea(AreaCountInfo& pInfo)
 	{
 		vector<BaseRole*>* tAlives = pInfo.getAlive()->getSkillTargets();
-		int tRange = min(tAlives->size(),pInfo.getAreaRange());		// num < val 表示武将不足	
+		int tRange = min((int)tAlives->size(),pInfo.getAreaRange());		// num < val 表示武将不足	
 		int tLoopNumberMax = 200;
 		for (int tLoopNum = 0;tLoopNum < tLoopNumberMax;tLoopNum++)
 		{
@@ -49,9 +49,9 @@ namespace BattleSpace
 	/***************************************************************************/
 
 	//随机固定武将区域
-	AffectType AffectAnyAliveDisperse::getAreaType()
+	sAffectType AffectAnyAliveDisperse::getAreaType()
 	{
-		return AffectType::eAnyFixAliveDisperse;
+		return sAffectType::eAnyFixAliveDisperse;
 	}
 
 	void AffectAnyAliveDisperse::initArea(AreaCountInfo& pInfo)

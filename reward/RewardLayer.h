@@ -44,6 +44,8 @@ private:
 	void updateOverTime(CBounty * bounty);
 	void onLeft(CCObject* pSender);
 	void onRight(CCObject* pSender);
+	void updateRewardTime(float dt);
+	void timeInBackground( CCObject* pObj );
 private:
 	CLayout *m_ui;
 	CLayout *m_cell;

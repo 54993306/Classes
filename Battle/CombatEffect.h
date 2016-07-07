@@ -13,6 +13,7 @@ class CPlayerSkillData;
 namespace BattleSpace{
 	class BattleScene;
 	class BaseRole;
+	class WarManager;
 	class CombatEffect : public CCObject
 	{
 	public:
@@ -40,6 +41,7 @@ namespace BattleSpace{
 		CCArmature* _armaturePlayerSkill;
 		SkeletonAnimation* m_skeletonNode;
 		CPlayerSkillData* _playerSkillData;
+		WarManager* mManage;
 	};
 };
 #endif

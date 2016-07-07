@@ -12,14 +12,14 @@ namespace BattleSpace{
 	{
 		if (actor&&self)
 		{
-			E_StateCode nextActionCode = self->getNextActionCode();					//下一个状态id
+			sStateCode nextActionCode = self->getNextActionCode();					//下一个状态id
 			State* nextState = actor->getStateInstance(nextActionCode);		//根据id从状态管理器中拿到状态
 			if (nextState)
 			{
 				return actor->switchPostureState(self,nextState);		//切换至下一个状态
 			}else{
 				CCLOG("[ *ERROR ] PostureState::ExecuteNextState");
-				nextState = actor->getStateInstance(E_StateCode::eNormalAttackState);
+				nextState = actor->getStateInstance(sStateCode::eNormalAttackState);
 				actor->switchPostureState(self,nextState);
 				return false;
 			}
@@ -35,8 +35,8 @@ namespace BattleSpace{
 		do{
 			if( self->getBlocked() ) break;												//状态机阻塞则返回
 			State* CurrentPostureState = self->getCurrentPostureState();				//得到当前状态
-			E_StateCode CurrentStateCode = CurrentPostureState->getCode();
-			E_StateCode targetStateCode = targetState->getCode();
+			sStateCode CurrentStateCode = CurrentPostureState->getCode();
+			sStateCode targetStateCode = targetState->getCode();
 			StateManager* stateManage = self->getStateManage();							//状态管理器
 			if( stateManage->isInTransitionVec(self,CurrentStateCode,targetStateCode))	//判断当前状态是否可以切换至目标状态
 			{
@@ -119,7 +119,7 @@ namespace BattleSpace{
 		if(outPutERRORMsg("DieState::entryState",self))return;
 		RoleObject* act = (RoleObject*) self;
 		act->setActionKey(Die_Action);
-		act->setMoveState(E_StateCode::eNullState);
+		act->setMoveState(sStateCode::eNullState);
 		act->setVisible(true);
 	}
 	//10入场
@@ -136,8 +136,8 @@ namespace BattleSpace{
 		act->setActionKey(Start_Action);
 		if (act->getModel() == 1056)			//海兽出场特殊处理
 		{
-			act->setPosition(ccpAdd(act->getPosition(),ccp(-200,0)));
-			act->runAction(CCSequence::create(CCDelayTime::create(2.0f),CCMoveBy::create(1.0f,ccp(200,0)),NULL));
+			act->setPosition(ccpAdd(act->getPosition(),ccp(-100,0)));
+			act->runAction(CCSequence::create(CCDelayTime::create(2.0f),CCMoveBy::create(1.0f,ccp(100,0)),NULL));
 		}
 	}
 }

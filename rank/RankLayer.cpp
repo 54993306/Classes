@@ -16,9 +16,12 @@
 #include "common/CGameSound.h"
 #include "Resources.h"
 #include "common/CommonFunction.h"
+#include "mainCity/MainCityControl.h"
+
+#define  FACEBOOKIMG "http://graph.facebook.com/%s/picture?width=70&height=70"
 
 
-CRankLayer::CRankLayer():m_cell(nullptr),m_bArchive(false),m_optionType(1)
+CRankLayer::CRankLayer():m_cell(nullptr),m_bArchive(false),m_optionType(2)
 {
 
 }
@@ -69,6 +72,10 @@ void CRankLayer::onEnter()
 	m_cell1->retain();
 	m_ui->removeChild(m_cell1);
 	
+	m_cell2 = (CLayout*)(m_ui->findWidgetById("Cell2"));
+	m_cell2->retain();
+	m_ui->removeChild(m_cell2);
+
 	m_heroLay = (CLayout*)(m_ui->findWidgetById("hero"));
 	m_heroLay->retain();
 	m_ui->removeChild(m_heroLay);
@@ -85,10 +92,14 @@ void CRankLayer::onEnter()
 	m_tableSize = m_tableView->getContentSize();
 
 	CRadioBtnGroup *radioGroup = (CRadioBtnGroup *)m_ui->getChildByTag(10);
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		CRadioButton *radioBtn= (CRadioButton*)(radioGroup->getChildByTag(i+1));
 		radioBtn->setOnCheckListener(this,ccw_check_selector(CRankLayer::onSwitchBtn));
+		if (!CMainCityControl::getInstance()->isCityOpen(3)&&i==2)
+		{
+			radioBtn->setVisible(false);
+		}
 	}
 
 
@@ -100,6 +111,8 @@ void CRankLayer::onEnter()
 	this->addChild(pClose, 999);
 
 	GetTcpNet->registerMsgHandler(RankReqMsg,this, CMsgHandler_selector(CRankLayer::ProcessMsg));
+	HttpLoadImage::getInstance()->bindUiTarget(this);
+
 }
 
 CCObject* CRankLayer::tableviewDataSource(CCObject* pConvertCell, unsigned int uIdx)
@@ -143,9 +156,13 @@ void CRankLayer::onSwitchBtn(CCObject *pSender, bool bChecked)
 			m_tableView->reloadData();
 			addMyRank(&m_rankMap[m_optionType].myRank);
 		}
-		else if (m_optionType==2)
+		else if (m_optionType==1)
 		{
-			CPlayerControl::getInstance().sendRank(2);
+			CPlayerControl::getInstance().sendRank(1);
+		}
+		else if (m_optionType==3)
+		{
+			CPlayerControl::getInstance().sendRank(3);
 		}
 	}
 }
@@ -163,6 +180,8 @@ void CRankLayer::onExit()
 		NOTIFICATION->postNotification(HIDE_TOP_LAYER);
 		NOTIFICATION->postNotification(SHOW_MAIN_SCENE);
 	}
+	HttpLoadImage::getInstance()->bindUiTarget(nullptr);
+
 } 
 
 void CRankLayer::addTableCell(unsigned int uIdx, CTableViewCell* pCell)
@@ -178,7 +197,7 @@ void CRankLayer::addTableCell(unsigned int uIdx, CTableViewCell* pCell)
 	}
 	else
 	{
-
+		addPvpRank(pCell, data);
 	}
 }
 
@@ -209,12 +228,25 @@ void CRankLayer::addMyRank(CRankData *data)
 			addCombatRank(rankLay, data);
 		}
 	}
+	else if (m_optionType==3)
+	{
+		m_ui->removeChildByTag(200);
+		if (data->rank>0)
+		{
+			CLayout *rankLay = CLayout::create(m_cell2->getContentSize());
+			rankLay->setTag(200);
+			rankLay->setPosition(ccp(545+25,490));
+			m_ui->addChild(rankLay);
+			addPvpRank(rankLay, data);
+		}
+	}
 }
 
 CRankLayer::~CRankLayer()
 {
 	CC_SAFE_RELEASE(m_cell);
 	CC_SAFE_RELEASE(m_cell1);
+	CC_SAFE_RELEASE(m_cell2);
 
 	for (int i=1; i<=2;i++)
 	{
@@ -275,7 +307,7 @@ void CRankLayer::updateBuyInfo(const TMessage& tMsg)
 void CRankLayer::addBossRank(CLayout* pCell, CRankData * data)
 {
 	CLayout *lay = UICloneMgr::cloneLayout(m_cell);
-	for (int i=1;i<=10;++i)
+	for (int i=1;i<=11;++i)
 	{
 		CCNode *child = lay->getChildByTag(i);
 		if (!child)
@@ -305,11 +337,31 @@ void CRankLayer::addBossRank(CLayout* pCell, CRankData * data)
 			break;
 		case 2:
 			{
-				CCSprite *head = CCSprite::create(CCString::createWithFormat("headImg/%d.png", data->roleData->getThumb())->getCString());
-				if (head)
+				if (data->roleData->getThumb()>0)
 				{
-					head->setPosition(ccp(child->getContentSize().width/2,child->getContentSize().height/2));
-					child->addChild(head);
+					CCSprite *head = CCSprite::create(CCString::createWithFormat("headImg/%d.png", data->roleData->getThumb())->getCString());
+					if (head)
+					{
+						head->setPosition(ccp(child->getContentSize().width/2,child->getContentSize().height/2));
+						child->addChild(head);
+					} 
+				}
+				else
+				{
+					string fbName = data->roleData->getFbId()+".jpg";
+					string fullName = CCFileUtils::sharedFileUtils()->fullPathForFilename(fbName.c_str());
+					bool isFileExist = CCFileUtils::sharedFileUtils()->isFileExist(fullName);
+					if(isFileExist)
+					{
+						CCSprite* spr =CCSprite::create(fullName.c_str());
+						child->addChild(spr);
+						NodeFillParent(spr);
+					}
+					else
+					{
+						CCString *imgUrl = CCString::createWithFormat(FACEBOOKIMG,data->roleData->getFbId().c_str());
+						HttpLoadImage::getInstance()->requestUrlImage(imgUrl->getCString(),data->roleData->getFbId().c_str());
+					}
 				}
 			}
 			break;
@@ -333,21 +385,26 @@ void CRankLayer::addBossRank(CLayout* pCell, CRankData * data)
 			break;
 		case 8:
 			{
-				if (data->rank<=3)
+				if (data->rank<=3&&data->rank>0)
 				{
 					CImageView *view = (CImageView*)child;
 					view->setTexture(CCTextureCache::sharedTextureCache()->addImage(CCString::createWithFormat("worldBoss/rank_%d.png",data->rank)->getCString()));
 				}
-				child->setVisible(data->rank<=3);
+				child->setVisible(data->rank<=3&&data->rank>0);
 			}
 			break;
 		case 9:
 			{
 				CLabelAtlas *lab = (CLabelAtlas*)child;
 				lab->setString(ToString(data->rank));
+				child->setVisible(data->rank>0);
 			}
 			break;
-
+		case 11:
+			{
+				child->setVisible(data->rank==0);
+			}
+			break;
 		default:
 			break;
 		}
@@ -382,10 +439,152 @@ void CRankLayer::addBossRank(CLayout* pCell, CRankData * data)
 	}
 }
 
+void CRankLayer::addPvpRank(CLayout* pCell, CRankData * data)
+{
+	CLayout *lay = UICloneMgr::cloneLayout(m_cell2);
+	for (int i=1;i<=13;++i)
+	{
+		CCNode *child = lay->getChildByTag(i);
+		if (!child)
+		{
+			continue;
+		}
+		lay->removeChild(child);
+		pCell->addChild(child);
+
+		switch (i)
+		{
+		case 1:
+			{
+				CButton *select = (CButton*)child;
+				if (data->rank==m_rankMap.find(m_optionType)->second.myRank.rank)
+				{
+					select->setNormalImage("worldBoss/box_rank.png");
+					select->setPositionY(select->getPositionY()-16);
+				}
+				else if (data->rank>3)
+				{
+					select->setNormalImage("worldBoss/box_rank3.png");
+				}
+
+				select->setOnClickListener(this,ccw_click_selector(CRankLayer::onSelect));
+			}
+			break;
+		case 2:
+			{
+				if (data->roleData->getThumb()>0)
+				{
+					CCSprite *head = CCSprite::create(CCString::createWithFormat("headImg/%d.png", data->roleData->getThumb())->getCString());
+					if (head)
+					{
+						head->setPosition(ccp(child->getContentSize().width/2,child->getContentSize().height/2));
+						child->addChild(head);
+					} 
+				}
+				else
+				{
+					string fbName = data->roleData->getFbId()+".jpg";
+					string fullName = CCFileUtils::sharedFileUtils()->fullPathForFilename(fbName.c_str());
+					bool isFileExist = CCFileUtils::sharedFileUtils()->isFileExist(fullName);
+					if(isFileExist)
+					{
+						CCSprite* spr =CCSprite::create(fullName.c_str());
+						child->addChild(spr);
+						NodeFillParent(spr);
+					}
+					else
+					{
+						CCString *imgUrl = CCString::createWithFormat(FACEBOOKIMG,data->roleData->getFbId().c_str());
+						HttpLoadImage::getInstance()->requestUrlImage(imgUrl->getCString(),data->roleData->getFbId().c_str());
+					}
+				}
+			}
+			break;
+		case 3:
+			{
+				CLabel *lab = (CLabel*)child;
+				lab->setString(data->roleData->getRoleName().c_str());
+			}
+			break;
+		case 4:
+			{
+				CLabel *lab = (CLabel*)child;
+				lab->setString(ToString(data->roleData->getLevel()));
+			}
+			break;
+		case 7:
+			{
+				CLabelAtlas *lab = (CLabelAtlas*)child;
+				lab->setString(ToString(data->roleData->getCombat()));
+			}
+			break;
+		case 8:
+			{
+				if (data->rank<=3&&data->rank>0)
+				{
+					CImageView *view = (CImageView*)child;
+					view->setTexture(CCTextureCache::sharedTextureCache()->addImage(CCString::createWithFormat("worldBoss/rank_%d.png",data->rank)->getCString()));
+				}
+				child->setVisible(data->rank<=3&&data->rank>0);
+			}
+			break;
+		case 9:
+			{
+				CLabelAtlas *lab = (CLabelAtlas*)child;
+				lab->setString(ToString(data->rank));
+				child->setVisible(data->rank>0);
+			}
+			break;
+		case 11:
+			{
+				child->setVisible(data->rank==0);
+			}
+			break;
+		case 13:
+			{
+				CLabelAtlas *lab = (CLabelAtlas*)child;
+				lab->setAnchorPoint(ccp(0,0.5));
+				lab->setString(ToString(data->hurt));
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
+
+	for (int i = 0; i < data->teamList.size(); i++)
+	{
+		CLayout *teamLay  = UICloneMgr::cloneLayout(m_heroLay);
+		CTeams *team = &data->teamList.at(i);
+		for (int j = 0; j < team->quality; j++)
+		{
+			CCNode *star = (CCNode*)(teamLay->findWidgetById(CCString::createWithFormat("star%d",j+1)->getCString()));
+			star->setVisible(true);
+		}
+		CCSprite *bg = (CCSprite*)teamLay->findWidgetById("bg");
+		CCSprite *head = CCSprite::create(CCString::createWithFormat("headImg/%d.png", team->thumb)->getCString());
+		if (head)
+		{
+			head->setPosition(ccp(bg->getContentSize().width/2,bg->getContentSize().height/2));
+			bg->addChild(head);
+		}
+		CCSprite *mask = (CCSprite*)teamLay->findWidgetById("mask");
+		mask->setTexture(setItemQualityTexture(team->color));
+		while (teamLay->getChildrenCount()>0)
+		{
+			CCNode *node = (CCNode *) teamLay->getChildren()->objectAtIndex(0);
+			node->removeFromParent();
+			pCell->addChild(node);
+			node->setPositionX(node->getPositionX()-55*i);
+		}
+	}
+}
+
 void CRankLayer::addCombatRank(CLayout* pCell, CRankData * data)
 {
 	CLayout *lay = UICloneMgr::cloneLayout(m_cell1);
-	for (int i=1;i<=11;++i)
+	for (int i=1;i<=12;++i)
 	{
 		CCNode *child = lay->getChildByTag(i);
 		if (!child)
@@ -414,12 +613,33 @@ void CRankLayer::addCombatRank(CLayout* pCell, CRankData * data)
 			break;
 		case 2:
 			{
-				CCSprite *head = CCSprite::create(CCString::createWithFormat("headImg/%d.png", data->roleData->getThumb())->getCString());
-				if (head)
+				if (data->roleData->getThumb()>0)
 				{
-					head->setPosition(ccp(child->getContentSize().width/2,child->getContentSize().height/2));
-					child->addChild(head);
+					CCSprite *head = CCSprite::create(CCString::createWithFormat("headImg/%d.png", data->roleData->getThumb())->getCString());
+					if (head)
+					{
+						head->setPosition(ccp(child->getContentSize().width/2,child->getContentSize().height/2));
+						child->addChild(head);
+					} 
 				}
+				else
+				{
+					string fbName = data->roleData->getFbId()+".jpg";
+					string fullName = CCFileUtils::sharedFileUtils()->fullPathForFilename(fbName.c_str());
+					bool isFileExist = CCFileUtils::sharedFileUtils()->isFileExist(fullName);
+					if(isFileExist)
+					{
+						CCSprite* spr =CCSprite::create(fullName.c_str());
+						child->addChild(spr);
+						NodeFillParent(spr);
+					}
+					else
+					{
+						CCString *imgUrl = CCString::createWithFormat(FACEBOOKIMG,data->roleData->getFbId().c_str());
+						HttpLoadImage::getInstance()->requestUrlImage(imgUrl->getCString(),data->roleData->getFbId().c_str());
+					}
+				}
+				
 			}
 			break;
 		case 3:
@@ -441,12 +661,25 @@ void CRankLayer::addCombatRank(CLayout* pCell, CRankData * data)
 			}
 			break;
 		case 8:
-			child->setVisible(data->rank<=3);
+			{
+				if (data->rank<=3&&data->rank>0)
+				{
+					CImageView *view = (CImageView*)child;
+					view->setTexture(CCTextureCache::sharedTextureCache()->addImage(CCString::createWithFormat("worldBoss/rank_%d.png",data->rank)->getCString()));
+				}
+				child->setVisible(data->rank<=3&&data->rank>0);
+			}
 			break;
 		case 9:
 			{
 				CLabelAtlas *lab = (CLabelAtlas*)child;
 				lab->setString(ToString(data->rank));
+				lab->setVisible(data->rank>0);
+			}
+			break;
+		case 12:
+			{
+				child->setVisible(data->rank==0);
 			}
 			break;
 		default:
@@ -458,4 +691,46 @@ void CRankLayer::addCombatRank(CLayout* pCell, CRankData * data)
 void CRankLayer::onSelect(CCObject* pSender)
 {
 
+}
+
+void CRankLayer::imageLoadSuccessCallBack(string sTag, vector<char>* pBuffer)
+{
+	CCImage* img = new CCImage;
+	img->initWithImageData((unsigned char*)pBuffer->data(), pBuffer->size());
+	CCTexture2D* texture = new CCTexture2D();
+	texture->initWithImage(img);
+
+	string path = HttpLoadImage::getInstance()->getStoragePath("download/fbImg",sTag.c_str())+".jpg";
+	string buff(pBuffer->begin(), pBuffer->end());
+	CCLOG("path: %s", path.c_str());
+	FILE *fp = fopen(path.c_str(), "wb+");
+	fwrite(buff.c_str(), 1, pBuffer->size(),  fp);
+	fclose(fp);
+
+	map<int,CRankResponse>::iterator iter = m_rankMap.find(m_optionType);	
+	CTableViewCell *pCell = nullptr;
+	int nIdx =-1;
+	if (iter!=m_rankMap.end())
+	{
+		for (int i = 0; i < iter->second.rankList.size(); i++)
+		{
+			if (iter->second.rankList.at(i).roleData->getFbId()==sTag)
+			{
+				nIdx = i;
+				break;
+			}
+		}
+	}
+	if (nIdx!=-1)
+	{
+		pCell = m_tableView->cellAtIndex(nIdx);
+	}
+	CCSprite *headImg = CCSprite::createWithTexture(texture);
+	if (pCell)
+	{
+		CCNode *node = pCell->getChildByTag(2);
+		headImg->setPosition(ccp(node->getContentSize().width/2,node->getContentSize().height/2));
+		pCell->addChild(headImg);
+	}	
+	img->release();
 }

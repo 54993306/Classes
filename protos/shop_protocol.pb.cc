@@ -306,8 +306,8 @@ void protobuf_AddDesc_shop_5fprotocol_2eproto() {
     "\020\n\010armor_id\030\002 \001(\005\"g\n\013ComposeData\022!\n\004item"
     "\030\001 \002(\0132\023.protos.common.Item\022%\n\010itemList\030"
     "\002 \003(\0132\023.protos.common.Item\022\016\n\006canGet\030\003 \001"
-    "(\010B0\n\036anvin.server.gameserver.protosB\014Sh"
-    "opProtocolH\001", 772);
+    "(\010B/\n\035dass.server.gameserver.protosB\014Sho"
+    "pProtocolH\001", 771);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "shop_protocol.proto", &protobuf_RegisterTypes);
   ShopRequest::default_instance_ = new ShopRequest();

@@ -10,7 +10,7 @@
 #include "tollgate/StageData.h"
 #include "RewardGM.h"
 #include "DataPool.h"
-
+#include "ShareGM.h"
 
 
 class CRroleData;
@@ -28,6 +28,7 @@ enum CityActionType{
 	CA_GoToWorldBoss
 };
 
+
 enum Task_Type
 {
 	Evole_Task,
@@ -42,6 +43,7 @@ namespace BattleSpace{
 };
 
 USING_NS_CC;
+
 class DataCenter : public CCObject
 {
 public:
@@ -64,6 +66,7 @@ public:
 	bool initWar();
 	RewardDataGM* getRewardDataGM();
 	CDataPool* getDataPool();
+	ShareGM* getShareData();
 
 	CC_SYNTHESIZE(CityActionType, m_cityActionType, CityActionType);
 	CC_SYNTHESIZE(CRroleData*, m_RoleData, RoleData);
@@ -83,6 +86,7 @@ protected:
 	CStageData *m_stageData;
 	RewardDataGM *m_rewardData;
 	CDataPool *m_dataPool;
+	ShareGM *m_shareData;
 private:
 	static DataCenter* m_dataCenter;
 };

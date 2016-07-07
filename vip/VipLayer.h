@@ -23,6 +23,8 @@ public:
 	CCObject* gridviewDataSource(CCObject* pConvertCell, unsigned int uIdx);	
 	void onToggle(CCObject* pSender);
 	void setOptionType(int type);
+
+	void updateMoney(int iAll);
 protected:
 	void addGridCell(unsigned int uIdx, CGridViewCell* pCell);
 	void ProcessMsg(int type, google::protobuf::Message *msg);
@@ -31,6 +33,13 @@ protected:
 	void buyCardRes(int type, google::protobuf::Message *msg);
 	void onConfirmBuy(CCObject* pSender);
 	void updateBuyInfo(const TMessage& tMsg);
+	void onPay(CCObject* pSender);
+	void rechargeRes(int type, google::protobuf::Message *msg);
+
+	void paySuccess(int money, RechargeRes *res);
+
+	void onConfirmRecharge(CCObject* pSender);
+	void updateRoleProperty(const TMessage& tMsg);
 private:
 	CLayout *m_ui;
 	CGridView *m_gridView;

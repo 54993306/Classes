@@ -47,17 +47,13 @@ void CItem::read(const Item& item)
 // 	memset(&prop,0,sizeof(CProp));
 	//memset(&monst,0,sizeof(CMonster));
 	
-	if (item.has_armor())
+	//if (item.has_armor())
 	{
 		this->armor.read(item.armor());
 	}
 	if (item.has_prop())
 	{
 		this->prop.read(item.prop());
-	}
-	if (item.has_soul())
-	{
-	//	this->soul.read(item.soul());
 	}
 	
 	for (int i = 0; i < item.drops_size(); i++)
@@ -179,35 +175,6 @@ void CBagData::read(const WareHouseResponse& res)
 		it.read(item);
 		this->itemList.push_back(it);
 	}
-}
-
-CCTexture2D* setQualityTexture(int quality)
-{
-	std::string texture;
-	switch (quality)
-	{
-	case 1:
-		texture="public/whtie__mask.png";
-		break;
-	case 2:
-		texture="public/green_mask.png";
-		break;
-	case 3:
-		texture="public/blue_mask.png";
-		break;
-	case 4:
-		texture="public/purple_mask.png";
-		break;
-	case 5:
-		texture="public/orange_mask.png";
-		break;
-	default:
-		texture="public/whtie__mask.png";
-		break;
-	}
-
-    CCTexture2D *pTexture = CCTextureCache::sharedTextureCache()->addImage(texture.c_str());
-	return pTexture;
 }
 
 CCTexture2D* setItemQualityTexture(int quality) 

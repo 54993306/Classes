@@ -31,6 +31,7 @@ NS_CC_WIDGET_BEGIN
 CSlider::CSlider()
 : m_pSlider(NULL)
 , m_bDrag(false)
+, m_bDragable(true)
 {
 	setThisObject(this);
 }
@@ -187,6 +188,11 @@ int CSlider::valueFromPoint(const CCPoint& tPoint)
 
 CWidgetTouchModel CSlider::onTouchBegan(CCTouch *pTouch)
 {
+	if (!m_bDragable)
+	{
+		return eWidgetTouchNone;
+	}
+
 	m_bDrag = m_pSlider->boundingBox().containsPoint(
 		convertToNodeSpace(pTouch->getLocation())
 	);
@@ -331,6 +337,11 @@ void CSlider::setSliderSpriteFrameName(const char* pSpriteName)
 void CSlider::setSliderPosition(CCPoint pos)
 {
 	m_pSlider->setPosition(ccp(25,45));
+}
+
+void CSlider::setDragable(bool bDragable)
+{
+	m_bDragable = bDragable;
 }
 
 NS_CC_WIDGET_END

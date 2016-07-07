@@ -16,9 +16,9 @@
 
 namespace BattleSpace
 {
-	AffectType AffectEnemy::getAreaType()
+	sAffectType AffectEnemy::getAreaType()
 	{
-		return AffectType::eEnemy;
+		return sAffectType::eEnemy;
 	}
 
 	void AffectEnemy::initArea(AreaCountInfo& pInfo)
@@ -30,15 +30,15 @@ namespace BattleSpace
 
 	/***************************************************************************/
 
-	AffectType AffectOur::getAreaType()
+	sAffectType AffectOur::getAreaType()
 	{
-		return AffectType::eOur;
+		return sAffectType::eOur;
 	}
 
 	/***************************************************************************/
 
-	AffectType AffectAllArea::getAreaType()
+	sAffectType AffectAllArea::getAreaType()
 	{
-		return AffectType::eAllArea;
+		return sAffectType::eAllArea;
 	}
 }

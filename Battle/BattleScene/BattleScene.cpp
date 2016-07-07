@@ -1,4 +1,17 @@
-﻿ 
+﻿ /************************************************************* 
+  *
+  *
+  *		Data : 2016.6.22
+  *	
+  *		Name : 
+  *
+  *		Author : Lin_Xiancheng
+  *
+  *		Description : 
+  *
+  *
+  *************************************************************/
+
 #include "BattleScene.h"
 #include "tools/commonDef.h"
 #include "model/DataCenter.h"
@@ -19,7 +32,9 @@
 #include "Battle/EffectData.h"
 #include "tools/CCShake.h"
 #include "Battle/BattleMessage.h"
-namespace BattleSpace{
+#include "Battle/RoleMacro.h"
+namespace BattleSpace
+{
 	BattleScene::BattleScene()
 		:m_MapLayer(nullptr),m_AliveLayer(nullptr),m_StoryLayer(nullptr)
 		,m_MoveLayer(nullptr),m_UILayer(nullptr),_dropItem(nullptr)
@@ -86,7 +101,6 @@ namespace BattleSpace{
 
 		m_Loginc = CombatLogic::create();
 		addChild(m_Loginc);									//添加到父类才能开启定时器
-		DataCenter::sharedData()->getWar()->setLogicObj(m_Loginc);
 	}
 	//添加事件处理监听等
 	void BattleScene::AddEvent()
@@ -177,7 +191,7 @@ namespace BattleSpace{
 	void BattleScene::LayerMoveEnd(CCObject* ob)
 	{
 #if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
-		CCNotificationCenter::sharedNotificationCenter()->postNotification(B_LayerMoveEnd,ob);
+		bNotification->postNotification(MsgCreateStory,ob);
 		//if (DataCenter::sharedData()->getWar()->getStageID())
 		//{
 		//	CCNotificationCenter::sharedNotificationCenter()->postNotification(LAYERMOVEEND,ob);
@@ -190,12 +204,12 @@ namespace BattleSpace{
 #else
 		if (DataCenter::sharedData()->getWar()->getStageID())
 		{
-			CCNotificationCenter::sharedNotificationCenter()->postNotification(B_LayerMoveEnd,ob);
+			bNotification->postNotification(MsgCreateStory,ob);
 		}else{
 			if (((CCInteger*)ob)->getValue() == (int)StoryType::eBeginStory)
-				CCNotificationCenter::sharedNotificationCenter()->postNotification(B_PlayBeginAnimation);
+				bNotification->postNotification(B_PlayBeginAnimation);
 			else
-				CCNotificationCenter::sharedNotificationCenter()->postNotification(B_LayerMoveEnd,ob);
+				bNotification->postNotification(MsgCreateStory,ob);
 		}
 #endif
 	}

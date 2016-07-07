@@ -537,13 +537,13 @@ void CShopLayer::addCell(CGridPageViewCell* pCell, unsigned int uIdx)
 	CLabel *price = (CLabel*)pCell->findWidgetById("price");
 	if (item.itemNum>=1000)
 	{
-		CCString *str = CCString::createWithFormat(U8("× %d"),item.itemNum-1000);
+		CCString *str = CCString::createWithFormat(U8("x %d"),item.itemNum-1000);
 		name->setString(strName.append(str->getCString()).c_str());
 		price->setString(ToString(item.buyPrice*(item.itemNum-1000)));
 	}
 	else
 	{
-		CCString *str = CCString::createWithFormat(U8("× %d"),item.itemNum);
+		CCString *str = CCString::createWithFormat(U8("x %d"),item.itemNum);
 		name->setString(strName.append(str->getCString()).c_str());
 		price->setString(ToString(item.buyPrice*item.itemNum));
 	}

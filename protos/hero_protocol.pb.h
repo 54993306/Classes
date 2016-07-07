@@ -44,6 +44,7 @@ class HeroRecruitRes;
 class HeroExpRequest;
 class HeroEvolReq;
 class HeroEvolRes;
+class SkillLevelUp;
 class DoResult;
 class HeroResponse;
 
@@ -1000,6 +1001,108 @@ class HeroEvolRes : public ::google::protobuf::Message {
 };
 // -------------------------------------------------------------------
 
+class SkillLevelUp : public ::google::protobuf::Message {
+ public:
+  SkillLevelUp();
+  virtual ~SkillLevelUp();
+
+  SkillLevelUp(const SkillLevelUp& from);
+
+  inline SkillLevelUp& operator=(const SkillLevelUp& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const SkillLevelUp& default_instance();
+
+  void Swap(SkillLevelUp* other);
+
+  // implements Message ----------------------------------------------
+
+  SkillLevelUp* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const SkillLevelUp& from);
+  void MergeFrom(const SkillLevelUp& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required int32 heroId = 1;
+  inline bool has_heroid() const;
+  inline void clear_heroid();
+  static const int kHeroIdFieldNumber = 1;
+  inline ::google::protobuf::int32 heroid() const;
+  inline void set_heroid(::google::protobuf::int32 value);
+
+  // required int32 skillId = 2;
+  inline bool has_skillid() const;
+  inline void clear_skillid();
+  static const int kSkillIdFieldNumber = 2;
+  inline ::google::protobuf::int32 skillid() const;
+  inline void set_skillid(::google::protobuf::int32 value);
+
+  // required int32 itemId = 3;
+  inline bool has_itemid() const;
+  inline void clear_itemid();
+  static const int kItemIdFieldNumber = 3;
+  inline ::google::protobuf::int32 itemid() const;
+  inline void set_itemid(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:protos.SkillLevelUp)
+ private:
+  inline void set_has_heroid();
+  inline void clear_has_heroid();
+  inline void set_has_skillid();
+  inline void clear_has_skillid();
+  inline void set_has_itemid();
+  inline void clear_has_itemid();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::int32 heroid_;
+  ::google::protobuf::int32 skillid_;
+  ::google::protobuf::int32 itemid_;
+
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
+
+  friend void  protobuf_AddDesc_hero_5fprotocol_2eproto();
+  friend void protobuf_AssignDesc_hero_5fprotocol_2eproto();
+  friend void protobuf_ShutdownFile_hero_5fprotocol_2eproto();
+
+  void InitAsDefaultInstance();
+  static SkillLevelUp* default_instance_;
+};
+// -------------------------------------------------------------------
+
 class DoResult : public ::google::protobuf::Message {
  public:
   DoResult();
@@ -1776,6 +1879,76 @@ inline void HeroEvolRes::set_allocated_hero(::protos::common::Hero* hero) {
   } else {
     clear_has_hero();
   }
+}
+
+// -------------------------------------------------------------------
+
+// SkillLevelUp
+
+// required int32 heroId = 1;
+inline bool SkillLevelUp::has_heroid() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void SkillLevelUp::set_has_heroid() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void SkillLevelUp::clear_has_heroid() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void SkillLevelUp::clear_heroid() {
+  heroid_ = 0;
+  clear_has_heroid();
+}
+inline ::google::protobuf::int32 SkillLevelUp::heroid() const {
+  return heroid_;
+}
+inline void SkillLevelUp::set_heroid(::google::protobuf::int32 value) {
+  set_has_heroid();
+  heroid_ = value;
+}
+
+// required int32 skillId = 2;
+inline bool SkillLevelUp::has_skillid() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void SkillLevelUp::set_has_skillid() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void SkillLevelUp::clear_has_skillid() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void SkillLevelUp::clear_skillid() {
+  skillid_ = 0;
+  clear_has_skillid();
+}
+inline ::google::protobuf::int32 SkillLevelUp::skillid() const {
+  return skillid_;
+}
+inline void SkillLevelUp::set_skillid(::google::protobuf::int32 value) {
+  set_has_skillid();
+  skillid_ = value;
+}
+
+// required int32 itemId = 3;
+inline bool SkillLevelUp::has_itemid() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void SkillLevelUp::set_has_itemid() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void SkillLevelUp::clear_has_itemid() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void SkillLevelUp::clear_itemid() {
+  itemid_ = 0;
+  clear_has_itemid();
+}
+inline ::google::protobuf::int32 SkillLevelUp::itemid() const {
+  return itemid_;
+}
+inline void SkillLevelUp::set_itemid(::google::protobuf::int32 value) {
+  set_has_itemid();
+  itemid_ = value;
 }
 
 // -------------------------------------------------------------------

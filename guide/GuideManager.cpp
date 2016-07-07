@@ -2,6 +2,7 @@
 #include "model/DataCenter.h"
 #include "mainCity/mainScene.h"
 #include "scene/CPopTip.h"
+#include "mainCity/mainCityBuild.h"
 
 CGuideManager* CGuideManager::m_instance = nullptr;
 
@@ -117,7 +118,7 @@ void CGuideManager::enterGuide()
 		if ((m_guideTask==7||m_guideTask==8)&&m_guideStep==2)
 		{
 			CMainScene *scene = (CMainScene*)(CSceneManager::sharedSceneManager()->getRunningScene());
-			scene->moveFrontByPos(task->offset);
+			scene->getCityBuildLayer()->moveFrontByPos(task->offset);
 			m_stepPos = widget->getParent()->convertToWorldSpace(widget->getPosition());
 			m_guideLayer->setTipMoveToPosition(widget,*task,m_stepPos,widget->boundingBox());
 		}
@@ -199,7 +200,7 @@ void CGuideManager::nextStep()
 			if ((m_guideTask==7&&m_guideStep==2)||((m_guideTask==19)&&m_guideStep==3))
 			{
 				CMainScene *scene = (CMainScene*)(CSceneManager::sharedSceneManager()->getRunningScene());
-				scene->moveFrontByPos(task->offset);
+				scene->getCityBuildLayer()->moveFrontByPos(task->offset);
 				m_stepPos = widget->getParent()->convertToWorldSpace(widget->getPosition());
 				if (task->type=="open")
 				{
@@ -232,7 +233,7 @@ void CGuideManager::nextStep()
 void CGuideManager::exitGuide()
 {
 	m_isRunGuiding = false;
-    CCScene *mainScene = dynamic_cast<CMainScene*>(CSceneManager::sharedSceneManager()->getCurrScene());
+    CMainScene *mainScene = dynamic_cast<CMainScene*>(CSceneManager::sharedSceneManager()->getCurrScene());
 	if (mainScene)
 	{	
 		mainScene->removeChildByTag(100001);
@@ -294,7 +295,12 @@ CCNode* CGuideManager::getStepNode(const GuideTask &task)
 				return res;
 			}
 		}
-		CWidgetWindow *widwin = (CWidgetWindow*)scene->getChildByTag(10000);
+		if (task.className=="CMainCityUI")
+		{
+			CMainCityUI *mainCity = (CMainCityUI*)((CMainScene*)scene)->getCityBuildLayer()->getChildByTag(20010);
+			return findStepWidget(mainCity,task);
+		}
+		CWidgetWindow *widwin = (CWidgetWindow*)((CMainScene*)scene)->getCityBuildLayer()->getChildByTag(10000);
 		if (widwin)
 		{
 			return findStepWidget((BaseLayer*)widwin,task);

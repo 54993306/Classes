@@ -1,5 +1,12 @@
 #pragma once
 
+/******************************************************
+*文件名称:	CJniHelper.h
+*编写日期:	2016-6-14-11:42
+*编写作者:	YPF
+*功能描述:	c++ <--> android 通信
+*******************************************************/
+
 #include "cocos2d.h"
 
 USING_NS_CC;
@@ -61,6 +68,17 @@ public:
 	void startVibrator(int iMsec);
 	//停止震动
 	void stopVibrator();
+
+	//获取国家标签
+	int getCountryType();
+
+	//获取网关IPchai
+	std::string getGateServerIp();
+	//获取网关端口
+	int getGateServerPort();
+
+	//是否需要下载拆分包
+	bool isNeedDownloadPackage();
 
 	void jniResult(int iReqCode, int iResult);
 

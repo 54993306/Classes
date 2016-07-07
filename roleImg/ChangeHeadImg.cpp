@@ -114,14 +114,31 @@ void CChangeHeadImg::addGridCell(unsigned int uIdx, CGridViewCell* pCell)
 
 		if (i==1)
 		{
-			CImageView* pHead = CImageView::create(CCString::createWithFormat("headImg/%d.png", m_headIconList.at(uIdx))->getCString());
-			if(!pHead)
+			if (m_headIconList.at(uIdx)>0)
 			{
-				pHead = CImageView::create("headImg/null.png");
-				CCLOG("ERROR_____CChangeHeadImg::addGridCell");
+				CImageView* pHead = CImageView::create(CCString::createWithFormat("headImg/%d.png", m_headIconList.at(uIdx))->getCString());
+				if(!pHead)
+				{
+					pHead = CImageView::create("headImg/null.png");
+					CCLOG("ERROR_____CChangeHeadImg::addGridCell");
+				}
+				child->addChild(pHead);
+				NodeFillParent(pHead);
 			}
-			child->addChild(pHead);
-			NodeFillParent(pHead);
+			else
+			{
+				UserData *data = DataCenter::sharedData()->getUser()->getUserData();
+				string fbName = data->getFbId() +".jpg";
+				string fullName = CCFileUtils::sharedFileUtils()->fullPathForFilename(fbName.c_str());
+				bool isFileExist = CCFileUtils::sharedFileUtils()->isFileExist(fullName);
+				if(isFileExist)
+				{
+					CCSprite* spr =CCSprite::create(fullName.c_str());
+					child->addChild(spr);
+					NodeFillParent(spr);
+				}
+			}
+			
 		}
 		else if(i==2)
 		{
@@ -157,6 +174,10 @@ void CChangeHeadImg::ProcessMsg(int type, google::protobuf::Message *msg)
 		m_headIconList.push_back(icon);
 	}
 
+	if (DataCenter::sharedData()->getUser()->getUserData()->getFbId()!="0")
+	{
+		m_headIconList.insert(m_headIconList.begin(),0);
+	}
     m_gridView->setCountOfCell(m_headIconList.size());
 	m_gridView->reloadData();
 }

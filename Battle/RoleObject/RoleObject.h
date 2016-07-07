@@ -24,7 +24,7 @@ namespace BattleSpace{
 	class WarControl;
 	class WarMapData;
 	class WarManager;
-	enum struct E_ActionEvent
+	enum struct eActionEvent
 	{
 		eBeginEvevt					=0,//攻击开始
 		eHitEvent					=1,//攻击帧
@@ -43,9 +43,10 @@ namespace BattleSpace{
 		virtual bool init();
 		virtual void setModel(int model);						//重写父类的方法
 		virtual void setActionKey(string actionKey);			//
-		virtual void setAlive(BaseRole* var);
-		virtual void setMoveState(E_StateCode pStateCode);
+		virtual void setBaseRole(BaseRole* var);
+		virtual void setMoveState(sStateCode pStateCode);
 		virtual void AliveDie();
+		virtual bool TurnStateTo(sStateCode pCode);
 		void initStateManage();
 		void SpineActionEvent(int trackIndex,spEvent* Event);
 		void SpineActionEnd(int trackIndex);
@@ -65,6 +66,7 @@ namespace BattleSpace{
 		void initMoveObject(CCNode* pMoveParent);
 		void setActMoveGrid(int pGird);
 		CC_SYNTHESIZE(bool,m_Reset,Reset);						//武将是否置空过(引导重置用)
+		inline bool getFirstBattle(){return mFirstBattle;}
 	private:
 		void actionEvent(int pFremIndex);
 		void dieActionEnd();
@@ -79,6 +81,7 @@ namespace BattleSpace{
 		void setSpineAction();
 		void setSpineEffectAction();
 	private:
+		bool mFirstBattle;
 		WarMapData* m_MapData;
 		WarManager* m_Manage;
 		int m_lastFrame;

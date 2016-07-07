@@ -15,9 +15,9 @@
 
 namespace BattleSpace
 {
-	AffectType AffectFront::getAreaType()
+	sAffectType AffectFront::getAreaType()
 	{
-		return AffectType::eFront;
+		return sAffectType::eFront;
 	}
 
 	void AffectFront::initArea(AreaCountInfo& pInfo)
@@ -43,9 +43,9 @@ namespace BattleSpace
 	/***************************************************************************/
 
 	//前方范围不贯穿类型
-	AffectType AffectPuncture::getAreaType()
+	sAffectType AffectPuncture::getAreaType()
 	{
-		return AffectType::ePuncture;
+		return sAffectType::ePuncture;
 	}
 
 	void AffectPuncture::initArea( AreaCountInfo& pInfo )

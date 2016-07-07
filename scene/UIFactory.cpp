@@ -17,7 +17,9 @@ static char* ButtonClickBackgound = NULL;
 void SetButtonClickBackground( const char* source ){ ButtonClickBackgound = (char*)source; }
 
 //默认矢量字体
-#define DEFAULT_FONT "Microsoft YaHei"		
+#define DEFAULT_FONT "supermarket.ttf"//"Microsoft YaHei"		
+#define DEFAULT_FONT1 "Arial"
+
 //默认BMFont字体
 static const char* BMFontDefault = "fonts/font.fnt";
 void SetBMFontDefault( const char* font ){ BMFontDefault = font; }
@@ -347,6 +349,7 @@ CLabel* CreateLabelFromXML( tinyxml2::XMLElement* XMLChild )
 
 	const char* fontFamily = XMLChild->Attribute("FontFamily");
 	if( fontFamily == NULL ) fontFamily = DEFAULT_FONT;
+	else fontFamily = DEFAULT_FONT1;
 
 	float fontSize = XMLChild->FloatAttribute("FontSize");
 	if( fontSize == 0 ) fontSize = 12;
@@ -456,39 +459,45 @@ CButton* CreateCCButton( const char* text, const char* fontFamily, float fontSiz
 	{
 		button = SndButton::create();
 	}
-	button->setScale9Enabled(isSacle9Enable);
 	if (isSacle9Enable)
 	{
-		button->setContentSize(CCSizeMake(width,height));
+// 		button->setContentSize(CCSizeMake(width,height));
+		button = SndButton::createWith9Sprite(CCSizeMake(width,height),normalImage,clickedImage,disableImage);
+		button->setScale9Enabled(isSacle9Enable);
 	}
-	if( text != NULL )
-		button->getLabel()->initWithString(text, fontFamily, fontSize);
-
-	if( normalImage != NULL )
+	else
 	{
-#ifdef CREATE_WITH_SPRITE_FRAME_NAME
-		button->setNormalSpriteFrame( CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(normalImage) );
-#else
-		button->setNormalImage(normalImage);
-#endif
-	}
-
-	if( clickedImage != NULL )
-	{
-#ifdef CREATE_WITH_SPRITE_FRAME_NAME
-		button->setSelectedSpriteFrame( CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(clickedImage) );
-#else
-		button->setSelectedImage(clickedImage);
-#endif
-	}
-
-	if( disableImage != NULL )
-	{
-#ifdef CREATE_WITH_SPRITE_FRAME_NAME
-		button->setDisabledSpriteFrame( CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(disableImage) );
-#else
-		button->setDisabledImage(disableImage);
-#endif
+		button = SndButton::create();
+		button->setScale9Enabled(isSacle9Enable);
+		if( text != NULL )
+				button->getLabel()->initWithString(text, fontFamily, fontSize);
+	
+			if( normalImage != NULL )
+			{
+		#ifdef CREATE_WITH_SPRITE_FRAME_NAME
+				button->setNormalSpriteFrame( CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(normalImage) );
+		#else
+				button->setNormalImage(normalImage);
+		#endif
+			}
+	
+			if( clickedImage != NULL )
+			{
+		#ifdef CREATE_WITH_SPRITE_FRAME_NAME
+				button->setSelectedSpriteFrame( CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(clickedImage) );
+		#else
+				button->setSelectedImage(clickedImage);
+		#endif
+			}
+	
+			if( disableImage != NULL )
+			{
+		#ifdef CREATE_WITH_SPRITE_FRAME_NAME
+				button->setDisabledSpriteFrame( CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(disableImage) );
+		#else
+				button->setDisabledImage(disableImage);
+		#endif
+			}
 	}
 
 	//float width = button->boundingBox().size.width;
@@ -514,7 +523,7 @@ CButton* CreateCCButtonFromXML( tinyxml2::XMLElement* XMLChild )
 	if( fontFamily == NULL ) fontFamily = DEFAULT_FONT;
 
 	float fontSize = XMLChild->FloatAttribute("FontSize");
-	if( fontSize == 0 )	fontSize = 12;
+	if( fontSize == 0 )	fontSize = 16;
 
 	char* normalImage = (char*)XMLChild->Attribute("NormalImage");
 
@@ -530,7 +539,7 @@ CButton* CreateCCButtonFromXML( tinyxml2::XMLElement* XMLChild )
 		isPixelEnale = true;
 	}
 
-	char *isScaleEnable= (char*)XMLChild->Attribute("isScaleEnable");
+	char *isScaleEnable= (char*)XMLChild->Attribute("IsScaleEnable");
 
 	bool isScale9Enable = false;
 	if (isScaleEnable&&strcmp(isScaleEnable,"True")==0)

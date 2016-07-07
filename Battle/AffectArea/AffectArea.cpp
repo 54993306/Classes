@@ -32,121 +32,121 @@ namespace BattleSpace
 {
 	AffectArea* AffectArea::create(int pAffectType)
 	{
-		switch ((AffectType)pAffectType) 
+		switch ((sAffectType)pAffectType) 
 		{
-		case AffectType::eFront:
+		case sAffectType::eFront:
 			{
 				return AffectFront::create();
 			}break;
-		case AffectType::eNearby:
+		case sAffectType::eNearby:
 			{
 				return AffectNearby::create();
 			}break;
-		case AffectType::eVertical:
+		case sAffectType::eVertical:
 			{
 				return AffectVertical::create();
 			}break;
-		case AffectType::eCross:
+		case sAffectType::eCross:
 			{
 				return AffectCross::create();
 			}break;
-		case AffectType::eFrontTow:
+		case sAffectType::eFrontTow:
 			{
 				return AffectFrontTwo::create();
 			}break;
-		case AffectType::eNearbyUnself:
+		case sAffectType::eNearbyUnself:
 			{
 				return AffectNearbyUnself::create();
 			}break;
-		case AffectType::eEnemy:
+		case sAffectType::eEnemy:
 			{
 				return AffectEnemy::create();
 			}break;
-		case AffectType::eOur:
+		case sAffectType::eOur:
 			{
 				return AffectOur::create();
 			}break;
-		case AffectType::eAllArea:
+		case sAffectType::eAllArea:
 			{
 				return AffectAllArea::create();
 			}break;
-		case AffectType::ePuncture:
+		case sAffectType::ePuncture:
 			{
 				return AffectPuncture::create();
 			}break;
-		case AffectType::eTArea:
+		case sAffectType::eTArea:
 			{
 				return AffectTArea::create();
 			}break;
-		case AffectType::eFrontSingle:
+		case sAffectType::eFrontSingle:
 			{
 				return AffectFrontSingle::create();
 			}break;
-		case AffectType::eCenterSingle:
+		case sAffectType::eCenterSingle:
 			{
 				return AffectCenterSingle::create();
 			}break;
-		case AffectType::eBackSingle:
+		case sAffectType::eBackSingle:
 			{
 				return AffectBackSingle::create();
 			}break;
-		case AffectType::eFrontDisperse:
+		case sAffectType::eFrontDisperse:
 			{
 				return AffectFrontDisperse::create();
 			}break;
-		case AffectType::eCenterDisperse:
+		case sAffectType::eCenterDisperse:
 			{
 				return AffectCenterDisperse::create();
 			}break;
-		case AffectType::eBackDisperse:
+		case sAffectType::eBackDisperse:
 			{
 				return AffectBackDisperse::create();
 			}break;
-		case AffectType::eFrontRow:
+		case sAffectType::eFrontRow:
 			{
 				return AffectFrontRow::create();
 			}break;
-		case AffectType::eCenterRow:
+		case sAffectType::eCenterRow:
 			{
 				return AffectCenterRow::create();
 			}break;
-		case AffectType::eBackRow:
+		case sAffectType::eBackRow:
 			{
 				return AffectBackRow::create();
 			}break;
-		case AffectType::eAnyFixGrid:
+		case sAffectType::eAnyFixGrid:
 			{
 				return AffectAnyFixGrid::create();
 			}break;
-		case AffectType::eAnyFixGridDisperse:
+		case sAffectType::eAnyFixGridDisperse:
 			{
 				return AffectAnyFixGridDisperse::create();
 			}break;
-		case AffectType::eAnyFixAlive:
+		case sAffectType::eAnyFixAlive:
 			{
 				return AffectAnyAlive::create();
 			}break;
-		case AffectType::eAnyFixAliveDisperse:
+		case sAffectType::eAnyFixAliveDisperse:
 			{
 				return AffectAnyAliveDisperse::create();
 			}break;
-		case AffectType::eLowestHp:
+		case sAffectType::eLowestHp:
 			{
 				return AffectLowesHp::create();
 			}break;
-		case AffectType::eMapCenterTwoLine:
+		case sAffectType::eMapCenterTwoLine:
 			{
 				return AffectMapCenterTwoLine::create();
 			}break;
-		case AffectType::eFrontFourGrid:
+		case sAffectType::eFrontFourGrid:
 			{
 				return AffectFrontFourGrid::create();
 			}break;
-		case AffectType::eLowestHpUnCaptain:
+		case sAffectType::eLowestHpUnCaptain:
 			{
 				return AffectLowesHpUnCaptain::create();
 			}break;
-		case AffectType::eMapAnyDoubleLine:
+		case sAffectType::eMapAnyDoubleLine:
 			{
 				return AffectMapAnyDoubleLine::create();
 			}break;
@@ -168,8 +168,7 @@ namespace BattleSpace
 
 	void AffectArea::initValidGrids( BaseRole* pRole,std::vector<int>& pValids )
 	{
-		if ( pRole->getBaseData()->getRoleRow() == 1 && 
-			 pRole->getBaseData()->getRoleCol() == 1 )
+		if ( pRole->singleGrid() )
 		{
 			if (pRole->getTouchState())
 			{
@@ -203,8 +202,16 @@ namespace BattleSpace
 		}
 	}
 
-	void AffectArea::commonHandle()
+	void AffectArea::commonHandle(AreaCountInfo& pInfo)
 	{
-
+		
+		initArea(pInfo);
 	}
+
+	void AffectArea::setEffectData( skEffectData* pData )
+	{
+		mEffectData = pData;
+		mAffectType = getAreaType();
+	}
+
 }

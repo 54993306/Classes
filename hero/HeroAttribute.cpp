@@ -25,6 +25,12 @@
 #include "common/CGameSound.h"
 #include "Resources.h"
 #include "common/CCRollLabelAction.h"
+#include "model/DataCenter.h"
+#include "model/WarManager.h"
+#include <spine/spine-cocos2dx.h>
+
+using namespace spine;
+using namespace BattleSpace;
 
 CHeroAttribute::CHeroAttribute():m_itemIndex(0),m_foodCount(0),m_bIsToLeft(false),m_pHeroTemporary(nullptr),
 	m_show_info_scroll(nullptr), m_pInfo1(nullptr), m_pInfo2(nullptr)
@@ -321,6 +327,10 @@ void CHeroAttribute::onExit()
 	vector<int>::iterator iter = m_VecMode.begin();
 	for (;iter!=m_VecMode.end();iter++)
 	{
+		if (DataCenter::sharedData()->getWar()->isSpine(*iter))
+		{
+			continue;
+		}
 		CCAnimationData *animationData = CCArmatureDataManager::sharedArmatureDataManager()->getAnimationData(ToString(*iter));
 		if (animationData)
 		{
@@ -373,8 +383,7 @@ void CHeroAttribute::onCheckBtn(CCObject *pSender, bool bChecked)
 		{
 			bgHideOrShow(false);
 		}
-		m_delegate->onHeroInfo(m_selectHero,btn->getTag());
-
+		m_delegate->onHeroInfo(m_selectHero, btn->getTag());
 	}
 }
 
@@ -415,6 +424,7 @@ CHeroAttribute::~CHeroAttribute()
 	CC_SAFE_DELETE(m_pHeroTemporary);
 }
 
+
 void CHeroAttribute::updateHeroAttr(CHero* hero)
 {
 	m_selectHero = hero;
@@ -422,9 +432,12 @@ void CHeroAttribute::updateHeroAttr(CHero* hero)
 	showBaseInfo(hero);
 	updateRaiseAttr(hero);
 	showArmor(hero);
+	bool isEvol = hero->evol;
+	showEvolveTip(isEvol);
 
-	CCNode *redPoint = (CCNode*)(m_ui->findWidgetById("redPoint"));
-	redPoint->setVisible(hero->evol);
+	bool hasExp = hero->battle;
+	showExpTip(hasExp);
+	showSkillTip(hero->remove);
 }
 
 void CHeroAttribute::onSelectItem(CCObject *pSender)
@@ -437,6 +450,7 @@ void CHeroAttribute::onSelectItem(CCObject *pSender)
 	selectItem->setSelForHero(m_selectHero->thumb);
 	selectItem->setSelectType(2);
 	selectItem->setEquipType(m_itemIndex);
+	selectItem->setAutoRolling(true);
 	LayerManager::instance()->push(selectItem);
 	selectItem->setOnSelectItemListener(this,ccw_select_Item(CHeroAttribute::onSelectArmor));	
 	
@@ -555,27 +569,34 @@ void CHeroAttribute::ProcessMsg(int type, google::protobuf::Message *msg)
 
 void CHeroAttribute::showArmor(CHero* hero)
 {
-	for(unsigned int i=0; i<4; i++)
+	for(unsigned int i=0; i<5; i++)
 	{
 		CItem* pItem;
 		if(i==0) pItem = &hero->armor1;
 		if(i==1) pItem = &hero->armor2;
 		if(i==2) pItem = &hero->armor3;
 		if(i==3) pItem = &hero->armor4;
+		if(i==4) pItem = &hero->armor5;
 
 		//100.锁住 200.解锁了没装备 300.解锁了有装备 400.库里有可用装备
 		int iParam = pItem->itparam;
 
+		//底板
+		CImageView* pItemBg = (CImageView*)(m_ui->findWidgetById("itembg5"));
+		pItemBg->setVisible(true);
+
 		//添加
 		CCSprite* pAdd = (CCSprite*)(m_ui->findWidgetById(CCString::createWithFormat("add%d", i+1)->getCString()));
+		pAdd->setVisible(true);
 
 		//锁
 		CImageView* pLock = (CImageView*)(m_ui->findWidgetById(CCString::createWithFormat("_lock%d", i+1)->getCString()));
+		pLock->setVisible(true);
 
 		//边框
 		CImageView* pMask = (CImageView*)(m_ui->findWidgetById(CCString::createWithFormat("mask%d", i+1)->getCString()));
-		pMask->removeChildByTag(1);
-		pMask->removeChildByTag(2);
+		pMask->removeAllChildren();
+		pMask->setVisible(true);
 
 		//未装备字样
 		pAdd->removeAllChildren();
@@ -647,43 +668,88 @@ void CHeroAttribute::showArmor(CHero* hero)
 			pLock->setOnClickListener(this, ccw_click_selector(CHeroAttribute::onTipsForUnlockArmor));
 			pLock->setTag(i);
 		}
+
+		//宝物特殊处理
+		if( i == 4 && hero->iColor <= 2)
+		{
+			pAdd->setVisible(false);
+			pLock->setVisible(false);
+			pMask->setVisible(false);
+			pItemBg->setVisible(false);
+		}
 	}
 }
 
 void CHeroAttribute::showBaseInfo(CHero* hero)
 {
 	CCSprite *role = (CCSprite*)(m_ui->findWidgetById("ying"));
+
+	//===============================================================================================
 	//使用模型代替贴图
-	//CCSprite *sp = CCSprite::create(CCString::createWithFormat("selectRole/%d.png",hero->thumb)->getCString());
 	int m_ModeID = hero->thumb;
-	char ExportJson_str[60] = {0};//"BoneAnimation/101.ExportJson"
-	sprintf(ExportJson_str,"BoneAnimation/%d.ExportJson",m_ModeID);
-	CCArmatureDataManager::sharedArmatureDataManager()->addArmatureFileInfo(ExportJson_str);
-	CCAnimationData *animationData = CCArmatureDataManager::sharedArmatureDataManager()->getAnimationData(ToString(m_ModeID));
-	if (!animationData)													//模型容错性处理
+
+	if (DataCenter::sharedData()->getWar()->isSpine(m_ModeID))
+	{ 
+		char json[60] = {0};
+		char altlas[60] = {0};
+		sprintf(json,"Spine/%d.json",m_ModeID);
+		sprintf(altlas,"Spine/%d.atlas",m_ModeID);
+		std::string strFullPath = CCFileUtils::sharedFileUtils()->fullPathForFilename(altlas);
+		if(CCFileUtils::sharedFileUtils()->isFileExist(strFullPath))
+		{
+			SkeletonAnimation * skeletonNode = SkeletonAnimation::createWithFile(json, altlas, 1);
+			m_VecMode.push_back(m_ModeID);
+			skeletonNode->setAnimation(0, Stand_Action, true);
+			role->getParent()->removeChildByTag(100);
+
+			skeletonNode->setTag(100);
+			CCPoint pos = ccpAdd(role->getPosition(),ccp(0, 40-role->getContentSize().height)/2);
+			skeletonNode->setPosition(pos);
+			role->getParent()->addChild(skeletonNode, role->getZOrder());
+			skeletonNode->completeListener = std::bind(&CHeroAttribute::SpineComplete, this, std::placeholders::_1, std::placeholders::_2);
+			
+			float zoom = hero->zoom*0.01f;
+			if (!zoom)
+				zoom = 300.0/skeletonNode->getContentSize().height;			//容错性处理
+			skeletonNode->setScale(zoom+0.3f);
+			m_pAnimationNode = skeletonNode;
+
+		}else{
+			CCLOG("[ *ERROR ] CWBossLayer::updateBossTexture");
+		}
+	}
+	else
 	{
-		CCLOG("[ *ERROR ]  CHeroAttribute::showBaseInfo Model=%d IS NULL",m_ModeID); 
-		m_ModeID = 516;
+		char ExportJson_str[60] = {0};//"BoneAnimation/101.ExportJson"
 		sprintf(ExportJson_str,"BoneAnimation/%d.ExportJson",m_ModeID);
 		CCArmatureDataManager::sharedArmatureDataManager()->addArmatureFileInfo(ExportJson_str);
-	}	
-	CCArmature* Armature = CCArmature::create(ToString(m_ModeID));
-	if (Armature)
-	{	
-		m_VecMode.push_back(m_ModeID);
-		Armature->getAnimation()->play(Stand_Action,0.01f);
-		role->getParent()->removeChildByTag(100);
-		float zoom = hero->zoom*0.01f;
-		if (!zoom)
-			zoom = 300.0/Armature->getContentSize().height;			//容错性处理
-		Armature->setScale(zoom+0.3f);
-		Armature->setTag(100);
-		CCPoint pos = ccpAdd(role->getPosition(),ccp(0, 40-role->getContentSize().height)/2);
-		Armature->setPosition(pos);
-		role->getParent()->addChild(Armature, role->getZOrder());
-		Armature->getAnimation()->setMovementEventCallFunc(this, movementEvent_selector(CHeroAttribute::movementCallBack));
-		m_pArmature = Armature;
-	}	
+		CCAnimationData *animationData = CCArmatureDataManager::sharedArmatureDataManager()->getAnimationData(ToString(m_ModeID));
+		if (!animationData)													//模型容错性处理
+		{
+			CCLOG("[ *ERROR ]  CHeroAttribute::showBaseInfo Model=%d IS NULL",m_ModeID); 
+			m_ModeID = 516;
+			sprintf(ExportJson_str,"BoneAnimation/%d.ExportJson",m_ModeID);
+			CCArmatureDataManager::sharedArmatureDataManager()->addArmatureFileInfo(ExportJson_str);
+		}	
+		CCArmature* Armature = CCArmature::create(ToString(m_ModeID));
+		if (Armature)
+		{	
+			m_VecMode.push_back(m_ModeID);
+			Armature->getAnimation()->play(Stand_Action,0.01f);
+			role->getParent()->removeChildByTag(100);
+			float zoom = hero->zoom*0.01f;
+			if (!zoom)
+				zoom = 300.0/Armature->getContentSize().height;			//容错性处理
+			Armature->setScale(zoom+0.3f);
+			Armature->setTag(100);
+			CCPoint pos = ccpAdd(role->getPosition(),ccp(0, 40-role->getContentSize().height)/2);
+			Armature->setPosition(pos);
+			role->getParent()->addChild(Armature, role->getZOrder());
+			Armature->getAnimation()->setMovementEventCallFunc(this, movementEvent_selector(CHeroAttribute::movementCallBack));
+			m_pAnimationNode = Armature;
+		}	
+	}
+	//===============================================================================================
 
 	const HeroInfoData *data = DataCenter::sharedData()->getHeroInfo()->getCfg(hero->thumb);
 
@@ -750,32 +816,38 @@ void CHeroAttribute::showBaseInfo(CHero* hero)
 
 	//立绘
 	CImageView *pBgRect = (CImageView*)(m_ui->findWidgetById("rect_bg"));
-	pBgRect->removeChildByTag(100);
+	//pBgRect->removeChildByTag(100);
 
-	//裁切区域
-	CCClippingNode* pClip = CCClippingNode::create();
-	pClip->setPosition(CCPointZero);
-	pClip->setTag(100);
-	CImageView* pImage = UICloneMgr::cloneImageView(pBgRect);
-	pImage->setAnchorPoint(CCPointZero);
-	pImage->setPosition(CCPointZero);
-	pClip->setStencil(pImage);
-	pBgRect->addChild(pClip, 99);
+	////裁切区域
+	//CCClippingNode* pClip = CCClippingNode::create();
+	//pClip->setPosition(CCPointZero);
+	//pClip->setTag(100);
+	//CImageView* pImage = UICloneMgr::cloneImageView(pBgRect);
+	//pImage->setAnchorPoint(CCPointZero);
+	//pImage->setPosition(CCPointZero);
+	//pClip->setStencil(pImage);
+	//pBgRect->addChild(pClip, 99);
 
-	const CHeroBodyShowInfo& bodyData = m_heroBodyShowdData->getDataById(hero->thumb);
-	CCSprite *spr = CCSprite::create(CCString::createWithFormat("selectRole/%d.png",hero->thumb)->getCString());
-	if (spr)
-	{	
-		CCTextureCache::sharedTextureCache()->removeTextureForKey(CCString::createWithFormat("selectRole/%d.png",hero->thumb)->getCString());
-		spr->setPosition(pBgRect->convertToNodeSpace(m_ui->convertToWorldSpace(bodyData.pos)));
-		spr->setScale(bodyData.fScale);
-		spr->setScaleX(spr->getScaleX()/pBgRect->getScaleX());
-		spr->setFlipX(bodyData.bFlipX);
-		spr->setRotation(bodyData.iRoate);
-		pClip->addChild(spr);
+	//const CHeroBodyShowInfo& bodyData = m_heroBodyShowdData->getDataById(hero->thumb);
+	//CCSprite *spr = CCSprite::create(CCString::createWithFormat("selectRole/%d.png",hero->thumb)->getCString());
+	//if (spr)
+	//{	
+	//	CCTextureCache::sharedTextureCache()->removeTextureForKey(CCString::createWithFormat("selectRole/%d.png",hero->thumb)->getCString());
+	//	spr->setPosition(pBgRect->convertToNodeSpace(m_ui->convertToWorldSpace(bodyData.pos)));
+	//	spr->setScale(bodyData.fScale);
+	//	spr->setScaleX(spr->getScaleX()/pBgRect->getScaleX());
+	//	spr->setFlipX(bodyData.bFlipX);
+	//	spr->setRotation(bodyData.iRoate);
+	//	pClip->addChild(spr);
+	//}
+
+	//updateBgColor(hero->roletype);
+	CCTexture2D* pTexture = CCTextureCache::sharedTextureCache()->addImage(CCString::createWithFormat("hero/%d.jpg", m_selectHero->thumb)->getCString());
+	if(!pTexture)
+	{
+		pTexture = CCTextureCache::sharedTextureCache()->addImage("hero/test.jpg");
 	}
-
-	updateBgColor(hero->roletype);
+	pBgRect->setTexture(pTexture);
 
 	//更新信息
 	if(data)
@@ -913,6 +985,8 @@ void CHeroAttribute::callbackForHideBackLayer()
 
 void CHeroAttribute::movementCallBack( CCArmature* pAramture, MovementEventType type, const char* sData )
 {
+	CCArmature* pArmature = dynamic_cast<CCArmature*>(m_pAnimationNode);
+
 	switch (type)
 	{
 	case cocos2d::extension::START:
@@ -924,40 +998,40 @@ void CHeroAttribute::movementCallBack( CCArmature* pAramture, MovementEventType 
 			float fRand = CCRANDOM_0_1();
 			if(fRand>0.7)
 			{
-				if(m_pArmature->getAnimation()->getAnimationData()->getMovement(Stand_Action))
+				if(pArmature->getAnimation()->getAnimationData()->getMovement(Stand_Action))
 				{
-					m_pArmature->getAnimation()->play(Stand_Action, 0.01f);
+					pArmature->getAnimation()->play(Stand_Action, 0.01f);
 					return;
 				}
 			}
 			else if(fRand>0.5)
 			{
-				if(m_pArmature->getAnimation()->getAnimationData()->getMovement(Attack_Action))
+				if(pArmature->getAnimation()->getAnimationData()->getMovement(Attack_Action))
 				{
-					m_pArmature->getAnimation()->play(Attack_Action, 0.01f);
+					pArmature->getAnimation()->play(Attack_Action, 0.01f);
 					return;
 				}
 			}
 			else if(fRand>0.3f)
 			{
-				if(m_pArmature->getAnimation()->getAnimationData()->getMovement(SpAttack_Action))
+				if(pArmature->getAnimation()->getAnimationData()->getMovement(SpAttack_Action))
 				{
-					m_pArmature->getAnimation()->play(SpAttack_Action, 0.01f);
+					pArmature->getAnimation()->play(SpAttack_Action, 0.01f);
 					return;
 				}
 			}
 			else if(fRand>0.1f)
 			{
-				if(m_pArmature->getAnimation()->getAnimationData()->getMovement(Win_Action))
+				if(pArmature->getAnimation()->getAnimationData()->getMovement(Win_Action))
 				{
-					m_pArmature->getAnimation()->play(Win_Action, 0.01f);
+					pArmature->getAnimation()->play(Win_Action, 0.01f);
 					return;
 				}
 			}
 
-			if(m_pArmature->getAnimation()->getAnimationData()->getMovement(Walk_Action))
+			if(pArmature->getAnimation()->getAnimationData()->getMovement(Walk_Action))
 			{
-				m_pArmature->getAnimation()->play(Walk_Action, 0.01f);
+				pArmature->getAnimation()->play(Walk_Action, 0.01f);
 			}
 		}
 		break;
@@ -965,6 +1039,42 @@ void CHeroAttribute::movementCallBack( CCArmature* pAramture, MovementEventType 
 		break;
 	}
 }
+
+
+void CHeroAttribute::SpineComplete( int trackIndex,int loopCount )
+{
+	SkeletonAnimation* skeletonNode = dynamic_cast<SkeletonAnimation*>(m_pAnimationNode);
+	if (skeletonNode)
+	{
+		//动作1
+		float fRand = CCRANDOM_0_1();
+		if(fRand>0.7)
+		{
+			skeletonNode->setAnimation(0,Stand_Action,true);
+			return;
+		}
+		else if(fRand>0.5)
+		{
+			skeletonNode->setAnimation(0,Attack_Action,true);
+			return;
+		}
+		else if(fRand>0.3f)
+		{
+			skeletonNode->setAnimation(0,SpAttack_Action,true);
+			return;
+		}
+		else if(fRand>0.1f)
+		{
+			skeletonNode->setAnimation(0,Win_Action,true);
+			return;
+		}
+		else
+		{
+			skeletonNode->setAnimation(0,Walk_Action,true);
+		}
+	}
+}
+
 
 void CHeroAttribute::compaseSuccess( CCObject* pObj )
 {
@@ -1017,30 +1127,36 @@ void CHeroAttribute::bgHideOrShow(bool bShow)
 
 		//立绘
 		CImageView *pBgRect = (CImageView*)(m_ui->findWidgetById("rect_bg"));
-		pBgRect->removeChildByTag(100);
+		//pBgRect->removeChildByTag(100);
 
-		//裁切区域
-		CCClippingNode* pClip = CCClippingNode::create();
-		pClip->setPosition(CCPointZero);
-		pClip->setTag(100);
-		CImageView* pImage = UICloneMgr::cloneImageView(pBgRect);
-		pImage->setAnchorPoint(CCPointZero);
-		pImage->setPosition(CCPointZero);
-		pClip->setStencil(pImage);
-		pBgRect->addChild(pClip, 99);
+		////裁切区域
+		//CCClippingNode* pClip = CCClippingNode::create();
+		//pClip->setPosition(CCPointZero);
+		//pClip->setTag(100);
+		//CImageView* pImage = UICloneMgr::cloneImageView(pBgRect);
+		//pImage->setAnchorPoint(CCPointZero);
+		//pImage->setPosition(CCPointZero);
+		//pClip->setStencil(pImage);
+		//pBgRect->addChild(pClip, 99);
 
-		const CHeroBodyShowInfo& bodyData = m_heroBodyShowdData->getDataById(m_selectHero->thumb);
-		CCSprite *spr = CCSprite::create(CCString::createWithFormat("selectRole/%d.png",m_selectHero->thumb)->getCString());
-		if (spr)
-		{	
-			CCTextureCache::sharedTextureCache()->removeTextureForKey(CCString::createWithFormat("selectRole/%d.png",m_selectHero->thumb)->getCString());
-			spr->setPosition(pBgRect->convertToNodeSpace(m_ui->convertToWorldSpace(bodyData.pos)));
-			spr->setScale(bodyData.fScale);
-			spr->setScaleX(spr->getScaleX()/pBgRect->getScaleX());
-			spr->setFlipX(bodyData.bFlipX);
-			spr->setRotation(bodyData.iRoate);
-			pClip->addChild(spr);
+		//const CHeroBodyShowInfo& bodyData = m_heroBodyShowdData->getDataById(m_selectHero->thumb);
+		//CCSprite *spr = CCSprite::create(CCString::createWithFormat("selectRole/%d.png",m_selectHero->thumb)->getCString());
+		//if (spr)
+		//{	
+		//	CCTextureCache::sharedTextureCache()->removeTextureForKey(CCString::createWithFormat("selectRole/%d.png",m_selectHero->thumb)->getCString());
+		//	spr->setPosition(pBgRect->convertToNodeSpace(m_ui->convertToWorldSpace(bodyData.pos)));
+		//	spr->setScale(bodyData.fScale);
+		//	spr->setScaleX(spr->getScaleX()/pBgRect->getScaleX());
+		//	spr->setFlipX(bodyData.bFlipX);
+		//	spr->setRotation(bodyData.iRoate);
+		//	pClip->addChild(spr);
+		//}
+		CCTexture2D* pTexture = CCTextureCache::sharedTextureCache()->addImage(CCString::createWithFormat("hero/%d.jpg", m_selectHero->thumb)->getCString());
+		if(!pTexture)
+		{
+			pTexture = CCTextureCache::sharedTextureCache()->addImage("hero/test.jpg");
 		}
+		pBgRect->setTexture(pTexture);
 	}
 }
 
@@ -1054,16 +1170,24 @@ void CHeroAttribute::onTipsForUnlockArmor( CCObject *pSender )
 {
 	CCNode* pNode = (CCNode*)pSender;
 	int iTag = pNode->getTag();
-	ShowPopTextTip(CCString::createWithFormat(GETLANGSTR(226), HERO_ARMOR_LOCK_LEVEL[iTag])->getCString());
+	if(iTag < 4)
+	{
+		ShowPopTextTip(CCString::createWithFormat(GETLANGSTR(226), HERO_ARMOR_LOCK_LEVEL[iTag])->getCString());
+	}
+	else
+	{
+		ShowPopTextTip(GETLANGSTR(2010));
+	}
+	
 	CCLOG("CHeroAttribute::onTipsForUnlockArmor");
 }
 
 void CHeroAttribute::updateStarRank( CHero* hero )
 {
 	CImageView* pImageView = (CImageView*)(m_ui->findWidgetById("bg_black"));
-	CLayout* pStarLay = getStarLayoutWithBlackBase(hero->quality, 1.0f);
+	CLayout* pStarLay = getStarLayout(hero->iColor, 1.0f);
 	pImageView->removeAllChildren();
-	pStarLay->setPosition(pStarLay->getPosition()+ccp(55, -5));
+	pStarLay->setPosition(pStarLay->getPosition()+ccp(35, -10));
 	pImageView->addChild(pStarLay);
 }
 
@@ -1100,4 +1224,22 @@ void CHeroAttribute::updateShowInfoScroll()
 
 	m_show_info_scroll->setContainerSize(contentSize);
 	m_show_info_scroll->setContentOffsetToTop();
+}
+
+void CHeroAttribute::showEvolveTip(bool isEvol)
+{
+	CCNode *redPoint = (CCNode*)(m_ui->findWidgetById("redPoint"));
+	redPoint->setVisible(isEvol);
+}
+
+void CHeroAttribute::showExpTip(bool hasExp)
+{
+	CCNode *expTip = (CCNode*)(m_ui->findWidgetById("expTip"));
+	expTip->setVisible(hasExp);
+}
+
+void CHeroAttribute::showSkillTip(bool hasSkill)
+{
+	CCNode *skillPoint = (CCNode*)(m_ui->findWidgetById("skillPoint"));
+	skillPoint->setVisible(hasSkill);
 }

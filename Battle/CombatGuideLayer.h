@@ -11,6 +11,7 @@
 //************************************************************************/
 namespace BattleSpace{
 	class BaseRole;
+	class WarManager;
 	class BattleScene;
 	class WarMapData;
 	class BattleMapLayer;
@@ -59,6 +60,7 @@ namespace BattleSpace{
 		void creaAliveByVector(vector<BaseRole*>VecAlive,CombatGuideStep* step);
 	private:
 		CCNode* m_root;
+		WarManager* mManage;
 		BattleScene* m_Scene;
 		WarMapData* m_mapData;
 		BattleMapLayer* m_MapLayer;

@@ -32,17 +32,15 @@ bool CWShopLayer::init()
 	{
 		CCSize winSize = CCDirector::sharedDirector()->getWinSize();
 		
-		//黑底
-		MaskLayer* pMaskLayer = MaskLayer::create("WorldBossMaskLayer");
-		pMaskLayer->setContentSize(winSize);
-		LayerManager::instance()->push(pMaskLayer);
+		////黑底
+		//MaskLayer* pMaskLayer = MaskLayer::create("WorldBossMaskLayer");
+		//pMaskLayer->setContentSize(winSize);
+		//LayerManager::instance()->push(pMaskLayer);
 
 		//内容
-		m_ui = LoadComponent("wShop.xaml");
-		m_ui->setPosition(VCENTER);
-		this->addChild(m_ui);
-
 		setVisible(true);
+
+		setIsShowBlack(false);
 
 		return true;
 	}
@@ -303,7 +301,12 @@ void CWShopLayer::addCell(CGridPageViewCell* pCell, unsigned int uIdx)
 	CLayout *lay = UICloneMgr::cloneLayout(m_cell);
 	CItem &item = m_itemList[uIdx];
 	item.itemNum=1;
-	for (int i=0; i<8; ++i)
+	int count = 8;
+	if (m_buyType==4)
+	{
+		count=9;
+	}
+	for (int i=0; i<count; ++i)
 	{
 		CCNode *node = (CCNode*)lay->getChildByTag(i+1);  //(CCNode*)lay->getChildren()->objectAtIndex(i);
 		lay->removeChild(node);
@@ -450,9 +453,31 @@ void CWShopLayer::onBuyItem(CCObject* pSender)
 	int num =0;
 	if (m_selectItem->buyPrice>0)
 	{
-		num = data->getRoleFood()/m_selectItem->buyPrice;
+		if (m_buyType==3)
+		{	
+			num = data->getRoleFood()/m_selectItem->buyPrice;
+		}
+		else if (m_buyType==4)
+		{
+			num = data->getRolePoints()/m_selectItem->buyPrice;
+		}
 	}
-	shopBuy->setShopType(3,num);
+	shopBuy->setShopType(m_buyType,num);
 	shopBuy->showItemProperty(m_selectItem);
 	LayerManager::instance()->push(shopBuy);
+}
+
+void CWShopLayer::loadUiByType(int type)
+{
+	m_buyType = type;
+	if (type==3)
+	{
+		m_ui = LoadComponent("wShop.xaml");
+	}
+	else if (type == 4)
+	{
+		m_ui = LoadComponent("PvpShop.xaml");
+	}	
+	m_ui->setPosition(VCENTER);
+	this->addChild(m_ui);
 }

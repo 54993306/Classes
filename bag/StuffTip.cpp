@@ -101,9 +101,9 @@ void CStuffTip::showItemProperty(CItem *item)
 	}
 	
 
-	CButton *jump = (CButton *)m_ui->findWidgetById("jump");
-	jump->setUserData(item);
-	jump->setOnClickListener(this,ccw_click_selector(CStuffTip::onJump));
+	//CButton *jump = (CButton *)m_ui->findWidgetById("jump");
+	//jump->setUserData(item);
+	//jump->setOnClickListener(this,ccw_click_selector(CStuffTip::onJump));
 
 	//
 	CLabel *haveNum= (CLabel *)m_ui->findWidgetById("haveNum");

@@ -22,7 +22,7 @@
 
 namespace BattleSpace{
 	AliveObject::AliveObject()
-		:m_Body(nullptr),m_HpObject(nullptr),m_Name(""),m_ActionKey(""),m_MoveState(E_StateCode::eNullState)
+		:m_Body(nullptr),m_HpObject(nullptr),m_Name(""),m_ActionKey(""),m_MoveState(sStateCode::eNullState)
 		,m_NameLabel(nullptr),m_Armature(nullptr),m_DropItem(0),m_offs(CCPointZero)
 		,mEnemy(false),m_EffectMusic(0),m_IsSpine(false),m_Speed(CCPointZero)
 		,m_Direction(-1),mModel(0),mRole(nullptr),mMoveObj(nullptr)
@@ -72,6 +72,7 @@ namespace BattleSpace{
 
 	void AliveObject::setHp(HPObject* hp)
 	{
+		testLabel();
 		m_HpObject = HPObject::create();
 		m_HpObject->initHp(this);
 		m_HpObject->retain();
@@ -86,7 +87,7 @@ namespace BattleSpace{
 		const HeroInfoData *c_data = DataCenter::sharedData()->getHeroInfo()->getCfg(mRole->getBaseData()->getRoleModel());
 		if(c_data)
 		{
-			sprintf(pPath,"common/type_%d_%d.png", mRole->getBaseData()->getRoleType(), c_data->iType2);
+			sprintf(pPath,"common/type_%d_%d.png", mRole->getBaseData()->getProperty(), c_data->iType2);
 		}else{
 			sprintf(pPath,"common/type_1_1.png");
 			CCLOG("[ *ERROR ] AliveObject::initAliveTypeIcon %d",mRole->getBaseData()->getRoleModel());
@@ -162,11 +163,13 @@ namespace BattleSpace{
 	//这个方法不属于数据类，也不属于显示类，但是应该在武将自身的身上，每个武将的死亡处理都不一样。
 	void AliveObject::AliveDie()
 	{
-		if (!mRole->getRoleObject() || mRole->getDieState())
+		if (!mRole->getRoleObject() || !mRole->getAliveState())
 			return;
 		mRole->clearHitAlive();
-		mRole->setDieState(true);
+		mRole->setAliveState(false);
 		mRole->setHp(0);
+		mRole->setBattle(false);
+		mRole->setGridIndex(INVALID_GRID);
 		m_HpObject->setHpNumber(0);
 		if (mRole->getMoveObject())
 			mRole->getMoveObject()->removeFromParentAndCleanup(true);
@@ -174,7 +177,7 @@ namespace BattleSpace{
 		this->setMoveObject(nullptr);
 		mRole->getBuffManage()->Buffclear();
 		NOTIFICATION->postNotification(B_DrpItem,this);
-		NOTIFICATION->postNotification(B_AliveDie,mRole);
+		NOTIFICATION->postNotification(MsgRoleDie,mRole);
 	}
 	//做受击判断和一个冲锋0号格子特殊处理,攻击音效攻击特效播放,使用了受击数组但是未操作
 	void AliveObject::AtkBegin_Event()
@@ -191,8 +194,8 @@ namespace BattleSpace{
 	void AliveObject::HpChange_Event()
 	{
 		mRole->attackEventLogic();
-		if (m_PlayerEffect)
-			NOTIFICATION->postNotification(B_SkilEffectInMap,this);
+		//if (getPlayerEffect())
+			//NOTIFICATION->postNotification(B_SkilEffectInMap,this);
 	}
 	//攻击区域必杀技状态才绘制,攻击完毕可以将武将传出去,进行下一个效果的判断或是重置武将信息等
 	void AliveObject::AtkEnd_Event()
@@ -244,7 +247,7 @@ namespace BattleSpace{
 			return	;
 		}
 		m_HpObject->playChangeNumber(num,type);
-		if (mRole->getAliveType() == E_ALIVETYPE::eWorldBoss)														//boss的情况处理应该在血量条的内部,自己进行。
+		if (mRole->getMonsterSpecies() == sMonsterSpecies::eWorldBoss)														//boss的情况处理应该在血量条的内部,自己进行。
 			NOTIFICATION->postNotification(B_WorldBoss_HurtUpdate,CCInteger::create(m_HpObject->getHpNumber()));	
 		if (type > gainType)
 			lostHpDispose();

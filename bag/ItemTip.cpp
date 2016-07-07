@@ -21,11 +21,12 @@
 #include "common/CGameSound.h"
 #include "Resources.h"
 #include "common/CommonFunction.h"
-
+using namespace BattleSpace;
 CItemTip::CItemTip()
 	:m_isOutClose(false)
 	,m_iMaxLineCount(0)
 	,m_pCellInfo(nullptr)
+	,m_iWillAddCoin(0)
 {
 	for(unsigned int i=0; i<4; i++)
 	{
@@ -52,11 +53,11 @@ bool CItemTip::init()
 
 		this->setIsShowBlack(false);
 
-		CColorView *colorView = CColorView::create(ccc4(0,0,0,200));
-		colorView->setContentSize(CCSizeMake(1138,640));
-		colorView->setPosition(VCENTER);
-		colorView->setTag(100);
-		this->addChild(colorView);
+		CColorView *pColorView = CColorView::create(ccc4(0,0,0,200));
+		pColorView->setContentSize(CCSizeMake(1138,640));
+		pColorView->setPosition(VCENTER);
+		pColorView->setTag(100);
+		this->addChild(pColorView);
 
 		m_ui = LoadComponent("ItemTip.xaml");  
 		m_ui->setPosition(VCENTER);
@@ -129,6 +130,13 @@ void CItemTip::onEnter()
 	GetTcpNet->registerMsgHandler(DecomposeArmor,this,CMsgHandler_selector(CItemTip::processNetMsg));
 
 	CSceneManager::sharedSceneManager()->addMsgObserver(UPDATE_ITEM_DATA, this, GameMsghandler_selector(CItemTip::updateItemData));
+	CCAnimation *lightAnim = AnimationManager::sharedAction()->getAnimation("8046");
+	lightAnim->setDelayPerUnit(0.2f);
+	CCSprite *spr = CCSprite::create("skill/8046.png");
+	CCNode *node = m_ui->findWidgetById("bg_item");
+	spr->setPosition(ccpAdd(node->getPosition(),ccp(node->getContentSize().width/2,node->getContentSize().height/2)));
+	spr->runAction(CCRepeatForever::create(CCSequence::createWithTwoActions(CCAnimate::create(lightAnim),CCDelayTime::create(0.2f))));
+	m_ui->addChild(spr);
 }
 
 void CItemTip::onExit()
@@ -139,89 +147,96 @@ void CItemTip::onExit()
 }
 
 
-void CItemTip::showItemProperty(CItem *item)
+void CItemTip::showItemProperty(CItem *pItem)
 {
-	m_selectItem = item;
+	m_selectItem = pItem;
 
-	const ItemData * itemData = DataCenter::sharedData()->getItemDesc()->getCfg(item->itemId);
+	const ItemData *pItemData = DataCenter::sharedData()->getItemDesc()->getCfg(pItem->itemId);
 
 	//背景
-	CCSprite *bg= (CCSprite *)m_ui->findWidgetById("itembg1");
-	bg->setOpacity(0);
+	CCSprite *pBg= (CCSprite *)m_ui->findWidgetById("itembg1");
+	pBg->setOpacity(0);
 
 	//品质
-	CCSprite *mask= (CCSprite *)m_ui->findWidgetById("mask");
-	mask->setTexture(setItemQualityTexture(item->quality));
+	CCSprite *pMask= (CCSprite *)m_ui->findWidgetById("mask");
+	pMask->setTexture(setItemQualityTexture(pItem->quality));
 
 	//名称
-	CLabel *name= (CLabel *)m_ui->findWidgetById("name");
-	if(itemData)
+	CLabel *pName= (CLabel *)m_ui->findWidgetById("name");
+	if(pItemData)
 	{
-		name->setString(itemData->itemName.c_str());
+		pName->setString(pItemData->itemName.c_str());
 	}
 
 	//类型
 	CLabel* pType= (CLabel *)m_ui->findWidgetById("type");
-	pType->setString(getArmorTypeStr(item->armor.armorType).c_str());
+	pType->setString(getArmorTypeStr(pItem->armor.armorType).c_str());
 
 	//分解
-	CButton *resolve = (CButton *)m_ui->findWidgetById("resolve");
-	resolve->setOnClickListener(this,ccw_click_selector(CItemTip::onResolve));
+	CButton *pResolveText = (CButton *)m_ui->findWidgetById("btn_t1");
+	CButton *pResolve = (CButton *)m_ui->findWidgetById("resolve");
+	pResolve->setOnClickListener(this,ccw_click_selector(CItemTip::onResolve));
 
 	//强化
-	CButton *strength = (CButton *)m_ui->findWidgetById("strength");
-	strength->setOnClickListener(this,ccw_click_selector(CItemTip::onStrength));
-	
+	CButton *pStrengthText = (CButton *)m_ui->findWidgetById("btn_t2");
+	CButton *pStrength = (CButton *)m_ui->findWidgetById("strength");
+	pStrength->setOnClickListener(this,ccw_click_selector(CItemTip::onStrength));
+	//如果类型为宝物不显示
+	pResolveText->setVisible(pItem->armor.armorType != 5);
+	pResolve->setVisible(pItem->armor.armorType != 5);
+	pStrengthText->setVisible(pItem->armor.armorType != 5);
+	pStrength->setVisible(pItem->armor.armorType != 5);
+
+
 	//物品icon
-	CCSprite *itemSpr = CCSprite::create(CCString::createWithFormat("prop/%d.png",item->iconId)->getCString());
-	if (!itemSpr)
+	CCSprite *pItemIcon = CCSprite::create(CCString::createWithFormat("prop/%d.png",pItem->iconId)->getCString());
+	if (!pItemIcon)
 	{
-		itemSpr = CCSprite::create("prop/32003.png");
-		CCLOG("[ ERROR ] CItemTip::showItemProperty Lost Image = %d",item->iconId);
+		pItemIcon = CCSprite::create("prop/32003.png");
+		CCLOG("[ ERROR ] CItemTip::showItemProperty Lost Image = %d",pItem->iconId);
 	}
-	if (itemSpr)
+	if (pItemIcon)
 	{
-		bg->removeChildByTag(111);
-		itemSpr->setPosition(ccp(bg->getContentSize().width/2,bg->getContentSize().height/2));
-		itemSpr->setTag(111);
-		itemSpr->setScale(1.3f);
-		bg->addChild(itemSpr);
+		pBg->removeChildByTag(111);
+		pItemIcon->setPosition(ccp(pBg->getContentSize().width/2,pBg->getContentSize().height/2));
+		pItemIcon->setTag(111);
+		pItemIcon->setScale(1.3f);
+		pBg->addChild(pItemIcon);
 	}
 
 	//如果是属性，则更新属性
-	if (item->itemType==2)
+	if (pItem->itemType==2)
 	{
-		updateArmorAttr(item);
+		updateArmorAttr(pItem);
 
 		//描述
-		CLabel *desc = (CLabel*)m_ui->findWidgetById("desc");
-		if (itemData)
+		CLabel *pDesc = (CLabel*)m_ui->findWidgetById("desc");
+		if (pItemData)
 		{
-			desc->setString(itemData->itemDesc.c_str());
+			pDesc->setString(pItemData->itemDesc.c_str());
 		}
 		else
 		{
-			desc->setString("");
+			pDesc->setString("");
 		}
 	}
 
 	//是否被英雄佩戴
-	CCSprite *isEqu = (CCSprite*)m_ui->findWidgetById("isEqu");
-	isEqu->setVisible(item->armor.hero!=0);
-	if (item->armor.hero>0)
+	CCSprite *pEquipByHero = (CCSprite*)m_ui->findWidgetById("isEqu");
+	pEquipByHero->setVisible(pItem->armor.hero!=0);
+	if (pItem->armor.hero>0)
 	{
-		isEqu->removeChildByTag(1);
-		CCSprite *img = CCSprite::create(CCString::createWithFormat("headIcon/%d.png",item->armor.hero)->getCString());
+		pEquipByHero->removeChildByTag(1);
+		CCSprite *img = CCSprite::create(CCString::createWithFormat("headIcon/%d.png",pItem->armor.hero)->getCString());
 		if(!img)
 		{
 			img = CCSprite::create("headIcon/101.png");
 		}
 		img->setScale(0.53f);
-		img->setPosition(ccp(isEqu->getContentSize().width/2,isEqu->getContentSize().height/2+14));
+		img->setPosition(ccp(pEquipByHero->getContentSize().width/2,pEquipByHero->getContentSize().height/2+14));
 		img->setTag(1);
-		isEqu->addChild(img);
+		pEquipByHero->addChild(img);
 	}
-
 }
 
 void CItemTip::onResolve(CCObject* pSender)
@@ -252,9 +267,16 @@ void CItemTip::onStrength(CCObject* pSender)
 {
 	if (CMainCityControl::getInstance()->isCityOpen(4))
 	{
-		CStrengthen *strength = CStrengthen::create();
-		LayerManager::instance()->push(strength);
-		CPlayerControl::getInstance().sendStrengthenArmor(m_selectItem->id,0);
+		if (m_selectItem->itemLevel<m_selectItem->armor.strenLv)
+		{
+			CStrengthen *strength = CStrengthen::create();
+			LayerManager::instance()->push(strength);
+			CPlayerControl::getInstance().sendStrengthenArmor(m_selectItem->id,0);
+		}
+		else
+		{
+			ShowPopTextTip(GETLANGSTR(237));
+		}
 	}
 	else
 	{
@@ -282,7 +304,7 @@ bool CItemTip::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
 	return res;
 }
 
-void CItemTip::updateArmorAttr(CItem * item)
+void CItemTip::updateArmorAttr(CItem *pItem)
 {
 	m_iMaxLineCount = 0;
 
@@ -318,14 +340,14 @@ void CItemTip::updateArmorAttr(CItem * item)
 	//基础属性
 	int iBaseValue[8] = 
 	{
-		item->armor.baseHp, item->armor.baseDef, item->armor.baseAtk, item->armor.baseHit,
-		item->armor.baseDex, item->armor.baseCrit, item->armor.baseRenew, item->armor.baseDodge
+		pItem->armor.baseHp, pItem->armor.baseDef, pItem->armor.baseAtk, pItem->armor.baseHit,
+		pItem->armor.baseDex, pItem->armor.baseCrit, pItem->armor.baseRenew, pItem->armor.baseDodge
 	};
 	//特殊属性
 	int iSpecialValue[8] = 
 	{
-		item->armor.addHp, item->armor.addDef, item->armor.addAtk, item->armor.addHit,
-		item->armor.addDex, item->armor.addCrit, item->armor.addRenew, item->armor.addDodge
+		pItem->armor.addHp, pItem->armor.addDef, pItem->armor.addAtk, pItem->armor.addHit,
+		pItem->armor.addDex, pItem->armor.addCrit, pItem->armor.addRenew, pItem->armor.addDodge
 	};
 	
 	int iMaxLineCountBase = updateInfoToUIAndReturnCount(m_pBaseInfo, iNameId, iBaseValue, 8, "base_title");
@@ -337,30 +359,37 @@ void CItemTip::updateArmorAttr(CItem * item)
 	updatePosOfLineAndDesc();
 
 	//等级
-	CLabel *itemLev= (CLabel *)m_ui->findWidgetById("level");
+	CLabel *pItemLv= (CLabel *)m_ui->findWidgetById("level");
 	CCNode *pMaskBg= (CCNode *)m_ui->findWidgetById("mask_level");
-	if(item->itemLevel == 0)
+	if(pItem->itemLevel == 0)
 	{
-		itemLev->setVisible(false);
+		pItemLv->setVisible(false);
 		pMaskBg->setVisible(false);
 	}
 	else
 	{
-		itemLev->setVisible(true);
+		pItemLv->setVisible(true);
 		pMaskBg->setVisible(true);
-		itemLev->setString(CCString::createWithFormat("+%d",item->itemLevel)->getCString());
+		pItemLv->setString(CCString::createWithFormat("+%d",pItem->itemLevel)->getCString());
 	}
 
 	//战力
-	CLabel* pFight= (CLabel *)m_ui->findWidgetById("power");
-	pFight->setString(ToString(item->armor.combat));
+	CLabel* pFightText = (CLabel *)m_ui->findWidgetById("power_t");
+	CLabel* pFight = (CLabel *)m_ui->findWidgetById("power");
+	pFight->setString(ToString(pItem->armor.combat));
+	//如果类型为宝物不显示
+	pFightText->setVisible(pItem->armor.armorType != 5);
+	pFight->setVisible(pItem->armor.armorType != 5);
 
 	//星级
 	CImageView* pImageView = (CImageView*)(m_ui->findWidgetById("bg_item"));
-	CLayout* pStarLay = getStarLayoutWithBlackBase(item->iStar, 0.6f);
 	pImageView->removeAllChildren();
-	pStarLay->setPosition(pStarLay->getPosition()+ccp(185, 73));
-	pImageView->addChild(pStarLay);
+	if( pItem->iStar > 0 )
+	{
+		CLayout* pStarLay = getStarLayoutWithBlackBase(pItem->iStar, 0.6f);
+		pStarLay->setPosition(pStarLay->getPosition()+ccp(185, 73));
+		pImageView->addChild(pStarLay);
+	}
 }
 
 
@@ -379,10 +408,8 @@ void CItemTip::processNetMsg(int type, google::protobuf::Message *msg)
 			itemList.push_back(item);
 		}
 
-		//金币更新到界面
-		UserData *data = DataCenter::sharedData()->getUser()->getUserData();
-		data->setCoin(data->getCoin()+res->coin());
-		CSceneManager::sharedSceneManager()->PostMessageA(UPDATE_HERO,0,nullptr,nullptr);
+		//设置将要增加的金币数量
+		m_iWillAddCoin = res->coin();
 
 		//增加金币
 		CItem item;
@@ -417,6 +444,12 @@ void CItemTip::onDecomposeBtn(CCObject* pSender)
 	if (btn->getTag()==1)
 	{
 		CPlayerControl::getInstance().sendDecomposeArmor(m_selectItem->id,DecomposeArmor);
+		
+		//金币更新到界面
+		UserData *data = DataCenter::sharedData()->getUser()->getUserData();
+		data->setCoin(data->getCoin()+m_iWillAddCoin);
+		CSceneManager::sharedSceneManager()->PostMessageA(UPDATE_HERO,0,nullptr,nullptr);
+		m_iWillAddCoin = 0;
 	}
 	else
 	{
@@ -457,7 +490,7 @@ void CItemTip::updatePosOfLineAndDesc()
 	pLine->setPositionY(iY);
 	CCNode* pDesc = (CCNode*)m_ui->findWidgetById("desc");
 	pDesc->setAnchorPoint(ccp(0, 1));
-	pDesc->setPositionY(iY-7);
+	pDesc->setPositionY(iY-2);
 }
 
 void CItemTip::hideNoneValueCell( int iCount, CLayout* pLayout[] )
@@ -512,7 +545,7 @@ void CItemTip::hideHeroEquipHead()
 
 void CItemTip::hideButton()
 {
-	const char* str[4] = {"itemLev_Copy", "itemLev_Copy1", "resolve", "strength"};
+	const char* str[4] = {"btn_t1", "btn_t2", "resolve", "strength"};
 	for(unsigned int i=0; i<4; i++)
 	{
 		CCNode* pNode = (CCNode*)m_ui->findWidgetById(str[i]);

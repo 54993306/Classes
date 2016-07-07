@@ -37,7 +37,6 @@ struct ROLE
 	CSkill skill5;				//主帅特殊攻击
 	CSkill skill6;				
 	CSkill skill7;				
-	//vector<CBuff> buffList;	//武将进入战场时带进来的buf
 	int thumb;					//模型id
 	bool enemy;					//是否为怪物
 	int alert;					//警戒区域类型
@@ -122,6 +121,7 @@ struct CHero :public ROLE
 	CItem armor2;				//装备2
 	CItem armor3;				//装备3
 	CItem armor4;				//装备4
+	CItem armor5;				//装备5-宝物
 	int armorNum;				//解锁的装备位置数量
 	vector<CItem> recItemList;	//招募英雄需要的道具列表
 	bool  remove;               //若英雄已驻守，是否可撤离

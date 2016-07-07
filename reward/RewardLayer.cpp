@@ -73,6 +73,9 @@ void CRewardLayer::onEnter()
 	CButton *btn = (CButton*)m_ui->findWidgetById("combat");
 	btn->setTouchEnabled(true);
 	btn->setOnClickListener(this,ccw_click_selector(CRewardLayer::onStage));
+	btn->runAction(CCRepeatForever::create(CCSequence::createWithTwoActions(CCScaleTo::create(0.3f, 1.1f), CCScaleTo::create(0.3f, 1.0f))));
+	btn->setAnchorPoint(ccp(0.5f, 0.5f));
+	btn->setPosition(ccpAdd(btn->getPosition(), ccp(btn->getContentSize().width/2, btn->getContentSize().height/2)));
 
 	CImageView *left = (CImageView*)m_ui->findWidgetById("left");
 	left->setTouchEnabled(true);
@@ -89,7 +92,7 @@ void CRewardLayer::onEnter()
 	story->setString(data->getStoryStr(m_pos));
 
 	NOTIFICATION->postNotification(HIDE_TOP_LAYER);
-
+	NOTIFICATION->addObserver(this, callfuncO_selector(CRewardLayer::timeInBackground), TIME_IN_BACKGROUND, nullptr);
 }
 
 CCObject* CRewardLayer::tableviewDataSource(CCObject* pConvertCell, unsigned int uIdx)
@@ -185,6 +188,7 @@ void CRewardLayer::onExit()
 	NOTIFICATION->postNotification(SHOW_TOP_LAYER);
 
 	TableViewOffSet = m_pageView->getContentOffset().y;
+	NOTIFICATION->removeAllObservers(this);
 }
 
 
@@ -254,6 +258,7 @@ void CRewardLayer::ProcessMsg(int type, google::protobuf::Message *msg)
 			bg->setTexture(texture);
 		}
 		updateOverTime(bounty);
+		this->schedule(schedule_selector(CRewardLayer::updateRewardTime),1.0,kCCRepeatForever,0);
 	}
 	else if (type==BountyHardMsg)
 	{
@@ -290,6 +295,18 @@ void CRewardLayer::ProcessMsg(int type, google::protobuf::Message *msg)
 		else
 		{
 
+		}
+	}
+}
+
+void CRewardLayer::updateRewardTime(float dt)
+{
+	for (int i = 0; i < m_bountyList.size(); i++)
+	{
+		m_bountyList.at(i).time -= 1;
+		if (m_bountyList.at(i).id == m_iCurrentChapterId)
+		{
+			updateOverTime(&m_bountyList.at(i));
 		}
 	}
 }
@@ -420,20 +437,17 @@ void CRewardLayer::showEffectCallBack()
 void CRewardLayer::updateOverTime(CBounty * bounty)
 {
 	CLabel *timeLab = (CLabel*)(m_ui->findWidgetById("time"));
-	tm tim;
-	time_t  t = bounty->time/1000;
-	tim = *localtime(&t);	
+ 	time_t  t = bounty->time;
 
-	tim.tm_hour = tim.tm_hour==0?24:tim.tm_hour;
-
-	if (tim.tm_min>9)
-	{					
-		timeLab->setString(CCString::createWithFormat("%d:%d",tim.tm_hour,tim.tm_min)->getCString());
-	}
-	else
+	if (t>=0)
 	{
-		timeLab->setString(CCString::createWithFormat("%d:0%d",tim.tm_hour,tim.tm_min)->getCString());
+		int hour = floor(t / 3600);
+		int min = floor((t - hour * 3600) / 60);
+		int sec = floor(t - hour * 3600 - min * 60);				
+		timeLab->setString(CCString::createWithFormat("%d:%d:%d",hour,min,sec)->getCString());
 	}
+
+	//timeLab->setString(CCString::createWithFormat("%ld:   %d-%d  %d:0%d",t,tim.tm_mon+1,tim.tm_mday,tim.tm_hour,tim.tm_min)->getCString());
 }
 
 void CRewardLayer::onLeft(CCObject* pSender)
@@ -458,6 +472,18 @@ void CRewardLayer::onRight(CCObject* pSender)
 	m_pageView->setContentOffset(pos);
 }
 
-
+void CRewardLayer::timeInBackground( CCObject* pObj )
+{
+	CCInteger* pValue = dynamic_cast<CCInteger*>(pObj);
+	int iValue = pValue->getValue()/1000;
+	for (int i = 0; i < m_bountyList.size(); i++)
+	{
+		m_bountyList.at(i).time -= iValue;
+		if (m_bountyList.at(i).id == m_iCurrentChapterId)
+		{
+			updateOverTime(&m_bountyList.at(i));
+		}
+	}
+}
 
 

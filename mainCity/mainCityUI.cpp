@@ -30,6 +30,10 @@
 #include "guide/GuideManager.h"
 #include "common/ShaderDataHelper.h"
 #include "activity/HttpLoadImage.h"
+#include "sign/PopItem.h"
+#include "common/CommonFunction.h"
+#include "tools/ShowTexttip.h"
+#include "tools/UICloneMgr.h"
 #define  FACEBOOKIMG "http://graph.facebook.com/%s/picture?width=106&height=106"
 
 #include "mail/EmailLayer.h"
@@ -77,6 +81,12 @@ void CMainCityUI::onEnter()
 
 	CLabelAtlas *vip_level = (CLabelAtlas*)(headPart->findWidgetById("level_vip"));
 	vip_level->setString(ToString(user->getVip()));
+	if (user->getVip()==0)
+	{
+		vip_level->setVisible(false);
+		CLabelAtlas *vip_font = (CLabelAtlas*)(headPart->findWidgetById("vip_font"));
+		vip_font->setVisible(false);
+	}
 
 	CImageView *headbg = (CImageView *)(headPart->findWidgetById("headbg"));
 	headbg->setTouchEnabled(true);
@@ -96,6 +106,7 @@ void CMainCityUI::onEnter()
 	}
 
 	CCSprite* head = (CCSprite*)headPart->getChildByTag(15);
+
 	if (user->getThumb()>0)
 	{
 		CCTexture2D *texture = CCTextureCache::sharedTextureCache()
@@ -107,13 +118,13 @@ void CMainCityUI::onEnter()
 	}
 	else
 	{
-		string fbName = "fbImg/"+user->getFbId()+".png";
+		string fbName = user->getFbId()+".jpg";
 		string fullName = CCFileUtils::sharedFileUtils()->fullPathForFilename(fbName.c_str());
 		bool isFileExist = CCFileUtils::sharedFileUtils()->isFileExist(fullName);
 		if(isFileExist)
 		{
 			CCSprite *headBg = (CCSprite *)(headPart->findWidgetById("headbg"));
-			CCSprite *sp = CCSprite::create(fullName.c_str());
+			CCSprite *sp = CCSprite::create(fbName.c_str());
 			CCSprite* spr = maskedSprite(sp);
 			spr->setPosition(headBg->getPosition());
 			headPart->removeChild(head);
@@ -124,7 +135,7 @@ void CMainCityUI::onEnter()
 		{
 			HttpLoadImage::getInstance()->bindUiTarget(this);
 			CCString *imgUrl = CCString::createWithFormat(FACEBOOKIMG,user->getFbId().c_str());
-			HttpLoadImage::getInstance()->requestUrlImage(imgUrl->getCString(),"fbimg");
+			HttpLoadImage::getInstance()->requestUrlImage(imgUrl->getCString(),user->getFbId().c_str());
 		}
 	}
 
@@ -152,13 +163,14 @@ void CMainCityUI::onEnter()
 		this->schedule(schedule_selector(CMainCityUI::updateActionTime),user->getInterval()*60);
 	}
     GetTcpNet->registerMsgHandler(FriendReqNumMsg,this,CMsgHandler_selector(CMainCityUI::processNetMsg));
-	
+	GetTcpNet->registerMsgHandler(CBExchangeMsg,this,CMsgHandler_selector(CMainCityUI::exchangeMsg));
+
 	//正在引导，不自动弹窗
 	if(user->getNewStep()==2||user->getNewStep()==17/*CGuideManager::getInstance()->getIsRunGuide()*/)
 	{
 		DataCenter::sharedData()->setCityActionType(CA_None);
 	}
-	else
+	else if(user->getNewStep()<=0 || user->getNewStep()>=100)
 	{
 		//自动弹签到
 		runAction(CCSequence::createWithTwoActions(CCDelayTime::create(0.7f), CCCallFunc::create(this, callfunc_selector(CMainCityUI::autoShowSign))));
@@ -199,7 +211,9 @@ void CMainCityUI::onEnter()
 	//绑定场景隐藏和显示的消息
 	NOTIFICATION->addObserver(this, callfuncO_selector(CMainCityUI::show), SHOW_MAIN_SCENE, nullptr);
 	NOTIFICATION->addObserver(this, callfuncO_selector(CMainCityUI::hide), HIDE_MAIN_SCENE, nullptr);
-	
+	NOTIFICATION->addObserver(this, callfuncO_selector(CMainCityUI::checkShowActivity), "CheckShowActivity", nullptr);
+
+
 	CCNode *lay = dynamic_cast<CCNode*>( m_ui->getChildByTag(6));
 	button = dynamic_cast<CButton*>(lay->getChildByTag(6));
 	CCAnimation *batAnim = AnimationManager::sharedAction()->getAnimation("9015");
@@ -259,13 +273,55 @@ void CMainCityUI::updateRoleProperty(const TMessage& tMsg)
 	CLabelAtlas *vip = (CLabelAtlas*)(headPart->findWidgetById("level_vip"));
 	vip->setString(ToString(user->getVip()));
 
-	CCSprite* head = (CCSprite*)headPart->getChildByTag(15);
-	CCTexture2D *texture = CCTextureCache::sharedTextureCache()
-		->addImage(CCString::createWithFormat("headIcon/%d.png", user->getThumb())->getCString());
-	if (texture)
+	if (user->getVip()==0)
 	{
-		head->setTexture(texture);
+		vip->setVisible(false);
+		CLabelAtlas *vip_font = (CLabelAtlas*)(headPart->findWidgetById("vip_font"));
+		vip_font->setVisible(false);
 	}
+
+	CCSprite* head = (CCSprite*)headPart->getChildByTag(15);
+	if (user->getThumb()>0)
+	{
+// 		CCTexture2D *texture = CCTextureCache::sharedTextureCache()
+// 		->addImage(CCString::createWithFormat("headIcon/%d.png", user->getThumb())->getCString());
+// 		if (texture)
+// 		{
+// 			head->setTexture(texture);
+// 		}
+// 		head->setFlipY(false);
+		CCSprite *headBg = (CCSprite *)(headPart->findWidgetById("headbg"));
+		CCString *strnName = CCString::createWithFormat("headIcon/%d.png", user->getThumb());
+		CCSprite *sp = CCSprite::create(strnName->getCString());
+		sp->setPosition(ccpAdd(headBg->getPosition(),ccp(0,10)));
+		sp->setScale(0.75f);
+		headPart->removeChild(head);
+		sp->setTag(15);
+		headPart->addChild(sp);
+	}
+	else
+	{
+		string fbName = user->getFbId()+".jpg";
+		string fullName = CCFileUtils::sharedFileUtils()->fullPathForFilename(fbName.c_str());
+		bool isFileExist = CCFileUtils::sharedFileUtils()->isFileExist(fullName);
+		if(isFileExist)
+		{
+			CCSprite *headBg = (CCSprite *)(headPart->findWidgetById("headbg"));
+			CCSprite *sp = CCSprite::create(fullName.c_str());
+			CCSprite* spr = maskedSprite(sp);
+			spr->setPosition(headBg->getPosition());
+			headPart->removeChild(head);
+			spr->setTag(15);
+			headPart->addChild(spr);
+		}
+		else
+		{
+			HttpLoadImage::getInstance()->bindUiTarget(this);
+			CCString *imgUrl = CCString::createWithFormat(FACEBOOKIMG,user->getFbId().c_str());
+			HttpLoadImage::getInstance()->requestUrlImage(imgUrl->getCString(),user->getFbId().c_str());
+		}
+	}
+	
 	CProgressBar *progressBar = (CProgressBar*)(headPart->getChildByTag(11));
 	progressBar->setMaxValue(user->getNextExp());
 	progressBar->startProgress(user->getExp(),0.3f);
@@ -307,7 +363,7 @@ void CMainCityUI::runMoveAction(int fromTag, int toTag,float moveTime)
 		child->runAction(ccseque);
 	}
 	m_moveX[fromTag-1] = dBtn->getPositionX() - child->getPositionX();
-}
+} 
 
 void CMainCityUI::hideBtn(CCNode *pSender)
 {
@@ -343,6 +399,19 @@ void CMainCityUI::onHeadImgBtn(CCObject *pSender)
 void CMainCityUI::onClickBtn(CCObject *pSender)
 {
 	int  tag = ((CButton*)pSender)->getTag();
+
+	map<int,CCity>::iterator iter = m_cityMap.find(tag+20);
+	if (iter!=m_cityMap.end()&&!iter->second.isOpen)
+	{
+		string str = GETLANGSTR(iter->second.cityId*1000);
+		if (str=="")
+		{
+			str = GETLANGSTR(2000);
+		}
+		ShowPopTextTip(str.c_str());
+		return;
+	}
+
 	switch (tag)
 	{
 	case Task_Btn:
@@ -389,14 +458,18 @@ void CMainCityUI::onClickBtn(CCObject *pSender)
 				if(DataCenter::sharedData()->getWar()->getNormal())
 				{
 					pLayer->setStory(true);
+					pLayer->ProcessMsg(ChapterList, CNetClient::getShareInstance()->getSaveMsg(ChapterList));
+					pLayer->selectChapter(DataCenter::sharedData()->getWar()->getChapterCount(), DataCenter::sharedData()->getWar()->getChapterIndex());
+					DataCenter::sharedData()->setCityActionType(CA_None);
 				}
 				else
 				{
 					pLayer->setStory(false);
+					pLayer->setLastChapter(DataCenter::sharedData()->getWar()->getChapterIndex());
+					CPlayerControl::getInstance().sendChapterList(1);
+					GetTcpNet->sendStageList(DataCenter::sharedData()->getWar()->getChapterIndex());
 				}
-				pLayer->ProcessMsg(ChapterList, CNetClient::getShareInstance()->getSaveMsg(ChapterList));
-				pLayer->selectChapter(DataCenter::sharedData()->getWar()->getChapterCount(), DataCenter::sharedData()->getWar()->getChapterIndex());
-				DataCenter::sharedData()->setCityActionType(CA_None);
+				
 			}
 			else
 			{
@@ -411,7 +484,7 @@ void CMainCityUI::onClickBtn(CCObject *pSender)
 		{
 			/*LayerManager::instance()->push(CHeroList::create());*/
 			CHeroControl *heroctl = CHeroControl::create();
-			CSceneManager::sharedSceneManager()->getRunningScene()->addChild(heroctl,0,1900);
+			LayerManager::instance()->push(heroctl);
 			CPlayerControl::getInstance().sendHeroList(1);
 			CCSprite *red = (CCSprite*)(m_ui->findWidgetById("heroPoint"));
 			red->setVisible(false);
@@ -606,8 +679,9 @@ void CMainCityUI::updateOpenState(CityData *cityData)
 				CButton *btn = dynamic_cast<CButton*>(child->getChildByTag(city->cityId-20));
 				if (btn)
 				{
-					btn->setEnabled(false);
+					//btn->setEnabled(false);
 					btn->getNormalImage()->setShaderProgram(ShaderDataMgr->getShaderByType(ShaderStone));
+					btn->getSelectedImage()->setShaderProgram(ShaderDataMgr->getShaderByType(ShaderStone));
 				}	
 			}
 		}
@@ -628,6 +702,7 @@ void CMainCityUI::updateFuctionOpen(const TMessage& tMsg)
 			{
 				btn->setEnabled(true);
 				btn->getNormalImage()->setShaderProgram(ShaderDataMgr->getShaderByType(ShaderDefault));
+				btn->getSelectedImage()->setShaderProgram(ShaderDataMgr->getShaderByType(ShaderDefault));
 			}	
 		}
 	}
@@ -681,11 +756,12 @@ void CMainCityUI::showNoticeTip(CGameTips * ct)
 
 void CMainCityUI::runTollgatepreviewCallBack()
 {
-	//CStage* stage = DataCenter::sharedData()->getWar()->getTollgete(); 
-	//CPlayerControl::getInstance().sendStageInfo(stage->id);
-	//CTollgatePreview *preview = CTollgatePreview::create();
-	//LayerManager::instance()->push(preview);
-	//preview->setStage(stage->id, stage->name.c_str());
+	int stage = DataCenter::sharedData()->getWar()->getStageID(); 
+	 
+	CPlayerControl::getInstance().sendStageInfo(stage);
+	CTollgatePreview *preview = CTollgatePreview::create();
+	LayerManager::instance()->push(preview);
+	preview->setStage(stage,"");
 }
 
 void CMainCityUI::setShowHeadPart(bool isSHow)
@@ -706,7 +782,7 @@ void CMainCityUI::imageLoadSuccessCallBack(string sTag, vector<char>* pBuffer)
 //	head->removeFromParent();
 	//head->setTexture(texture);
 
-	string path = HttpLoadImage::getInstance()->getStoragePath("download/fbImg",sTag.c_str())+".png";
+	string path = HttpLoadImage::getInstance()->getStoragePath("download/fbImg",sTag.c_str())+".jpg";
 	string buff(pBuffer->begin(), pBuffer->end());
 	CCLOG("path: %s", path.c_str());
 	FILE *fp = fopen(path.c_str(), "wb+");
@@ -747,7 +823,7 @@ void CMainCityUI::imageLoadSuccessCallBack(string sTag, vector<char>* pBuffer)
 
 CCSprite * CMainCityUI::maskedSprite(CCSprite *textureSprite)  
 {  
-	CCSprite * maskSprite = CCSprite::create("mainCity/touxiang_kuang.png");  
+	CCSprite * maskSprite = CCSprite::create("mainCity/tencil.png");  
 	CCRenderTexture * renderTexture = CCRenderTexture::create(maskSprite->getContentSize().width, maskSprite->getContentSize().height);  
 
 	maskSprite->setPosition(ccp(maskSprite->getContentSize().width / 2, maskSprite->getContentSize().height / 2));  
@@ -769,6 +845,7 @@ CCSprite * CMainCityUI::maskedSprite(CCSprite *textureSprite)
 
 	CCSprite * retval = CCSprite::createWithTexture(renderTexture->getSprite()->getTexture());  
 	retval->setFlipY(true);  
+
 	return retval;  
 }  
 
@@ -779,6 +856,55 @@ void CMainCityUI::autoShowSign()
 		CSignLayer *sign = CSignLayer::create();
 		LayerManager::instance()->push(sign);
 		GetTcpNet->sendDataType(SignDataMsg,true);
+	}
+}
+
+
+void CMainCityUI::exchangeMsg(int type, google::protobuf::Message *msg)
+{
+	CardExchangeRes *res= (CardExchangeRes*)msg;
+	int  ret = res->result();
+	if (ret==1)
+	{
+		CGetPrizeRes prizers;
+		prizers.result =1;
+		for (int i = 0; i < res->prize_list_size(); i++)
+		{  
+			CPrize prize;
+			prize.read(res->prize_list(i));
+			prizers.prizeList.push_back(prize);
+		}
+
+		//弹框
+		CPopItem *popItem = CPopItem::create();
+		LayerManager::instance()->push(popItem);
+		popItem->popPrizeRes(&prizers);
+
+		//收集货币
+		collectMoneyFromPrize(prizers);
+
+	}
+	//2 兑换码已使用，3 已兑换过该奖励，4 账号密码错误
+	else if (ret==2)
+	{
+		ShowPopTextTip(GETLANGSTR(281));
+	}
+	else if (ret==3)
+	{
+		ShowPopTextTip(GETLANGSTR(282));
+	}
+	else if (ret==4)
+	{
+		ShowPopTextTip(GETLANGSTR(165));
+	}
+}
+
+void CMainCityUI::checkShowActivity( CCObject* pObj )
+{
+	if(DataCenter::sharedData()->getUser()->getUserData()->getFirstLogin())
+	{
+		CButton *btn = (CButton*)m_ui->getChildByTag(Activity_Btn);
+		btn->runAction(CCCallFuncN::create(this, callfuncN_selector(CMainCityUI::onTimeWaitCityAction)));
 		DataCenter::sharedData()->getUser()->getUserData()->setFirstLogin(false);
 	}
 }

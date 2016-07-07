@@ -19,15 +19,25 @@ CButton* UICloneMgr::cloneButton(CCNodeRGBA *node)
 	 if (button)
 	 {
 		 CButton *btn = CButton::create();
-		 btn->setNormalTexture(dynamic_cast<CCSprite*>(button->getNormalImage())->getTexture());
-		 if (button->getSelectedImage())
+		 btn->setScale9Enabled(button->isScale9Enabled());
+
+		 if (!button->isScale9Enabled())
 		 {
-			 btn->setSelectedTexture(dynamic_cast<CCSprite*>(button->getSelectedImage())->getTexture());
+			 btn->setNormalTexture(dynamic_cast<CCSprite*>(button->getNormalImage())->getTexture());
+			 if (button->getSelectedImage())
+			 {
+				 btn->setSelectedTexture(dynamic_cast<CCSprite*>(button->getSelectedImage())->getTexture());
+			 }
+			 if (button->getDisabledImage())
+			 {
+				 btn->setDisabledTexture(dynamic_cast<CCSprite*>(button->getDisabledImage())->getTexture());
+			 } 
 		 }
-		 if (button->getDisabledImage())
+		 else
 		 {
-			 btn->setDisabledTexture(dynamic_cast<CCSprite*>(button->getDisabledImage())->getTexture());
+			 
 		 }
+		
 	     cloneProperties(btn, button);
 		 cloneWidgetProperties(btn, button);
 		 return btn;

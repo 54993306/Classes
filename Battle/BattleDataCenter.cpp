@@ -39,6 +39,12 @@ namespace BattleSpace{
 			CC_SAFE_RELEASE(tData);
 		}
 		mMonsterVec.clear();
+		for (auto tData : mCallRoleVec)
+		{
+			CC_SAFE_RELEASE(tData);
+		}
+		mCallRoleVec.clear();
+		mBaseRoleData.clear();
 	}
 
 	void BattleDataCenter::initBattleData( const google::protobuf::Message *pResponse,bool pWorldBoss /*=false*/ )
@@ -52,7 +58,20 @@ namespace BattleSpace{
 		}else{
 			initNormalStage(pResponse);
 		}
+		initBaseRoleDataVector();
 		DataCenter::sharedData()->getWar()->initCommonData();
+	}
+
+	void BattleDataCenter::initBaseRoleDataVector()
+	{
+		mBaseRoleData.insert(mBaseRoleData.end(),mHeroVec.begin(),mHeroVec.end());
+		mBaseRoleData.insert(mBaseRoleData.end(),mMonsterVec.begin(),mMonsterVec.end());
+		mBaseRoleData.insert(mBaseRoleData.end(),mCallRoleVec.begin(),mCallRoleVec.end());
+	}
+
+	const vector<BaseRoleData*>& BattleDataCenter::getRoleDatas() const
+	{
+		return mBaseRoleData;
 	}
 
 	const vector<HeroData*>& BattleDataCenter::getHeroVector() const
@@ -63,6 +82,11 @@ namespace BattleSpace{
 	const vector<MonsterData*>& BattleDataCenter::getMonsterVector() const
 	{
 		return mMonsterVec;
+	}
+
+	const vector<MonsterData*>& BattleDataCenter::getCallRoleDatas() const
+	{
+		return mCallRoleVec;
 	}
 
 	void BattleDataCenter::initHeroData( const protos::common::Hero* pData )
@@ -78,16 +102,22 @@ namespace BattleSpace{
 		MonsterData* tMonsterData = MonsterData::create();
 		tMonsterData->readData(pData);
 		tMonsterData->retain();
-		mMonsterVec.push_back(tMonsterData);
+		if (tMonsterData->getCallRole())
+		{
+			mCallRoleVec.push_back(tMonsterData);			//召唤类武将可能是英雄也可能是怪物
+		}else{
+			mMonsterVec.push_back(tMonsterData);
+		}
 	}
 
 	BaseRoleData* BattleDataCenter::getCallRoleData( int pRoleID ) const 
 	{
-		for (auto tRole : mMonsterVec)
+		for (auto tRole : mCallRoleVec)
 		{
-			if (tRole->getCallRole() && tRole->getMonsterID() == pRoleID)
+			if (tRole->getMonsterID() == pRoleID)
 				return tRole;
 		}
+		return nullptr;
 	}
 
 

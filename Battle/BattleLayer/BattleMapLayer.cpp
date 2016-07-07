@@ -34,7 +34,7 @@ namespace BattleSpace{
 
 	BattleMapLayer::BattleMapLayer()
 		:m_MapLayer(nullptr),m_GridIndex(nullptr),mGuardArea(nullptr)
-		,m_SkillRange(nullptr),m_Manage(nullptr),m_BackgroundManage(nullptr)
+		,m_SkillRange(nullptr),mManage(nullptr),m_BackgroundManage(nullptr)
 		,m_DisPlayArea(nullptr),m_BackArea(false),m_FrontArea(false)
 	{}
 	BattleMapLayer::~BattleMapLayer()
@@ -50,7 +50,7 @@ namespace BattleSpace{
 		m_GridIndex = nullptr;
 		CC_SAFE_RELEASE(mGuardArea);
 		mGuardArea = nullptr;
-		m_Manage = nullptr;
+		mManage = nullptr;
 		CCSpriteFrameCache::sharedSpriteFrameCache()->removeSpriteFramesFromFile("warScene/movebg.plist");
 	}
 
@@ -62,10 +62,10 @@ namespace BattleSpace{
 	bool BattleMapLayer::init()
 	{
 		bool res = CCNode::init();
-		m_Manage = DataCenter::sharedData()->getWar();
-		m_SkillRange = SkillRange::create(m_Manage);
+		mManage = DataCenter::sharedData()->getWar();
+		m_SkillRange = SkillRange::create(mManage);
 		m_SkillRange->retain();
-		mGuardArea = GuardArea::create(m_Manage);
+		mGuardArea = GuardArea::create(mManage);
 		mGuardArea->retain();
 
 		CCSpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile("warScene/movebg.plist");
@@ -182,7 +182,7 @@ namespace BattleSpace{
 			sp->setDisplayFrame(CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(AtksImg));
 			sp->setVisible(true);
 			m_VecGridIndex.push_back(grid+map_Bg);
-			BaseRole* t_alive = m_Manage->getAliveByGrid(grid);
+			BaseRole* t_alive = mManage->getAliveByGrid(grid);
 			if (t_alive&&t_alive->getEnemy() != alive->getEnemy())
 			{
 				if (alive->getOpposite())
@@ -202,22 +202,24 @@ namespace BattleSpace{
 		alive->setTouchState(false);
 	}
 
-	void BattleMapLayer::DrawMoveArea(BaseRole* alive)
+	void BattleMapLayer::DrawMoveArea(BaseRole* tRole)
 	{
-		for (auto i : *m_Manage->getMoveVec())
+		for (auto tGrid : *mManage->getMoveVec())
 		{
-			if (i < C_GRID_ROW+C_BEGINGRID)
+			if (mManage->inUnDefineArea(tGrid))
 				continue;
-			CCSprite* sp = (CCSprite*)m_DisPlayArea->getChildByTag(i+map_Bg);
+			if (tGrid < C_GRID_ROW+C_BEGINGRID)
+				continue;
+			CCSprite* sp = (CCSprite*)m_DisPlayArea->getChildByTag(tGrid+map_Bg);
 			if (!sp)continue;
-			if (m_Manage->inAddCostArea(i))
+			if (mManage->inAddCostArea(tGrid))
 			{
 				sp->setDisplayFrame(CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(AddMoveImg));
 			}else{
 				sp->setDisplayFrame(CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(CutMoveImg));
 			}
 			sp->setVisible(true);
-			m_VecGridIndex.push_back(i+map_Bg); 
+			m_VecGridIndex.push_back(tGrid+map_Bg); 
 		}
 	}
 
@@ -242,7 +244,7 @@ namespace BattleSpace{
 			m_SkillRange->initSkillArea(alive,tVector);
 			for (auto tGrid:tVector)
 			{
-				BaseRole* pAlive = m_Manage->getAliveByGrid(tGrid);
+				BaseRole* pAlive = mManage->getAliveByGrid(tGrid);
 				if (pAlive&&pAlive->getEnemy() != alive->getEnemy())
 					ReverseArea = true;
 			}
@@ -256,28 +258,31 @@ namespace BattleSpace{
 	//in map draw skill effect
 	void BattleMapLayer::DrawAtkEffect(CCObject* ob)
 	{
-		RoleObject* act = (RoleObject*)ob;
-		BaseRole* alive = act->getAlive();
-		for (auto i:alive->mSkillArea)
+		RoleObject* tRoleObject = (RoleObject*)ob;
+		BaseRole* tBaseRole = tRoleObject->getBaseRole();
+		for (auto tGrid:tBaseRole->mSkillArea)
 		{
-			CCSprite* sp = (CCSprite*)m_DisPlayArea->getChildByTag(i+map_Bg);
-			EffectObject* Effect = EffectObject::create(ToString(act->getPlayerEffect()));
+			if (tBaseRole->getEnemy() && tBaseRole->inStandGrid(tGrid))				//怪物站立格子不绘制
+				continue;
+			CCSprite* sp = (CCSprite*)m_DisPlayArea->getChildByTag(tGrid+map_Bg);
+			EffectObject* tEffect = EffectObject::create(ToString(tRoleObject->getPlayerEffect()));
 			int x = sp->getPosition().x - sp->getContentSize().width/4;
-			if (alive->getEnemy()) x = sp->getPosition().x + sp->getContentSize().width/4;
-			int y = sp->getPosition().y - sp->getContentSize().height*1.5f;
-			Effect->setEffAnchorPoint(0.5f,0);
-			Effect->setPosition(ccp(x,y));
-			this->addChild(Effect);
-			Effect->setShaderEffect(act->getArmature()->getShaderProgram());
-			Effect->setMusic(act->getEffectMusic());
+			if (tBaseRole->getEnemy()) x = sp->getPosition().x + sp->getContentSize().width/4;
+			int y = sp->getPosition().y - sp->getContentSize().height;
+			tEffect->setEffAnchorPoint(0.5f,0);
+			tEffect->setPosition(ccp(x,y));
+			this->addChild(tEffect);
+			tEffect->setShaderEffect(tRoleObject->getArmature()->getShaderProgram());
+			tEffect->setMusic(tRoleObject->getEffectMusic());
 			if (sp->isVisible()) sp->setVisible(false);
 		}
-		act->setEffectMusic(0);
-		act->setPlayerEffect(0);
+		tRoleObject->setEffectMusic(0);
+		tRoleObject->setPlayerEffect(0);
 	}
 	//现在攻击的情况已经不绘制攻击范围了
 	void BattleMapLayer::CancelCombatArea(CCObject* ob)
 	{
+		return;
 		BaseRole* alive = (BaseRole*)ob;
 		for (auto tGrid : alive->mSkillArea)
 		{
@@ -392,13 +397,13 @@ namespace BattleSpace{
 			yellow,
 			cancel,
 		};
-		for (auto i : *m_Manage->getMoveVec())
+		for (auto i : *mManage->getMoveVec())
 		{
 			CCSprite* sp = (CCSprite*)m_DisPlayArea->getChildByTag(i+map_Bg);
 			if (!sp)continue;
 			sp->stopAllActions();
 			sp->setVisible(false);
-			if (m_Manage->inAddCostArea(i))
+			if (mManage->inAddCostArea(i))
 			{
 				sp->setDisplayFrame(CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(AddMoveImg));
 				sp->setVisible(type == green);

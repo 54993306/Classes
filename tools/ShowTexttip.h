@@ -58,7 +58,7 @@ void ShowTexttip(CCNode * content,									//显示的提示节点
 
 void showScrollTip(const char* str, CCNode * _parent = NULL);                        
 
-CPopTip* ShowPopTextTip(const char* str,const ccColor3B& color =ccWHITE);
+CPopTip* ShowPopTextTip(const char* str,const ccColor3B& color =ccWHITE, bool isAutoClose = true);
 void ShowConfirmTextTip(const char* str, CCObject *pSender, SEL_ClickHandler pHandler, const ccColor3B& color =ccWHITE);
 void showItemTip(const CItem *item);
 #endif

@@ -5,6 +5,7 @@
 #include "protos/protocol.h"
 #include "tollgate/Chapter.h"
 #include "model/BattleData.h"
+#include "model/HeroInfoGM.h"
 
 USING_NS_CC_WIDGET;
 using namespace cocos2d;
@@ -96,12 +97,28 @@ void showBookAnimate(CLayout* pNode, bool bToLeft=true);
 int getCombatLevel(int combat);
 
 //添加90X90星星层
-CLayout* getStarLayout(int iStarCount, float fScale=0.4f);
+CLayout *getStarLayout(int iStarCount, float fScale=0.4f);
 
 //添加90X90星星层，五星，不够级有黑底
-CLayout* getStarLayoutWithBlackBase(int iStarCount, float fScale=0.4f);
+CLayout *getStarLayoutWithBlackBase(int iStarCount, float fScale=0.4f);
+
+//根据奖励是英雄还是物品来使用iColor还是iStar/iQuality
+CLayout *SmartGetStarLayout(const CPrize *pPrize, float fScale=0.4f);
+
 
 void PlaySoundEvent(int sData);
 
 //获取Armor类型
 std::string getArmorTypeStr(int iType);
+
+
+//设置属性框（新版；火水木）
+CCTexture2D* SetRectColor(int iType);
+
+//为什么要写这个函数，英雄的颜色改为采用水火木，之前英雄的品质改为星级，之前的星级改为进阶球
+//设置颜色的时候，prize相关的东西要特殊处理（有英雄和物品一起的情况），item相关的东西要特殊处理（有魂石和物品一起的情况）
+//只能统一做在这里
+//void SmartSetRectItemColor(CCSprite* pSprite, int iColor, HeroInfoData* pHeroData=nullptr);  ///-魂石秘籍都是单色，不做特殊处理，
+
+//只处理英雄跟物品一起的情况
+void SmartSetRectPrizeColor(CCSprite* pSprite, const CPrize* pPrize, const Prize* pProPrize=nullptr, HeroInfoData* pHeroData=nullptr);

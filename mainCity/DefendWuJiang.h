@@ -28,6 +28,8 @@ protected:
 	void onSelectHero(CCObject* pSender);
 	bool longSelectHero(CCObject* pSender, CCTouch* pTouch);
 	CCNode* getItemByIndex(int iIndex);
+
+	void SpineComplete( int trackIndex,int loopCount );
 private:
 	CLayout *m_ui;
 	CGridView *m_grid;
@@ -39,7 +41,7 @@ private:
 	int m_iStartIndex;
 	CCSprite *m_selectImg;
 	vector<int> m_VecMode;
-	CCArmature* m_pArmature;
+	CCNode* m_pAnimationNode;
 };
 
 

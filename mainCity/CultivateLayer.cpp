@@ -13,6 +13,8 @@
 #include "model/DataDefine.h"
 #include "common/CGameSound.h"
 #include "Resources.h"
+#include "common/ShaderDataHelper.h"
+#include "model/DataCenter.h"
 
 bool CCultivateLayer::init()
 {
@@ -239,9 +241,12 @@ void CCultivateLayer::showBuildInfo(const CCity& ct)
 
 	m_iCurrentMoneyRank = calculateMoneyHeapRank((100*ct.cap/ct.maxCap));
 
+	m_iBase = ct.cap;
 	m_iNow = ct.cap;
 	m_iMax = ct.maxCap;
 	m_fSpeed = ct.basePE + ct.extPE;
+
+	updateGetMoneyButtonStatus();
 
 	//更新金币堆
 	showMoneyHeap(m_iCurrentMoneyRank);
@@ -280,10 +285,15 @@ void CCultivateLayer::showBuildInfo(const CCity& ct)
 			NodeFillParent(head);
 
 			//边框
+			const HeroInfoData *data = DataCenter::sharedData()->getHeroInfo()->getCfg(hero.thumb);
 			CImageView* pQuality = (CImageView*)m_ui->findWidgetById(CCString::createWithFormat("rect_%d",i+1)->getCString());
-			pQuality->setTexture(setItemQualityTexture(hero.iColor));
+			if(data)
+			{
+				pQuality->setTexture(SetRectColor(data->iType1));
+			}
+			
 			//添加星级
-			CLayout* pStarLayout = getStarLayout(hero.quality);
+			CLayout* pStarLayout = getStarLayout(hero.iColor);
 			pQuality->addChild(pStarLayout);
 
 			//驻守标记（有人开采则隐藏掉）
@@ -362,6 +372,7 @@ void CCultivateLayer::timeDelay(float delt)
 		m_time->setVisible(false);
 		CButton *btn = (CButton*)m_ui->getChildByTag(5);
 		btn->setEnabled(true);
+		updateGetMoneyButtonStatus();
 	}
 	m_second--;
 }
@@ -509,7 +520,7 @@ void CCultivateLayer::showGetMoneyHeapEffectCallBack()
 
 	CCString *str = CCString::createWithFormat(GETLANGSTR(255), m_iCurrentGetMoney);
 	ShowPopTextTip(str->getCString());
-	waitTime();
+	//waitTime();
 	CProgressBar *prostro = (CProgressBar*)(m_ui->findWidgetById("ProgressSto"));
 	prostro->startProgress(0, 0.3f);
 	CLabel* pLabel = (CLabel*)m_ui->findWidgetById("storLab");
@@ -519,6 +530,8 @@ void CCultivateLayer::showGetMoneyHeapEffectCallBack()
 	m_bAddMoneyScheduleLock = false;
 
 	m_iNow = 0;
+	m_iBase = 0;
+	updateGetMoneyButtonStatus();
 }
 
 void CCultivateLayer::showGiftWave( CCString* pStr, CCPoint pBasePos, CCPoint pAimPos )
@@ -567,16 +580,34 @@ void CCultivateLayer::updateLabel( float dt )
 
 	//进来界面后，开采了多少
 	int iAdd = m_fCultivateTime*m_fSpeed/3600;
-	iAdd += m_iNow;
+	m_iNow = iAdd + m_iBase;
 
 	//开采量/总量
 	CLabel *storge = (CLabel*)(m_ui->findWidgetById("storLab"));
-	CCString *str = CCString::createWithFormat("%d/%d", iAdd, m_iMax);
+	CCString *str = CCString::createWithFormat("%d/%d", m_iNow, m_iMax);
 	storge->setString(str->getCString());
 
 	//开采进度条
 	CProgressBar *proStorge = (CProgressBar*)(m_ui->findWidgetById("ProgressSto"));
-	proStorge->startProgress(iAdd, 0.2f);
+	proStorge->startProgress(m_iNow, 0.2f);
 
+	updateGetMoneyButtonStatus();
+}
+
+void CCultivateLayer::updateGetMoneyButtonStatus()
+{
+	CButton* pBtn = (CButton*)m_ui->getChildByTag(5);
+	if(m_iNow>0 && m_second<=0)
+	{
+		//按钮可按，正常状态
+		pBtn->setEnabled(true);
+		pBtn->getDisabledImage()->setShaderProgram(ShaderDataMgr->getShaderByType(ShaderDefault));
+	}
+	else
+	{
+		//按钮不可按, 变灰
+		pBtn->setEnabled(false);
+		pBtn->getDisabledImage()->setShaderProgram(ShaderDataMgr->getShaderByType(ShaderStone));
+	}
 }
 

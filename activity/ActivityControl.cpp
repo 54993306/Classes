@@ -36,10 +36,14 @@ void CActivityControl::askForActList( int iType )
 	delete req;
 }
 
-void CActivityControl::askForBuyGift( int iId )
+void CActivityControl::askForBuyGift( int iId, int iExId/*=0*/ )
 {
 	BuyGiftReq *req = new BuyGiftReq;
 	req->set_actid(iId);
+	if(iExId>0)
+	{
+		req->set_exid(iExId);
+	}
 	GetTcpNet->sendData(req, BuyGiftMsg);
 	delete req;
 }

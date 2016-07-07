@@ -25,6 +25,11 @@ public:
     void onClose(CCObject* pSender);
     void onExit();
 	void updateHeroAttr(CHero* hero);	
+
+	void showExpTip(bool hasExp);
+
+	void showEvolveTip(bool isEvol);
+
 	void showBaseInfo(CHero* hero);
 
 	void showArmor(CHero* hero);
@@ -47,6 +52,8 @@ public:
 
 	void compaseSuccess(CCObject* pObj);
 	void updateStarRank(CHero* hero);
+	void showSkillTip(bool hasSkill);
+
 protected:
 	void onSelectHero(CCObject *pSender);
 	void onSelectItem(CCObject *pSender);
@@ -80,6 +87,7 @@ private:
 	//更新滑动区域
 	void updateShowInfoScroll();
 
+	void SpineComplete( int trackIndex,int loopCount );
 private:
 	CLayout *m_ui;
 	CHero *m_selectHero;
@@ -90,7 +98,7 @@ private:
 	vector<int> m_VecMode;
 
 	bool m_bIsToLeft;
-	CCArmature* m_pArmature;
+	CCNode* m_pAnimationNode;
 	CHeroBodyShowData* m_heroBodyShowdData;
 
 	CHero* m_pHeroTemporary;

@@ -172,6 +172,13 @@ class Role : public ::google::protobuf::Message {
   inline ::google::protobuf::int32 nextexp() const;
   inline void set_nextexp(::google::protobuf::int32 value);
 
+  // optional int32 roleMoney = 6;
+  inline bool has_rolemoney() const;
+  inline void clear_rolemoney();
+  static const int kRoleMoneyFieldNumber = 6;
+  inline ::google::protobuf::int32 rolemoney() const;
+  inline void set_rolemoney(::google::protobuf::int32 value);
+
   // optional int32 roleCoin = 11;
   inline bool has_rolecoin() const;
   inline void clear_rolecoin();
@@ -199,6 +206,13 @@ class Role : public ::google::protobuf::Message {
   static const int kRoleFCoinFieldNumber = 18;
   inline ::google::protobuf::int32 rolefcoin() const;
   inline void set_rolefcoin(::google::protobuf::int32 value);
+
+  // optional int32 rolePoints = 22;
+  inline bool has_rolepoints() const;
+  inline void clear_rolepoints();
+  static const int kRolePointsFieldNumber = 22;
+  inline ::google::protobuf::int32 rolepoints() const;
+  inline void set_rolepoints(::google::protobuf::int32 value);
 
   // optional int32 roleAction = 13;
   inline bool has_roleaction() const;
@@ -256,6 +270,13 @@ class Role : public ::google::protobuf::Message {
   inline bool firstlogin() const;
   inline void set_firstlogin(bool value);
 
+  // optional bool gooleBilling = 28;
+  inline bool has_goolebilling() const;
+  inline void clear_goolebilling();
+  static const int kGooleBillingFieldNumber = 28;
+  inline bool goolebilling() const;
+  inline void set_goolebilling(bool value);
+
   // @@protoc_insertion_point(class_scope:protos.common.Role)
  private:
   inline void set_has_roleid();
@@ -278,6 +299,8 @@ class Role : public ::google::protobuf::Message {
   inline void clear_has_roleexp();
   inline void set_has_nextexp();
   inline void clear_has_nextexp();
+  inline void set_has_rolemoney();
+  inline void clear_has_rolemoney();
   inline void set_has_rolecoin();
   inline void clear_has_rolecoin();
   inline void set_has_rolegold();
@@ -286,6 +309,8 @@ class Role : public ::google::protobuf::Message {
   inline void clear_has_rolefood();
   inline void set_has_rolefcoin();
   inline void clear_has_rolefcoin();
+  inline void set_has_rolepoints();
+  inline void clear_has_rolepoints();
   inline void set_has_roleaction();
   inline void clear_has_roleaction();
   inline void set_has_actionlimit();
@@ -302,6 +327,8 @@ class Role : public ::google::protobuf::Message {
   inline void clear_has_invitefriend();
   inline void set_has_firstlogin();
   inline void clear_has_firstlogin();
+  inline void set_has_goolebilling();
+  inline void clear_has_goolebilling();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
@@ -315,10 +342,12 @@ class Role : public ::google::protobuf::Message {
   ::std::string* fbid_;
   ::google::protobuf::int32 roleexp_;
   ::google::protobuf::int32 nextexp_;
+  ::google::protobuf::int32 rolemoney_;
   ::google::protobuf::int32 rolecoin_;
   ::google::protobuf::int32 rolegold_;
   ::google::protobuf::int32 rolefood_;
   ::google::protobuf::int32 rolefcoin_;
+  ::google::protobuf::int32 rolepoints_;
   ::google::protobuf::int32 roleaction_;
   ::google::protobuf::int32 actionlimit_;
   ::google::protobuf::uint64 actiontime_;
@@ -327,9 +356,10 @@ class Role : public ::google::protobuf::Message {
   ::google::protobuf::int32 invitefriend_;
   bool mobileshop_;
   bool firstlogin_;
+  bool goolebilling_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(22 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(25 + 31) / 32];
 
   friend void  protobuf_AddDesc_common_2frole_5fcommon_2eproto();
   friend void protobuf_AssignDesc_common_2frole_5fcommon_2eproto();
@@ -661,15 +691,37 @@ inline void Role::set_nextexp(::google::protobuf::int32 value) {
   nextexp_ = value;
 }
 
-// optional int32 roleCoin = 11;
-inline bool Role::has_rolecoin() const {
+// optional int32 roleMoney = 6;
+inline bool Role::has_rolemoney() const {
   return (_has_bits_[0] & 0x00000400u) != 0;
 }
-inline void Role::set_has_rolecoin() {
+inline void Role::set_has_rolemoney() {
   _has_bits_[0] |= 0x00000400u;
 }
-inline void Role::clear_has_rolecoin() {
+inline void Role::clear_has_rolemoney() {
   _has_bits_[0] &= ~0x00000400u;
+}
+inline void Role::clear_rolemoney() {
+  rolemoney_ = 0;
+  clear_has_rolemoney();
+}
+inline ::google::protobuf::int32 Role::rolemoney() const {
+  return rolemoney_;
+}
+inline void Role::set_rolemoney(::google::protobuf::int32 value) {
+  set_has_rolemoney();
+  rolemoney_ = value;
+}
+
+// optional int32 roleCoin = 11;
+inline bool Role::has_rolecoin() const {
+  return (_has_bits_[0] & 0x00000800u) != 0;
+}
+inline void Role::set_has_rolecoin() {
+  _has_bits_[0] |= 0x00000800u;
+}
+inline void Role::clear_has_rolecoin() {
+  _has_bits_[0] &= ~0x00000800u;
 }
 inline void Role::clear_rolecoin() {
   rolecoin_ = 0;
@@ -685,13 +737,13 @@ inline void Role::set_rolecoin(::google::protobuf::int32 value) {
 
 // optional int32 roleGold = 14;
 inline bool Role::has_rolegold() const {
-  return (_has_bits_[0] & 0x00000800u) != 0;
+  return (_has_bits_[0] & 0x00001000u) != 0;
 }
 inline void Role::set_has_rolegold() {
-  _has_bits_[0] |= 0x00000800u;
+  _has_bits_[0] |= 0x00001000u;
 }
 inline void Role::clear_has_rolegold() {
-  _has_bits_[0] &= ~0x00000800u;
+  _has_bits_[0] &= ~0x00001000u;
 }
 inline void Role::clear_rolegold() {
   rolegold_ = 0;
@@ -707,13 +759,13 @@ inline void Role::set_rolegold(::google::protobuf::int32 value) {
 
 // optional int32 roleFood = 15;
 inline bool Role::has_rolefood() const {
-  return (_has_bits_[0] & 0x00001000u) != 0;
+  return (_has_bits_[0] & 0x00002000u) != 0;
 }
 inline void Role::set_has_rolefood() {
-  _has_bits_[0] |= 0x00001000u;
+  _has_bits_[0] |= 0x00002000u;
 }
 inline void Role::clear_has_rolefood() {
-  _has_bits_[0] &= ~0x00001000u;
+  _has_bits_[0] &= ~0x00002000u;
 }
 inline void Role::clear_rolefood() {
   rolefood_ = 0;
@@ -729,13 +781,13 @@ inline void Role::set_rolefood(::google::protobuf::int32 value) {
 
 // optional int32 roleFCoin = 18;
 inline bool Role::has_rolefcoin() const {
-  return (_has_bits_[0] & 0x00002000u) != 0;
+  return (_has_bits_[0] & 0x00004000u) != 0;
 }
 inline void Role::set_has_rolefcoin() {
-  _has_bits_[0] |= 0x00002000u;
+  _has_bits_[0] |= 0x00004000u;
 }
 inline void Role::clear_has_rolefcoin() {
-  _has_bits_[0] &= ~0x00002000u;
+  _has_bits_[0] &= ~0x00004000u;
 }
 inline void Role::clear_rolefcoin() {
   rolefcoin_ = 0;
@@ -749,15 +801,37 @@ inline void Role::set_rolefcoin(::google::protobuf::int32 value) {
   rolefcoin_ = value;
 }
 
+// optional int32 rolePoints = 22;
+inline bool Role::has_rolepoints() const {
+  return (_has_bits_[0] & 0x00008000u) != 0;
+}
+inline void Role::set_has_rolepoints() {
+  _has_bits_[0] |= 0x00008000u;
+}
+inline void Role::clear_has_rolepoints() {
+  _has_bits_[0] &= ~0x00008000u;
+}
+inline void Role::clear_rolepoints() {
+  rolepoints_ = 0;
+  clear_has_rolepoints();
+}
+inline ::google::protobuf::int32 Role::rolepoints() const {
+  return rolepoints_;
+}
+inline void Role::set_rolepoints(::google::protobuf::int32 value) {
+  set_has_rolepoints();
+  rolepoints_ = value;
+}
+
 // optional int32 roleAction = 13;
 inline bool Role::has_roleaction() const {
-  return (_has_bits_[0] & 0x00004000u) != 0;
+  return (_has_bits_[0] & 0x00010000u) != 0;
 }
 inline void Role::set_has_roleaction() {
-  _has_bits_[0] |= 0x00004000u;
+  _has_bits_[0] |= 0x00010000u;
 }
 inline void Role::clear_has_roleaction() {
-  _has_bits_[0] &= ~0x00004000u;
+  _has_bits_[0] &= ~0x00010000u;
 }
 inline void Role::clear_roleaction() {
   roleaction_ = 0;
@@ -773,13 +847,13 @@ inline void Role::set_roleaction(::google::protobuf::int32 value) {
 
 // optional int32 actionLimit = 19;
 inline bool Role::has_actionlimit() const {
-  return (_has_bits_[0] & 0x00008000u) != 0;
+  return (_has_bits_[0] & 0x00020000u) != 0;
 }
 inline void Role::set_has_actionlimit() {
-  _has_bits_[0] |= 0x00008000u;
+  _has_bits_[0] |= 0x00020000u;
 }
 inline void Role::clear_has_actionlimit() {
-  _has_bits_[0] &= ~0x00008000u;
+  _has_bits_[0] &= ~0x00020000u;
 }
 inline void Role::clear_actionlimit() {
   actionlimit_ = 0;
@@ -795,13 +869,13 @@ inline void Role::set_actionlimit(::google::protobuf::int32 value) {
 
 // optional fixed64 actionTime = 21;
 inline bool Role::has_actiontime() const {
-  return (_has_bits_[0] & 0x00010000u) != 0;
+  return (_has_bits_[0] & 0x00040000u) != 0;
 }
 inline void Role::set_has_actiontime() {
-  _has_bits_[0] |= 0x00010000u;
+  _has_bits_[0] |= 0x00040000u;
 }
 inline void Role::clear_has_actiontime() {
-  _has_bits_[0] &= ~0x00010000u;
+  _has_bits_[0] &= ~0x00040000u;
 }
 inline void Role::clear_actiontime() {
   actiontime_ = GOOGLE_ULONGLONG(0);
@@ -817,13 +891,13 @@ inline void Role::set_actiontime(::google::protobuf::uint64 value) {
 
 // optional int32 interval = 23;
 inline bool Role::has_interval() const {
-  return (_has_bits_[0] & 0x00020000u) != 0;
+  return (_has_bits_[0] & 0x00080000u) != 0;
 }
 inline void Role::set_has_interval() {
-  _has_bits_[0] |= 0x00020000u;
+  _has_bits_[0] |= 0x00080000u;
 }
 inline void Role::clear_has_interval() {
-  _has_bits_[0] &= ~0x00020000u;
+  _has_bits_[0] &= ~0x00080000u;
 }
 inline void Role::clear_interval() {
   interval_ = 0;
@@ -839,13 +913,13 @@ inline void Role::set_interval(::google::protobuf::int32 value) {
 
 // optional int32 newerStep = 24;
 inline bool Role::has_newerstep() const {
-  return (_has_bits_[0] & 0x00040000u) != 0;
+  return (_has_bits_[0] & 0x00100000u) != 0;
 }
 inline void Role::set_has_newerstep() {
-  _has_bits_[0] |= 0x00040000u;
+  _has_bits_[0] |= 0x00100000u;
 }
 inline void Role::clear_has_newerstep() {
-  _has_bits_[0] &= ~0x00040000u;
+  _has_bits_[0] &= ~0x00100000u;
 }
 inline void Role::clear_newerstep() {
   newerstep_ = 0;
@@ -861,13 +935,13 @@ inline void Role::set_newerstep(::google::protobuf::int32 value) {
 
 // optional bool mobileShop = 25;
 inline bool Role::has_mobileshop() const {
-  return (_has_bits_[0] & 0x00080000u) != 0;
+  return (_has_bits_[0] & 0x00200000u) != 0;
 }
 inline void Role::set_has_mobileshop() {
-  _has_bits_[0] |= 0x00080000u;
+  _has_bits_[0] |= 0x00200000u;
 }
 inline void Role::clear_has_mobileshop() {
-  _has_bits_[0] &= ~0x00080000u;
+  _has_bits_[0] &= ~0x00200000u;
 }
 inline void Role::clear_mobileshop() {
   mobileshop_ = false;
@@ -883,13 +957,13 @@ inline void Role::set_mobileshop(bool value) {
 
 // optional int32 inviteFriend = 26;
 inline bool Role::has_invitefriend() const {
-  return (_has_bits_[0] & 0x00100000u) != 0;
+  return (_has_bits_[0] & 0x00400000u) != 0;
 }
 inline void Role::set_has_invitefriend() {
-  _has_bits_[0] |= 0x00100000u;
+  _has_bits_[0] |= 0x00400000u;
 }
 inline void Role::clear_has_invitefriend() {
-  _has_bits_[0] &= ~0x00100000u;
+  _has_bits_[0] &= ~0x00400000u;
 }
 inline void Role::clear_invitefriend() {
   invitefriend_ = 0;
@@ -905,13 +979,13 @@ inline void Role::set_invitefriend(::google::protobuf::int32 value) {
 
 // optional bool firstLogin = 27;
 inline bool Role::has_firstlogin() const {
-  return (_has_bits_[0] & 0x00200000u) != 0;
+  return (_has_bits_[0] & 0x00800000u) != 0;
 }
 inline void Role::set_has_firstlogin() {
-  _has_bits_[0] |= 0x00200000u;
+  _has_bits_[0] |= 0x00800000u;
 }
 inline void Role::clear_has_firstlogin() {
-  _has_bits_[0] &= ~0x00200000u;
+  _has_bits_[0] &= ~0x00800000u;
 }
 inline void Role::clear_firstlogin() {
   firstlogin_ = false;
@@ -923,6 +997,28 @@ inline bool Role::firstlogin() const {
 inline void Role::set_firstlogin(bool value) {
   set_has_firstlogin();
   firstlogin_ = value;
+}
+
+// optional bool gooleBilling = 28;
+inline bool Role::has_goolebilling() const {
+  return (_has_bits_[0] & 0x01000000u) != 0;
+}
+inline void Role::set_has_goolebilling() {
+  _has_bits_[0] |= 0x01000000u;
+}
+inline void Role::clear_has_goolebilling() {
+  _has_bits_[0] &= ~0x01000000u;
+}
+inline void Role::clear_goolebilling() {
+  goolebilling_ = false;
+  clear_has_goolebilling();
+}
+inline bool Role::goolebilling() const {
+  return goolebilling_;
+}
+inline void Role::set_goolebilling(bool value) {
+  set_has_goolebilling();
+  goolebilling_ = value;
 }
 
 

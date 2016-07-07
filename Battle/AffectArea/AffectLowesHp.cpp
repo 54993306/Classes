@@ -18,15 +18,15 @@
 namespace BattleSpace
 {
 	//血量最少目标
-	AffectType AffectLowesHp::getAreaType()
+	sAffectType AffectLowesHp::getAreaType()
 	{
-		return AffectType::eLowestHp;
+		return sAffectType::eLowestHp;
 	}
 
 	void AffectLowesHp::initArea(AreaCountInfo& pInfo)
 	{
 		vector<BaseRole*>* tAlives = pInfo.getAlive()->getSkillTargets();
-		VectorSortAliveHp(*tAlives);
+		SortRoleHp(*tAlives);
 		if (pInfo.getAreaRange() >= tAlives->size())
 		{
 			for(auto i:*tAlives)
@@ -44,9 +44,9 @@ namespace BattleSpace
 	/***************************************************************************/
 
 	//血量最少目标除主帅外
-	AffectType AffectLowesHpUnCaptain::getAreaType()
+	sAffectType AffectLowesHpUnCaptain::getAreaType()
 	{
-		return AffectType::eLowestHpUnCaptain;
+		return sAffectType::eLowestHpUnCaptain;
 	}
 
 	void AffectLowesHpUnCaptain::initArea(AreaCountInfo& pInfo)

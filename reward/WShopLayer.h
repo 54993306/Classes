@@ -1,5 +1,10 @@
 ﻿#pragma once
-
+/******************************************************
+*文件名称:	WShopLayer.h
+*编写日期:	2016-6-12-18:32
+*编写作者:	YPF
+*功能描述:	世界BOSS商店界面
+*******************************************************/
 #include "AppUI.h"
 #include "scene/layer/LayerManager.h"
 #include "net/CNetClient.h"
@@ -25,6 +30,7 @@ public:
 	void onBuyItem(CCObject* pSender);
 	void onComfirmUpdate(CCObject* pSender);
 	void updateItemList(vector<CItem>& itemList);
+	void loadUiByType(int type);
 private:
 	CLayout* m_ui;
 	CGridPageView *m_pageView;

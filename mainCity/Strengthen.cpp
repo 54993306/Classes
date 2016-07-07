@@ -105,6 +105,16 @@ void CStrengthen::onSwitchBtn(CCObject *pSender, bool bChecked)
 
 		int iTag = btn->getTag();
 		m_iType = (StrengthenType)iTag;
+
+		//换标题
+		CImageView* pTitle = (CImageView*)m_pUi->findWidgetById("title");
+		CCString* pStr = CCString::createWithFormat("title/strengthen_%d.png", m_iType);
+		std::string sFullPath = CCFileUtils::sharedFileUtils()->fullPathForFilename(pStr->getCString());
+		if(CCFileUtils::sharedFileUtils()->isFileExist(sFullPath))
+		{
+			pTitle->setTexture(CCTextureCache::sharedTextureCache()->addImage(sFullPath.c_str()));
+		}
+
 		switch (m_iType)
 		{
 			//强化
@@ -181,6 +191,6 @@ void CStrengthen::changeToStrengthenWithType( StrengthenType iType )
 	for(unsigned int i=0; i<3; i++)
 	{
 		CRadioButton* pRadioButton = (CRadioButton*)(radioGroup->getChildByTag(i+1));
-		radioGroup->selectButton(pRadioButton, i==iType);
+		radioGroup->selectButton(pRadioButton, i+1==iType);
 	}
 }

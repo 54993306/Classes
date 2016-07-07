@@ -8,35 +8,13 @@
 #include "Battle/RoleSkill.h"
 #include "Battle/BaseRoleData.h"
 #include "Battle/skEffectData.h"
-namespace BattleSpace{
+namespace BattleSpace
+{
 
-	CaptainSkill::CaptainSkill(){}
-
-	CaptainSkill::~CaptainSkill(){}
-
-	CaptainSkill* CaptainSkill::create()
-	{
-		CaptainSkill* pRec = new CaptainSkill();
-		if (pRec && pRec->init())
-		{
-			pRec->autorelease();
-			return pRec;
-		}else{
-			delete pRec;
-			pRec = NULL;
-			return NULL;
-		}
-	}
-
-	bool CaptainSkill::init()
-	{
-		return true;
-	}
-
-	void CaptainSkill::ExecuteCaptainSkill()
+	void CaptainSkill::ExecuteSkill()
 	{
 		BaseRole* alive  = DataCenter::sharedData()->getWar()->getAliveByGrid(C_CAPTAINGRID);
-		CCArray* arr = DataCenter::sharedData()->getWar()->getAlivesByCamp(false,true);
+		CCArray* arr = DataCenter::sharedData()->getWar()->getHeros(true);
 		if (!alive||!arr||alive->getBaseData()->hasCaptainSkill())
 			return;
 		const RoleSkill* skill = alive->getBaseData()->getCaptainSkill();							//需同时满足种族限制且满足属性限制
@@ -115,15 +93,15 @@ namespace BattleSpace{
 					{
 						if (!type)
 						{
-							type = alive->getBaseData()->getRoleType();
+							type = alive->getBaseData()->getProperty();
 							continue;
 						}
-						type2 = alive->getBaseData()->getRoleType();
+						type2 = alive->getBaseData()->getProperty();
 						continue;
 					}
 					if (type&&type2)
 					{
-						if (alive->getBaseData()->getRoleType() != type&&alive->getBaseData()->getRoleType()!=type2)
+						if (alive->getBaseData()->getProperty() != type&&alive->getBaseData()->getProperty()!=type2)
 						{
 							aliveArr = arr;
 							break;
@@ -160,10 +138,10 @@ namespace BattleSpace{
 			if (alive->getExecuteCap())continue;
 			if (exclude)
 			{
-				if (alive->getBaseData()->getRoleType() == type)continue;
+				if (alive->getBaseData()->getProperty() == type)continue;
 				targetArr->addObject(obj);
 			}else{
-				if (alive->getBaseData()->getRoleType() != type)continue;
+				if (alive->getBaseData()->getProperty() != type)continue;
 				targetArr->addObject(obj);
 			}
 		}
@@ -176,10 +154,10 @@ namespace BattleSpace{
 			BaseRole* alive = (BaseRole*)obj;
 			if (!secondType)
 			{
-				secondType = alive->getBaseData()->getRoleType();
+				secondType = alive->getBaseData()->getProperty();
 				continue;
 			}
-			if (secondType&&secondType!=alive->getBaseData()->getRoleType())
+			if (secondType&&secondType!=alive->getBaseData()->getProperty())
 			{
 				fail = false;
 				break;
@@ -204,51 +182,52 @@ namespace BattleSpace{
 	//属性判定
 	bool CaptainSkill::AttributeJudge(BaseRole* alive,int type,int rate)
 	{
-		switch (type)
+		switch ((sAttribute)type)
 		{
-		case allAtb: { return true; }
-		case DefRate:		//除去NedHpRate是少于规定触发外其他都是进入战斗立马处理，扣减完后触发队长技处理
+		case sAttribute::eNull:
+			{
+				return true;
+			}break;
+		case sAttribute::DefRate:		//除去NedHpRate是少于规定触发外其他都是进入战斗立马处理，扣减完后触发队长技处理
 			{ 
 				alive->setDef(alive->getBaseData()->getRoleDefense()*rate*0.01f);
 				return true;	
 			}break;
-		case AtkRate:		
+		case sAttribute::AtkRate:		
 			{ 
 				alive->setAtk(alive->getBaseData()->getRoleAttack()*rate*0.01f);			
 				return true;	
 			}break;
-		case NedHpRate:			//血量少于某值触发效果
+		case sAttribute::NedHpRate:			//血量少于某值触发效果
 			{ 
 				if (alive->getHp() <= alive->getBaseData()->getRoleHp()*rate*0.01f)
 					return true;	
 			}break;
-		case RenewRate:		
+		case sAttribute::RenewRate:		
 			{ 
 				alive->setRenew(alive->getBaseData()->getRoleRegain()*rate*0.01f);
 				return true;	
 			}break;
-		case DogeRate:		
+		case sAttribute::DogeRate:		
 			{ 
 				alive->setDoge(alive->getBaseData()->getRoleDodge()*rate*0.01f);	
 				return true;	
 			}break;
-		case HitRate:		
+		case sAttribute::HitRate:		
 			{ 
 				alive->setHit(alive->getBaseData()->getRoleHit()*rate*0.01f);		
 				return true;	
 			}break;
-		case CritRate:		
+		case sAttribute::CritRate:		
 			{ 
 				if (alive->getCrit() >= alive->getBaseData()->getRoleCrit()*rate*0.01f)			
 					return true;	
 			}break;
-		case HpMaxRate:		
+		case sAttribute::HpMaxRate:		
 			{ 
 				alive->setHp(alive->getBaseData()->getRoleHp()*rate*0.01f);				
 				return true;	
 			}break;
-		default:
-			break;
 		}
 		return false;
 	}
@@ -392,35 +371,35 @@ namespace BattleSpace{
 	{
 		switch (pEffect->getImpactType())
 		{
-		case DefRate:
+		case sAttribute::DefRate:
 			{
 				pAlive->setDef(pAlive->getDef()+(pAlive->getBaseData()->getRoleDefense() * (pEffect->getImpactRate()*0.01f-1)));
 			}break;
-		case AtkRate:
+		case sAttribute::AtkRate:
 			{
 				pAlive->setAtk(pAlive->getAtk()+(pAlive->getBaseData()->getRoleAttack() * (pEffect->getImpactRate()*0.01f-1)));
 			}break;
-		case AgilityRate:
+		case sAttribute::AgilityRate:
 			{
 				pAlive->setAtkInterval(pAlive->getAtkInterval()+(pEffect->getImpactRate()*0.01f-1)*pAlive->getBaseData()->getAttackSpeed());
 			}break;
-		case RenewRate:
+		case sAttribute::RenewRate:
 			{
 				pAlive->setRenew(pAlive->getRenew()+(pAlive->getBaseData()->getRoleRegain() * (pEffect->getImpactRate()*0.01f-1)));
 			}break;
-		case DogeRate:
+		case sAttribute::DogeRate:
 			{
 				pAlive->setDoge(pAlive->getDoge() + (pAlive->getBaseData()->getRoleDodge() * (pEffect->getImpactRate()*0.01f-1)));
 			}break;
-		case HitRate:
+		case sAttribute::HitRate:
 			{
 				pAlive->setHit(pAlive->getHit() + (pAlive->getBaseData()->getRoleHit() * (pEffect->getImpactRate()*0.01f-1)));
 			}break;
-		case CritRate:
+		case sAttribute::CritRate:
 			{
 				pAlive->setCrit(pAlive->getCrit() + (pAlive->getBaseData()->getRoleCrit() * (pEffect->getImpactRate()*0.01f-1)));
 			}break;
-		case HpMaxRate:
+		case sAttribute::HpMaxRate:
 			{
 				pAlive->setMaxHp(pAlive->getMaxHp()+(pAlive->getBaseData()->getRoleHp() * (pEffect->getImpactRate()*0.01f-1)));
 				pAlive->setHp(pAlive->getMaxHp());

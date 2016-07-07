@@ -38,7 +38,7 @@ void protobuf_AssignDesc_common_2fitem_5fcommon_2eproto() {
       "common/item_common.proto");
   GOOGLE_CHECK(file != NULL);
   Item_descriptor_ = file->message_type(0);
-  static const int Item_offsets_[23] = {
+  static const int Item_offsets_[22] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Item, id_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Item, itemid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Item, itemname_),
@@ -55,7 +55,6 @@ void protobuf_AssignDesc_common_2fitem_5fcommon_2eproto() {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Item, gridnum_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Item, armor_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Item, prop_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Item, soul_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Item, thumb_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Item, param_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Item, canuse_),
@@ -125,26 +124,23 @@ void protobuf_AddDesc_common_2fitem_5fcommon_2eproto() {
 
   ::protos::common::protobuf_AddDesc_common_2farmor_5fcommon_2eproto();
   ::protos::common::protobuf_AddDesc_common_2fprop_5fcommon_2eproto();
-  ::protos::common::protobuf_AddDesc_common_2fsoul_5fcommon_2eproto();
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
     "\n\030common/item_common.proto\022\rprotos.commo"
     "n\032\031common/armor_common.proto\032\030common/pro"
-    "p_common.proto\032\030common/soul_common.proto"
-    "\"\330\003\n\004Item\022\n\n\002id\030\001 \001(\005\022\016\n\006itemId\030\002 \001(\005\022\020\n"
-    "\010itemName\030\003 \001(\t\022\020\n\010itemType\030\004 \001(\005\022\020\n\010use"
-    "Level\030\005 \001(\005\022\021\n\tmoneyType\030\006 \001(\005\022\020\n\010buyPri"
-    "ce\030\007 \001(\005\022\021\n\tsellPrice\030\010 \001(\005\022\017\n\007quality\030\t"
-    " \001(\005\022\021\n\titemLevel\030\020 \001(\005\022\017\n\007useTime\030\n \001(\006"
-    "\022\020\n\010loseTime\030\013 \001(\006\022\017\n\007itemNum\030\014 \001(\005\022\017\n\007g"
-    "ridNum\030\r \001(\005\022#\n\005armor\030\016 \001(\0132\024.protos.com"
-    "mon.Armor\022!\n\004prop\030\017 \001(\0132\023.protos.common."
-    "Prop\022!\n\004soul\030\021 \001(\0132\023.protos.common.Soul\022"
-    "\r\n\005thumb\030\023 \001(\005\022\r\n\005param\030\022 \001(\005\022\016\n\006canUse\030"
-    "\024 \001(\010\022\'\n\005drops\030\025 \003(\0132\030.protos.common.Dro"
-    "pStage\022\r\n\005stren\030\026 \001(\010\022\014\n\004star\030\027 \001(\005\"*\n\tD"
-    "ropStage\022\017\n\007stageId\030\001 \002(\005\022\014\n\004open\030\002 \002(\010B"
-    "4\n$dass.server.gameserver.protos.commonB"
-    "\nItemCommonH\001", 693);
+    "p_common.proto\"\265\003\n\004Item\022\n\n\002id\030\001 \001(\005\022\016\n\006i"
+    "temId\030\002 \001(\005\022\020\n\010itemName\030\003 \001(\t\022\020\n\010itemTyp"
+    "e\030\004 \001(\005\022\020\n\010useLevel\030\005 \001(\005\022\021\n\tmoneyType\030\006"
+    " \001(\005\022\020\n\010buyPrice\030\007 \001(\005\022\021\n\tsellPrice\030\010 \001("
+    "\005\022\017\n\007quality\030\t \001(\005\022\021\n\titemLevel\030\020 \001(\005\022\017\n"
+    "\007useTime\030\n \001(\006\022\020\n\010loseTime\030\013 \001(\006\022\017\n\007item"
+    "Num\030\014 \001(\005\022\017\n\007gridNum\030\r \001(\005\022#\n\005armor\030\016 \001("
+    "\0132\024.protos.common.Armor\022!\n\004prop\030\017 \001(\0132\023."
+    "protos.common.Prop\022\r\n\005thumb\030\023 \001(\005\022\r\n\005par"
+    "am\030\022 \001(\005\022\016\n\006canUse\030\024 \001(\010\022\'\n\005drops\030\025 \003(\0132"
+    "\030.protos.common.DropStage\022\r\n\005stren\030\026 \001(\010"
+    "\022\014\n\004star\030\027 \001(\005\"*\n\tDropStage\022\017\n\007stageId\030\001"
+    " \002(\005\022\014\n\004open\030\002 \002(\010B4\n$dass.server.gamese"
+    "rver.protos.commonB\nItemCommonH\001", 632);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "common/item_common.proto", &protobuf_RegisterTypes);
   Item::default_instance_ = new Item();
@@ -180,7 +176,6 @@ const int Item::kItemNumFieldNumber;
 const int Item::kGridNumFieldNumber;
 const int Item::kArmorFieldNumber;
 const int Item::kPropFieldNumber;
-const int Item::kSoulFieldNumber;
 const int Item::kThumbFieldNumber;
 const int Item::kParamFieldNumber;
 const int Item::kCanUseFieldNumber;
@@ -197,7 +192,6 @@ Item::Item()
 void Item::InitAsDefaultInstance() {
   armor_ = const_cast< ::protos::common::Armor*>(&::protos::common::Armor::default_instance());
   prop_ = const_cast< ::protos::common::Prop*>(&::protos::common::Prop::default_instance());
-  soul_ = const_cast< ::protos::common::Soul*>(&::protos::common::Soul::default_instance());
 }
 
 Item::Item(const Item& from)
@@ -224,7 +218,6 @@ void Item::SharedCtor() {
   gridnum_ = 0;
   armor_ = NULL;
   prop_ = NULL;
-  soul_ = NULL;
   thumb_ = 0;
   param_ = 0;
   canuse_ = false;
@@ -244,7 +237,6 @@ void Item::SharedDtor() {
   if (this != default_instance_) {
     delete armor_;
     delete prop_;
-    delete soul_;
   }
 }
 
@@ -299,9 +291,6 @@ void Item::Clear() {
     }
   }
   if (_has_bits_[16 / 32] & (0xffu << (16 % 32))) {
-    if (has_soul()) {
-      if (soul_ != NULL) soul_->::protos::common::Soul::Clear();
-    }
     thumb_ = 0;
     param_ = 0;
     canuse_ = false;
@@ -567,20 +556,6 @@ bool Item::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(138)) goto parse_soul;
-        break;
-      }
-
-      // optional .protos.common.Soul soul = 17;
-      case 17: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
-         parse_soul:
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
-               input, mutable_soul()));
-        } else {
-          goto handle_uninterpreted;
-        }
         if (input->ExpectTag(144)) goto parse_param;
         break;
       }
@@ -784,12 +759,6 @@ void Item::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt32(16, this->itemlevel(), output);
   }
 
-  // optional .protos.common.Soul soul = 17;
-  if (has_soul()) {
-    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      17, this->soul(), output);
-  }
-
   // optional int32 param = 18;
   if (has_param()) {
     ::google::protobuf::internal::WireFormatLite::WriteInt32(18, this->param(), output);
@@ -916,13 +885,6 @@ void Item::SerializeWithCachedSizes(
   // optional int32 itemLevel = 16;
   if (has_itemlevel()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(16, this->itemlevel(), target);
-  }
-
-  // optional .protos.common.Soul soul = 17;
-  if (has_soul()) {
-    target = ::google::protobuf::internal::WireFormatLite::
-      WriteMessageNoVirtualToArray(
-        17, this->soul(), target);
   }
 
   // optional int32 param = 18;
@@ -1080,13 +1042,6 @@ int Item::ByteSize() const {
 
   }
   if (_has_bits_[16 / 32] & (0xffu << (16 % 32))) {
-    // optional .protos.common.Soul soul = 17;
-    if (has_soul()) {
-      total_size += 2 +
-        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
-          this->soul());
-    }
-
     // optional int32 thumb = 19;
     if (has_thumb()) {
       total_size += 2 +
@@ -1206,9 +1161,6 @@ void Item::MergeFrom(const Item& from) {
     }
   }
   if (from._has_bits_[16 / 32] & (0xffu << (16 % 32))) {
-    if (from.has_soul()) {
-      mutable_soul()->::protos::common::Soul::MergeFrom(from.soul());
-    }
     if (from.has_thumb()) {
       set_thumb(from.thumb());
     }
@@ -1266,7 +1218,6 @@ void Item::Swap(Item* other) {
     std::swap(gridnum_, other->gridnum_);
     std::swap(armor_, other->armor_);
     std::swap(prop_, other->prop_);
-    std::swap(soul_, other->soul_);
     std::swap(thumb_, other->thumb_);
     std::swap(param_, other->param_);
     std::swap(canuse_, other->canuse_);

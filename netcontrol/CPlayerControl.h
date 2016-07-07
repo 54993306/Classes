@@ -6,6 +6,12 @@
 
 using namespace protos;
 using namespace protos::common;
+
+namespace protos
+{
+	class Member;
+}
+
 /************************************************************************/
 /*
 							接收处理玩家服务器消息
@@ -98,11 +104,21 @@ public:
 	void sendExchangeCode(const char* str);	
 	void sendItemInfo(int itemId);
 	void sendBuyCard(int cardId);
-	void sendBuyCardStep1(int iCardId, string sDeviceId, string sTel);
-	void sendBuyCardStep2(string sSmsCode);
+	void sendBuyMoneyCard(string cardId);
+	void sendBuyPhoneStep1(int money, string sDeviceId, string sTel);
+	void sendBuyPhoneStep2(string sSmsCode, int step);
 	void sendArmorList(int itemId,int mask=1);
 	void sendAccountBind(const char* strId);
-	void sendRank(int type);//排行榜类型(1 世界BOSS排行，2 战斗力排行)
+	void sendRank(int type);//排行榜类型(1 世界BOSS排行，2 战斗力排行)	
+	void sendCbExchange(string usrname, string pwd);
+	void sendSkillLvUp(int id, int skillId, int itemId);
+	//请求PVP队伍数据
+	void askForPvpTeamData();
+	void sendPvpTeamData(int iStatus, const vector<Member*> vec);
+
+	//请求挑战队伍数据
+	void askForPvpChallenge(bool bFirst=true);
+
 private:
 	CPlayerControl();
 	string m_bulletText;

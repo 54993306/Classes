@@ -24,7 +24,7 @@ namespace BattleSpace
 		AffectMapCenterTwoLine(){};
 		virtual ~AffectMapCenterTwoLine(){};
 		UNINITCREATE(AffectMapCenterTwoLine);
-		virtual AffectType getAreaType();
+		virtual sAffectType getAreaType();
 		virtual void initArea(AreaCountInfo &pInfo);
 		
 	};
@@ -38,7 +38,7 @@ namespace BattleSpace
 		AffectMapAnyDoubleLine(){};
 		virtual ~AffectMapAnyDoubleLine(){};
 		UNINITCREATE(AffectMapAnyDoubleLine);
-		virtual AffectType getAreaType();
+		virtual sAffectType getAreaType();
 		virtual void initArea(AreaCountInfo &pInfo);
 
 	};

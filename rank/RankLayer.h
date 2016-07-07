@@ -6,8 +6,9 @@
 #include "scene/layer/LayerManager.h"
 #include "net/CNetClient.h"
 #include "RankData.h"
+#include "activity/HttpLoadImage.h"
 
-class CRankLayer: public BaseLayer
+class CRankLayer: public BaseLayer,public HttpLoadImageDelegate
 {
 public:
 	CREATE_LAYER(CRankLayer);
@@ -32,11 +33,14 @@ protected:
 	void onSelect(CCObject* pSender);
 	void addCombatRank(CLayout* pCell, CRankData * data);
 	void addMyRank(CRankData *data);
+	void imageLoadSuccessCallBack(string sTag, vector<char>* pBuffer);
+	void addPvpRank(CLayout* pCell, CRankData * data);
 private:
 	CLayout *m_ui;
 	CTableView *m_tableView;
 	CLayout *m_cell;
 	CLayout *m_cell1;
+	CLayout *m_cell2;
 	CLayout *m_heroLay;
 	CCSize m_tableSize;
 	bool m_bArchive;

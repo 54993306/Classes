@@ -29,11 +29,17 @@
 #include "scene/layer/WaitLayer.h"
 #include "scene/layer/GameTip.h"
 #include "Battle/BattleScene/LoadBattleResource.h"
+#include "GMessage.h"
+#include "CFileScaner.h"
+
+#include "GamePlatfomDefine.h"
 
 USING_NS_CC;
 using namespace CocosDenshion;
 using namespace cn::sharesdk;
 using namespace BattleSpace;
+int AppDelegate::m_iMsecInBackground = 0;
+
 AppDelegate::AppDelegate()
 {
 
@@ -80,6 +86,13 @@ bool AppDelegate::applicationDidFinishLaunching()
 	CResEncrypt::getInstance()->setIsImageEncrypt(true);
 #endif
 	
+#if OPEN_SCAN_USED_FILE
+	//设置扫描文件打开
+	//只能做为辅助检查是否有漏掉的图片，不能作为主要的分包依据
+	//因为很多随机性的图片无法确定在有限操作内必然使用到
+	CFileScaner::getInstance()->startFileScaner();
+#endif
+	
 	//注册所有场景
 	REGISTE_SCENE_CLASS(LogoScene);
 	REGISTE_SCENE_CLASS(LoadScene);
@@ -104,6 +117,11 @@ bool AppDelegate::applicationDidFinishLaunching()
 
 	//添加版本更新目录到搜索路径
 	AddPathToSearchPath(VERSION_UPDATE_PATH);
+	
+	vector<string> pathVec = CCFileUtils::sharedFileUtils()->getSearchPaths();
+	pathVec.insert(pathVec.end()-1, FBIMG_PATH);
+	CCFileUtils::sharedFileUtils()->setSearchPaths(pathVec);
+	CheckPathDir(FBIMG_PATH);
 
 	//读取语言配置文件
 	CMultLanguage::getInstance()->parseFromJson("language.json");
@@ -115,16 +133,22 @@ bool AppDelegate::applicationDidFinishLaunching()
 	//读取人物立绘配置
 	CWholeBodyShowData::getInstance()->reloadFile();
 
-	//关闭拆分包下载
-#if !DOWNLOAD_EXTRA_PACKAGE
-	CCUserDefault::sharedUserDefault()->setBoolForKey(PACKAGE_DOWNLOAD_OPEN, false);
+	//关闭拆分包标记
+	CCUserDefault::sharedUserDefault()->setBoolForKey(PACKAGE_DOWNLOAD_OPEN, DOWNLOAD_EXTRA_PACKAGE);
 	CCUserDefault::sharedUserDefault()->flush();
-#endif
 	
 	CCUserDefault::sharedUserDefault()->setBoolForKey(ACCESS_UI_OPEN, true);
 	CCUserDefault::sharedUserDefault()->flush();
 
 	CSceneManager::sharedSceneManager()->runScene(GETSCENE(LogoScene));
+
+
+
+	//UC-初始化
+#if G_PLATFORM_TARGET==G_PLATFORM_UC
+	LoginLayerUC::uc_sdk_init();
+#endif
+	
 
     return true;
 }
@@ -146,12 +170,14 @@ void AppDelegate::applicationWillEnterForeground() {
 		//
 	}
 
-	//如果在游戏里, 世界BOSS在读秒倒计时，重新请求一次数据
-	if(LayerManager::instance()->getLayer("CWorldBoss"))
+	//广播时间差
+	if(m_iMsecInBackground!=0)
 	{
-		//AskForWorldBoss();
+		NOTIFICATION->postNotification(TIME_IN_BACKGROUND, CCInteger::create(m_iMsecInBackground));
+		m_iMsecInBackground = 0;
 	}
-
+	
+	
 	GameSound->enterForeground();
 }
 

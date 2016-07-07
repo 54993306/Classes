@@ -1,5 +1,4 @@
-﻿#ifndef __FRIEND_LAYER_
-#define __FRIEND_LAYER_
+﻿#pragma once
 
 #include "AppUI.h"
 #include "scene/layer/LayerManager.h"
@@ -74,7 +73,3 @@ private:
 	string m_textStr;
 	CPanelTips* m_pPanelTips;
 };
-
-
-
-#endif // !__GOLDMINE_LAYER_

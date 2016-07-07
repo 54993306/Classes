@@ -77,6 +77,7 @@ void CTaskControl::recvTaskNotice(int type, google::protobuf::Message *msg)
 		if (taskLayer)
 		{		
 			sendTaskList(taskLayer->getTaskType());
+			taskLayer->showReadAll(true);
 		}
 		else
 		{

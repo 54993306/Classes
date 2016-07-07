@@ -23,6 +23,7 @@ public:
 	void setCallbackForAuthor(CCObject *target,SEL_CallFuncO func);
 	void setCallbackForUserInfo(CCObject *target,SEL_CallFuncO func);
 	void setCallbackForFriendList(CCObject *target,SEL_CallFuncO func);
+	void onShareToFb(const char* desc, const char* imgUrl);
 
 	void openFriendList();
 private:
@@ -32,7 +33,7 @@ private:
 	static FaceBookSDK *g_Instance;
 
 	void onUpdate(float dt);
-	
+
 };
 
 #endif

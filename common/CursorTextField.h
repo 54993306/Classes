@@ -12,6 +12,14 @@
 
 USING_NS_CC;
 
+enum InputTextType
+{
+	CharNumAnd_=1,
+	CharType,
+	NumberType,
+	RandomType,
+};
+
 class CursorTextField: public CCTextFieldTTF, public CCTextFieldDelegate, public CCTouchDelegate
 {
 private:
@@ -64,7 +72,10 @@ public:
     virtual bool onTextFieldAttachWithIME(CCTextFieldTTF *pSender);
     virtual bool onTextFieldDetachWithIME(CCTextFieldTTF * pSender);
     virtual bool onTextFieldInsertText(CCTextFieldTTF * pSender, const char * text, int nLen);
-    virtual bool onTextFieldDeleteBackward(CCTextFieldTTF * pSender, const char * delText, int nLen);
+
+	bool checkInput(const char * text);
+
+	virtual bool onTextFieldDeleteBackward(CCTextFieldTTF * pSender, const char * delText, int nLen);
 	virtual unsigned int countLimitForInsertText();
 	virtual int getContentInputType();
 //	virtual bool attachWithIME();

@@ -20,6 +20,7 @@
 
 #include "common/CGameSound.h"
 #include "Resources.h"
+#define  FACEBOOKIMG "http://graph.facebook.com/%s/picture?width=106&height=106"
 
 CRoleInfo::CRoleInfo()
 {
@@ -101,12 +102,15 @@ void CRoleInfo::onEnter()
 
 	NOTIFICATION->addObserver(this, callfuncO_selector(CRoleInfo::show), SHOW_ROLE_INFO, nullptr);
 	NOTIFICATION->addObserver(this, callfuncO_selector(CRoleInfo::hide), HIDE_ROLE_INFO, nullptr);
+// 	HttpLoadImage::getInstance()->bindUiTarget(this);
+
 }
 
 
 void CRoleInfo::onExit()
 {
 	BaseLayer::onExit();
+// 	HttpLoadImage::getInstance()->bindUiTarget(nullptr);
 
 	GetTcpNet->unRegisterAllMsgHandler(this);
 	NOTIFICATION->removeAllObservers(this);
@@ -129,6 +133,7 @@ void CRoleInfo::setRoleInfoVal(UserData *data)
 	CLabel *exp = (CLabel*)(m_ui->findWidgetById("exp"));
 	exp->setString(CCString::createWithFormat("%d/%d",data->getExp(),data->getNextExp())->getCString());
 
+	CCSprite *headbg = (CCSprite*)(m_ui->findWidgetById("headbg"));
 	CImageView *headImg = (CImageView*)(m_ui->findWidgetById("headImg"));
 	if (data->getThumb()>0)
 	{
@@ -138,17 +143,38 @@ void CRoleInfo::setRoleInfoVal(UserData *data)
 		{
 			headImg->setTexture(texture);
 		}
+		headImg->setFlipY(false);
+
 	}
 	else
 	{
-		string fbName = "fbImg/"+data->getFbId()+".png";
+		string fbName = /*CCFileUtils::sharedFileUtils()->getWritablePath()+*//*"download/fbImg/"+*/data->getFbId()+".jpg";
 		string fullName = CCFileUtils::sharedFileUtils()->fullPathForFilename(fbName.c_str());
 		bool isFileExist = CCFileUtils::sharedFileUtils()->isFileExist(fullName);
+
 		if(isFileExist)
 		{
-			CCSprite *spr = maskedSprite(CCSprite::create(fullName.c_str()));
-			headImg->setTexture(spr->getTexture());
+			CImageView *sp = CImageView::create(fbName.c_str());
+			if (sp)
+			{	
+				CImageView *spr = (CImageView*)maskedSprite(sp);		
+				spr->setPosition(headbg->getPosition());
+				m_ui->removeChild(headImg);
+				spr->setId("headImg");
+				m_ui->addChild(spr);
+			}
+			else
+			{
+				CCLOGERROR("%s error", fullName.c_str());
+			}
+		
 		}
+// 		else
+// 		{
+// 			HttpLoadImage::getInstance()->bindUiTarget(this);
+// 			CCString *imgUrl = CCString::createWithFormat(FACEBOOKIMG,data->getFbId().c_str());
+// 			HttpLoadImage::getInstance()->requestUrlImage(imgUrl->getCString(),data->getFbId().c_str());
+// 		}
 	}
 
 	CLabel *acttime = (CLabel*)(m_ui->findWidgetById("time"));
@@ -166,9 +192,35 @@ void CRoleInfo::setRoleInfoVal(UserData *data)
 	roleId->setString(ToString(data->getRoleID()));
 }
 
+void CRoleInfo::imageLoadSuccessCallBack(string sTag, vector<char>* pBuffer)
+{
+	CCImage* img = new CCImage;
+	img->initWithImageData((unsigned char*)pBuffer->data(), pBuffer->size());
+	CCTexture2D* texture = new CCTexture2D();
+	texture->initWithImage(img);
+	CLayout* headPart = (CLayout*)m_ui->findWidgetById("head_part");
+
+	CCSprite* head = (CCSprite*)headPart->getChildByTag(15);
+	//	head->removeFromParent();
+	//head->setTexture(texture);
+
+	string path = HttpLoadImage::getInstance()->getStoragePath("download/fbImg",sTag.c_str())+".png";
+	string buff(pBuffer->begin(), pBuffer->end());
+	CCLOG("path: %s", path.c_str());
+	FILE *fp = fopen(path.c_str(), "wb+");
+	fwrite(buff.c_str(), 1, pBuffer->size(),  fp);
+	fclose(fp);
+
+	CImageView *headImg = (CImageView*)(m_ui->findWidgetById("headImg"));
+	CCSprite *headSpr = maskedSprite(CCSprite::createWithTexture(texture));
+	headImg->setTexture(headSpr->getTexture());
+	headImg->setTextureRect(CCRectMake(0,0,105,105));
+	img->release();
+}
+
 CCSprite* CRoleInfo::maskedSprite(CCSprite *textureSprite)  
 {  
-	CCSprite * maskSprite = CCSprite::create("mainCity/touxiang_kuang.png");  
+	CCSprite * maskSprite = CCSprite::create("mainCity/tencil.png");  
 	CCRenderTexture * renderTexture = CCRenderTexture::create(maskSprite->getContentSize().width, maskSprite->getContentSize().height);  
 
 	maskSprite->setPosition(ccp(maskSprite->getContentSize().width / 2, maskSprite->getContentSize().height / 2));  
@@ -188,8 +240,9 @@ CCSprite* CRoleInfo::maskedSprite(CCSprite *textureSprite)
 	textureSprite->visit();  
 	renderTexture->end();  
 
-	CCSprite * retval = CCSprite::createWithTexture(renderTexture->getSprite()->getTexture());  
+	CImageView * retval = CImageView::createWithTexture(renderTexture->getSprite()->getTexture());  
 	retval->setFlipY(true);  
+
 	return retval;  
 }  
 
@@ -236,12 +289,33 @@ void CRoleInfo::updateRoleProperty()
 	name->setString(data->getRoleName().c_str());
 
 	CCSprite* head = (CCSprite*)m_ui->getChildByTag(15);
-	CCTexture2D *texture = CCTextureCache::sharedTextureCache()
-		->addImage(CCString::createWithFormat("headIcon/%d.png", data->getThumb())->getCString());
-	if (texture)
+	CCSprite *headbg = (CCSprite*)(m_ui->findWidgetById("headbg"));
+	CImageView *headImg = (CImageView*)(m_ui->findWidgetById("headImg"));
+
+	if (data->getThumb()>0)
 	{
-		head->setTexture(texture);
+		CImageView *spr = (CImageView*)CImageView::create(CCString::createWithFormat("headIcon/%d.png", data->getThumb())->getCString());
+		spr->setPosition(ccpAdd(headbg->getPosition(),ccp(0,10)));
+		spr->setScale(0.75f);
+		m_ui->removeChild(headImg);
+		spr->setId("headImg");
+		m_ui->addChild(spr);
 	}
+	else
+	{
+		string fbName = data->getFbId()+".jpg";
+		string fullName = CCFileUtils::sharedFileUtils()->fullPathForFilename(fbName.c_str());
+		bool isFileExist = CCFileUtils::sharedFileUtils()->isFileExist(fullName);
+		if(isFileExist)
+		{
+			CImageView *spr = (CImageView*)maskedSprite(CCSprite::create(fullName.c_str()));
+			spr->setPosition(headbg->getPosition());
+			m_ui->removeChild(headImg);
+			spr->setId("headImg");
+			m_ui->addChild(spr);
+		}
+	}
+	
 }
 
 void CRoleInfo::processError(int errCode)

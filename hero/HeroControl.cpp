@@ -21,9 +21,28 @@ CHeroControl::CHeroControl():m_skillLayer(nullptr),m_detailLayer(nullptr),m_move
 	CNetClient::getShareInstance()->registerMsgHandler(HeroEvolTaskMsg,this, CMsgHandler_selector(CHeroControl::processEvolveMsg));
 	CNetClient::getShareInstance()->registerMsgHandler(HeroEvolveMsg,this, CMsgHandler_selector(CHeroControl::processEvolveMsg));
 	CNetClient::getShareInstance()->registerMsgHandler(HeroExpMsg,this, CMsgHandler_selector(CHeroControl::processMessage));
-	
+	//
+	CNetClient::getShareInstance()->registerMsgHandler(SkillLvUpMsg,this,CMsgHandler_selector(CHeroControl::processMessage));
 	GetTcpNet->registerMsgHandler(RecruitMsg,this,CMsgHandler_selector(CHeroControl::recruitMessage));
 }
+
+
+
+bool CHeroControl::init()
+{
+	if (BaseLayer::init())
+	{
+		MaskLayer* lay = MaskLayer::create("CHeroControlMask");
+		lay->setContentSize(CCSizeMake(2824,640));
+		LayerManager::instance()->push(lay);
+
+		setVisible(false);
+
+		return true;
+	}
+	return false;
+}
+
 
 void CHeroControl::processMessage(int type, google::protobuf::Message *msg)
 {
@@ -31,10 +50,15 @@ void CHeroControl::processMessage(int type, google::protobuf::Message *msg)
 	{
 	case HeroListMsg:
 		{
+			if(!isVisible())
+			{
+				this->setVisible(true);
+			}
 			m_heroLayer = CHeroList::create();
 			m_heroLayer->setVisible(true);
-
-			LayerManager::instance()->push(m_heroLayer);
+			int iPriority = LayerManager::instance()->getCurrLayer()->getTouchPriority()-1;
+			m_heroLayer->setTouchPriority(iPriority);
+			this->addChild(m_heroLayer, 10);
 
 			HeroListResponse *res = (HeroListResponse*)msg;
 			m_heroList.clear();
@@ -43,7 +67,7 @@ void CHeroControl::processMessage(int type, google::protobuf::Message *msg)
 
 			m_iOwnCount = 0;
 			for (; i<res->herolist_size(); i++)
-			{
+			{//301 302  102 101 103
 				Hero hero = res->herolist(i);
 				CHero obj;
 				obj.readData(hero);
@@ -95,9 +119,12 @@ void CHeroControl::processMessage(int type, google::protobuf::Message *msg)
 					CHero hero = m_heroList.at(i);
 					if ((hero.heroid==101||(hero.heroid==203)||hero.heroid==301)&&i!=0)
 					{
-						m_heroList.erase(m_heroList.begin()+i);
-						m_heroList.insert(m_heroList.begin(),hero);
-						break;
+						if (m_heroList.at(0).heroid!=301)
+						{
+							m_heroList.erase(m_heroList.begin()+i);
+							m_heroList.insert(m_heroList.begin(),hero);
+							break;
+						}
 					}					
 				}
 			}
@@ -131,36 +158,6 @@ void CHeroControl::processMessage(int type, google::protobuf::Message *msg)
 				i++;
 			}
 
-// 			for (; i<res->herolist_size(); i++)
-// 			{
-// 				Hero hero = res->herolist(i);
-// 				CHero obj;
-// 				obj.readData(hero);
-// // 				if (hero.own())
-// // 				{	
-// // 					m_heroList.push_back(obj);
-// // 				}
-// 				//添加分割线
-// 				else if (i-1>0&&res->herolist(i-1).own())
-// 				{ 
-// 					m_insertIndex =i;
-// 					CHero hr;
-// 					hr.heroid =0;
-// 					m_heroList.push_back(hr);
-// 					hr.heroid =-1;
-// 					m_heroList.push_back(hr);
-// 					if (i%2==1)
-// 					{
-// 						hr.heroid=-2;
-// 						m_heroList.push_back(hr);
-// 					}
-// 					m_heroList.push_back(obj);
-// 				}
-// 				else
-// 				{
-// 					m_heroList.push_back(obj);
-// 				}
-// 			}
 			m_heroLayer->updateHeroList(m_heroList, m_insertIndex);
 			m_heroLayer->runOpenAnim();
 		}
@@ -175,8 +172,7 @@ void CHeroControl::processMessage(int type, google::protobuf::Message *msg)
 			{
 				CHero chero;
 				chero.readData(*hero);
-				m_evolveLayer->updateNextQualityAttr(&chero);
-				m_evolveLayer->setAskNextQualityHero(false);
+				m_evolveLayer->askForRankDataCallBack(&chero);
 				return;
 			}
 
@@ -203,14 +199,6 @@ void CHeroControl::processMessage(int type, google::protobuf::Message *msg)
 			{
 				CSceneManager::sharedSceneManager()->PostMessageA(UPDATE_HEROINFO,1,nullptr, &m_hero);
 				updateHeroValue(&m_hero);
-
-				//如果有进阶界面，请求下一等级数据
-				if(m_evolveLayer)
-				{
-					m_evolveLayer->updateAttr(&m_hero);
-					m_evolveLayer->askForData();
-					//return;
-				}
 			}
 
 			//左右按钮
@@ -260,6 +248,8 @@ void CHeroControl::processMessage(int type, google::protobuf::Message *msg)
 				{
 					m_heroAttrLayer->showUpLevelAnimation();
 				}
+				m_heroAttrLayer->showExpTip(false);
+
 				m_hero.readData(res->hero());
 				CSceneManager::sharedSceneManager()->PostMessageA(UPDATE_HEROINFO,0,NULL, &m_hero);
 				updateHeroValue(&m_hero);
@@ -272,6 +262,19 @@ void CHeroControl::processMessage(int type, google::protobuf::Message *msg)
 			}
 		}
 		break;
+	case SkillLvUpMsg:
+		{
+			DoResult * res = (DoResult*)msg;
+			/*if (res->result()==1&&m_skillLayer)*/
+			{
+				m_skillLayer->levelUp(res->result());
+				if (m_heroAttrLayer)
+				{
+					m_heroAttrLayer->showSkillTip(false);
+				}
+
+			}
+		}
 	default:
 		break;
 	}
@@ -339,9 +342,9 @@ void CHeroControl::onHeroInfo(CHero *hero,int showType)
 				m_skillLayer->setTouchPriority(LayerManager::instance()->getCurrLayer()->getTouchPriority()-1);
 				m_heroAttrLayer->addChild(m_skillLayer);
 				/*LayerManager::instance()->push(m_skillLayer);	*/	
-			}			
-			m_skillLayer->showSkill(&m_hero,1);
+			}				
 			m_skillLayer->setVisible(true);
+			m_skillLayer->showSkill(&m_hero,1);
 		}
 		break;
 	case 4:
@@ -351,18 +354,9 @@ void CHeroControl::onHeroInfo(CHero *hero,int showType)
 				m_evolveLayer = CHeroEvolve::create();
 				m_evolveLayer->setVisible(true);
 				m_evolveLayer->setTouchPriority(LayerManager::instance()->getCurrLayer()->getTouchPriority()-1);
-				m_evolveLayer->showHeroHead(&m_hero);
-				m_evolveLayer->updateAttr(&m_hero);
+				m_evolveLayer->updateEvolve(hero);
 				m_heroAttrLayer->addChild(m_evolveLayer);
-				m_evolveLayer->askForDataCallBack();
 			}
-			//else if (!m_evolveLayer)
-			//{
-			//	//当前是最大品质
-			//	ShowPopTextTip(GETLANGSTR(181));
-			//	return;
-			//}
-			//sendEvolveInfo(m_hero.itemId);
 			m_evolveLayer->setVisible(true);
 		}
 		break;
@@ -376,9 +370,9 @@ void CHeroControl::onHeroInfo(CHero *hero,int showType)
 				m_expLayer->setTouchPriority(LayerManager::instance()->getCurrLayer()->getTouchPriority()-1);
 				m_heroAttrLayer->addChild(m_expLayer);  		
 				CPlayerControl::getInstance().sendRoleBag(4,false,m_hero.heroid);
-			}
-			m_expLayer->onSetHero(&m_hero);
+			}			
 			m_expLayer->setVisible(true);
+			m_expLayer->onSetHero(&m_hero);
 		}
 		break;
 	default:
@@ -426,14 +420,7 @@ void CHeroControl::processEvolveMsg(int type, google::protobuf::Message *msg)
 	{
 	case HeroEvolTaskMsg:
 		{
-// 		    EvolInfo *res = (EvolInfo*)msg;
-// 			CEvolInfo evolinfo;
-// 			evolinfo.read(*res);
-// 
-// 			if (m_evolveLayer)
-// 			{
-// 				m_evolveLayer->evolveTask(evolinfo);
-// 			}
+
 		}
 		break;
 
@@ -441,20 +428,18 @@ void CHeroControl::processEvolveMsg(int type, google::protobuf::Message *msg)
 		{
 			HeroEvolRes *res = (HeroEvolRes*)msg;
 			CEvolResult evoRes; 
-			evoRes.read(res);
+			evoRes.read(*res);
 			if (evoRes.result==1)
 			{
 				if (res->has_hero())
 				{
 
-
-					m_evolveLayer->levelSkillUp(&m_hero,&res->hero());
-					m_evolveLayer->showUpLevelAnimation();
 					m_hero.readData(res->hero());
-					m_evolveLayer->showHeroQuality(&m_hero);
-					m_evolveLayer->updateAttr(&m_hero);
-					m_evolveLayer->askForData();
 
+					//进阶成功
+					m_evolveLayer->evolveSuccess(&m_hero);
+
+					//更新hero给其他界面
 					CSceneManager::sharedSceneManager()->PostMessageA(UPDATE_HEROINFO,0,nullptr, &m_hero);
 					updateHeroValue(&m_hero);
 
@@ -467,6 +452,10 @@ void CHeroControl::processEvolveMsg(int type, google::protobuf::Message *msg)
 					if(m_skillLayer)
 					{
 						m_skillLayer->showSkill(&m_hero,1);
+					}
+					if (m_heroAttrLayer)
+					{
+						m_heroAttrLayer->showEvolveTip(false);
 					}
 				}
 
@@ -640,6 +629,6 @@ void CHeroControl::updateHeroValue(CHero * hero)
 }
 
 void CHeroControl::setIsHideOperation(bool isHide)
-{ 
+{
 	m_isShowOpr = isHide;
 }

@@ -8,8 +8,9 @@
 #include "jni/CJniHelper.h"
 #include "netcontrol/CPlayerControl.h"
 #include "common/ShaderDataHelper.h"
+#define BUY_NUM 5
 
-CVipPay::CVipPay():m_ui(nullptr),m_pTelInput(nullptr),m_pCodeInput(nullptr),m_iCardId(0),m_bStep1Success(false),m_iTimeRemain(0)
+CVipPay::CVipPay():m_ui(nullptr),m_pTelInput(nullptr),m_pCodeInput(nullptr),m_iCardId(0),m_bStep1Success(false),m_iTimeRemain(0),m_buyMoney(0),m_payStep(1)
 {
 
 }
@@ -36,7 +37,15 @@ bool CVipPay::init()
 		this->addChild(m_ui, 2);
 
 		this->setVisible(true);
+		CColorView *grad = CColorView::create(ccc4(53, 53, 53,255));
+		grad->setPosition(VCENTER);
+		grad->setContentSize(CCSize(1138,640));
+		m_ui->addChild(grad,-1);
 
+		CColorView *view = CColorView::create(ccc4(255, 255, 255,255));
+		view->setPosition(VCENTER);
+		view->setContentSize(CCSize(1138,430));
+		m_ui->addChild(view,-1);
 		return true;
 	}
 	return false;
@@ -46,14 +55,22 @@ void CVipPay::onEnter()
 {
 	BaseLayer::onEnter();
 
+	CButton* pClose = CButton::create("common/back.png", "common/back.png");
+	pClose->getSelectedImage()->setScale(1.1f);
+	pClose->setPosition(VLEFT+50, VTOP-50);
+	pClose->setOnClickListener(this,ccw_click_selector(CVipPay::onClose));
+	this->addChild(pClose, 999);
 
 	//确定
 	CButton* pConfirm = (CButton*)m_ui->findWidgetById("confirm");
 	pConfirm->setOnClickListener(this, ccw_click_selector(CVipPay::onConfirm));
+	pConfirm->setVisible(false);
+	
+	CButton* cancel = (CButton*)m_ui->findWidgetById("cancel");
+	cancel->setOnClickListener(this, ccw_click_selector(CVipPay::onCancel));
 
-	//取消
-	CButton* pCancel = (CButton*)m_ui->findWidgetById("cancel");
-	pCancel->setOnClickListener(this, ccw_click_selector(CVipPay::onCancel));
+	CLabel* text_confirm = (CLabel*)m_ui->findWidgetById("text_confirm");
+	text_confirm->setVisible(false);
 
 	//获取验证码
 	CButton* pGetSercurityCode = (CButton*)m_ui->findWidgetById("get_code");
@@ -81,31 +98,51 @@ void CVipPay::onEnter()
 	string sTel = CCUserDefault::sharedUserDefault()->getStringForKey(TELEPHONE, "");
 
 	CImageViewScale9* pRect1 = (CImageViewScale9*)m_ui->findWidgetById("rect_1");
-	m_pTelInput = CursorTextField::textFieldWithPlaceHolder(sTel.c_str(), FONT_NAME, 18, CCSize(220, 40), ccWHITE);
-	m_pTelInput->setPriority(-20);
+	m_pTelInput = CursorTextField::textFieldWithPlaceHolder(sTel.c_str(), FONT_NAME, 22, CCSize(690, 50), ccBLACK);
+	m_pTelInput->setPriority(this->getTouchPriority());
 	m_pTelInput->setTextInput(sTel);
 	m_pTelInput->setLimitNum(17);
 	m_pTelInput->setAnchorPoint(ccp(0, 0.5f));
-	m_pTelInput->setPosition( ccp(pRect1->getPositionX()-90, pRect1->getPositionY()));
+	m_pTelInput->setPosition( ccp(pRect1->getPositionX()-370, pRect1->getPositionY()));
 	m_ui->addChild(m_pTelInput);
-
 
 	//验证码
 	CImageViewScale9* pRect2 = (CImageViewScale9*)m_ui->findWidgetById("rect_2");
-	m_pCodeInput = CursorTextField::textFieldWithPlaceHolder("", FONT_NAME, 18, CCSize(120, 40), ccWHITE);
-	m_pCodeInput->setPriority(-20);
+	m_pCodeInput = CursorTextField::textFieldWithPlaceHolder("", FONT_NAME, 22, CCSize(470, 50), ccBLACK);
+	m_pCodeInput->setPriority(this->getTouchPriority());
 	m_pCodeInput->setTextInput("");
-	m_pCodeInput->setPosition(ccp(pRect2->getPositionX()-46, pRect2->getPositionY()));
+	m_pCodeInput->setPosition(ccp(pRect2->getPositionX()-370, pRect2->getPositionY()));
 	m_pCodeInput->setLimitNum(10);
 	m_pCodeInput->setAnchorPoint(ccp(0, 0.5f));
 	m_ui->addChild(m_pCodeInput);
+
+	HttpLoadImage::getInstance()->bindUiTarget(this);
+
 }
 
 void CVipPay::onExit()
 {
 	BaseLayer::onExit();	
+	HttpLoadImage::getInstance()->bindUiTarget(nullptr);
 }
 
+void CVipPay::onCheckMoney(CCObject *pSender, bool bChecked)
+{
+// 	if (bChecked)
+// 	{
+// 		CRadioButton *checkBtn = (CRadioButton*)pSender;
+// 		CLabel *lab = (CLabel*)m_ui->findWidgetById(CCString::createWithFormat("lab%d",checkBtn->getTag())->getCString());
+// 		m_buyMoney = atoi(lab->getString());
+// 		for (int i=1; i<=BUY_NUM; ++i)
+// 		{
+// 			CRadioButton *btn = (CRadioButton*)(m_ui->getChildByTag(i));
+// 			if (btn->getTag()!=checkBtn->getTag())
+// 			{
+// 				btn->setChecked(false);
+// 			}
+// 		}
+// 	}
+}
 
 void CVipPay::onConfirm( CCObject * pSender )
 {
@@ -134,7 +171,7 @@ void CVipPay::onConfirm( CCObject * pSender )
 
 	CCLOG("sms%s", m_pCodeInput->getString());
 	//请求支付
-	CPlayerControl::getInstance().sendBuyCardStep2(m_pCodeInput->getString());
+	CPlayerControl::getInstance().sendBuyPhoneStep2(m_pCodeInput->getString(), m_payStep);
 }
 
 void CVipPay::onCancel( CCObject * pSender )
@@ -154,7 +191,7 @@ void CVipPay::onGetSecurityCode( CCObject * pSender )
 	CCLOG("CARD:%d", m_iCardId);
 	CCLOG("DEVICE:%s", m_sDeviceId.c_str());
 	CCLOG("TELEPHONE:%s", m_sTelNumber.c_str());
-	CPlayerControl::getInstance().sendBuyCardStep1(m_iCardId, m_sDeviceId, m_sTelNumber);
+	CPlayerControl::getInstance().sendBuyPhoneStep1(m_buyMoney, m_sDeviceId, m_sTelNumber);
 	disEnableSmsCodeBtn();
 }
 
@@ -185,8 +222,11 @@ void CVipPay::hideErrorCode()
 void CVipPay::setStep1Success( bool bSuccess )
 {
 	m_bStep1Success = bSuccess;
+	setConfirmState(bSuccess);
+
 	if(bSuccess)
 	{
+		m_payStep = 2;
 		CCUserDefault::sharedUserDefault()->setStringForKey(TELEPHONE, m_sTelNumber);
 		CCUserDefault::sharedUserDefault()->flush();
 	}
@@ -211,7 +251,10 @@ void CVipPay::updateClock( float dt )
 	m_iTimeRemain--;
 	if(m_iTimeRemain<0)
 	{
-		hideTimeClock();
+		if (m_payStep!=3)
+		{
+			hideTimeClock();
+		}
 	}
 	else
 	{
@@ -243,3 +286,67 @@ void CVipPay::disEnableSmsCodeBtn()
 	pBtn->setEnabled(false);
 }
 
+
+bool CVipPay::isFloatStr(const char* str)
+{
+	if (strstr(str,".")==nullptr)
+	{
+		ShowPopTextTip("");
+		return false;
+	}
+	return true;
+}
+
+void CVipPay::showVerifyCode(const char* str)
+{
+	m_payStep = 3;
+	m_pCodeInput->setTextInput("");
+	CButton* pGetSercurityCode = (CButton*)m_ui->findWidgetById("get_code");
+	pGetSercurityCode->setVisible(false);
+	CCNode* pLabel = (CCNode*)m_ui->findWidgetById("time_delay");
+	pLabel->setVisible(false);
+	setConfirmState(true);
+	//隐藏手机输入框
+	{
+		m_pTelInput->setVisible(false);
+		CImageViewScale9* pRect1 = (CImageViewScale9*)m_ui->findWidgetById("rect_1");
+		pRect1->setVisible(false);
+		CButton* cancel = (CButton*)m_ui->findWidgetById("cancel");
+		cancel->setVisible(false);
+	}
+	HttpLoadImage::getInstance()->requestUrlImage(str,"code");
+}
+
+void CVipPay::imageLoadSuccessCallBack(string sTag, vector<char>* pBuffer)
+{
+	if (sTag=="code")
+	{
+		CCImage* img = new CCImage;
+		img->initWithImageData((unsigned char*)pBuffer->data(), pBuffer->size());
+		CCTexture2D* texture = new CCTexture2D();
+		texture->initWithImage(img);
+		CCSprite *spr = CCSprite::createWithTexture(texture);
+		CButton* pGetSercurityCode = (CButton*)m_ui->findWidgetById("error_code");
+		spr->setPositionX(pGetSercurityCode->getPositionX());
+		spr->setPositionY(pGetSercurityCode->getPositionY()+20);
+		m_ui->addChild(spr);
+	}
+}
+
+void CVipPay::setConfirmState(bool bSuccess)
+{
+	CButton* pConfirm = (CButton*)m_ui->findWidgetById("confirm");
+	pConfirm->setVisible(bSuccess);
+
+	CLabel* text_confirm = (CLabel*)m_ui->findWidgetById("text_confirm");
+	text_confirm->setVisible(bSuccess);
+}
+
+void CVipPay::setPayItem(const char* name, const char* desc, int price)
+{
+	CLabel* nameLab = (CLabel*)m_ui->findWidgetById("name");
+	nameLab->setString(name);
+	CLabel* descLab = (CLabel*)m_ui->findWidgetById("price");
+	descLab->setString(desc);
+	m_buyMoney = price;
+}

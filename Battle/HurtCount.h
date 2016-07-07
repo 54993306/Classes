@@ -50,13 +50,5 @@ namespace BattleSpace{
 		usTargetType = 1,	//自方目标或自己
 		hitTargetType = 2,
 	};
-	enum HURTCOUNT_EffectType
-	{
-		Suckblood_Type=1,			//吸血类效果
-		Boom_Type,					//自爆类效果(配pro_Rate)
-		RateBlood_Type,				//扣血百分比型吸血效果
-		NumBoold_Type,				//扣数值型吸血效果
-		RateNowBoold_Type,			//扣当前血量百分比
-	};
 };
 #endif

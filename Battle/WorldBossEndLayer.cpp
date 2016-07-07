@@ -20,8 +20,9 @@
 #include "mainCity/RecruitData.h"
 #include "mainCity/CNewHero.h"
 #include "common/CCMixLabelAction.h"
+#include "sdk/FaceBookSDK.h"
 
-WorldBossEndLayer::WorldBossEndLayer()
+WorldBossEndLayer::WorldBossEndLayer():m_rank(0)
 {
 }
 
@@ -72,6 +73,10 @@ void WorldBossEndLayer::onEnter()
 	btnExit->setVisible(false);
 
 	setTouchPriority(-12);
+
+	CButton* fbBtn = (CButton*)m_ui->findWidgetById("fbBtn");
+	fbBtn->setOnClickListener(this,ccw_click_selector(WorldBossEndLayer::shareFb));
+
 }
 
 void WorldBossEndLayer::onExit()
@@ -90,12 +95,13 @@ void WorldBossEndLayer::processBattleFinish(int type, google::protobuf::Message 
 	BossFinishRes *res = (BossFinishRes*)msg;
 
 	float fDelayTime = 1.0;
-
+	
 	//退出按钮
 	CButton *btnExit = (CButton*)m_ui->findWidgetById("exit");
 	btnExit->runAction(CCSequence::create(CCDelayTime::create(fDelayTime), CCShow::create(), CCScaleTo::create(0.2f, 1.2f), CCScaleTo::create(0.1f, 1), NULL));
 
 	int iRank = res->rank();
+	m_rank = iRank;
 	//UP
 	CLayout* pLayerUp = (CLayout*)m_ui->findWidgetById("up");
 	////DOWN
@@ -210,6 +216,15 @@ void WorldBossEndLayer::onExitClick(CCObject *pSender)
 		CCScaleTo::create(0.1f, 1.f), 
 		CCCallFuncN::create(this, callfuncN_selector(WorldBossEndLayer::onBackClick)),
 		NULL));
+}
+
+void WorldBossEndLayer::shareFb(CCObject *pSender)
+{
+	int stageId = DataCenter::sharedData()->getWar()->getStageID();
+	const ShareData *data = DataCenter::sharedData()->getShareData()->getCfg(10);
+	CCString *desc = CCString::createWithFormat(data->desc.c_str(),m_rank);
+	CCString *url = CCString::createWithFormat(data->url.c_str(),stageId);
+	FaceBookSDK::sharedInstance()->onShareToFb(desc->getCString(),url->getCString());
 }
 
 void WorldBossEndLayer::onBackClick(CCNode* ob)

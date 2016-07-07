@@ -5,8 +5,10 @@
 #include "model/DataCenter.h"
 #include "GMessage.h"
 #include "Battle/AnimationManager.h"
-
-CNewHero::CNewHero():m_ui(nullptr),m_pEffect(nullptr),m_bEvolve(false),m_bShowing(false)
+#include "SDK/FaceBookSDK.h"
+#include "RecruitResult.h"
+#include "guide/GuideManager.h"
+CNewHero::CNewHero():m_ui(nullptr),m_pEffect(nullptr),m_bEvolve(false),m_bShowing(false),m_isFinish(false),m_isShare(false),m_pTarget(nullptr),m_pNewHeroEffectCallback(nullptr)
 {
 
 }
@@ -58,13 +60,36 @@ void CNewHero::onEnter()
 	CCSprite* pCircle = (CCSprite*)m_ui->findWidgetById("light");
 	pCircle->setAnchorPoint(ccp(0.5f, 0.5f));
 	//pCircle->setPosition(pCircle->getPosition()+ccp(pCircle->getContentSize().width/2, pCircle->getContentSize().height/2));
+
+	CButton* fbBtn = (CButton*)m_ui->findWidgetById("fbBtn");
+	fbBtn->setOnClickListener(this,ccw_click_selector(CNewHero::shareFb));
+	fbBtn->setVisible(false);
 }
 
+void CNewHero::shareFb(CCObject* pObj )
+{
+	if (m_bEvolve)
+	{
+		const ShareData *data = DataCenter::sharedData()->getShareData()->getCfg(m_pHero.quality+4);
+		const HeroInfoData *heroInfo = DataCenter::sharedData()->getHeroInfo()->getCfg(m_pHero.thumb);
+		CCString *strDesc = CCString::createWithFormat(data->desc.c_str(),heroInfo->heroName.c_str());
+		CCString *strUrl = CCString::createWithFormat(data->url.c_str(),m_pHero.thumb);
+		FaceBookSDK::sharedInstance()->onShareToFb(strDesc->getCString(),strUrl->getCString());
+	}
+	else
+	{
+		const ShareData *data = DataCenter::sharedData()->getShareData()->getCfg(m_pHero.quality);
+		const HeroInfoData *heroInfo = DataCenter::sharedData()->getHeroInfo()->getCfg(m_pHero.thumb);
+		CCString *strDesc = CCString::createWithFormat(data->desc.c_str(),heroInfo->heroName.c_str());
+		CCString *strUrl = CCString::createWithFormat(data->url.c_str(),m_pHero.thumb);
+		FaceBookSDK::sharedInstance()->onShareToFb(strDesc->getCString(),strUrl->getCString());
+	}
+}
 
 void CNewHero::showNewHeroEffect( HeroLotteryData* pHero )
 {
 	m_pHero = *pHero;
-
+	m_isFinish = false;
 	if(m_bShowing)
 	{
 		//停掉上一次的动画,手动执行回调
@@ -95,7 +120,7 @@ void CNewHero::showNewHeroEffect( HeroLotteryData* pHero )
 	pCircle->setOpacity(0);
 	pCircle->stopAllActions();
 	pCircle->runAction(CCSpawn::createWithTwoActions(CCScaleTo::create(fTime, 1.4f), CCFadeIn::create(fTime)));
-	pCircle->runAction(CCRepeat::create(CCRotateBy::create(1.0,360), 4));
+	pCircle->runAction(CCRepeat::create(CCRotateBy::create(1.0,360), 1000));
 
 	//隐藏其他
 	hideOrShow(false);
@@ -173,11 +198,11 @@ void CNewHero::callBackForEffectShow()
 	CCSprite *level1 = (CCSprite *)(m_ui->findWidgetById("level1"));
 	level1->setAnchorPoint(ccp(0.5,0.5));
 	level1->setVisible(true);
-	CCTexture2D* pTexture = CCTextureCache::sharedTextureCache()->addImage(CCString::createWithFormat("recruit/star_%d.png",m_pHero.quality)->getCString());
+	CCTexture2D* pTexture = CCTextureCache::sharedTextureCache()->addImage(CCString::createWithFormat("recruit/star_%d.png",m_pHero.iColor)->getCString());
 	if(pTexture)
 	{
 		level1->setTexture(pTexture);
-		level1->setTextureRect(CCRect(0,0,49*m_pHero.quality,45));
+		level1->setTextureRect(CCRect(0,0,49*m_pHero.iColor,45));
 	}
 	
 	CCPoint pos = level1->getPosition();
@@ -199,7 +224,7 @@ void CNewHero::callBackForEffectShow()
 	// 	move = CCMoveTo::create(0.1f,pos);
 	// 	level2->runAction(CCEaseBackIn::create(move));
 
-	this->runAction(CCSequence::createWithTwoActions(CCDelayTime::create(2.5f), CCCallFunc::create(this, callfunc_selector(CNewHero::showEffectCallBack))));
+	this->runAction(CCSequence::createWithTwoActions(CCDelayTime::create(2.5f), CCCallFunc::create(this, callfunc_selector(CNewHero::effectFinish))));
 }
 
 
@@ -214,6 +239,8 @@ void CNewHero::showEffectCallBack()
 	m_bShowing = false;
 	setVisible(false);
 	NOTIFICATION->postNotification(SHOW_TOP_LAYER);
+
+	checkCallBackBind();
 }
 
 void CNewHero::showEvolveEffect()
@@ -246,6 +273,7 @@ void CNewHero::showEvolveEffect()
 bool CNewHero::ccTouchBegan( CCTouch *pTouch, CCEvent *pEvent )
 {
 	bool res = isVisible();
+	CWidgetWindow::ccTouchBegan(pTouch,pEvent);
 	return res;
 }
 
@@ -288,4 +316,59 @@ void CNewHero::onExit()
 		this->stopAllActions();
 		showEffectCallBack();
 	}
+}
+
+
+void CNewHero::effectFinish()
+{
+	m_isFinish = true;
+	if (CGuideManager::getInstance()->getIsRunGuide())
+	{
+		showEffectCallBack();
+	}
+}
+
+void CNewHero::ccTouchEnded(CCTouch* pTouch, CCEvent* pEvent)
+{
+	CWidgetWindow::ccTouchEnded(pTouch, pEvent);
+	CButton* fbBtn = (CButton*)m_ui->findWidgetById("fbBtn");
+	bool isSel = fbBtn->boundingBox().containsPoint(pTouch->getLocation());
+	if (m_isFinish&&!isSel)
+	{
+		showEffectCallBack();
+		RecruitResult *recruitRes = (RecruitResult*)LayerManager::instance()->getLayer("RecruitResult");
+		if (recruitRes)
+		{
+// 			recruitRes->continueMoveLight(1.0f);
+			recruitRes->setHeroViewVis(true);
+			recruitRes->heroInfoAnim();
+		}
+	}
+}
+
+void CNewHero::setIsShare(bool isShare)
+{
+	m_isShare = isShare;
+	CButton* fbBtn = (CButton*)m_ui->findWidgetById("fbBtn");
+    fbBtn->setVisible(isShare);
+	if (CGuideManager::getInstance()->getIsRunGuide())
+	{
+		fbBtn->setVisible(false);
+	}
+}
+
+void CNewHero::checkCallBackBind()
+{
+	if(m_pTarget!=nullptr && m_pNewHeroEffectCallback!=nullptr)
+	{
+		(m_pTarget->*m_pNewHeroEffectCallback)();
+		m_pTarget = nullptr;
+		m_pNewHeroEffectCallback = nullptr;
+	}
+}
+
+void CNewHero::bindCallback( CCObject* pTarget, newHeroEffectCallBack pFunCall )
+{
+	m_pTarget = pTarget;
+	m_pNewHeroEffectCallback = pFunCall;
 }

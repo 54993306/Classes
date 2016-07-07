@@ -13,6 +13,9 @@ CUpdateLayer::CUpdateLayer()
 	,m_pathToSave("")
 	,m_sVersion("")
 	,m_iIndexVersion(0)
+	,m_iCurrentIPixelndex(0)
+	,m_iMaxPixel(0)
+	,m_iPercent(0)
 {
 
 }
@@ -40,6 +43,9 @@ bool CUpdateLayer::init()
 		//初始化下载路径
 		initDownloadDir();
 
+		schedule(schedule_selector(CUpdateLayer::updateForChangePicture), 30);
+		scheduleUpdate();
+
 		m_VersionJson = new CVersionJson;
 
 		return true;
@@ -62,7 +68,9 @@ void CUpdateLayer::onEnter()
 
 	//进度条
 	m_progress = (CProgressBar*)m_ui->findWidgetById("progress");
-	m_progress->setMaxValue(100);
+	m_iMaxPixel = m_progress->getContentSize().width;
+	m_progress->setMinValue(0);
+	m_progress->setMaxValue(m_iMaxPixel);
 
 	////僵尸跳
 	//CCAnimation *pZombieEffect = AnimationManager::sharedAction()->getAnimation("9049");
@@ -90,6 +98,8 @@ void CUpdateLayer::onEnter()
 void CUpdateLayer::onExit()
 {
 	BaseLayer::onExit();
+
+	CCTextureCache::sharedTextureCache()->removeUnusedTextures();
 }
 
 void CUpdateLayer::initDownloadDir()
@@ -127,15 +137,21 @@ void CUpdateLayer::onError( AssetsManagerErrorCode errorCode )
 void CUpdateLayer::onProgress( int percent )
 {
 	if (percent < 0)
+	{
 		return;
+	}
+	CCLOG("%d", percent);	
+
+	m_iPercent = percent;
+	//显示百分比
 	char progress[20];
-	snprintf(progress, 20, "%d%%", percent);
+	snprintf(progress, 20, "%d%%", m_iPercent);
 	m_pLabel->setString(progress);
-	m_progress->setValue(percent);
-	//僵尸位置
-	//m_pZombieSprite->setPositionX(m_progress->getPositionX()+m_progress->getContentSize().width*percent/100-5);
-	CCLOG("%f", percent);
+
+	//转换为像素百分比
+	m_iCurrentIPixelndex = (m_iMaxPixel*m_iPercent)/100;
 }
+
 //下载成功
 void CUpdateLayer::onSuccess()
 {
@@ -250,8 +266,11 @@ void CUpdateLayer::downloadVersion()
 	{
 		CC_SAFE_DELETE(m_pAssetManager);
 	}
+
+	onProgress(0);
+
 	std::string sUpdateServer = CCUserDefault::sharedUserDefault()->getStringForKey(SERVER_FOR_UPDATE);
-	m_pAssetManager = new AssetsManager(CCString::createWithFormat("%s%s?r=%ld", sUpdateServer.c_str(), version.sFile.c_str(), getCurrentTime())->getCString() , m_pathToSave.c_str(), "http://www.baidu.com/version.php");
+	m_pAssetManager = new AssetsManager(CCString::createWithFormat("%s%s?r=%ld", sUpdateServer.c_str(), version.sFile.c_str(), getCurrentTime())->getCString() , m_pathToSave.c_str());
 	m_pAssetManager->setZipFileName(CCString::createWithFormat("%s", version.sFile.c_str())->getCString());
 	m_pAssetManager->setDelegate(this);
 	//m_pAssetManager->setConnectionTimeout(3);			//3S内没有回调则报错调用 onError
@@ -268,4 +287,34 @@ void CUpdateLayer::callBackForSuccess()
 	CJniHelper::getInstance()->restartGame();
 	CCDirector::sharedDirector()->end();
 #endif
+}
+
+void CUpdateLayer::updateForChangePicture( float dt )
+{
+	CCSprite* pSprite = dynamic_cast<CCSprite*>(m_ui->findWidgetById("bg"));
+	ChangePicture(pSprite);
+}
+
+void CUpdateLayer::update( float dt )
+{
+	if(m_iCurrentIPixelndex==0 || m_iCurrentIPixelndex==m_iMaxPixel)
+	{
+		m_progress->setValue(m_iCurrentIPixelndex);
+		return;
+	}
+
+	int iValue = m_progress->getValue();
+	if(iValue<m_iCurrentIPixelndex)
+	{
+		int iGap = (m_iCurrentIPixelndex-iValue)/30;//确保到达目标值的时间控制在30帧
+		iGap +=1;
+		iValue += iGap;
+		if(iValue<=m_iMaxPixel)
+		{
+			m_progress->setValue(iValue);
+		}
+	}
+
+	//僵尸位置
+	//m_pZombieSprite->setPositionX(m_progress->getPositionX()+m_progress->getContentSize().width*percent/100-5);
 }

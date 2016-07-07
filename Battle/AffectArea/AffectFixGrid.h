@@ -24,7 +24,7 @@ namespace BattleSpace
 		AffectAnyFixGrid(){};
 		virtual ~AffectAnyFixGrid(){};
 		UNINITCREATE(AffectAnyFixGrid);
-		virtual AffectType getAreaType();
+		virtual sAffectType getAreaType();
 		virtual void initArea(AreaCountInfo &pInfo);
 		
 	};
@@ -38,7 +38,7 @@ namespace BattleSpace
 		AffectAnyFixGridDisperse(){};
 		virtual ~AffectAnyFixGridDisperse(){};
 		UNINITCREATE(AffectAnyFixGridDisperse);
-		virtual AffectType getAreaType();
+		virtual sAffectType getAreaType();
 		virtual void initArea(AreaCountInfo &pInfo);
 
 	};

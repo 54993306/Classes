@@ -16,9 +16,9 @@
 #include "Battle/BaseRole.h"
 namespace BattleSpace
 {
-	AffectType AffectVertical::getAreaType()
+	sAffectType AffectVertical::getAreaType()
 	{
-		return AffectType::eVertical;
+		return sAffectType::eVertical;
 	}
 
 	void AffectVertical::initArea( AreaCountInfo& pInfo )

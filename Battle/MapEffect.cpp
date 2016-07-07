@@ -370,7 +370,7 @@ namespace BattleSpace{
 			case JPG_Effect:
 			case PNG_Effect:
 				{
-					EffectObject* Animation_effect = EffectObject::create(ToString(ef_data->getEffectID()),PLAYERTYPE::Repeat);
+					EffectObject* Animation_effect = EffectObject::create(ToString(ef_data->getEffectID()),sPlayType::eRepeat);
 					Animation_effect->setEffAnchorPoint(ef_data->getAnchorPointX(),ef_data->getAnchorPointY());
 					Animation_effect->setPosition(ccp(ef_data->getPointX(),ef_data->getPointY()));
 					Animation_effect->setScale(ef_data->getScale());

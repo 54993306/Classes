@@ -16,9 +16,9 @@
 namespace BattleSpace
 {
 	//后方单体
-	AffectType AffectBackSingle::getAreaType()
+	sAffectType AffectBackSingle::getAreaType()
 	{
-		return AffectType::eBackSingle;
+		return sAffectType::eBackSingle;
 	}
 
 	void AffectBackSingle::initArea(AreaCountInfo& pInfo)
@@ -37,9 +37,9 @@ namespace BattleSpace
 	/***************************************************************************/
 
 	//后方分散
-	AffectType AffectBackDisperse::getAreaType()
+	sAffectType AffectBackDisperse::getAreaType()
 	{
-		return AffectType::eBackDisperse;
+		return sAffectType::eBackDisperse;
 	}
 
 	void AffectBackDisperse::initArea(AreaCountInfo& pInfo)
@@ -51,9 +51,9 @@ namespace BattleSpace
 	/***************************************************************************/
 
 	//后方n排
-	AffectType AffectBackRow::getAreaType()
+	sAffectType AffectBackRow::getAreaType()
 	{
-		return AffectType::eBackRow;
+		return sAffectType::eBackRow;
 	}
 
 	void AffectBackRow::initArea(AreaCountInfo& pInfo)

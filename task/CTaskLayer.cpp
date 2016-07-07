@@ -105,6 +105,14 @@ void CTaskLayer::onEnter()
 // 	CCEaseBounceOut *out = CCEaseBounceOut::create(move);
 // 	m_ui->runAction(out);
 
+	CButton *read = (CButton *)(m_ui->findWidgetById("readAll"));
+	read->setOnClickListener(this,ccw_click_selector(CTaskLayer::onReadAllMail));
+}
+
+void CTaskLayer::onReadAllMail(CCObject* pSender)
+{
+	CTaskControl::getInstance()->sendGetTaskPrize(0);
+	m_selectTask = nullptr;
 }
 
 void CTaskLayer::onSwitchBtn(CCObject *pSender, bool bChecked)
@@ -259,7 +267,7 @@ void CTaskLayer::onGoTask(CCObject* pSender)
 	case 6:
 		{
 			CHeroControl *heroctl = CHeroControl::create();
-			CSceneManager::sharedSceneManager()->getRunningScene()->addChild(heroctl,0,1900);
+			LayerManager::instance()->push(heroctl);
 			CPlayerControl::getInstance().sendHeroList(1);
 		}
 		break;
@@ -489,7 +497,8 @@ void CTaskLayer::updateTaskInfo(CTask* data)
 		btn->setVisible(true);
 		btn->removeAllChildren();
 
-		CCSprite *mask = CCSprite::createWithTexture(setItemQualityTexture(prize.color));
+		CCSprite *mask = CCSprite::create();
+		SmartSetRectPrizeColor(mask, &prize);
 		mask->setPosition(ccp(btn->getContentSize().width/2,btn->getContentSize().height/2));
 		btn->addChild(mask);
 
@@ -742,18 +751,41 @@ void CTaskLayer::isFinishTask(bool isFinish)
 
 void CTaskLayer::deleteTaskMsg(const TMessage& tMsg)
 {
-	vector<CTask>::iterator iter = m_taskList.begin();
-
-	for (; iter!=m_taskList.end(); iter++)
+	if (m_selectTask)
 	{
-		if (m_selectTask->taskId==iter->taskId)
-		{
-			m_taskList.erase(iter);
-			break;
-		}
-	}
+		vector<CTask>::iterator iter = m_taskList.begin();
 
- 	showTaskView();
+		for (; iter!=m_taskList.end(); iter++)
+		{
+			if (m_selectTask->taskId==iter->taskId)
+			{
+				m_taskList.erase(iter);
+				break;
+			}
+		}
+		showTaskView();
+	}
+	else
+	{
+		vector<CTask>::iterator iter = m_taskList.begin();
+		for (; iter!=m_taskList.end(); )
+		{
+			if (iter->finish)
+			{
+				iter = m_taskList.erase(iter);
+			}
+			else
+			{
+				iter++;
+			}
+		}
+		showTaskView();
+		showReadAll(false);
+		CCNode *redPoint = m_ui->findWidgetById("redPoint");
+		CCNode *redPoint1 = m_ui->findWidgetById("redPoint1");
+		redPoint->setVisible(false);
+		redPoint1->setVisible(false);
+	}
 }
 
 void CTaskLayer::popItemPrize(PrizeResponse* res)
@@ -769,14 +801,14 @@ void CTaskLayer::popItemPrize(PrizeResponse* res)
 	}
 
 	//多加一个主角经验在上面
-	CPrize prize;
-	prize.id = 10;
-	prize.num = m_selectTask->exp;
-	prize.color = 0;
-	prize.type = 1;
-	prize.thumb = 10;
-	prize.quality = 0;
-	prizers.prizeList.push_back(prize);
+// 	CPrize prize;
+// 	prize.id = 10;
+// 	prize.num = m_selectTask->exp;
+// 	prize.color = 0;
+// 	prize.type = 1;
+// 	prize.thumb = 10;
+// 	prize.quality = 0;
+// 	prizers.prizeList.push_back(prize);
 
 	CPopItem *popItem = CPopItem::create();
 	LayerManager::instance()->push(popItem);
@@ -839,6 +871,11 @@ void CTaskLayer::showTaskTip(TaskListResponse * res)
 			redPoint->setUserObject(CCBool::create(res->maintips()));
 		}
 	}
+
+	if (m_taskType==1)
+	{	
+		showReadAll(res->maintips()||res->dailytips());
+	}
 }
 
 void CTaskLayer::showNoTaskTip( bool bShow, const char* sInfo )
@@ -860,4 +897,12 @@ void CTaskLayer::showNoTaskTip( bool bShow, const char* sInfo )
 			m_pPanelTips->setVisible(false);
 		}
 	}
+}
+
+void CTaskLayer::showReadAll(bool isVisible)
+{
+	CButton *readAll = (CButton *)(m_ui->findWidgetById("readAll"));
+	CLabel *readtext = (CLabel *)(m_ui->findWidgetById("readtext"));
+	readAll->setVisible(isVisible);
+	readtext->setVisible(isVisible);
 }

@@ -21,6 +21,7 @@
 #include "common/MultLanguage.h"
 #include "tollgate/ItemInfo.h"
 #include "common/CommonFunction.h"
+#include "CNewHero.h"
 
 #define TileMapWidth  1920
 #define TileMapHeight 640
@@ -59,6 +60,7 @@ void CRecruit::onExit()
 {
 	BaseLayer::onExit();
 	CCDirector::sharedDirector()->getTouchDispatcher()->removeDelegate(this);
+	CSceneManager::sharedSceneManager()->removeMsgObserver(UPDATE_RECRUIT,this);
 	GetTcpNet->unRegisterAllMsgHandler(this);
 	NOTIFICATION->removeAllObservers(this);
 	NOTIFICATION->postNotification(SHOW_MAIN_SCENE);
@@ -185,14 +187,16 @@ void CRecruit::InitRecrui(int num1,int num2,int num3)
 		//设置品质-颜色
 		int iAdapterType = lotteryData.type;
 		iAdapterType = iAdapterType==1?2:1;
-		pQuality->setTexture(setItemQualityTexture(lotteryData.iColor));
 		pQuality->setUserData(&m_LotteryData.at(i));
 		pQuality->setTouchEnabled(true);
 		pQuality->setOnPressListener(this, ccw_press_selector(CRecruit::onPress));
 
+
 		//英雄
 		if(type == 1)
 		{
+			pQuality->setTexture(SetRectColor(lotteryData.heroType));
+
 			//图片从headImage里面拿
 			sprintf(str1,"headImg/%d.png", lotteryData.thumb);
 			//读取数据
@@ -212,6 +216,8 @@ void CRecruit::InitRecrui(int num1,int num2,int num3)
 		//魂石
 		else if(type == 2 && lotteryData.iColor >= 10)
 		{
+			pQuality->setTexture(setItemQualityTexture(lotteryData.iColor));
+
 			//图片从headImage里面拿
 			sprintf(str1,"headImg/%d.png", lotteryData.thumb);
 			////读取数据
@@ -245,7 +251,8 @@ void CRecruit::InitRecrui(int num1,int num2,int num3)
 		//添加星级
 		if(lotteryData.quality>0)
 		{
-			CLayout* pStarLayout = getStarLayout(lotteryData.quality);
+			int iStarCount = lotteryData.type==1?lotteryData.iColor:lotteryData.quality;
+			CLayout* pStarLayout = getStarLayout(iStarCount);
 			pQuality->addChild(pStarLayout);
 		}
 
@@ -338,12 +345,23 @@ void CRecruit::LotteryBtn(CCObject* ob)
 
 void CRecruit::onComfirmOneTime(CCObject* pSender)
 {
-	CButton *btn = (CButton*)pSender;
+ 	CButton *btn = (CButton*)pSender;
 	if (btn->getTag()==PopTipConfirm)
 	{
 		CPlayerControl::getInstance().SendLotteryType(GoldOnes);
 	}
 	((CPopTip*)(btn->getParent()->getParent()))->onClose(nullptr);
+// 	CNewHero *m_pNew = CNewHero::create();
+// 	m_pNew->setIsShare(true);
+// 	HeroLotteryData data;
+// 	data.heroType = 1;
+// 	data.iColor = 2;
+// 	data.isnew = true;
+// 	data.quality = 3;
+// 	data.thumb = 111;
+// 	this->addChild(m_pNew, 20);
+// 	m_pNew->setIsShare(true);
+// 	m_pNew->showNewHeroEffect(&data);
 }
 
 void CRecruit::onComfirmTenTime(CCObject* pSender)

@@ -20,7 +20,9 @@
 #include "tollgate/ItemInfo.h"
 #include "Recruit.h"
 #include "common/CheckMoney.h"
-
+#include "jni/CJniHelper.h"
+#include "Battle/BattleTools.h"
+using namespace BattleSpace;
 RecruitResult::RecruitResult()
 	:m_ui(nullptr),m_cell1(nullptr),m_cell2(nullptr),m_Res(nullptr),m_Turn(nullptr)
 	,m_Type(0),m_needNum(0),m_EFView(nullptr),m_HeroView(nullptr), m_BtnTurn(false)
@@ -31,8 +33,9 @@ RecruitResult::RecruitResult()
 	,m_pMonsterInfo(nullptr)
 	,m_pItemInfo(nullptr)
 	,m_bIsSuccess(false)
+	,m_pHand(nullptr)
 {}
-using namespace BattleSpace;
+
 RecruitResult::~RecruitResult()
 {
 	m_LotteryResult.clear();
@@ -55,7 +58,19 @@ bool RecruitResult::init()
 
 		m_pNewHeroEffect = CNewHero::create();
 		m_pNewHeroEffect->setVisible(false);
+		m_pNewHeroEffect->setIsShare(true);
 		this->addChild(m_pNewHeroEffect, 20);
+
+		//初始化手
+		CCArmatureDataManager::sharedArmatureDataManager()->addArmatureFileInfo("recruit/figure.ExportJson");
+		CCArmature* pHand = CCArmature::create("figure");
+		pHand->setPosition(ccp(1138/2, 240));
+		m_ui->addChild(pHand, 500);
+		pHand->getAnimation()->playWithIndex(0);
+
+		m_pHand = pHand;
+
+		hideHand();
 
 		return true;
 	}
@@ -69,7 +84,7 @@ void RecruitResult::onExit()
 	CCDirector::sharedDirector()->getTouchDispatcher()->removeDelegate(this);
 	GetTcpNet->unRegisterAllMsgHandler(this);
 
-	CCArmatureDataManager::sharedArmatureDataManager()->removeAnimationData("recruit/zhaomu.ExportJson");
+	CCArmatureDataManager::sharedArmatureDataManager()->removeArmatureFileInfo("recruit/zhaomu.ExportJson");
 	CCSpriteFrameCache::sharedSpriteFrameCache()->removeSpriteFramesFromFile("recruit/r1.plist");
 	CCSpriteFrameCache::sharedSpriteFrameCache()->removeSpriteFramesFromFile("recruit/r2.plist");
 	CCSpriteFrameCache::sharedSpriteFrameCache()->removeSpriteFramesFromFile("recruit/r3.plist");
@@ -79,6 +94,8 @@ void RecruitResult::onExit()
 	NOTIFICATION->postNotification(SHOW_TOP_LAYER);
 
 	CSceneManager::sharedSceneManager()->removeMsgObserver(UPDATE_HERO,this);
+
+	CCArmatureDataManager::sharedArmatureDataManager()->removeArmatureFileInfo("recruit/figure.ExportJson");
 }
 
 void RecruitResult::setResult(vector<HeroLotteryData>& result,int type,int num) 
@@ -178,6 +195,7 @@ void RecruitResult::openMovementEvent( CCArmature *pArmature, MovementEventType 
 			{
 				pArmature->getAnimation()->play("opened", 0.01f);
 				showArrowAndButton();
+				showHand();
 			}
 			else if(strcmp(name, "expo")==0)
 			{
@@ -210,6 +228,12 @@ void RecruitResult::openFrameEvent( CCBone *pBone, const char* sKey, int iA, int
 
 		PlayEffectSound(SFX_425);
 
+		CJniHelper::getInstance()->stopVibrator();
+	}
+	else
+	{
+		int iSoundId = atoi(sKey);
+		PlaySound(iSoundId);
 	}
 }
 
@@ -476,6 +500,12 @@ void RecruitResult::setHeroIcon(CCSprite* icon,CCSprite*quality,CLabel* name,Her
 
 	if (data.type == 1 || data.iColor >= 10)
 	{
+		//是英雄，按水火木
+		if(data.type == 1)
+		{
+			quality->setTexture(SetRectColor(data.heroType));
+		}
+
 		sprintf(pathIcon,"headImg/%d.png",data.thumb);
 
 		if(data.iColor < 10)
@@ -506,7 +536,8 @@ void RecruitResult::setHeroIcon(CCSprite* icon,CCSprite*quality,CLabel* name,Her
 	if(data.quality>0)
 	{
 		//添加星星
-		CLayout* pStarLayout = getStarLayout(data.quality);
+		int iStarCount = data.type==1?data.iColor:data.quality;
+		CLayout* pStarLayout = getStarLayout(iStarCount);
 		quality->addChild(pStarLayout);
 	}
 
@@ -910,9 +941,9 @@ void RecruitResult::heroInfoAnim( )
 				pCell->runAction(CCSequence::createWithTwoActions(delay,CCCallFuncN::create(this,callfuncN_selector(RecruitResult::showHeroCall))));
 			}
 			//抽到新英雄动画
-			CCSequence* pAction = CCSequence::createWithTwoActions(CCDelayTime::create(delt+3.4f), CCCallFunc::create(this, callfunc_selector(RecruitResult::heroInfoAnim)));
-			pAction->setTag(111);
-			this->runAction(pAction);
+// 			CCSequence* pAction = CCSequence::createWithTwoActions(CCDelayTime::create(delt+3.4f), CCCallFunc::create(this, callfunc_selector(RecruitResult::heroInfoAnim)));
+// 			pAction->setTag(111);
+// 			this->runAction(pAction);
 			this->scheduleOnce(schedule_selector(RecruitResult::playNewHeroAnim), delt+0.4f);
 			return;
 		}
@@ -960,7 +991,7 @@ void RecruitResult::playNewHeroAnim(float dt)
 	showNewHeroAnimation();
 
 	m_cellIndex++;
-	this->scheduleOnce(schedule_selector(RecruitResult::continueMoveLight), 2.6f);
+//	this->scheduleOnce(schedule_selector(RecruitResult::continueMoveLight), 2.6f);
 }
 
 void RecruitResult::showCoffinWithRank()
@@ -1001,15 +1032,15 @@ void RecruitResult::showCoffinWithRank()
 
 void RecruitResult::showArrowAndButton()
 {
-	//箭头
-	CCNode* pArrow = (CCNode*)m_ui->findWidgetById("arrow");
-	pArrow->setVisible(true);
-	if(pArrow->getActionByTag(111)==nullptr)
-	{
-		CCRepeatForever* pRep = CCRepeatForever::create(CCSequence::createWithTwoActions(CCMoveBy::create(0.3f, ccp(0, 40)), CCMoveBy::create(0.3f, ccp(0, -40))));
-		pRep->setTag(111);
-		pArrow->runAction(pRep);
-	}
+	////箭头
+	//CCNode* pArrow = (CCNode*)m_ui->findWidgetById("arrow");
+	//pArrow->setVisible(true);
+	//if(pArrow->getActionByTag(111)==nullptr)
+	//{
+	//	CCRepeatForever* pRep = CCRepeatForever::create(CCSequence::createWithTwoActions(CCMoveBy::create(0.3f, ccp(0, 40)), CCMoveBy::create(0.3f, ccp(0, -40))));
+	//	pRep->setTag(111);
+	//	pArrow->runAction(pRep);
+	//}
 	
 	//按钮
 	CImageView* pView = (CImageView*)m_ui->findWidgetById("hide_btn");
@@ -1024,7 +1055,16 @@ void RecruitResult::showArrowAndButton()
 
 void RecruitResult::touchCoffin( CCObject* pSender )
 {
-	//m_armature->getAnimation()->play("expo", 0.01f);
+	if(CGuideManager::getInstance()->getIsRunGuide())
+	{
+		if(m_armature->getAnimation()->getCurrentMovementID().compare("expo")==0)
+		{
+			return;
+		}
+		m_armature->getAnimation()->play("expo", 0.01f);
+		CJniHelper::getInstance()->startVibrator(3000);
+		hideHand();
+	}
 }
 
 
@@ -1034,7 +1074,13 @@ void RecruitResult::pressCoffin( CCObject* pSender, CTouchPressState iState )
 	{
 	case cocos2d::cocoswidget::CTouchPressOn:
 		{
+			if(m_armature->getAnimation()->getCurrentMovementID().compare("expo")==0)
+			{
+				return;
+			}
 			m_armature->getAnimation()->play("expo", 0.01f);
+			CJniHelper::getInstance()->startVibrator(3000);
+			hideHand();
 		}
 		break;
 	case cocos2d::cocoswidget::CTouchPressOff:
@@ -1042,6 +1088,9 @@ void RecruitResult::pressCoffin( CCObject* pSender, CTouchPressState iState )
 			if(!m_bIsSuccess)
 			{
 				m_armature->getAnimation()->play("opened", 0.01f);
+				CJniHelper::getInstance()->stopVibrator();
+				showHand();
+				GameSound->stopAllEffects();
 			}
 		}
 		break;
@@ -1150,6 +1199,12 @@ void RecruitResult::showNewHeroAnimation()
 	HeroLotteryData *lottery = &m_LotteryResult.at(m_cellIndex);
 	m_pNewHeroEffect->showNewHeroEffect(lottery);
 }
+
+void RecruitResult::setHeroViewVis(bool isVisible)
+{
+	m_HeroView->setVisible(isVisible);
+}
+
 
 void RecruitResult::showNewHeroAnimationCallBack()
 {
@@ -1352,12 +1407,22 @@ void RecruitResult::roleUpdate( const TMessage& tMsg )
 
 void RecruitResult::callbackForSound()
 {
-	PlayEffectSound(SFX_540);
+	//PlayEffectSound(SFX_540);
 }
 
 void RecruitResult::callBackForCloesed()
 {
 	m_armature->getAnimation()->play("closed", 0.01f);
+}
+
+void RecruitResult::showHand()
+{
+	m_pHand->setVisible(true);
+}
+
+void RecruitResult::hideHand()
+{
+	m_pHand->setVisible(false);
 }
 
 

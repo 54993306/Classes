@@ -26,7 +26,6 @@
 #include <google/protobuf/unknown_field_set.h>
 #include "armor_common.pb.h"
 #include "prop_common.pb.h"
-#include "soul_common.pb.h"
 // @@protoc_insertion_point(includes)
 
 namespace protos {
@@ -217,15 +216,6 @@ class Item : public ::google::protobuf::Message {
   inline ::protos::common::Prop* release_prop();
   inline void set_allocated_prop(::protos::common::Prop* prop);
 
-  // optional .protos.common.Soul soul = 17;
-  inline bool has_soul() const;
-  inline void clear_soul();
-  static const int kSoulFieldNumber = 17;
-  inline const ::protos::common::Soul& soul() const;
-  inline ::protos::common::Soul* mutable_soul();
-  inline ::protos::common::Soul* release_soul();
-  inline void set_allocated_soul(::protos::common::Soul* soul);
-
   // optional int32 thumb = 19;
   inline bool has_thumb() const;
   inline void clear_thumb();
@@ -307,8 +297,6 @@ class Item : public ::google::protobuf::Message {
   inline void clear_has_armor();
   inline void set_has_prop();
   inline void clear_has_prop();
-  inline void set_has_soul();
-  inline void clear_has_soul();
   inline void set_has_thumb();
   inline void clear_has_thumb();
   inline void set_has_param();
@@ -336,10 +324,9 @@ class Item : public ::google::protobuf::Message {
   ::google::protobuf::int32 itemnum_;
   ::google::protobuf::uint64 losetime_;
   ::protos::common::Armor* armor_;
-  ::protos::common::Prop* prop_;
   ::google::protobuf::int32 gridnum_;
   ::google::protobuf::int32 thumb_;
-  ::protos::common::Soul* soul_;
+  ::protos::common::Prop* prop_;
   ::google::protobuf::int32 param_;
   bool canuse_;
   bool stren_;
@@ -347,7 +334,7 @@ class Item : public ::google::protobuf::Message {
   ::google::protobuf::int32 star_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(23 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(22 + 31) / 32];
 
   friend void  protobuf_AddDesc_common_2fitem_5fcommon_2eproto();
   friend void protobuf_AssignDesc_common_2fitem_5fcommon_2eproto();
@@ -887,53 +874,15 @@ inline void Item::set_allocated_prop(::protos::common::Prop* prop) {
   }
 }
 
-// optional .protos.common.Soul soul = 17;
-inline bool Item::has_soul() const {
-  return (_has_bits_[0] & 0x00010000u) != 0;
-}
-inline void Item::set_has_soul() {
-  _has_bits_[0] |= 0x00010000u;
-}
-inline void Item::clear_has_soul() {
-  _has_bits_[0] &= ~0x00010000u;
-}
-inline void Item::clear_soul() {
-  if (soul_ != NULL) soul_->::protos::common::Soul::Clear();
-  clear_has_soul();
-}
-inline const ::protos::common::Soul& Item::soul() const {
-  return soul_ != NULL ? *soul_ : *default_instance_->soul_;
-}
-inline ::protos::common::Soul* Item::mutable_soul() {
-  set_has_soul();
-  if (soul_ == NULL) soul_ = new ::protos::common::Soul;
-  return soul_;
-}
-inline ::protos::common::Soul* Item::release_soul() {
-  clear_has_soul();
-  ::protos::common::Soul* temp = soul_;
-  soul_ = NULL;
-  return temp;
-}
-inline void Item::set_allocated_soul(::protos::common::Soul* soul) {
-  delete soul_;
-  soul_ = soul;
-  if (soul) {
-    set_has_soul();
-  } else {
-    clear_has_soul();
-  }
-}
-
 // optional int32 thumb = 19;
 inline bool Item::has_thumb() const {
-  return (_has_bits_[0] & 0x00020000u) != 0;
+  return (_has_bits_[0] & 0x00010000u) != 0;
 }
 inline void Item::set_has_thumb() {
-  _has_bits_[0] |= 0x00020000u;
+  _has_bits_[0] |= 0x00010000u;
 }
 inline void Item::clear_has_thumb() {
-  _has_bits_[0] &= ~0x00020000u;
+  _has_bits_[0] &= ~0x00010000u;
 }
 inline void Item::clear_thumb() {
   thumb_ = 0;
@@ -949,13 +898,13 @@ inline void Item::set_thumb(::google::protobuf::int32 value) {
 
 // optional int32 param = 18;
 inline bool Item::has_param() const {
-  return (_has_bits_[0] & 0x00040000u) != 0;
+  return (_has_bits_[0] & 0x00020000u) != 0;
 }
 inline void Item::set_has_param() {
-  _has_bits_[0] |= 0x00040000u;
+  _has_bits_[0] |= 0x00020000u;
 }
 inline void Item::clear_has_param() {
-  _has_bits_[0] &= ~0x00040000u;
+  _has_bits_[0] &= ~0x00020000u;
 }
 inline void Item::clear_param() {
   param_ = 0;
@@ -971,13 +920,13 @@ inline void Item::set_param(::google::protobuf::int32 value) {
 
 // optional bool canUse = 20;
 inline bool Item::has_canuse() const {
-  return (_has_bits_[0] & 0x00080000u) != 0;
+  return (_has_bits_[0] & 0x00040000u) != 0;
 }
 inline void Item::set_has_canuse() {
-  _has_bits_[0] |= 0x00080000u;
+  _has_bits_[0] |= 0x00040000u;
 }
 inline void Item::clear_has_canuse() {
-  _has_bits_[0] &= ~0x00080000u;
+  _has_bits_[0] &= ~0x00040000u;
 }
 inline void Item::clear_canuse() {
   canuse_ = false;
@@ -1018,13 +967,13 @@ Item::mutable_drops() {
 
 // optional bool stren = 22;
 inline bool Item::has_stren() const {
-  return (_has_bits_[0] & 0x00200000u) != 0;
+  return (_has_bits_[0] & 0x00100000u) != 0;
 }
 inline void Item::set_has_stren() {
-  _has_bits_[0] |= 0x00200000u;
+  _has_bits_[0] |= 0x00100000u;
 }
 inline void Item::clear_has_stren() {
-  _has_bits_[0] &= ~0x00200000u;
+  _has_bits_[0] &= ~0x00100000u;
 }
 inline void Item::clear_stren() {
   stren_ = false;
@@ -1040,13 +989,13 @@ inline void Item::set_stren(bool value) {
 
 // optional int32 star = 23;
 inline bool Item::has_star() const {
-  return (_has_bits_[0] & 0x00400000u) != 0;
+  return (_has_bits_[0] & 0x00200000u) != 0;
 }
 inline void Item::set_has_star() {
-  _has_bits_[0] |= 0x00400000u;
+  _has_bits_[0] |= 0x00200000u;
 }
 inline void Item::clear_has_star() {
-  _has_bits_[0] &= ~0x00400000u;
+  _has_bits_[0] &= ~0x00200000u;
 }
 inline void Item::clear_star() {
   star_ = 0;

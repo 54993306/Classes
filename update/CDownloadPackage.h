@@ -1,12 +1,19 @@
 ﻿#pragma once
 
+/******************************************************
+*文件名称:	CDownloadPackage.h
+*编写日期:	2016-6-14-11:49
+*编写作者:	YPF
+*功能描述:	拆分资源包下载
+*******************************************************/
+
 #include "AppUI.h"
 #include "scene/layer/LayerManager.h"
 #include "AssetsManager/AssetsManager.h"
 #include "CDownloadPackageDelegate.h"
+#include "CPackageVersionJson.h"
 
 #define PACKAGE_NAME "%d.zip"
-#define PACKAGE_COUNT 10 
 
 class CDownloadPackage : public BaseLayer, public AssetsManagerDelegateProtocol
 {
@@ -21,6 +28,11 @@ public:
     void onEnter();
     void onExit();
 
+	//请求所有版本的文件信息
+	void requestVersionInfo();
+	//数据回调
+	void requestVersionInfoCallBack(cocos2d::extension::CCHttpClient *sender, cocos2d::extension::CCHttpResponse *response);
+
 	void onError(AssetsManagerErrorCode errorCode);	//错误信息
 	void onProgress(int percent);	//更新下载进度
 	void onSuccess();	//下载成功
@@ -29,9 +41,16 @@ public:
 
 	void downLoadPackage();
 
+	void startDownload();
+
 	void callBackForSuccess();
 
 	CC_SYNTHESIZE(DownloadPackageDelegate*, m_pDownloadPacakgeDelegate, DownloadPacakgeDelegate);
+
+	void updateForChangePic(float dt);
+
+	void update(float dt);
+
 private:
 	void initDownloadDir();
 	void downloadVersionByIndex();
@@ -42,8 +61,13 @@ private:
 	CLabel*										m_pLabel;
 	CLabel*										m_pInfoLabel;
 	std::string									m_pathToSave;
-	std::string									m_sVersion;
 	CLayout*									m_ui;
 	AssetsManager*						m_pAssetManager;
 	int												m_iPackageIndex;
+	int												m_iPackageMax;
+	CPackageVersionJson*			m_VersionJson;
+	CPackageVersionData				m_versionNeedData;
+	int												m_iCurrentIPixelndex;
+	int												m_iMaxPixel;
+	int												m_iPercent;
 };

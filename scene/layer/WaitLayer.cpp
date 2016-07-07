@@ -15,7 +15,7 @@ bool WaitLayer::init()
 		this->addChild(m_ui);
 		this->setVisible(true);
 
-	    m_loadEffect = EffectObject::create("loading",PLAYERTYPE::Repeat);
+	    m_loadEffect = EffectObject::create("loading",sPlayType::eRepeat);
 		m_loadEffect->setPositionX(VCENTER.x);
 		m_loadEffect->setPositionY(VCENTER.y+50.0f);
 		m_loadEffect->setEffAnchorPoint(0.5f,0.5f);

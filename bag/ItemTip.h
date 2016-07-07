@@ -23,9 +23,9 @@ public:
     void onEnter();
     void onClose(CCObject* pSender);
     void onExit();
-	void showItemProperty(CItem *item);
+	void showItemProperty(CItem *pItem);
 
-	void updateArmorAttr(CItem * item);
+	void updateArmorAttr(CItem *pItem);
 	bool ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent);
 	void onResolve(CCObject* pSender);
 	void onStrength(CCObject* pSender);
@@ -53,6 +53,7 @@ private:
 	CLayout* m_pCellInfo;
 	CLayout* m_pBaseInfo[ITEM_MAX_LINE_COUNT];
 	CLayout* m_pSpecialInfo[ITEM_MAX_LINE_COUNT];
+	int m_iWillAddCoin;
 };
 
 void inline CopyBaseAttr(CItem* pAim, CItem* pFrom)

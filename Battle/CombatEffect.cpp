@@ -34,6 +34,7 @@ namespace BattleSpace{
 
 	CombatEffect::CombatEffect()
 		:m_Scene(nullptr),_armaturePlayerSkill(nullptr),_playerSkillData(nullptr),m_PlayerNum(0)
+		,mManage(nullptr)
 	{}
 
 	CombatEffect::~CombatEffect()
@@ -45,8 +46,8 @@ namespace BattleSpace{
 		NOTIFICATION->removeAllObservers(this);
 
 		//释放资源
-		CCArmatureDataManager::sharedArmatureDataManager()->removeArmatureFileInfo("warScene/playerskill/confirm.ExportJson");
-		CCTextureCache::sharedTextureCache()->removeTextureForKey("warScene/playerskill/confirm0.png");
+		CCArmatureDataManager::sharedArmatureDataManager()->removeArmatureFileInfo("warScene/playerSkill/confirm.ExportJson");
+		CCTextureCache::sharedTextureCache()->removeTextureForKey("warScene/playeSkill/confirm0.png");
 	}
 
 	void CombatEffect::addEvent()
@@ -59,6 +60,7 @@ namespace BattleSpace{
 	bool CombatEffect::init()
 	{
 		CCSize winSize = CCDirector::sharedDirector()->getWinSize();
+		mManage = DataCenter::sharedData()->getWar();
 		addEvent();
 		//加载配置信息
 		_playerSkillData = new CPlayerSkillData;
@@ -98,7 +100,7 @@ namespace BattleSpace{
 	{
 		CCSize winSize = CCDirector::sharedDirector()->getWinSize();
 		m_Scene = scene;
-		SpData* data = DataCenter::sharedData()->getWar()->getSpineData(ToString(9999));
+		SpData* data = mManage->getSpineData(ToString(9999));
 		m_skeletonNode = SkeletonAnimation::createWithData(data->first);
 		m_skeletonNode->eventListener = std::bind(&CombatEffect::SpineActionEvent,this,std::placeholders::_1,std::placeholders::_2);
 		m_skeletonNode->endListener = std::bind(&CombatEffect::SpineActionEnd,this,std::placeholders::_1);
@@ -108,31 +110,31 @@ namespace BattleSpace{
 
 	void CombatEffect::SpineActionEnd( int trackIndex ){
 		m_skeletonNode->setVisible(false);
-		m_Scene->getCombatLogic()->setRunLogic(true);
+		mManage->setLogicState(true);
 	}
 	//连击造成伤害效果
 	void CombatEffect::SpineActionEvent( int trackIndex, spEvent* pEvent )
 	{
-		switch ((E_ActionEvent)pEvent->intValue)
+		switch ((eActionEvent)pEvent->intValue)
 		{
-		case E_ActionEvent::eHitEvent:
+		case eActionEvent::eHitEvent:
 			{
 				continuousHurt();
 			}break;
-		case E_ActionEvent::eShark:
+		case eActionEvent::eShark:
 			{
 				NOTIFICATION->postNotification(B_Shark,nullptr);
 			}break;
-		case E_ActionEvent::eAttackEventEnd:
+		case eActionEvent::eAttackEventEnd:
 			{
-				CCArray* monsters = DataCenter::sharedData()->getWar()->getAlivesByCamp(true,false,false);
+				CCArray* monsters = mManage->getMonsters();
 				CCObject* mObj = nullptr;
 				CCARRAY_FOREACH(monsters,mObj)
 				{
 					BaseRole* alive = (BaseRole*)mObj;
 					if(alive->getHp()<=0 
 						&& alive->getRoleObject() != nullptr
-						&& !alive->getDieState())
+						&& alive->getAliveState())
 						alive->getRoleObject()->AliveDie();
 				}
 			}break;
@@ -140,74 +142,72 @@ namespace BattleSpace{
 			break;
 		}									//动画确定播放点,策划确定播放内容
 		if (pEvent->intValue >= 200)			//音效从200号文件开始播放
-			PlaySound_Event(pEvent->intValue);
+			PlaySound(pEvent->intValue);
 	}
 	//伤害(实际扣血) = 攻击力^2/( 攻击力+目标防御 )
 	void CombatEffect::continuousHurt()
 	{
 		float tAttackNum = CountAliveAtk();
-		vector<BaseRole*>* Vec = DataCenter::sharedData()->getWar()->getVecMonsters();
-		for (auto alive : *Vec)
+		vector<BaseRole*>* Vec = mManage->inBattleMonsters();
+		for (auto tRole : *Vec)
 		{
-			RoleObject* actObject = alive->getRoleObject();
-			if (alive->getGridIndex() < C_BEGINGRID)
+			RoleObject* tObject = tRole->getRoleObject();
+			if (tRole->getGridIndex() < C_BEGINGRID)
 				continue;
-			if (!actObject)
+			if (!tObject)
 				continue;
-			actObject->TurnStateTo(E_StateCode::eHitState); 
-			int lostNum = pow(tAttackNum,2)/(tAttackNum+alive->getDef());
+			tObject->TurnStateTo(sStateCode::eHitState); 
+			int lostNum = pow(tAttackNum,2)/(tAttackNum+tRole->getDef());
 			if (lostNum <= 0)
 				lostNum = 1;
-			alive->setHp(alive->getHp()-lostNum);
-			actObject->playerNum(lostNum,generalType);	//受击武将播放血量变化
+			tRole->setHp(tRole->getHp()-lostNum);
+			tObject->playerNum(lostNum,generalType);	//受击武将播放血量变化
 		}
 	}
 	//公式：	攻击力=近战英雄攻击力总和*0.05+远程英雄攻击力总和*0.04+辅助英雄攻击力总和*0.1+肉盾英雄攻击力总和*0.08		
 	float CombatEffect::CountAliveAtk()
 	{
-		float attackNum = 0;
-		CCArray* heros = DataCenter::sharedData()->getWar()->getAlivesByCamp(false,false,false);
+		float tHurt = 0;
+		CCArray* heros = mManage->getHeros();
 		CCObject* obj = nullptr;
 		CCARRAY_FOREACH(heros,obj)
 		{
-			BaseRole* alive = (BaseRole*)obj;
-			if (alive->getBaseData()->getCallRole())
+			BaseRole* tRole = (BaseRole*)obj;
+			if (tRole->getFatherID())
 				continue;
-			const HeroInfoData *c_data = DataCenter::sharedData()->getHeroInfo()->getCfg(alive->getBaseData()->getRoleModel());
+			const HeroInfoData *c_data = DataCenter::sharedData()->getHeroInfo()->getCfg(tRole->getBaseData()->getRoleModel());
 			if (!c_data)
 			{
 				CCLOG("[ *ERROR ] CombatEffect::CountAliveAtk heroDesc.csv MoveID=%d");
-				attackNum += alive->getAtk()*0.04f;
+				tHurt += tRole->getAtk()*0.04f;
 				continue;
 			}
 			switch (c_data->iType2)		//近战，远战，坦克，辅助
 			{
 			case 1:
 				{
-					attackNum += alive->getAtk()*0.05f;
+					tHurt += tRole->getAtk()*0.05f;
 				}break;
 			case 2:
 				{
-					attackNum += alive->getAtk()*0.04f;
+					tHurt += tRole->getAtk()*0.04f;
 				}break;
 			case 3:
 				{
-					attackNum += alive->getAtk()*0.08f;
+					tHurt += tRole->getAtk()*0.08f;
 				}break;
 			case 4:
 				{
-					attackNum += alive->getAtk()*0.1f;
+					tHurt += tRole->getAtk()*0.1f;
 				}break;
-			default:
-				break;
 			}			
 		}
-		return attackNum;
+		return tHurt;
 	}
 
 	void CombatEffect::BatterSpine( int index )
 	{
-		if (DataCenter::sharedData()->getWar()->getbattleOver())			//战斗胜利不再播放效果
+		if (mManage->getbattleOver())			//战斗胜利不再播放效果
 			return;
 		if (index >= 2)
 		{
@@ -217,7 +217,7 @@ namespace BattleSpace{
 			m_skeletonNode->setToSetupPose();
 			m_skeletonNode->setAnimation(0,str,false);
 		}else{
-			m_Scene->getCombatLogic()->setRunLogic(true);
+			mManage->setLogicState(true);
 		}
 	}
 
@@ -227,10 +227,10 @@ namespace BattleSpace{
 		BaseRole*alive = Result->getAlive();
 		RoleObject* aliveOb = alive->getRoleObject();
 		const skEffectData* efInfo = alive->getCurrEffect();									//状态性的数据	
-		EffectInfo* effectinfo = DataCenter::sharedData()->getWar()->getEffData()->getEffectInfo(efInfo->getEffectID());	
+		EffectInfo* effectinfo = mManage->getEffData()->getEffectInfo(efInfo->getEffectID());	
 		if (!effectinfo)
 		{
-			effectinfo = DataCenter::sharedData()->getWar()->getEffData()->getEffectInfo(10000021);
+			effectinfo = mManage->getEffData()->getEffectInfo(10000021);
 			CCLOG("[ ERROR ] CombatEffect::BattleEffect EffectInfo NULL %d",efInfo->getEffectID());
 		}
 		if (Result->getusNum()&&Result->getusType())
@@ -260,7 +260,7 @@ namespace BattleSpace{
 				NOTIFICATION->postNotification(B_Shark,nullptr);
 			if (Result->m_LostHp[*iter].hitNum < 0)													//播放受击动作
 			{
-				pAliveOb->TurnStateTo(E_StateCode::eHitState); 
+				pAliveOb->TurnStateTo(sStateCode::eHitState); 
 				if (!alive->getEnemy())
 					NOTIFICATION->postNotification(B_ContinuousNumber);			//刷新连击处理
 			}
@@ -269,7 +269,7 @@ namespace BattleSpace{
 			if (Result->m_Repel[*iter] != pAlive->getGridIndex())
 			{
 				pAlive->setMoveGrid(Result->m_Repel[*iter]);
-				pAliveOb->setMoveState(E_StateCode::eHitState);
+				pAliveOb->setMoveState(sStateCode::eHitState);
 			}
 		}
 	}
@@ -277,10 +277,10 @@ namespace BattleSpace{
 	void CombatEffect::AttackNull(CCObject* ob)
 	{
 		BattleResult* Result = (BattleResult*)ob;
-		BaseRole*alive = Result->getAlive();
-		RoleObject* aliveOb = alive->getRoleObject();
-		const skEffectData* efInfo = alive->getCurrEffect();
-		EffectInfo* effectinfo = DataCenter::sharedData()->getWar()->getEffData()->getEffectInfo(efInfo->getEffectID());
+		BaseRole*tBaseRole = Result->getAlive();
+		RoleObject* tRoleObject = tBaseRole->getRoleObject();
+		const skEffectData* efInfo = tBaseRole->getCurrEffect();
+		EffectInfo* effectinfo = mManage->getEffData()->getEffectInfo(efInfo->getEffectID());
 		if (!effectinfo)
 		{
 			CCLOG("[ *ERROR ] CombatEffect::AttackNull");
@@ -288,11 +288,11 @@ namespace BattleSpace{
 		}
 		if (!Result->m_HitTargets.size())							//未打中目标播放受击音效
 		{
-			aliveOb->setEffectMusic(effectinfo->getfoeMusicId());
+			tRoleObject->setEffectMusic(effectinfo->getfoeMusicId());
 			if (effectinfo->getisblack())															//震屏处理
 				NOTIFICATION->postNotification(B_Shark,nullptr);
 		}
-		aliveOb->setPlayerEffect(effectinfo->getfoeEft());
+		tRoleObject->setPlayerEffect(effectinfo->getfoeEft());
 	}
 
 	void CombatEffect::PlayerSkill(BaseRole* alive)
@@ -338,7 +338,7 @@ namespace BattleSpace{
 				newX = MAP_MINX(m_map);
 			if (newX > 0)newX = 0;
 			CCMoveTo* moveTo = CCMoveTo::create(0.2f,ccp(newX,MoveLayer->getPositionY()));
-			if (DataCenter::sharedData()->getWar()->getNormal())																//非普通关卡技能不移动位置
+			if (mManage->getNormal())																//非普通关卡技能不移动位置
 				MoveLayer->runAction(moveTo);
 			float dx = (newX - MoveLayer->getPositionX())*0.3f;
 			float layx = 0;
@@ -360,13 +360,12 @@ namespace BattleSpace{
 		SkillEffect->addChild(skillname);
 
 		//获取技能文本
-		WarManager* warManager = DataCenter::sharedData()->getWar();
 		const SkillCfg* pSkillCfg = DataCenter::sharedData()->getSkill()->getCfg(((BaseRole*)SkillEffect->getUserData())->getCurrSkill()->getSkillID());
 		std::string text = pSkillCfg->name;
 		CCSprite* pSprite = CCSprite::create(CCString::createWithFormat("warScene/playerSkill/%d.png", pSkillCfg->id)->getCString());
 		if(!pSprite)
 		{
-			CCLOG("*ERROR-CombatEffect::SkillEfHandleForEnemy");
+			CCLOG("[ *ERROR ]CombatEffect::SkillEfHandleForEnemy Lost Image warScene/playerSkill/%d.png", pSkillCfg->id);
 			pSprite = CCSprite::create("warScene/playerSkill/10000020.png");
 			CCTextureCache::sharedTextureCache()->removeTextureForKey("warScene/playerSkill/10000020.png");
 		}else{
@@ -445,7 +444,7 @@ namespace BattleSpace{
 			CCLOG("ERROR CombatEffect::SkillEfHandle");
 			pText = CCSprite::create("warScene/playerSkill/10351050.png");
 		}
-		pText->setPosition(ccp(730, 79));
+		pText->setPosition(ccp(810, 92));
 		pText->setAnchorPoint(ccp(0.5, 0.5f));
 		pText->runAction(CCSequence::create(CCMoveBy::create(0.3f, ccp(-570, -155)), CCMoveBy::create(1.0f, ccp(0, -5)), CCMoveBy::create(0.1f, ccp(-570, -120)),NULL));
 		pText->setRotation(-10);
@@ -455,8 +454,8 @@ namespace BattleSpace{
 		_armaturePlayerSkill->addChild(pText, _armaturePlayerSkill->getBone("heizi0")->getZOrder()+1, FRAME_ACTION_TEXT_CHILD_TAG);
 
 		//移除图片
-		CCTextureCache::sharedTextureCache()->removeTextureForKey(pHeadStr->getCString());
-		CCTextureCache::sharedTextureCache()->removeTextureForKey(pTextStr->getCString());
+		//CCTextureCache::sharedTextureCache()->removeTextureForKey(pHeadStr->getCString());
+		//CCTextureCache::sharedTextureCache()->removeTextureForKey(pTextStr->getCString());
 	}
 
 	void CombatEffect::armatureMovementEventCallFunc( CCArmature * pArmature, MovementEventType type, const char *data )
@@ -472,7 +471,7 @@ namespace BattleSpace{
 				_armaturePlayerSkill->getChildByTag(FRAME_ACTION_HEAD_CHILD_TAG)->getChildByTag(FRAME_ACTION_HEAD_CHILD_TAG)->removeFromParentAndCleanup(true);
 				_armaturePlayerSkill->getChildByTag(FRAME_ACTION_TEXT_CHILD_TAG)->removeFromParentAndCleanup(true);
 				_armaturePlayerSkill->removeFromParentAndCleanup(false);		
-				m_Scene->getCombatLogic()->setRunLogic(true); 
+				mManage->setLogicState(true);
 			}break;
 		case cocos2d::extension::LOOP_COMPLETE:{}break;
 		default:break;

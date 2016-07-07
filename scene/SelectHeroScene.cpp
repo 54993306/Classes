@@ -734,7 +734,7 @@ void SelectHeroScene::updateFrame( float dt )
 				if(sEventName.size()>0)
 				{
 					if(sEventName.compare(EVE_SOUND)			==0 )		
-						PlaySound_Event(armatureEvent.sound);				//播放声音
+						PlaySound(armatureEvent.sound);				//播放声音
 				}
 			}
 		}

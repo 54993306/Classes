@@ -17,8 +17,9 @@
 #include "model/DataCenter.h"
 #include "model/WarManager.h"
 #include "reward/WorldBoss.h"
-#include "Battle/ActionNameDefine.h"
 #include "Battle/EffectData.h"
+#include "Battle/ActionNameDefine.h"
+#include "Global.h"
 using namespace BattleSpace;
 bool WBossSortWarPrize(const Prize& data1, const Prize& data2)
 {
@@ -60,11 +61,6 @@ void CWBossLayer::onEnter()
 {
 	BaseLayer::onEnter();
 
-	//绑定活动列表回调
-	GetTcpNet->registerMsgHandler(BossDataMsg, this, CMsgHandler_selector(CWBossLayer::processNetMsg));
-	GetTcpNet->registerMsgHandler(BuyInspireMsg, this, CMsgHandler_selector(CWBossLayer::processNetMsg));
-	GetTcpNet->registerMsgHandler(ResetBattleTimeMsg, this, CMsgHandler_selector(CWBossLayer::processNetMsg));
-
 	//几个按钮
 	CButton* pBtnReset = (CButton*)m_ui->findWidgetById("reset");
 	pBtnReset->setOnClickListener(this, ccw_click_selector(CWBossLayer::reset));
@@ -89,6 +85,13 @@ void CWBossLayer::onEnter()
 	CImageView* pRewardBox2 = (CImageView*)m_ui->findWidgetById("reward_2");
 	pRewardBox2->setTouchEnabled(true);
 	pRewardBox2->setOnPressListener(this, ccw_press_selector(CWBossLayer::pressRewardBox));
+
+	//绑定活动列表回调
+	GetTcpNet->registerMsgHandler(BossDataMsg, this, CMsgHandler_selector(CWBossLayer::processNetMsg));
+	GetTcpNet->registerMsgHandler(BuyInspireMsg, this, CMsgHandler_selector(CWBossLayer::processNetMsg));
+	GetTcpNet->registerMsgHandler(ResetBattleTimeMsg, this, CMsgHandler_selector(CWBossLayer::processNetMsg));
+
+	NOTIFICATION->addObserver(this, callfuncO_selector(CWBossLayer::timeInBackground), TIME_IN_BACKGROUND, nullptr);
 }
 
 void CWBossLayer::onExit()
@@ -110,6 +113,7 @@ void CWBossLayer::onExit()
 	CCTextureCache::sharedTextureCache()->removeUnusedTextures();
 
 	NOTIFICATION->postNotification(SHOW_MAIN_SCENE);
+	NOTIFICATION->removeAllObservers(this);
 }
 
 void CWBossLayer::processNetMsg( int type, google::protobuf::Message *msg )
@@ -413,7 +417,7 @@ void CWBossLayer::updateDataBossCome( BossData* pData )
 	pRect->setOnPressListener(this,ccw_press_selector(CWBossLayer::pressSkill));	
 	pRect->setUserObject(CCBool::create(true));
 	//贴图
-	CCSprite* pIcon = CImageView::create("skillIcon/100000.png");
+	CCSprite* pIcon = CImageView::create("skillIcon/10000.png");
 	pBg->addChild(pIcon);
 	NodeFillParent(pIcon);
 	//等级
@@ -726,10 +730,10 @@ void CWBossLayer::showStory( CCObject* pSender )
 		{
 			sFile = "csv/story/boss_1101.json";
 		}
-		m_pStoryData->LoadFile(sFile.c_str(), (int)BattleSpace::StoryType::eBeginStory);
+		m_pStoryData->LoadFile(sFile.c_str(), (int)StoryType::eBeginStory);
 	}
 
-	pLayer->CreateStoryWithStoryData(CCInteger::create((int)BattleSpace::StoryType::eBeginStory), m_pStoryData);
+	pLayer->CreateStoryWithStoryData(CCInteger::create((int)StoryType::eBeginStory), m_pStoryData);
 
 	pLayer->hideJumpBtn();
 }
@@ -986,6 +990,14 @@ void CWBossLayer::callBackForSetArmatureScale()
 		pArmature->setScale(550/pArmature->boundingBox().size.height);
 		return;
 	}
+}
+
+void CWBossLayer::timeInBackground( CCObject* pObj )
+{
+	CCInteger* pValue = dynamic_cast<CCInteger*>(pObj);
+	int iValue = pValue->getValue()/1000;
+	m_iBossSecond -= iValue;
+	m_iNextChallengeSecond -= iValue;
 }
 
 

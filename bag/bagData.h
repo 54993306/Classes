@@ -135,7 +135,7 @@ struct CItem
 	int id ;		//玩家道具ID
 	int itemId ;	//道具标识ID
 	string itemName;	//道具名称
-	int itemType ;	//道具类型(1 常规道具，只显示名称和描述说明，不具有特殊属性， 2 装备，3 消耗类道具 比如药品 ……)
+	int itemType ;	//道具类型(1 常规道具，只显示名称和描述说明，不具有特殊属性， 2 装备，3 消耗类道具 比如药品 ……4.宝物)
 	int useLevel ;	//使用等级
 	int moneyType  ;	//购买道具花费的货币类型
 	int buyPrice  ;	//购买价格
@@ -183,7 +183,6 @@ struct  CStrengthenResponse
 };
 
 CCTexture2D* setItemQualityTexture(int quality);
-CCTexture2D* setQualityTexture(int quality);
 
 CImageView *getPrizeSprite(const CPrize *prize);
 

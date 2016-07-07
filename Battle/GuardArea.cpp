@@ -29,7 +29,7 @@ namespace BattleSpace{
 		initAliveGuard(pAlive,Vecguard);
 		for (auto i:Vecguard)
 		{
-			for (auto tAlive:*mManage->getVecMonsters())
+			for (auto tAlive:*mManage->inBattleMonsters())
 			{
 				vector<int>::reverse_iterator iter= tAlive->mStandGrids.rbegin();
 				for (;iter != tAlive->mStandGrids.rend();iter++)			//我方对怪物应该从最大的格子开始进行判断
@@ -76,7 +76,7 @@ namespace BattleSpace{
 				return;
 			}
 		}
-		VectorRemoveRepeat(pGuards);
+		VectorUnique(pGuards);
 		sort(pGuards.begin(),pGuards.end(),greater<int>());				//警戒区域优先判断后方与上方区域是否有人
 	}
 

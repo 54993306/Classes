@@ -1,6 +1,8 @@
 
 //#include "JNITool.h"
 #include "FaceBookSDK.h"
+#include "model/DataCenter.h"
+#include "common/MultLanguage.h"
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 	#include "platform/android/jni/JniHelper.h"
 	#include <android/log.h>
@@ -75,11 +77,42 @@ void FaceBookSDK::closeAuthor()
 
 void FaceBookSDK::onOpenPickFriends()
 {
+	UserData *data = DataCenter::sharedData()->getUser()->getUserData();
+	string appName = GETLANGSTR(1258);
+	CCString *str = CCString::createWithFormat(GETLANGSTR(1260),ToString(data->getRoleID()+10000));
+	string appDesc = GETLANGSTR(1259)+ string(str->getCString());
+	string imgUrl ="";
 #if (CC_TARGET_PLATFORM==CC_PLATFORM_ANDROID)
-		JniMethodInfo minfo;
-	if(JniHelper::getMethodInfo(minfo,Java_Main_Name,"onOpenPickFriends","()V"))
+	
+	JniMethodInfo minfo;
+	if(JniHelper::getMethodInfo(minfo,Java_Main_Name,"onOpenPickFriends","(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V"))
 	{
-		minfo.env->CallVoidMethod(getMainActivityObject(),minfo.methodID);
+		jstring stringName = minfo.env->NewStringUTF(appName.c_str());
+		jstring stringDesc = minfo.env->NewStringUTF(appDesc.c_str());
+		jstring stringImgUrl = minfo.env->NewStringUTF(imgUrl.c_str());
+		minfo.env->CallVoidMethod(getMainActivityObject(),minfo.methodID,stringName,stringDesc,stringImgUrl);
+	//	minfo.env->DeleteLocalRef(stringName);
+	//  ¡¡minfo.env->DeleteLocalRef(stringDesc);
+	}
+#endif
+}
+
+void FaceBookSDK::onShareToFb(const char* desc, const char* imgUrl)
+{
+	UserData *data = DataCenter::sharedData()->getUser()->getUserData();
+	string appName = GETLANGSTR(1258);
+	string strdesc = desc;
+	string strimg = imgUrl;
+
+#if (CC_TARGET_PLATFORM==CC_PLATFORM_ANDROID)
+
+	JniMethodInfo minfo;
+	if(JniHelper::getMethodInfo(minfo,Java_Main_Name,"onOpenPickFriends","(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V"))
+	{
+		jstring stringName = minfo.env->NewStringUTF(appName.c_str());
+		jstring stringDesc = minfo.env->NewStringUTF(strdesc.c_str());
+		jstring stringImgUrl = minfo.env->NewStringUTF(strimg.c_str());
+		minfo.env->CallVoidMethod(getMainActivityObject(),minfo.methodID,stringName,stringDesc,stringImgUrl);
 	}
 #endif
 }

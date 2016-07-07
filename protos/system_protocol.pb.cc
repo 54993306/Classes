@@ -32,6 +32,9 @@ const ::google::protobuf::internal::GeneratedMessageReflection*
 const ::google::protobuf::Descriptor* CardExchangeRes_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   CardExchangeRes_reflection_ = NULL;
+const ::google::protobuf::Descriptor* CBExchange_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  CBExchange_reflection_ = NULL;
 const ::google::protobuf::Descriptor* GameTips_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   GameTips_reflection_ = NULL;
@@ -106,7 +109,23 @@ void protobuf_AssignDesc_system_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(CardExchangeRes));
-  GameTips_descriptor_ = file->message_type(4);
+  CBExchange_descriptor_ = file->message_type(4);
+  static const int CBExchange_offsets_[2] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CBExchange, username_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CBExchange, password_),
+  };
+  CBExchange_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      CBExchange_descriptor_,
+      CBExchange::default_instance_,
+      CBExchange_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CBExchange, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CBExchange, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(CBExchange));
+  GameTips_descriptor_ = file->message_type(5);
   static const int GameTips_offsets_[10] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GameTips, mailtips_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GameTips, tasktips_),
@@ -151,6 +170,8 @@ void protobuf_RegisterTypes(const ::std::string&) {
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     CardExchangeRes_descriptor_, &CardExchangeRes::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    CBExchange_descriptor_, &CBExchange::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     GameTips_descriptor_, &GameTips::default_instance());
 }
 
@@ -165,6 +186,8 @@ void protobuf_ShutdownFile_system_5fprotocol_2eproto() {
   delete CardExchangeReq_reflection_;
   delete CardExchangeRes::default_instance_;
   delete CardExchangeRes_reflection_;
+  delete CBExchange::default_instance_;
+  delete CBExchange_reflection_;
   delete GameTips::default_instance_;
   delete GameTips_reflection_;
 }
@@ -182,24 +205,28 @@ void protobuf_AddDesc_system_5fprotocol_2eproto() {
     "on\030\001 \002(\005\"\030\n\010Bulletin\022\014\n\004text\030\001 \002(\t\"\"\n\017Ca"
     "rdExchangeReq\022\017\n\007card_no\030\001 \002(\t\"K\n\017CardEx"
     "changeRes\022\016\n\006result\030\001 \002(\005\022(\n\nprize_list\030"
-    "\002 \003(\0132\024.protos.common.Prize\"\305\001\n\010GameTips"
-    "\022\020\n\010mailTips\030\001 \001(\010\022\020\n\010taskTips\030\002 \001(\010\022\023\n\013"
-    "lotteryTips\030\003 \001(\010\022\020\n\010heroTips\030\004 \001(\010\022\020\n\010f"
-    "armTips\030\005 \001(\010\022\021\n\tstrenTips\030\006 \001(\010\022\017\n\007actT"
-    "ips\030\007 \001(\010\022\020\n\010shopTips\030\010 \001(\010\022\022\n\nbountyTip"
-    "s\030\t \001(\010\022\022\n\nrisingTips\030\n \001(\010B1\n\035dass.serv"
-    "er.gameserver.protosB\016SystemProtocolH\001", 478);
+    "\002 \003(\0132\024.protos.common.Prize\"0\n\nCBExchang"
+    "e\022\020\n\010username\030\001 \002(\t\022\020\n\010password\030\002 \002(\t\"\305\001"
+    "\n\010GameTips\022\020\n\010mailTips\030\001 \001(\010\022\020\n\010taskTips"
+    "\030\002 \001(\010\022\023\n\013lotteryTips\030\003 \001(\010\022\020\n\010heroTips\030"
+    "\004 \001(\010\022\020\n\010farmTips\030\005 \001(\010\022\021\n\tstrenTips\030\006 \001"
+    "(\010\022\017\n\007actTips\030\007 \001(\010\022\020\n\010shopTips\030\010 \001(\010\022\022\n"
+    "\nbountyTips\030\t \001(\010\022\022\n\nrisingTips\030\n \001(\010B1\n"
+    "\035dass.server.gameserver.protosB\016SystemPr"
+    "otocolH\001", 528);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "system_protocol.proto", &protobuf_RegisterTypes);
   Disconnect::default_instance_ = new Disconnect();
   Bulletin::default_instance_ = new Bulletin();
   CardExchangeReq::default_instance_ = new CardExchangeReq();
   CardExchangeRes::default_instance_ = new CardExchangeRes();
+  CBExchange::default_instance_ = new CBExchange();
   GameTips::default_instance_ = new GameTips();
   Disconnect::default_instance_->InitAsDefaultInstance();
   Bulletin::default_instance_->InitAsDefaultInstance();
   CardExchangeReq::default_instance_->InitAsDefaultInstance();
   CardExchangeRes::default_instance_->InitAsDefaultInstance();
+  CBExchange::default_instance_->InitAsDefaultInstance();
   GameTips::default_instance_->InitAsDefaultInstance();
   ::google::protobuf::internal::OnShutdown(&protobuf_ShutdownFile_system_5fprotocol_2eproto);
 }
@@ -1117,6 +1144,289 @@ void CardExchangeRes::Swap(CardExchangeRes* other) {
   ::google::protobuf::Metadata metadata;
   metadata.descriptor = CardExchangeRes_descriptor_;
   metadata.reflection = CardExchangeRes_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int CBExchange::kUsernameFieldNumber;
+const int CBExchange::kPasswordFieldNumber;
+#endif  // !_MSC_VER
+
+CBExchange::CBExchange()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+}
+
+void CBExchange::InitAsDefaultInstance() {
+}
+
+CBExchange::CBExchange(const CBExchange& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+}
+
+void CBExchange::SharedCtor() {
+  _cached_size_ = 0;
+  username_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  password_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+CBExchange::~CBExchange() {
+  SharedDtor();
+}
+
+void CBExchange::SharedDtor() {
+  if (username_ != &::google::protobuf::internal::kEmptyString) {
+    delete username_;
+  }
+  if (password_ != &::google::protobuf::internal::kEmptyString) {
+    delete password_;
+  }
+  if (this != default_instance_) {
+  }
+}
+
+void CBExchange::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* CBExchange::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return CBExchange_descriptor_;
+}
+
+const CBExchange& CBExchange::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_system_5fprotocol_2eproto();
+  return *default_instance_;
+}
+
+CBExchange* CBExchange::default_instance_ = NULL;
+
+CBExchange* CBExchange::New() const {
+  return new CBExchange;
+}
+
+void CBExchange::Clear() {
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (has_username()) {
+      if (username_ != &::google::protobuf::internal::kEmptyString) {
+        username_->clear();
+      }
+    }
+    if (has_password()) {
+      if (password_ != &::google::protobuf::internal::kEmptyString) {
+        password_->clear();
+      }
+    }
+  }
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool CBExchange::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+  ::google::protobuf::uint32 tag;
+  while ((tag = input->ReadTag()) != 0) {
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // required string username = 1;
+      case 1: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_username()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+            this->username().data(), this->username().length(),
+            ::google::protobuf::internal::WireFormat::PARSE);
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(18)) goto parse_password;
+        break;
+      }
+
+      // required string password = 2;
+      case 2: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_password:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_password()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+            this->password().data(), this->password().length(),
+            ::google::protobuf::internal::WireFormat::PARSE);
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectAtEnd()) return true;
+        break;
+      }
+
+      default: {
+      handle_uninterpreted:
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          return true;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+  return true;
+#undef DO_
+}
+
+void CBExchange::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // required string username = 1;
+  if (has_username()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->username().data(), this->username().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      1, this->username(), output);
+  }
+
+  // required string password = 2;
+  if (has_password()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->password().data(), this->password().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      2, this->password(), output);
+  }
+
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+}
+
+::google::protobuf::uint8* CBExchange::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // required string username = 1;
+  if (has_username()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->username().data(), this->username().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        1, this->username(), target);
+  }
+
+  // required string password = 2;
+  if (has_password()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->password().data(), this->password().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        2, this->password(), target);
+  }
+
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  return target;
+}
+
+int CBExchange::ByteSize() const {
+  int total_size = 0;
+
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // required string username = 1;
+    if (has_username()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::StringSize(
+          this->username());
+    }
+
+    // required string password = 2;
+    if (has_password()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::StringSize(
+          this->password());
+    }
+
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void CBExchange::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const CBExchange* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const CBExchange*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void CBExchange::MergeFrom(const CBExchange& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_username()) {
+      set_username(from.username());
+    }
+    if (from.has_password()) {
+      set_password(from.password());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void CBExchange::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void CBExchange::CopyFrom(const CBExchange& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool CBExchange::IsInitialized() const {
+  if ((_has_bits_[0] & 0x00000003) != 0x00000003) return false;
+
+  return true;
+}
+
+void CBExchange::Swap(CBExchange* other) {
+  if (other != this) {
+    std::swap(username_, other->username_);
+    std::swap(password_, other->password_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata CBExchange::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = CBExchange_descriptor_;
+  metadata.reflection = CBExchange_reflection_;
   return metadata;
 }
 

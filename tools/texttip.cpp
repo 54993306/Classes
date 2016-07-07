@@ -119,11 +119,12 @@ void texttip::doProcess()
 		{
 			CCSprite* bg = CCSprite::create("label/wave_jp.png");
 			//bg->setAnchorPoint(ccp(0.5f, 0.5f));
-			//bg->setPosition(this->getAnchorPointInPoints());
+			bg->setPositionX(bg->getPositionX()-30);
 			this->addChild(bg);
 			if (m_pNodeContent)
 			{
-				m_pNodeContent->setPosition(ccp(40,-25));
+				m_pNodeContent->setScale(0.95f);
+				m_pNodeContent->setPosition(ccp(70,-35));
 				this->addChild(m_pNodeContent);	
 			}
 					

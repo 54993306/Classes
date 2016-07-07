@@ -16,7 +16,9 @@ USING_NS_CC;
 enum AccessType
 {
 	AccessTypeSign = 1,
-	AccessTypeMax
+	AccessExchange,
+	AccessTypeMax,
+	
 };
 
 class CAccessLayer: public BaseLayer

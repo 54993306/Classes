@@ -134,6 +134,13 @@ class Prize : public ::google::protobuf::Message {
   inline ::google::protobuf::int32 color() const;
   inline void set_color(::google::protobuf::int32 value);
 
+  // optional int32 param = 7;
+  inline bool has_param() const;
+  inline void clear_param();
+  static const int kParamFieldNumber = 7;
+  inline ::google::protobuf::int32 param() const;
+  inline void set_param(::google::protobuf::int32 value);
+
   // @@protoc_insertion_point(class_scope:protos.common.Prize)
  private:
   inline void set_has_type();
@@ -148,6 +155,8 @@ class Prize : public ::google::protobuf::Message {
   inline void clear_has_thumb();
   inline void set_has_color();
   inline void clear_has_color();
+  inline void set_has_param();
+  inline void clear_has_param();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
@@ -157,9 +166,10 @@ class Prize : public ::google::protobuf::Message {
   ::google::protobuf::int32 quality_;
   ::google::protobuf::int32 thumb_;
   ::google::protobuf::int32 color_;
+  ::google::protobuf::int32 param_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(6 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(7 + 31) / 32];
 
   friend void  protobuf_AddDesc_common_2fprize_5fcommon_2eproto();
   friend void protobuf_AssignDesc_common_2fprize_5fcommon_2eproto();
@@ -305,6 +315,28 @@ inline ::google::protobuf::int32 Prize::color() const {
 inline void Prize::set_color(::google::protobuf::int32 value) {
   set_has_color();
   color_ = value;
+}
+
+// optional int32 param = 7;
+inline bool Prize::has_param() const {
+  return (_has_bits_[0] & 0x00000040u) != 0;
+}
+inline void Prize::set_has_param() {
+  _has_bits_[0] |= 0x00000040u;
+}
+inline void Prize::clear_has_param() {
+  _has_bits_[0] &= ~0x00000040u;
+}
+inline void Prize::clear_param() {
+  param_ = 0;
+  clear_has_param();
+}
+inline ::google::protobuf::int32 Prize::param() const {
+  return param_;
+}
+inline void Prize::set_param(::google::protobuf::int32 value) {
+  set_has_param();
+  param_ = value;
 }
 
 

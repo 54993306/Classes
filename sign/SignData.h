@@ -1,5 +1,11 @@
-﻿#ifndef __SIGN_DATA_
-#define __SIGN_DATA_
+﻿#pragma once
+
+/******************************************************
+*文件名称:	SignData.h
+*编写日期:	2016-6-14-11:45
+*编写作者:	YPF
+*功能描述:	签到数据
+*******************************************************/
 
 #include "bag/bagData.h"
 #include "protos/protocol.h"
@@ -34,5 +40,3 @@ struct CSignRes
 	CSignRes();
 	void read(const SignResponse& res);
 };
-
-#endif

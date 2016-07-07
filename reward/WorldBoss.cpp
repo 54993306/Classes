@@ -180,6 +180,7 @@ void CWorldBoss::updateShowArea()
 			if(!m_pShopLayer)
 			{
 				m_pShopLayer = CWShopLayer::create();
+				m_pShopLayer->loadUiByType(3);
 				m_pShopLayer->setTouchPriority(LayerManager::instance()->getPriority()-1);
 				pLayer->addChild(m_pShopLayer);
 				m_pShopLayer->setPosition(pLayer->convertToNodeSpace(m_pShopLayer->getPosition()));
@@ -223,7 +224,7 @@ void CWorldBoss::showWorldBossEffect(int iBossId)
 	PlayBackgroundMusic(BGM_Boss1,true);
 
 	//警告闪电
-	EffectObject* eff = EffectObject::create("warning",PLAYERTYPE::Repeat);
+	EffectObject* eff = EffectObject::create("warning",sPlayType::eRepeat);
 	eff->setPosition(VCENTER);
 	eff->setEffAnchorPoint(0.5,0.5);
 	eff->setZOrder(2);

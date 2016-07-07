@@ -16,9 +16,9 @@
 
 namespace BattleSpace
 {
-	AffectType AffectCross::getAreaType()
+	sAffectType AffectCross::getAreaType()
 	{
-		return AffectType::eCross;
+		return sAffectType::eCross;
 	}
 
 	void AffectCross::initArea(AreaCountInfo& pInfo)

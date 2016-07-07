@@ -252,6 +252,13 @@ class Server : public ::google::protobuf::Message {
   inline bool selected() const;
   inline void set_selected(bool value);
 
+  // optional uint64 open_time = 6;
+  inline bool has_open_time() const;
+  inline void clear_open_time();
+  static const int kOpenTimeFieldNumber = 6;
+  inline ::google::protobuf::uint64 open_time() const;
+  inline void set_open_time(::google::protobuf::uint64 value);
+
   // @@protoc_insertion_point(class_scope:protos.Server)
  private:
   inline void set_has_server_name();
@@ -264,6 +271,8 @@ class Server : public ::google::protobuf::Message {
   inline void clear_has_server_status();
   inline void set_has_selected();
   inline void clear_has_selected();
+  inline void set_has_open_time();
+  inline void clear_has_open_time();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
@@ -271,10 +280,11 @@ class Server : public ::google::protobuf::Message {
   ::std::string* server_host_;
   ::google::protobuf::int32 server_port_;
   ::google::protobuf::int32 server_status_;
+  ::google::protobuf::uint64 open_time_;
   bool selected_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(5 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(6 + 31) / 32];
 
   friend void  protobuf_AddDesc_gate_5fprotocol_2eproto();
   friend void protobuf_AssignDesc_gate_5fprotocol_2eproto();
@@ -663,6 +673,28 @@ inline bool Server::selected() const {
 inline void Server::set_selected(bool value) {
   set_has_selected();
   selected_ = value;
+}
+
+// optional uint64 open_time = 6;
+inline bool Server::has_open_time() const {
+  return (_has_bits_[0] & 0x00000020u) != 0;
+}
+inline void Server::set_has_open_time() {
+  _has_bits_[0] |= 0x00000020u;
+}
+inline void Server::clear_has_open_time() {
+  _has_bits_[0] &= ~0x00000020u;
+}
+inline void Server::clear_open_time() {
+  open_time_ = GOOGLE_ULONGLONG(0);
+  clear_has_open_time();
+}
+inline ::google::protobuf::uint64 Server::open_time() const {
+  return open_time_;
+}
+inline void Server::set_open_time(::google::protobuf::uint64 value) {
+  set_has_open_time();
+  open_time_ = value;
 }
 
 

@@ -1,8 +1,6 @@
 ﻿#ifndef _WAR_SCENE_H_
 #define _WAR_SCENE_H_
-#include "AppUI.h"
-#include "Global.h"
-namespace BattleSpace{
+
 /************************************************************* 
  *
  *
@@ -16,6 +14,10 @@ namespace BattleSpace{
  *
  *
  *************************************************************/
+#include "AppUI.h"
+#include "Global.h"
+namespace BattleSpace
+{
 	class StoryLayer;
 	class BattleMapLayer;
 	class BattleRoleLayer;

@@ -26,7 +26,9 @@ public:
 private:
 	void onExitClick(CCObject *pSender);
 	void onBackClick(CCNode* ob);
-	
+	void shareFb(CCObject *pSender);
+
 private:
 	CLayout* m_ui;
+	int m_rank;
 };

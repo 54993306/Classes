@@ -8,6 +8,8 @@
 #include "model/DataCenter.h"
 #include "task/TaskControl.h"
 #include "Battle/BattleMessage.h"
+#include "GamePlatfomDefine.h"
+
 using namespace cocos2d;
 
 BackLayer::BackLayer(void)
@@ -36,13 +38,19 @@ void BackLayer::keyBackClicked()
 	{
 		if (LayerManager::instance()->getLayerCount()==0&&name=="CMainScene")
 		{
+
+			//UC-ÍË³ö
+#if G_PLATFORM_TARGET==G_PLATFORM_UC
+			LoginLayerUC::exit_with_uc();
+			return;
+#endif
+
 			m_backTip = CPopTip::create();
 			m_backTip->addContentTip(GETLANGSTR(5));
 			m_backTip->setTouchEnabled(true);
 			m_backTip->setTouchPriority(-100);
- 			m_backTip->setButtonLisener(this,ccw_click_selector(BackLayer::onExitGame));
+			m_backTip->setButtonLisener(this,ccw_click_selector(BackLayer::onExitGame));
 			this->addChild(m_backTip,10,1);
-
 			return;
 		}
 		else if(LayerManager::instance()->getLayerCount()==0&&name=="BattleScene")

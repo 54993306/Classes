@@ -10,6 +10,12 @@
 
 #include "model/RoleNameGM.h"
 
+enum ExchangeType
+{
+	ExCode = 1,
+	CBCode
+};
+
 class CExchangeCode: public BaseLayer
 {
 public:
@@ -24,9 +30,12 @@ public:
 	void onExchange(CCObject* pSender);
 	void onClose(CCObject* pSender);
 	bool ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent);
+	void loadExchangeByType(int type);
 private:
 	CLayout *m_ui;
 	CursorTextField* m_textFieldName;
+	CursorTextField* m_textFieldPwd;
+	int m_type;
 };
 
 #endif

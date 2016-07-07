@@ -11,6 +11,12 @@
 #include "common/CGameSound.h"
 #include "Resources.h"
 #include "common/CCRollLabelAction.h"
+#include <spine/spine-cocos2dx.h>
+#include "model/DataCenter.h"
+#include "model/WarManager.h"
+
+using namespace spine;
+using namespace BattleSpace;
 
 bool CDefendWuJiang::init()
 {
@@ -183,13 +189,19 @@ void CDefendWuJiang::addTableCell( unsigned int uIdx, CGridViewCell * pCell )
 		}
 
 		//边框
-		CCSprite *mask = CCSprite::createWithTexture(setItemQualityTexture(hero.iColor));
-		btn->addChild(mask, 2);
-		NodeFillNode(mask, btn);
-		mask->setScale(mask->getScale()*1.05f);
-		//添加星级
-		CLayout* pStarLayout = getStarLayout(hero.quality);
-		mask->addChild(pStarLayout);
+		const HeroInfoData *data = DataCenter::sharedData()->getHeroInfo()->getCfg(hero.thumb);
+		if(data)
+		{
+			CCSprite *mask = CCSprite::createWithTexture(SetRectColor(data->iType1));
+			btn->addChild(mask, 2);
+			NodeFillNode(mask, btn);
+			mask->setScale(mask->getScale()*1.05f);
+			
+			//添加星级
+			CLayout* pStarLayout = getStarLayout(hero.iColor);
+			mask->addChild(pStarLayout);
+		}
+
 	}
 
 
@@ -266,34 +278,69 @@ void CDefendWuJiang::onSelectHero(CCObject* pSender)
 		//使用模型代替贴图
 		CImageView* pBoard = (CImageView*)m_ui->findWidgetById("board_2");
 		int m_ModeID = hero.thumb;
-		char ExportJson_str[60] = {0};//"BoneAnimation/101.ExportJson"
-		sprintf(ExportJson_str,"BoneAnimation/%d.ExportJson",m_ModeID);
-		CCArmatureDataManager::sharedArmatureDataManager()->addArmatureFileInfo(ExportJson_str);
-		CCAnimationData *animationData = CCArmatureDataManager::sharedArmatureDataManager()->getAnimationData(ToString(m_ModeID));
-		if (!animationData)													//模型容错性处理
+		//===============================================================================================
+		if (DataCenter::sharedData()->getWar()->isSpine(m_ModeID))
+		{ 
+			char json[60] = {0};
+			char altlas[60] = {0};
+			sprintf(json,"Spine/%d.json",m_ModeID);
+			sprintf(altlas,"Spine/%d.atlas",m_ModeID);
+			std::string strFullPath = CCFileUtils::sharedFileUtils()->fullPathForFilename(altlas);
+			if(CCFileUtils::sharedFileUtils()->isFileExist(strFullPath))
+			{
+				SkeletonAnimation * skeletonNode = SkeletonAnimation::createWithFile(json, altlas, 1);
+				m_VecMode.push_back(m_ModeID);
+				skeletonNode->setAnimation(0, Stand_Action, true);
+				pBoard->removeChildByTag(989);
+
+				skeletonNode->setTag(989);
+				CCPoint pos = ccp(pBoard->getContentSize().width*0.5f, 107);
+				skeletonNode->setPosition(pos);
+				pBoard->addChild(skeletonNode);
+				skeletonNode->completeListener = std::bind(&CDefendWuJiang::SpineComplete, this, std::placeholders::_1, std::placeholders::_2);
+
+				//float zoom = hero.zoom*0.01f;
+				//if (!zoom)
+				//	zoom = 300.0/skeletonNode->getContentSize().height;			//容错性处理
+				//skeletonNode->setScale(zoom+0.3f);
+				m_pAnimationNode = skeletonNode;
+
+			}else{
+				CCLOG("[ *ERROR ] CWBossLayer::updateBossTexture");
+			}
+		}
+		else
 		{
-			CCLOG("[ *ERROR ]  CHeroAttribute::showBaseInfo Model=%d IS NULL",m_ModeID); 
-			m_ModeID = 516;
+			char ExportJson_str[60] = {0};//"BoneAnimation/101.ExportJson"
 			sprintf(ExportJson_str,"BoneAnimation/%d.ExportJson",m_ModeID);
 			CCArmatureDataManager::sharedArmatureDataManager()->addArmatureFileInfo(ExportJson_str);
-		}	
-		CCArmature* Armature = CCArmature::create(ToString(m_ModeID));
-		if (Armature)
-		{	
-			m_VecMode.push_back(m_ModeID);
-			Armature->getAnimation()->play(Stand_Action, 0.01f);
-			pBoard->removeChildByTag(989);
-			float zoom = hero.zoom*0.01f;
-			if (!zoom)
-				zoom = 300.0/Armature->getContentSize().height;			//容错性处理
-			Armature->setScale(zoom);
-			Armature->setTag(989);
-			CCPoint pos = ccp(pBoard->getContentSize().width*0.5f, 107);
-			Armature->setPosition(pos);
-			pBoard->addChild(Armature);
-			Armature->getAnimation()->setMovementEventCallFunc(this, movementEvent_selector(CDefendWuJiang::movementCallBack));
-			m_pArmature = Armature;
-		}	
+			CCAnimationData *animationData = CCArmatureDataManager::sharedArmatureDataManager()->getAnimationData(ToString(m_ModeID));
+			if (!animationData)													//模型容错性处理
+			{
+				CCLOG("[ *ERROR ]  CHeroAttribute::showBaseInfo Model=%d IS NULL",m_ModeID); 
+				m_ModeID = 516;
+				sprintf(ExportJson_str,"BoneAnimation/%d.ExportJson",m_ModeID);
+				CCArmatureDataManager::sharedArmatureDataManager()->addArmatureFileInfo(ExportJson_str);
+			}	
+			CCArmature* Armature = CCArmature::create(ToString(m_ModeID));
+			if (Armature)
+			{	
+				m_VecMode.push_back(m_ModeID);
+				Armature->getAnimation()->play(Stand_Action,0.01f);
+				pBoard->removeChildByTag(989);
+				float zoom = hero.zoom*0.01f;
+				if (!zoom)
+					zoom = 300.0/Armature->getContentSize().height;			//容错性处理
+				Armature->setScale(zoom+0.3f);
+				Armature->setTag(989);
+				CCPoint pos = ccp(pBoard->getContentSize().width*0.5f, 107);
+				Armature->setPosition(pos);
+				pBoard->addChild(Armature);
+				Armature->getAnimation()->setMovementEventCallFunc(this, movementEvent_selector(CDefendWuJiang::movementCallBack));
+				m_pAnimationNode = Armature;
+			}	
+		}
+		//===============================================================================================
 	}
 }
 
@@ -397,45 +444,79 @@ void CDefendWuJiang::movementCallBack( CCArmature* pAramture, MovementEventType 
 			float fRand = CCRANDOM_0_1();
 			if(fRand>0.7)
 			{
-				if(m_pArmature->getAnimation()->getAnimationData()->getMovement(Stand_Action))
+				if(pAramture->getAnimation()->getAnimationData()->getMovement(Stand_Action))
 				{
-					m_pArmature->getAnimation()->play(Stand_Action, 0.01f);
+					pAramture->getAnimation()->play(Stand_Action, 0.01f);
 					return;
 				}
 			}
 			else if(fRand>0.5)
 			{
-				if(m_pArmature->getAnimation()->getAnimationData()->getMovement(Attack_Action))
+				if(pAramture->getAnimation()->getAnimationData()->getMovement(Attack_Action))
 				{
-					m_pArmature->getAnimation()->play(Attack_Action, 0.01f);
+					pAramture->getAnimation()->play(Attack_Action, 0.01f);
 					return;
 				}
 			}
 			else if(fRand>0.3f)
 			{
-				if(m_pArmature->getAnimation()->getAnimationData()->getMovement(SpAttack_Action))
+				if(pAramture->getAnimation()->getAnimationData()->getMovement(SpAttack_Action))
 				{
-					m_pArmature->getAnimation()->play(SpAttack_Action, 0.01f);
+					pAramture->getAnimation()->play(SpAttack_Action, 0.01f);
 					return;
 				}
 			}
 			else if(fRand>0.1f)
 			{
-				if(m_pArmature->getAnimation()->getAnimationData()->getMovement(Win_Action))
+				if(pAramture->getAnimation()->getAnimationData()->getMovement(Win_Action))
 				{
-					m_pArmature->getAnimation()->play(Win_Action, 0.01f);
+					pAramture->getAnimation()->play(Win_Action, 0.01f);
 					return;
 				}
 			}
 
-			if(m_pArmature->getAnimation()->getAnimationData()->getMovement(Walk_Action))
+			if(pAramture->getAnimation()->getAnimationData()->getMovement(Walk_Action))
 			{
-				m_pArmature->getAnimation()->play(Walk_Action, 0.01f);
+				pAramture->getAnimation()->play(Walk_Action, 0.01f);
 			}
 		}
 		break;
 	default:
 		break;
+	}
+}
+
+void CDefendWuJiang::SpineComplete( int trackIndex,int loopCount )
+{
+	SkeletonAnimation* skeletonNode = dynamic_cast<SkeletonAnimation*>(m_pAnimationNode);
+	if (skeletonNode)
+	{
+		//动作1
+		float fRand = CCRANDOM_0_1();
+		if(fRand>0.7)
+		{
+			skeletonNode->setAnimation(0,Stand_Action,true);
+			return;
+		}
+		else if(fRand>0.5)
+		{
+			skeletonNode->setAnimation(0,Attack_Action,true);
+			return;
+		}
+		else if(fRand>0.3f)
+		{
+			skeletonNode->setAnimation(0,SpAttack_Action,true);
+			return;
+		}
+		else if(fRand>0.1f)
+		{
+			skeletonNode->setAnimation(0,Win_Action,true);
+			return;
+		}
+		else
+		{
+			skeletonNode->setAnimation(0,Walk_Action,true);
+		}
 	}
 }
 

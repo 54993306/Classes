@@ -16,9 +16,9 @@
 namespace BattleSpace
 {
 	//中心单体
-	AffectType AffectCenterSingle::getAreaType()
+	sAffectType AffectCenterSingle::getAreaType()
 	{
-		return AffectType::eCenterSingle;
+		return sAffectType::eCenterSingle;
 	}
 
 	void AffectCenterSingle::initArea(AreaCountInfo& pInfo)
@@ -32,9 +32,9 @@ namespace BattleSpace
 	/***************************************************************************/
 
 	//中心分散
-	AffectType AffectCenterDisperse::getAreaType()
+	sAffectType AffectCenterDisperse::getAreaType()
 	{
-		return AffectType::eCenterDisperse;
+		return sAffectType::eCenterDisperse;
 	}
 
 	void AffectCenterDisperse::initArea(AreaCountInfo& pInfo)
@@ -46,9 +46,9 @@ namespace BattleSpace
 	/***************************************************************************/
 
 	//中心n排
-	AffectType AffectCenterRow::getAreaType()
+	sAffectType AffectCenterRow::getAreaType()
 	{
-		return AffectType::eCenterRow;
+		return sAffectType::eCenterRow;
 	}
 
 	void AffectCenterRow::initArea(AreaCountInfo& pInfo)

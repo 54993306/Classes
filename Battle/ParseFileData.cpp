@@ -3,9 +3,13 @@
 #include "model/DataCenter.h"
 #include "model/WarManager.h"
 #include "Battle/ConstNum.h"
+#include "Battle/BattleTools.h"
+using namespace BattleSpace;
 //解析可移动格子文件
-void ParseMoveGrid( int stageid,vector<int> & vec )
+void ParseMoveGrid( int stageid,vector<int> & pMoveGrids,vector<int>& pUndefinedGrids )
 {
+	pUndefinedGrids.clear();
+	pMoveGrids.clear();
 	unsigned long size = 0;
 	unsigned char *buff = CCFileUtils::sharedFileUtils()->getFileData("csv/MoveGrids.json","r",&size);
 	string data ((const char*)buff,size);
@@ -27,7 +31,6 @@ void ParseMoveGrid( int stageid,vector<int> & vec )
 		CCLOG("[ *ERROR ]  ParseFileData::ParseMoveGrid Can Not't Find  COSTGRIDS");
 		return ;
 	}
-	vec.clear();
 	for (rapidjson::SizeType i = 0;i<Vec.Size();i++)
 	{
 		rapidjson::Value& json_step = Vec[i];
@@ -40,7 +43,7 @@ void ParseMoveGrid( int stageid,vector<int> & vec )
 			{
 				rapidjson::Value & par = json_step["grid"];
 				for (int j=par.GetInt();j< C_CAPTAINGRID;j++)
-					vec.push_back(j);
+					pMoveGrids.push_back(j);
 			}
 			if (json_step.HasMember("grids"))
 			{
@@ -53,7 +56,21 @@ void ParseMoveGrid( int stageid,vector<int> & vec )
 				for (rapidjson::SizeType j = 0;j<pVec.Size();j++)
 				{
 					rapidjson::Value& json_step = pVec[j];
-					vec.push_back(json_step.GetInt());
+					pMoveGrids.push_back(json_step.GetInt());
+				}
+			}
+			if (json_step.HasMember("undefine"))
+			{
+				rapidjson::Value& pVec = json_step["undefine"];		//得到键对应的数组信息
+				if (!pVec.IsArray())								//判断是否为数组
+				{
+					CCLOG("[ *ERROR ] ParseFileData::ParseMoveGrid Can Not't Find grids Vec");
+					continue;
+				}
+				for (rapidjson::SizeType j = 0;j<pVec.Size();j++)
+				{
+					rapidjson::Value& json_step = pVec[j];
+					pUndefinedGrids.push_back(json_step.GetInt());
 				}
 			}
 			break;													//只存储当前关卡的可移动范围
@@ -62,14 +79,16 @@ void ParseMoveGrid( int stageid,vector<int> & vec )
 			continue;
 		}
 	}
-	if (!vec.size())
+	if (!pMoveGrids.size())
 	{
 		for (int j=C_BEGINGRID;j< C_CAPTAINGRID;j++)				//默认情况处理(都可以移动)
-			vec.push_back(j);
+			pMoveGrids.push_back(j);
 	}
+	VectorUnique(pMoveGrids);
+	VectorUnique(pUndefinedGrids);
 }
 //解析增加cost格子文件
-void ParseAddCostGrid( int stageid,vector<int> & vec )
+void ParseAddCostGrid( int stageid,vector<int> & pAddCostArea )
 {
 	unsigned long size = 0;
 	unsigned char *buff = CCFileUtils::sharedFileUtils()->getFileData("csv/CostGrids.json","r",&size);
@@ -92,7 +111,7 @@ void ParseAddCostGrid( int stageid,vector<int> & vec )
 		CCLOG("[ *ERROR ]  WarMapLayer::initGrids Can Not't Find  COSTGRIDS");
 		return ;
 	}
-	vec.clear();
+	pAddCostArea.clear();
 	for (rapidjson::SizeType i = 0;i<Vec.Size();i++)
 	{
 		rapidjson::Value& json_step = Vec[i];
@@ -105,7 +124,7 @@ void ParseAddCostGrid( int stageid,vector<int> & vec )
 			{
 				rapidjson::Value & par = json_step["grid"];
 				for (int j=par.GetInt();j< C_GRID_ROW * C_GRID_COL;j++)
-					vec.push_back(j);
+					pAddCostArea.push_back(j);
 			}
 			if (json_step.HasMember("grids"))
 			{
@@ -118,7 +137,7 @@ void ParseAddCostGrid( int stageid,vector<int> & vec )
 				for (rapidjson::SizeType j = 0;j<pVec.Size();j++)
 				{
 					rapidjson::Value& json_step = pVec[j];
-					vec.push_back(json_step.GetInt());
+					pAddCostArea.push_back(json_step.GetInt());
 				}
 			}
 			break;														//只存储当前关卡的范围
@@ -127,9 +146,20 @@ void ParseAddCostGrid( int stageid,vector<int> & vec )
 			continue;
 		}
 	}
-	if (!vec.size())
+	if (!pAddCostArea.size())
 	{
 		for (int j=C_STANDGRID;j< C_GRID_ROW * C_GRID_COL;j++)			//默认情况处理
-			vec.push_back(j);
+			pAddCostArea.push_back(j);
 	}
+	VectorUnique(pAddCostArea);
+}
+
+void parseSpineModelFile( vector<int>& pVector )
+{
+	pVector.clear();
+	CSVFile* pFile = (CSVFile*)FileUtils::sharedFileUtils()->loadCSVFile("csv/SpineIDFile.csv");
+	for (int pIndex=0;pIndex < pFile->getRowNum(); pIndex++)
+		pVector.push_back(atoi(pFile->get(pIndex,0)));
+	VectorUnique(pVector);
+	FileUtils::sharedFileUtils()->releaseFile("csv/SpineIDFile.csv");
 }

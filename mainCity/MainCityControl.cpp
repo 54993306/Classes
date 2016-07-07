@@ -3,6 +3,7 @@
 #include "scene/CPopTip.h"
 #include "GMessage.h"
 #include "tools/ShowTexttip.h"
+#include "mainCity/mainCityBuild.h"
 
 CMainCityControl* CMainCityControl::instance = nullptr;
 
@@ -85,7 +86,7 @@ void CMainCityControl::resCityInfo()
  	m_scene = dynamic_cast<CMainScene*>(CSceneManager::sharedSceneManager()->getCurrScene());
 	if (m_scene)
 	{	
-		m_scene->showCityInfo(m_cityData);
+		m_scene->getCityBuildLayer()->showCityInfo(m_cityData);
 	}
 }
 

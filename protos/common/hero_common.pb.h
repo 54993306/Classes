@@ -274,12 +274,12 @@ class Hero : public ::google::protobuf::Message {
   inline ::google::protobuf::int32 usecost() const;
   inline void set_usecost(::google::protobuf::int32 value);
 
-  // optional int32 addCost = 24;
+  // optional float addCost = 24;
   inline bool has_addcost() const;
   inline void clear_addcost();
   static const int kAddCostFieldNumber = 24;
-  inline ::google::protobuf::int32 addcost() const;
-  inline void set_addcost(::google::protobuf::int32 value);
+  inline float addcost() const;
+  inline void set_addcost(float value);
 
   // optional int32 moveCost = 25;
   inline bool has_movecost() const;
@@ -502,6 +502,15 @@ class Hero : public ::google::protobuf::Message {
   inline ::protos::common::Item* release_armor4();
   inline void set_allocated_armor4(::protos::common::Item* armor4);
 
+  // optional .protos.common.Item armor5 = 53;
+  inline bool has_armor5() const;
+  inline void clear_armor5();
+  static const int kArmor5FieldNumber = 53;
+  inline const ::protos::common::Item& armor5() const;
+  inline ::protos::common::Item* mutable_armor5();
+  inline ::protos::common::Item* release_armor5();
+  inline void set_allocated_armor5(::protos::common::Item* armor5);
+
   // optional int32 prate = 54;
   inline bool has_prate() const;
   inline void clear_prate();
@@ -649,6 +658,8 @@ class Hero : public ::google::protobuf::Message {
   inline void clear_has_armor3();
   inline void set_has_armor4();
   inline void clear_has_armor4();
+  inline void set_has_armor5();
+  inline void clear_has_armor5();
   inline void set_has_prate();
   inline void clear_has_prate();
   inline void set_has_battle();
@@ -687,7 +698,7 @@ class Hero : public ::google::protobuf::Message {
   ::google::protobuf::int32 adddex_;
   ::google::protobuf::int32 initcost_;
   ::google::protobuf::int32 usecost_;
-  ::google::protobuf::int32 addcost_;
+  float addcost_;
   ::google::protobuf::int32 movecost_;
   ::google::protobuf::int32 maxcost_;
   ::google::protobuf::int32 exp_;
@@ -714,17 +725,18 @@ class Hero : public ::google::protobuf::Message {
   ::google::protobuf::int32 coin_;
   ::protos::common::Item* armor1_;
   ::protos::common::Item* armor2_;
+  ::protos::common::Item* armor3_;
   bool own_;
   bool battle_;
   bool remove_;
   bool evol_;
   ::google::protobuf::int32 prate_;
-  ::protos::common::Item* armor3_;
   ::protos::common::Item* armor4_;
+  ::protos::common::Item* armor5_;
   ::google::protobuf::int32 color_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(60 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(61 + 31) / 32];
 
   friend void  protobuf_AddDesc_common_2fhero_5fcommon_2eproto();
   friend void protobuf_AssignDesc_common_2fhero_5fcommon_2eproto();
@@ -1338,7 +1350,7 @@ inline void Hero::set_usecost(::google::protobuf::int32 value) {
   usecost_ = value;
 }
 
-// optional int32 addCost = 24;
+// optional float addCost = 24;
 inline bool Hero::has_addcost() const {
   return (_has_bits_[0] & 0x02000000u) != 0;
 }
@@ -1352,10 +1364,10 @@ inline void Hero::clear_addcost() {
   addcost_ = 0;
   clear_has_addcost();
 }
-inline ::google::protobuf::int32 Hero::addcost() const {
+inline float Hero::addcost() const {
   return addcost_;
 }
-inline void Hero::set_addcost(::google::protobuf::int32 value) {
+inline void Hero::set_addcost(float value) {
   set_has_addcost();
   addcost_ = value;
 }
@@ -2142,15 +2154,53 @@ inline void Hero::set_allocated_armor4(::protos::common::Item* armor4) {
   }
 }
 
-// optional int32 prate = 54;
-inline bool Hero::has_prate() const {
+// optional .protos.common.Item armor5 = 53;
+inline bool Hero::has_armor5() const {
   return (_has_bits_[1] & 0x00800000u) != 0;
 }
-inline void Hero::set_has_prate() {
+inline void Hero::set_has_armor5() {
   _has_bits_[1] |= 0x00800000u;
 }
-inline void Hero::clear_has_prate() {
+inline void Hero::clear_has_armor5() {
   _has_bits_[1] &= ~0x00800000u;
+}
+inline void Hero::clear_armor5() {
+  if (armor5_ != NULL) armor5_->::protos::common::Item::Clear();
+  clear_has_armor5();
+}
+inline const ::protos::common::Item& Hero::armor5() const {
+  return armor5_ != NULL ? *armor5_ : *default_instance_->armor5_;
+}
+inline ::protos::common::Item* Hero::mutable_armor5() {
+  set_has_armor5();
+  if (armor5_ == NULL) armor5_ = new ::protos::common::Item;
+  return armor5_;
+}
+inline ::protos::common::Item* Hero::release_armor5() {
+  clear_has_armor5();
+  ::protos::common::Item* temp = armor5_;
+  armor5_ = NULL;
+  return temp;
+}
+inline void Hero::set_allocated_armor5(::protos::common::Item* armor5) {
+  delete armor5_;
+  armor5_ = armor5;
+  if (armor5) {
+    set_has_armor5();
+  } else {
+    clear_has_armor5();
+  }
+}
+
+// optional int32 prate = 54;
+inline bool Hero::has_prate() const {
+  return (_has_bits_[1] & 0x01000000u) != 0;
+}
+inline void Hero::set_has_prate() {
+  _has_bits_[1] |= 0x01000000u;
+}
+inline void Hero::clear_has_prate() {
+  _has_bits_[1] &= ~0x01000000u;
 }
 inline void Hero::clear_prate() {
   prate_ = 0;
@@ -2166,13 +2216,13 @@ inline void Hero::set_prate(::google::protobuf::int32 value) {
 
 // optional bool battle = 55;
 inline bool Hero::has_battle() const {
-  return (_has_bits_[1] & 0x01000000u) != 0;
+  return (_has_bits_[1] & 0x02000000u) != 0;
 }
 inline void Hero::set_has_battle() {
-  _has_bits_[1] |= 0x01000000u;
+  _has_bits_[1] |= 0x02000000u;
 }
 inline void Hero::clear_has_battle() {
-  _has_bits_[1] &= ~0x01000000u;
+  _has_bits_[1] &= ~0x02000000u;
 }
 inline void Hero::clear_battle() {
   battle_ = false;
@@ -2188,13 +2238,13 @@ inline void Hero::set_battle(bool value) {
 
 // optional bool remove = 56;
 inline bool Hero::has_remove() const {
-  return (_has_bits_[1] & 0x02000000u) != 0;
+  return (_has_bits_[1] & 0x04000000u) != 0;
 }
 inline void Hero::set_has_remove() {
-  _has_bits_[1] |= 0x02000000u;
+  _has_bits_[1] |= 0x04000000u;
 }
 inline void Hero::clear_has_remove() {
-  _has_bits_[1] &= ~0x02000000u;
+  _has_bits_[1] &= ~0x04000000u;
 }
 inline void Hero::clear_remove() {
   remove_ = false;
@@ -2210,13 +2260,13 @@ inline void Hero::set_remove(bool value) {
 
 // optional int32 color = 47;
 inline bool Hero::has_color() const {
-  return (_has_bits_[1] & 0x04000000u) != 0;
+  return (_has_bits_[1] & 0x08000000u) != 0;
 }
 inline void Hero::set_has_color() {
-  _has_bits_[1] |= 0x04000000u;
+  _has_bits_[1] |= 0x08000000u;
 }
 inline void Hero::clear_has_color() {
-  _has_bits_[1] &= ~0x04000000u;
+  _has_bits_[1] &= ~0x08000000u;
 }
 inline void Hero::clear_color() {
   color_ = 0;
@@ -2232,13 +2282,13 @@ inline void Hero::set_color(::google::protobuf::int32 value) {
 
 // optional bool evol = 57;
 inline bool Hero::has_evol() const {
-  return (_has_bits_[1] & 0x08000000u) != 0;
+  return (_has_bits_[1] & 0x10000000u) != 0;
 }
 inline void Hero::set_has_evol() {
-  _has_bits_[1] |= 0x08000000u;
+  _has_bits_[1] |= 0x10000000u;
 }
 inline void Hero::clear_has_evol() {
-  _has_bits_[1] &= ~0x08000000u;
+  _has_bits_[1] &= ~0x10000000u;
 }
 inline void Hero::clear_evol() {
   evol_ = false;

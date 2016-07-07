@@ -35,12 +35,15 @@ public:
 	void setSelForHero(int toHero);
 	CC_SYNTHESIZE(int, m_iEquipType, EquipType);
 	void setAskType(CStrengthenItemType type);
+	void setAutoRolling(bool bAutoRoll);
 protected:	
 	CCObject* tableviewDataSource(CCObject* pConvertCell, unsigned int uIdx);
 	void addTableCell(unsigned int uIdx, CTableViewCell * pCell);
 	void recItemData(int type, google::protobuf::Message *msg);
 	void onSetFilter(const TMessage& tMsg);
 	void processNetMessage(int type, google::protobuf::Message *msg);
+	bool autoRoll();
+
 private:
 	CLayout *m_ui;
 	CLayout *m_cell;
@@ -60,6 +63,7 @@ private:
 
 	CItemTip* m_pItemTip;
 	CStrengthenItemType m_iAskType;
+	bool m_bAutoRoll;
 };
 
 #endif

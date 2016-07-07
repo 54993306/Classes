@@ -22,7 +22,7 @@
 #include "Resources.h"
 #include "mainCity/PanelTips.h"
 
-#define  FACEBOOKIMG "http://graph.facebook.com/%s/picture?width=90&height=90"
+#define  FACEBOOKIMG "http://graph.facebook.com/%s/picture?width=92&height=92"
 
 CFriendLayer::~CFriendLayer()
 {
@@ -530,14 +530,17 @@ void CFriendLayer::addFriendCell(CLayout* layCell, unsigned int uIdx, CTableView
 				}
 				else
 				{
-					string fbName = "fbImg/"+frd->fbId+".png";
+					string fbName = frd->fbId+".jpg";
 					string fullName = CCFileUtils::sharedFileUtils()->fullPathForFilename(fbName.c_str());
 					bool isFileExist = CCFileUtils::sharedFileUtils()->isFileExist(fullName);
 					if(isFileExist)
 					{
 						CCSprite* spr =CCSprite::create(fullName.c_str());
-						child->addChild(spr);
-						NodeFillParent(spr);
+						if (spr)
+						{
+							child->addChild(spr);
+							NodeFillParent(spr);
+						}
 					}
 					else
 					{
@@ -904,7 +907,7 @@ void CFriendLayer::imageLoadSuccessCallBack(string sTag, vector<char>* pBuffer)
 	CCTexture2D* texture = new CCTexture2D();
 	texture->initWithImage(img);
 
-	string path = HttpLoadImage::getInstance()->getStoragePath("download/fbImg",sTag.c_str())+".png";
+	string path = HttpLoadImage::getInstance()->getStoragePath("download/fbImg",sTag.c_str())+".jpg";
 	string buff(pBuffer->begin(), pBuffer->end());
 	CCLOG("path: %s", path.c_str());
 	FILE *fp = fopen(path.c_str(), "wb+");
@@ -938,6 +941,7 @@ void CFriendLayer::imageLoadSuccessCallBack(string sTag, vector<char>* pBuffer)
 	}
 	CCSprite *headImg = CCSprite::createWithTexture(texture);
 	if (pCell) pCell->getChildByTag(2)->addChild(headImg);
+	NodeFillParent(headImg);
 	img->release();
 }
 

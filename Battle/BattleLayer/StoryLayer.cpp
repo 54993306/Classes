@@ -9,6 +9,8 @@
 #include "common/CGameSound.h"
 #include "Battle/EffectData.h"
 #include "Battle/BattleMessage.h"
+#include "common/CGameSound.h"
+
 namespace BattleSpace{
 	StoryLayer::StoryLayer()
 		:m_ui(nullptr),m_index(0),m_StoryStep(nullptr),m_LastStep(nullptr)
@@ -35,7 +37,7 @@ namespace BattleSpace{
 		this->setIsShowBlack(false);
 		this->addChild(m_ui);
 		this->setTouchEnabled(false);
-		NOTIFICATION->addObserver(this,callfuncO_selector(StoryLayer::CreateStory),B_LayerMoveEnd,nullptr);
+		NOTIFICATION->addObserver(this,callfuncO_selector(StoryLayer::CreateStory),MsgCreateStory,nullptr);
 
 		CImageViewScale9* rightJumpBtn = (CImageViewScale9*)m_ui->getChildByTag(rightJumpBtn_tag);
 		rightJumpBtn->setTouchEnabled(true);
@@ -301,18 +303,21 @@ namespace BattleSpace{
 	void StoryLayer::newRole()
 	{
 		Skeleton();
-		nameBackground();
-		CLabel* name = CLabel::create(m_StoryStep->getRoleName().c_str(),FONT_NAME,25);
-		name->runAction(CCFadeIn::create(0.25f));
-		if (m_StoryStep->getright())
+		if (strcmp(m_StoryStep->getRoleName().c_str(),""))
 		{
-			name->setTag(rightName_tag);
-			name->setPosition(ccpAdd(ccp(60,0),getPointIntag(rightName_tag)));
-		}else{
-			name->setTag(leftName_tag);
-			name->setPosition(ccpAdd(ccp(60,0),getPointIntag(leftName_tag)));
+			nameBackground();
+			CLabel* name = CLabel::create(m_StoryStep->getRoleName().c_str(),FONT_NAME,25);
+			name->runAction(CCFadeIn::create(0.25f));
+			if (m_StoryStep->getright())
+			{
+				name->setTag(rightName_tag);
+				name->setPosition(ccpAdd(ccp(60,0),getPointIntag(rightName_tag)));
+			}else{
+				name->setTag(leftName_tag);
+				name->setPosition(ccpAdd(ccp(60,0),getPointIntag(leftName_tag)));
+			}
+			m_ui->addChild(name);
 		}
-		m_ui->addChild(name);
 	}
 
 	SkeletonAnimation* StoryLayer::getSkeleton(bool update)
@@ -450,7 +455,7 @@ namespace BattleSpace{
 		m_VecStep.clear();
 		m_StoryStep = nullptr;
 		this->setTouchEnabled(false);
-		NOTIFICATION->postNotification(B_StoryOver,nullptr);
+		NOTIFICATION->postNotification(MsgStorOver,CCInteger::create(m_SType));
 	}
 
 	void StoryLayer::updateForTouch( float dt ){	m_bOpenTouch = true; }

@@ -14,9 +14,9 @@
 #include "Battle/AffectArea/AffectNearby.h"
 namespace BattleSpace
 {
-	AffectType AffectNearby::getAreaType()
+	sAffectType AffectNearby::getAreaType()
 	{
-		return AffectType::eNearby;
+		return sAffectType::eNearby;
 	}
 
 	void AffectNearby::initArea( AreaCountInfo& pInfo )
@@ -54,9 +54,9 @@ namespace BattleSpace
 	}
 
 
-	AffectType AffectNearbyUnself::getAreaType()
+	sAffectType AffectNearbyUnself::getAreaType()
 	{
-		return AffectType::eNearbyUnself;
+		return sAffectType::eNearbyUnself;
 	}
 
 	void AffectNearbyUnself::initArea(AreaCountInfo& pInfo)

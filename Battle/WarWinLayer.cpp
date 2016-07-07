@@ -22,9 +22,12 @@
 #include "mainCity/RecruitData.h"
 #include "mainCity/CNewHero.h"
 #include "common/CCRollLabelAction.h"
+#include "common/CommonFunction.h"
 
 const char WarWinLayer::WAR_WIN_RESULT[] = "war_win_show";
+
 using namespace BattleSpace;
+
 WarWinLayer::WarWinLayer()
 	:m_pMonsterInfo(nullptr)
 	,m_pItemInfo(nullptr)
@@ -179,14 +182,15 @@ void WarWinLayer::processBattleFinish(int type, google::protobuf::Message *msg)
 	//延时出现
 	float fDelayTime = 1.0;
 	//有信息回调了，考虑弹出商人
-	if(res->has_mobieshop())
+	if(res->has_mobieshop()&&res->mobieshop())
 	{
 		fDelayTime = 1.5f;
 		runAction(CCSequence::createWithTwoActions(CCDelayTime::create(0.5f), CCCallFunc::create(this, callfunc_selector(WarWinLayer::callBackShowRandomHero))));
+		DataCenter::sharedData()->getUser()->getUserData()->setFirstMobileShop(true);
 	}
 
 	 //大关卡才有重来按钮
-	if(DataCenter::sharedData()->getWar()->getStageType()==1)
+	/*if(DataCenter::sharedData()->getWar()->getStageType()==1)*/
 	{
 		CButton *btnTry = (CButton*)m_ui->findWidgetById("retry");
 		btnTry->runAction(CCSequence::create(CCDelayTime::create(fDelayTime), CCShow::create(), CCScaleTo::create(0.2f, 1.2f), CCScaleTo::create(0.1f, 1), NULL));
@@ -234,11 +238,15 @@ void WarWinLayer::processBattleFinish(int type, google::protobuf::Message *msg)
 		pLayout->setVisible(true);
 
 		//品质框
+		const HeroInfoData *data = DataCenter::sharedData()->getHeroInfo()->getCfg(hero.thumb());
 		CCSprite* pMask = (CCSprite*)pLayout->findWidgetById(pStrMask->getCString());
-		pMask->setTexture(setItemQualityTexture(hero.color()));
+		if(data)
+		{
+			pMask->setTexture(SetRectColor(data->iType1));
+		}
 
 		//添加星星
-		CLayout* pStarLayout = getStarLayout(hero.quality());
+		CLayout* pStarLayout = getStarLayout(hero.color());
 		pMask->addChild(pStarLayout, 10);
 
 		//获取头像底板
@@ -720,6 +728,10 @@ void WarWinLayer::onPress( CCObject* pSender, CTouchPressState iState )
 	//1.物品 2.英雄
 	switch (iType)
 	{
+	case 6:
+	case 3:
+	case 4:
+	case 5:
 	case 1:
 		{
 			if(m_pItemInfo==nullptr)
@@ -827,7 +839,7 @@ void WarWinLayer::addTableCell( unsigned int uIdx, CTableViewCell* pCell )
 		case 2:
 			{
 				CImageView *mask= (CImageView *)child;
-				mask->setTexture(setItemQualityTexture(prize.color));
+				SmartSetRectPrizeColor(mask, &prize);
 				mask->setTag(uIdx);
 				mask->setZOrder(prize.type);
 				mask->setTouchEnabled(true);
@@ -836,7 +848,7 @@ void WarWinLayer::addTableCell( unsigned int uIdx, CTableViewCell* pCell )
 				//添加星星
 				if(prize.quality >0)
 				{
-					CLayout* pStarLayout = getStarLayout(prize.quality);
+					CLayout* pStarLayout = SmartGetStarLayout(&prize);
 					mask->addChild(pStarLayout);
 				}
 

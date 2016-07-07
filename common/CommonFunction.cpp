@@ -233,6 +233,11 @@ std::string GetImageName( int iType, int iColor, int iThumb )
 			str ="headImg/";
 		}
 		break;
+	case 7:
+		{
+			str = "prop/";
+		}
+		break;
 	default:
 		break;
 	}
@@ -378,7 +383,7 @@ int getCombatLevel( int combat )
 	return level;
 }
 
-CLayout* getStarLayout(int iStarCount, float fScale/*=0.4f*/)
+CLayout *getStarLayout(int iStarCount, float fScale/*=0.4f*/)
 {
 	CLayout* pLayout = CLayout::create();
 	pLayout->setAnchorPoint(CCPointZero);
@@ -396,7 +401,7 @@ CLayout* getStarLayout(int iStarCount, float fScale/*=0.4f*/)
 }
 
 
-CLayout* getStarLayoutWithBlackBase( int iStarCount, float fScale/*=0.4f*/ )
+CLayout *getStarLayoutWithBlackBase( int iStarCount, float fScale/*=0.4f*/ )
 {
 	CLayout* pLayout = CLayout::create();
 	pLayout->setAnchorPoint(CCPointZero);
@@ -413,6 +418,20 @@ CLayout* getStarLayoutWithBlackBase( int iStarCount, float fScale/*=0.4f*/ )
 	}
 	return pLayout;
 }
+
+
+CLayout *SmartGetStarLayout( const CPrize *pPrize, float fScale/*=0.4f*/ )
+{
+	if( pPrize->type == 2 )
+	{
+		return getStarLayout(pPrize->color);
+	}
+	else
+	{
+		return getStarLayout(pPrize->quality);
+	}
+}
+
 
 void PlaySoundEvent( int sData )
 {
@@ -434,8 +453,52 @@ std::string getArmorTypeStr( int iType )
 	case 2: return GETLANGSTR(78);
 	case 3: return GETLANGSTR(80);
 	case 4: return GETLANGSTR(79);
+	case 0: return GETLANGSTR(2011);
+	case 5: return GETLANGSTR(2011);
 	default:
 		break;
 	}
 	return "";
+}
+
+CCTexture2D* SetRectColor( int iType )
+{
+	return CCTextureCache::sharedTextureCache()->addImage(CCString::createWithFormat("common/rect_%d.png", iType)->getCString());
+}
+
+void SmartSetRectPrizeColor( CCSprite* pSprite, const CPrize* pPrize, const Prize* pProPrize/*=nullptr*/, HeroInfoData* pHeroData/*=nullptr*/ )
+{
+	//如果是英雄
+	int iType = 0;
+	int iThumb = 316;
+	int iColor = 1;
+	if(pPrize != nullptr)
+	{
+		iType = pPrize->type;
+		iThumb = pPrize->thumb;
+		iColor = pPrize->color;
+	}
+	else if(pProPrize !=nullptr)
+	{
+		iType = pProPrize->type();
+		iThumb = pProPrize->thumb();
+		iColor = pProPrize->color();
+	}
+
+	if(iType == 2)
+	{
+		//设置颜色按水火木
+		if(pHeroData==nullptr)
+		{
+			const HeroInfoData *pData = DataCenter::sharedData()->getHeroInfo()->getCfg(iThumb);
+			if(pData)
+			{
+				pSprite->setTexture(SetRectColor(pData->iType1));
+			}
+		}
+	}
+	else
+	{
+		pSprite->setTexture(setItemQualityTexture(iColor));
+	}
 }

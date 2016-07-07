@@ -39,6 +39,7 @@ class ActListRes;
 class BuyGiftReq;
 class BuyGiftRes;
 class Activity;
+class ExList;
 
 // ===================================================================
 
@@ -295,17 +296,27 @@ class BuyGiftReq : public ::google::protobuf::Message {
   inline ::google::protobuf::int32 actid() const;
   inline void set_actid(::google::protobuf::int32 value);
 
+  // optional int32 exId = 2;
+  inline bool has_exid() const;
+  inline void clear_exid();
+  static const int kExIdFieldNumber = 2;
+  inline ::google::protobuf::int32 exid() const;
+  inline void set_exid(::google::protobuf::int32 value);
+
   // @@protoc_insertion_point(class_scope:protos.BuyGiftReq)
  private:
   inline void set_has_actid();
   inline void clear_has_actid();
+  inline void set_has_exid();
+  inline void clear_has_exid();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
   ::google::protobuf::int32 actid_;
+  ::google::protobuf::int32 exid_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
 
   friend void  protobuf_AddDesc_act_5fprotocol_2eproto();
   friend void protobuf_AssignDesc_act_5fprotocol_2eproto();
@@ -529,6 +540,18 @@ class Activity : public ::google::protobuf::Message {
   inline ::google::protobuf::int32 param() const;
   inline void set_param(::google::protobuf::int32 value);
 
+  // repeated .protos.ExList exchange = 8;
+  inline int exchange_size() const;
+  inline void clear_exchange();
+  static const int kExchangeFieldNumber = 8;
+  inline const ::protos::ExList& exchange(int index) const;
+  inline ::protos::ExList* mutable_exchange(int index);
+  inline ::protos::ExList* add_exchange();
+  inline const ::google::protobuf::RepeatedPtrField< ::protos::ExList >&
+      exchange() const;
+  inline ::google::protobuf::RepeatedPtrField< ::protos::ExList >*
+      mutable_exchange();
+
   // @@protoc_insertion_point(class_scope:protos.Activity)
  private:
   inline void set_has_actid();
@@ -555,9 +578,10 @@ class Activity : public ::google::protobuf::Message {
   ::google::protobuf::int32 status_;
   ::google::protobuf::int32 param_;
   ::std::string* pic_;
+  ::google::protobuf::RepeatedPtrField< ::protos::ExList > exchange_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(7 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(8 + 31) / 32];
 
   friend void  protobuf_AddDesc_act_5fprotocol_2eproto();
   friend void protobuf_AssignDesc_act_5fprotocol_2eproto();
@@ -565,6 +589,124 @@ class Activity : public ::google::protobuf::Message {
 
   void InitAsDefaultInstance();
   static Activity* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class ExList : public ::google::protobuf::Message {
+ public:
+  ExList();
+  virtual ~ExList();
+
+  ExList(const ExList& from);
+
+  inline ExList& operator=(const ExList& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const ExList& default_instance();
+
+  void Swap(ExList* other);
+
+  // implements Message ----------------------------------------------
+
+  ExList* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const ExList& from);
+  void MergeFrom(const ExList& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required int32 exId = 1;
+  inline bool has_exid() const;
+  inline void clear_exid();
+  static const int kExIdFieldNumber = 1;
+  inline ::google::protobuf::int32 exid() const;
+  inline void set_exid(::google::protobuf::int32 value);
+
+  // repeated .protos.common.Prize oItems = 2;
+  inline int oitems_size() const;
+  inline void clear_oitems();
+  static const int kOItemsFieldNumber = 2;
+  inline const ::protos::common::Prize& oitems(int index) const;
+  inline ::protos::common::Prize* mutable_oitems(int index);
+  inline ::protos::common::Prize* add_oitems();
+  inline const ::google::protobuf::RepeatedPtrField< ::protos::common::Prize >&
+      oitems() const;
+  inline ::google::protobuf::RepeatedPtrField< ::protos::common::Prize >*
+      mutable_oitems();
+
+  // repeated .protos.common.Prize tItems = 3;
+  inline int titems_size() const;
+  inline void clear_titems();
+  static const int kTItemsFieldNumber = 3;
+  inline const ::protos::common::Prize& titems(int index) const;
+  inline ::protos::common::Prize* mutable_titems(int index);
+  inline ::protos::common::Prize* add_titems();
+  inline const ::google::protobuf::RepeatedPtrField< ::protos::common::Prize >&
+      titems() const;
+  inline ::google::protobuf::RepeatedPtrField< ::protos::common::Prize >*
+      mutable_titems();
+
+  // optional bool achieve = 4;
+  inline bool has_achieve() const;
+  inline void clear_achieve();
+  static const int kAchieveFieldNumber = 4;
+  inline bool achieve() const;
+  inline void set_achieve(bool value);
+
+  // @@protoc_insertion_point(class_scope:protos.ExList)
+ private:
+  inline void set_has_exid();
+  inline void clear_has_exid();
+  inline void set_has_achieve();
+  inline void clear_has_achieve();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::RepeatedPtrField< ::protos::common::Prize > oitems_;
+  ::google::protobuf::int32 exid_;
+  bool achieve_;
+  ::google::protobuf::RepeatedPtrField< ::protos::common::Prize > titems_;
+
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
+
+  friend void  protobuf_AddDesc_act_5fprotocol_2eproto();
+  friend void protobuf_AssignDesc_act_5fprotocol_2eproto();
+  friend void protobuf_ShutdownFile_act_5fprotocol_2eproto();
+
+  void InitAsDefaultInstance();
+  static ExList* default_instance_;
 };
 // ===================================================================
 
@@ -740,6 +882,28 @@ inline ::google::protobuf::int32 BuyGiftReq::actid() const {
 inline void BuyGiftReq::set_actid(::google::protobuf::int32 value) {
   set_has_actid();
   actid_ = value;
+}
+
+// optional int32 exId = 2;
+inline bool BuyGiftReq::has_exid() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void BuyGiftReq::set_has_exid() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void BuyGiftReq::clear_has_exid() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void BuyGiftReq::clear_exid() {
+  exid_ = 0;
+  clear_has_exid();
+}
+inline ::google::protobuf::int32 BuyGiftReq::exid() const {
+  return exid_;
+}
+inline void BuyGiftReq::set_exid(::google::protobuf::int32 value) {
+  set_has_exid();
+  exid_ = value;
 }
 
 // -------------------------------------------------------------------
@@ -1093,6 +1257,129 @@ inline ::google::protobuf::int32 Activity::param() const {
 inline void Activity::set_param(::google::protobuf::int32 value) {
   set_has_param();
   param_ = value;
+}
+
+// repeated .protos.ExList exchange = 8;
+inline int Activity::exchange_size() const {
+  return exchange_.size();
+}
+inline void Activity::clear_exchange() {
+  exchange_.Clear();
+}
+inline const ::protos::ExList& Activity::exchange(int index) const {
+  return exchange_.Get(index);
+}
+inline ::protos::ExList* Activity::mutable_exchange(int index) {
+  return exchange_.Mutable(index);
+}
+inline ::protos::ExList* Activity::add_exchange() {
+  return exchange_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::protos::ExList >&
+Activity::exchange() const {
+  return exchange_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::protos::ExList >*
+Activity::mutable_exchange() {
+  return &exchange_;
+}
+
+// -------------------------------------------------------------------
+
+// ExList
+
+// required int32 exId = 1;
+inline bool ExList::has_exid() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void ExList::set_has_exid() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void ExList::clear_has_exid() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void ExList::clear_exid() {
+  exid_ = 0;
+  clear_has_exid();
+}
+inline ::google::protobuf::int32 ExList::exid() const {
+  return exid_;
+}
+inline void ExList::set_exid(::google::protobuf::int32 value) {
+  set_has_exid();
+  exid_ = value;
+}
+
+// repeated .protos.common.Prize oItems = 2;
+inline int ExList::oitems_size() const {
+  return oitems_.size();
+}
+inline void ExList::clear_oitems() {
+  oitems_.Clear();
+}
+inline const ::protos::common::Prize& ExList::oitems(int index) const {
+  return oitems_.Get(index);
+}
+inline ::protos::common::Prize* ExList::mutable_oitems(int index) {
+  return oitems_.Mutable(index);
+}
+inline ::protos::common::Prize* ExList::add_oitems() {
+  return oitems_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::protos::common::Prize >&
+ExList::oitems() const {
+  return oitems_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::protos::common::Prize >*
+ExList::mutable_oitems() {
+  return &oitems_;
+}
+
+// repeated .protos.common.Prize tItems = 3;
+inline int ExList::titems_size() const {
+  return titems_.size();
+}
+inline void ExList::clear_titems() {
+  titems_.Clear();
+}
+inline const ::protos::common::Prize& ExList::titems(int index) const {
+  return titems_.Get(index);
+}
+inline ::protos::common::Prize* ExList::mutable_titems(int index) {
+  return titems_.Mutable(index);
+}
+inline ::protos::common::Prize* ExList::add_titems() {
+  return titems_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::protos::common::Prize >&
+ExList::titems() const {
+  return titems_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::protos::common::Prize >*
+ExList::mutable_titems() {
+  return &titems_;
+}
+
+// optional bool achieve = 4;
+inline bool ExList::has_achieve() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void ExList::set_has_achieve() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void ExList::clear_has_achieve() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void ExList::clear_achieve() {
+  achieve_ = false;
+  clear_has_achieve();
+}
+inline bool ExList::achieve() const {
+  return achieve_;
+}
+inline void ExList::set_achieve(bool value) {
+  set_has_achieve();
+  achieve_ = value;
 }
 
 

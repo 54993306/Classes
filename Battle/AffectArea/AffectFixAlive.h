@@ -24,7 +24,7 @@ namespace BattleSpace
 		AffectAnyAlive(){};
 		virtual ~AffectAnyAlive(){};
 		UNINITCREATE(AffectAnyAlive);
-		virtual AffectType getAreaType();
+		virtual sAffectType getAreaType();
 		virtual void initArea(AreaCountInfo &pInfo);
 		
 	};
@@ -38,7 +38,7 @@ namespace BattleSpace
 		AffectAnyAliveDisperse(){};
 		virtual ~AffectAnyAliveDisperse(){};
 		UNINITCREATE(AffectAnyAliveDisperse);
-		virtual AffectType getAreaType();
+		virtual sAffectType getAreaType();
 		virtual void initArea(AreaCountInfo &pInfo);
 
 	};

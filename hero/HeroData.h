@@ -3,9 +3,6 @@
 #include "protos/protocol.h"
 #include "model/BattleData.h"
 
-
-
-
 struct CEvolQuest 
 {
 	int id;			//进阶任务ID
@@ -32,7 +29,7 @@ struct CEvolResult
 // 	bool canEvol;		//是否仍可继续进阶
 // 	vector<CEvolQuest> questsList;		//下一进阶任务列表
 // 	CEvolInfo evolInfo;
-	void read(const protos::HeroEvolRes* eq);
+	void read(const protos::HeroEvolRes& eq);
 };
 
 #endif

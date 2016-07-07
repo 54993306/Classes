@@ -40,17 +40,22 @@ namespace BattleSpace{
 		void releaseRoleData();
 	public:
 		void initBattleData( const google::protobuf::Message *pResponse,bool pWorldBoss = false );
-		void initWordBossStage( const google::protobuf::Message *pResponse );
-		void initNormalStage( const google::protobuf::Message *pResponse );
 		const  vector<HeroData*>&  getHeroVector()const	;
 		const vector<MonsterData*>& getMonsterVector()const;
+		const vector<MonsterData*>& getCallRoleDatas()const;
+		const vector<BaseRoleData*>& getRoleDatas()const;
 		BaseRoleData* getCallRoleData(int pRoleID) const;
 	private:
+		void initWordBossStage( const google::protobuf::Message *pResponse );
+		void initNormalStage( const google::protobuf::Message *pResponse );
+		void initBaseRoleDataVector();
 		void initMonsterData(const protos::common::Monster* pData);
 		void initHeroData(const protos::common::Hero* pData);
 	private:
 		vector<HeroData*> mHeroVec;
 		vector<MonsterData*>mMonsterVec;
+		vector<MonsterData*>mCallRoleVec;
+		vector<BaseRoleData*>mBaseRoleData;
 		BattleDataCenter();
 		static BattleDataCenter* mDataControl;
 		class SingletonDestroy

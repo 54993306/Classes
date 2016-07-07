@@ -14,7 +14,8 @@
  *
  *
  *************************************************************/
-namespace BattleSpace{
+namespace BattleSpace
+{
 	class BaseRole;
 	class RoleSkill;
 	class skEffectData;
@@ -29,13 +30,21 @@ namespace BattleSpace{
 	int getMonsterNewCol(int originCol ,int aimCol ,int aim_col);
 	void CallAliveByFixRange( BaseRole*father , BaseRole*child );
 
-	void VectorRemoveRepeat(vector<int>& Vec);
+	void VectorUnique(vector<int>& Vec);
 
-	void VectorRemoveRepeat(vector<BaseRole*> &pVector);
+	void VectorUnique(vector<BaseRole*> &pVector);
 
-	void VectorSortAliveHp(vector<BaseRole*> &pVector);
+	void SortRoleHp(vector<BaseRole*> &pVector);
 
-	void PlaySound_Event(int id);
+	bool VectorHasInt(vector<int> &pVec , int pGrid);
+
+	bool VectorHasObject(vector<CCObject*> &pVec, CCObject* ob);
+
+	void PlaySound(int id);
+
+	int converRow(int pGrid);
+
+	int converCol(int pGrid);
 
 };
 #endif

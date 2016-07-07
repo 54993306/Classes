@@ -35,7 +35,7 @@ void protobuf_AssignDesc_common_2fhero_5fcommon_2eproto() {
       "common/hero_common.proto");
   GOOGLE_CHECK(file != NULL);
   Hero_descriptor_ = file->message_type(0);
-  static const int Hero_offsets_[60] = {
+  static const int Hero_offsets_[61] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Hero, id_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Hero, heroid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Hero, name_),
@@ -91,6 +91,7 @@ void protobuf_AssignDesc_common_2fhero_5fcommon_2eproto() {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Hero, armor2_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Hero, armor3_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Hero, armor4_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Hero, armor5_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Hero, prate_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Hero, battle_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Hero, remove_),
@@ -142,7 +143,7 @@ void protobuf_AddDesc_common_2fhero_5fcommon_2eproto() {
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
     "\n\030common/hero_common.proto\022\rprotos.commo"
     "n\032\031common/skill_common.proto\032\030common/ite"
-    "m_common.proto\"\200\t\n\004Hero\022\n\n\002id\030\001 \001(\005\022\016\n\006h"
+    "m_common.proto\"\245\t\n\004Hero\022\n\n\002id\030\001 \001(\005\022\016\n\006h"
     "eroId\030\002 \001(\005\022\014\n\004name\030\003 \001(\t\022\r\n\005level\030\004 \001(\005"
     "\022\020\n\010maxLevel\030\005 \001(\005\022\020\n\010coldDown\030\006 \001(\005\022\023\n\013"
     "atkInterval\030\007 \001(\002\022\n\n\002hp\030\010 \001(\005\022\013\n\003atk\030\t \001"
@@ -152,7 +153,7 @@ void protobuf_AddDesc_common_2fhero_5fcommon_2eproto() {
     "addDef\030\021 \001(\005\022\016\n\006addHit\030\022 \001(\005\022\017\n\007addCrit\030"
     "\023 \001(\005\022\020\n\010addDodge\030\024 \001(\005\022\020\n\010addRenew\030\025 \001("
     "\005\022\016\n\006addDex\030\? \001(\005\022\020\n\010initCost\030\026 \001(\005\022\017\n\007u"
-    "seCost\030\027 \001(\005\022\017\n\007addCost\030\030 \001(\005\022\020\n\010moveCos"
+    "seCost\030\027 \001(\005\022\017\n\007addCost\030\030 \001(\002\022\020\n\010moveCos"
     "t\030\031 \001(\005\022\017\n\007maxCost\030\032 \001(\005\022\013\n\003exp\030\033 \001(\005\022\017\n"
     "\007nextExp\030\034 \001(\005\022\020\n\010heroType\030\035 \001(\005\022\r\n\005thum"
     "b\030\036 \001(\005\022\014\n\004zoom\030\037 \001(\005\022\017\n\007quality\030  \001(\005\022\022"
@@ -169,10 +170,11 @@ void protobuf_AddDesc_common_2fhero_5fcommon_2eproto() {
     "\0132\023.protos.common.Item\022#\n\006armor2\0304 \001(\0132\023"
     ".protos.common.Item\022#\n\006armor3\0300 \001(\0132\023.pr"
     "otos.common.Item\022#\n\006armor4\0302 \001(\0132\023.proto"
-    "s.common.Item\022\r\n\005prate\0306 \001(\005\022\016\n\006battle\0307"
-    " \001(\010\022\016\n\006remove\0308 \001(\010\022\r\n\005color\030/ \001(\005\022\014\n\004e"
-    "vol\0309 \001(\010B5\n%anvin.server.gameserver.pro"
-    "tos.commonB\nHeroCommonH\001", 1304);
+    "s.common.Item\022#\n\006armor5\0305 \001(\0132\023.protos.c"
+    "ommon.Item\022\r\n\005prate\0306 \001(\005\022\016\n\006battle\0307 \001("
+    "\010\022\016\n\006remove\0308 \001(\010\022\r\n\005color\030/ \001(\005\022\014\n\004evol"
+    "\0309 \001(\010B4\n$dass.server.gameserver.protos."
+    "commonB\nHeroCommonH\001", 1340);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "common/hero_common.proto", &protobuf_RegisterTypes);
   Hero::default_instance_ = new Hero();
@@ -245,6 +247,7 @@ const int Hero::kArmor1FieldNumber;
 const int Hero::kArmor2FieldNumber;
 const int Hero::kArmor3FieldNumber;
 const int Hero::kArmor4FieldNumber;
+const int Hero::kArmor5FieldNumber;
 const int Hero::kPrateFieldNumber;
 const int Hero::kBattleFieldNumber;
 const int Hero::kRemoveFieldNumber;
@@ -267,6 +270,7 @@ void Hero::InitAsDefaultInstance() {
   armor2_ = const_cast< ::protos::common::Item*>(&::protos::common::Item::default_instance());
   armor3_ = const_cast< ::protos::common::Item*>(&::protos::common::Item::default_instance());
   armor4_ = const_cast< ::protos::common::Item*>(&::protos::common::Item::default_instance());
+  armor5_ = const_cast< ::protos::common::Item*>(&::protos::common::Item::default_instance());
 }
 
 Hero::Hero(const Hero& from)
@@ -332,6 +336,7 @@ void Hero::SharedCtor() {
   armor2_ = NULL;
   armor3_ = NULL;
   armor4_ = NULL;
+  armor5_ = NULL;
   prate_ = 0;
   battle_ = false;
   remove_ = false;
@@ -358,6 +363,7 @@ void Hero::SharedDtor() {
     delete armor2_;
     delete armor3_;
     delete armor4_;
+    delete armor5_;
   }
 }
 
@@ -473,9 +479,12 @@ void Hero::Clear() {
     if (has_armor4()) {
       if (armor4_ != NULL) armor4_->::protos::common::Item::Clear();
     }
-    prate_ = 0;
+    if (has_armor5()) {
+      if (armor5_ != NULL) armor5_->::protos::common::Item::Clear();
+    }
   }
   if (_has_bits_[56 / 32] & (0xffu << (56 % 32))) {
+    prate_ = 0;
     battle_ = false;
     remove_ = false;
     color_ = 0;
@@ -855,17 +864,17 @@ bool Hero::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(192)) goto parse_addCost;
+        if (input->ExpectTag(197)) goto parse_addCost;
         break;
       }
 
-      // optional int32 addCost = 24;
+      // optional float addCost = 24;
       case 24: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
          parse_addCost:
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                   float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
                  input, &addcost_)));
           set_has_addcost();
         } else {
@@ -1303,6 +1312,20 @@ bool Hero::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(426)) goto parse_armor5;
+        break;
+      }
+
+      // optional .protos.common.Item armor5 = 53;
+      case 53: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_armor5:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+               input, mutable_armor5()));
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectTag(432)) goto parse_prate;
         break;
       }
@@ -1570,9 +1593,9 @@ void Hero::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt32(23, this->usecost(), output);
   }
 
-  // optional int32 addCost = 24;
+  // optional float addCost = 24;
   if (has_addcost()) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(24, this->addcost(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteFloat(24, this->addcost(), output);
   }
 
   // optional int32 moveCost = 25;
@@ -1721,6 +1744,12 @@ void Hero::SerializeWithCachedSizes(
   if (has_armor2()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
       52, this->armor2(), output);
+  }
+
+  // optional .protos.common.Item armor5 = 53;
+  if (has_armor5()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      53, this->armor5(), output);
   }
 
   // optional int32 prate = 54;
@@ -1892,9 +1921,9 @@ void Hero::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(23, this->usecost(), target);
   }
 
-  // optional int32 addCost = 24;
+  // optional float addCost = 24;
   if (has_addcost()) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(24, this->addcost(), target);
+    target = ::google::protobuf::internal::WireFormatLite::WriteFloatToArray(24, this->addcost(), target);
   }
 
   // optional int32 moveCost = 25;
@@ -2051,6 +2080,13 @@ void Hero::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
         52, this->armor2(), target);
+  }
+
+  // optional .protos.common.Item armor5 = 53;
+  if (has_armor5()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        53, this->armor5(), target);
   }
 
   // optional int32 prate = 54;
@@ -2285,11 +2321,9 @@ int Hero::ByteSize() const {
           this->usecost());
     }
 
-    // optional int32 addCost = 24;
+    // optional float addCost = 24;
     if (has_addcost()) {
-      total_size += 2 +
-        ::google::protobuf::internal::WireFormatLite::Int32Size(
-          this->addcost());
+      total_size += 2 + 4;
     }
 
     // optional int32 moveCost = 25;
@@ -2497,6 +2531,15 @@ int Hero::ByteSize() const {
           this->armor4());
     }
 
+    // optional .protos.common.Item armor5 = 53;
+    if (has_armor5()) {
+      total_size += 2 +
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+          this->armor5());
+    }
+
+  }
+  if (_has_bits_[56 / 32] & (0xffu << (56 % 32))) {
     // optional int32 prate = 54;
     if (has_prate()) {
       total_size += 2 +
@@ -2504,8 +2547,6 @@ int Hero::ByteSize() const {
           this->prate());
     }
 
-  }
-  if (_has_bits_[56 / 32] & (0xffu << (56 % 32))) {
     // optional bool battle = 55;
     if (has_battle()) {
       total_size += 2 + 1;
@@ -2732,11 +2773,14 @@ void Hero::MergeFrom(const Hero& from) {
     if (from.has_armor4()) {
       mutable_armor4()->::protos::common::Item::MergeFrom(from.armor4());
     }
-    if (from.has_prate()) {
-      set_prate(from.prate());
+    if (from.has_armor5()) {
+      mutable_armor5()->::protos::common::Item::MergeFrom(from.armor5());
     }
   }
   if (from._has_bits_[56 / 32] & (0xffu << (56 % 32))) {
+    if (from.has_prate()) {
+      set_prate(from.prate());
+    }
     if (from.has_battle()) {
       set_battle(from.battle());
     }
@@ -2778,6 +2822,9 @@ bool Hero::IsInitialized() const {
   }
   if (has_armor4()) {
     if (!this->armor4().IsInitialized()) return false;
+  }
+  if (has_armor5()) {
+    if (!this->armor5().IsInitialized()) return false;
   }
   return true;
 }
@@ -2839,6 +2886,7 @@ void Hero::Swap(Hero* other) {
     std::swap(armor2_, other->armor2_);
     std::swap(armor3_, other->armor3_);
     std::swap(armor4_, other->armor4_);
+    std::swap(armor5_, other->armor5_);
     std::swap(prate_, other->prate_);
     std::swap(battle_, other->battle_);
     std::swap(remove_, other->remove_);

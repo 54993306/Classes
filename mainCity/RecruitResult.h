@@ -85,6 +85,9 @@ public:
 
 	void callBackForCloesed();
 
+	void showHand();
+	void hideHand();
+	void setHeroViewVis(bool isVisible);
 private:
 	int m_Type;
 	int m_needNum;
@@ -104,6 +107,8 @@ private:
 
 	CMonsterInfo* m_pMonsterInfo;
 	CItemInfo* m_pItemInfo;
+
+	CCArmature* m_pHand;
 
 	bool m_bIsSuccess;
 };

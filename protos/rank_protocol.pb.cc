@@ -160,9 +160,9 @@ void protobuf_AddDesc_rank_5fprotocol_2eproto() {
     "\022%\n\010roleData\030\002 \001(\0132\023.protos.common.Role\022"
     "\014\n\004hurt\030\003 \001(\005\022\037\n\010teamList\030\004 \003(\0132\r.protos"
     ".Teams\"B\n\005Teams\022\n\n\002id\030\001 \002(\005\022\r\n\005thumb\030\002 \001"
-    "(\005\022\017\n\007quality\030\004 \001(\005\022\r\n\005color\030\005 \001(\005B0\n\036an"
-    "vin.server.gameserver.protosB\014RankProtoc"
-    "olH\001", 404);
+    "(\005\022\017\n\007quality\030\004 \001(\005\022\r\n\005color\030\005 \001(\005B/\n\035da"
+    "ss.server.gameserver.protosB\014RankProtoco"
+    "lH\001", 403);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "rank_protocol.proto", &protobuf_RegisterTypes);
   RankRequest::default_instance_ = new RankRequest();

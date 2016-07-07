@@ -41,7 +41,7 @@ bool CSelectArmy::init()
 		lay->setContentSize(CCSizeMake(2824,640));
 		LayerManager::instance()->push(lay);
 		
-		m_ui = LoadComponent("selectArmy.xaml");  //
+		m_ui = LoadComponent("selectArmy.xaml");  //selectPvpHero
 		m_ui->setPosition(VCENTER);
 		this->addChild(m_ui);
 		m_selectType = 1;
@@ -316,6 +316,7 @@ void CSelectArmy::addHeroCell(unsigned int uIdx, CPageViewCell * pCell)
 			}	
 		}
 
+		const HeroInfoData *data = DataCenter::sharedData()->getHeroInfo()->getCfg(hero.thumb);
 		for (int i=1;i<=4;++i)
 		{
 			CCNode *child = lay->getChildByTag(i);
@@ -343,7 +344,10 @@ void CSelectArmy::addHeroCell(unsigned int uIdx, CPageViewCell * pCell)
 			case 2:
 				{
 					CImageView *mask =(CImageView*)child;
-					mask->setTexture(setItemQualityTexture(hero.iColor));
+					if(data)
+					{
+						mask->setTexture(SetRectColor(data->iType1));
+					}	
 					mask->setTouchEnabled(true);
 					mask->setOnClickListener(this,ccw_click_selector(CSelectArmy::onClearHero));
 					mask->setUserObject(CCInteger::create(j));
@@ -351,7 +355,7 @@ void CSelectArmy::addHeroCell(unsigned int uIdx, CPageViewCell * pCell)
 						mask->setTouchEnabled(false);
 
 					//添加星级
-					CLayout* pStarLayout = getStarLayout(hero.quality);
+					CLayout* pStarLayout = getStarLayout(hero.iColor);
 					mask->addChild(pStarLayout);
 
 				}break;
@@ -362,7 +366,6 @@ void CSelectArmy::addHeroCell(unsigned int uIdx, CPageViewCell * pCell)
 				}break;
 			case 4:
 				{
-					const HeroInfoData *data = DataCenter::sharedData()->getHeroInfo()->getCfg(hero.thumb);
 					if(data)
 					{
 						CCSprite *heroType = (CCSprite*)child;
@@ -427,6 +430,8 @@ void CSelectArmy::onCombat(CCObject* pSender)
 
 		CButton *combat= (CButton *)pSender;
 		combat->setEnabled(false);
+
+		//有世界BOSS
 		if(m_WorldBoss)
 		{
 			CPlayerControl::getInstance().sendEnterStageForBoss(
@@ -435,7 +440,7 @@ void CSelectArmy::onCombat(CCObject* pSender)
 				m_union.heroList.at(2).id,
 				m_union.heroList.at(3).id,
 				m_union.heroList.at(4).id);
-
+			DataCenter::sharedData()->getWar()->setWorldBoss(true);
 		}else{
 			CPlayerControl::getInstance().sendEnterStage(
 				m_stageId,
@@ -568,6 +573,7 @@ void CSelectArmy::addGridCell(unsigned int uIdx, CGridViewCell* pCell)
 {
 	CHero *hero = m_currHeroList->at(uIdx);
 	CLayout *lay = UICloneMgr::cloneLayout(m_cell);
+	const HeroInfoData *data = DataCenter::sharedData()->getHeroInfo()->getCfg(hero->thumb);
 	for (int i = 1; i <=22; i++)
 	{
 		CCNode *child = lay->getChildByTag(i);
@@ -583,7 +589,10 @@ void CSelectArmy::addGridCell(unsigned int uIdx, CGridViewCell* pCell)
 		else if (i==3)
 		{
 			CCSprite *mask = (CCSprite*)child;
-			mask->setTexture(setItemQualityTexture(hero->iColor));
+			if(data)
+			{
+				mask->setTexture(SetRectColor(data->iType1));
+			}
 			CCSprite *head = CCSprite::create(CCString::createWithFormat("headImg/%d.png", hero->thumb)->getCString());
 			if (!head)
 			{
@@ -597,9 +606,8 @@ void CSelectArmy::addGridCell(unsigned int uIdx, CGridViewCell* pCell)
 		{
 			CLabel *name = (CLabel *)child;
 			if (m_selectType == 1) {
-				const HeroInfoData *c_data = DataCenter::sharedData()->getHeroInfo()->getCfg(hero->thumb);
-				if(c_data && c_data->heroName.size() > 0)
-					name->setString(c_data->heroName.c_str());
+				if( data && data->heroName.size() > 0)
+					name->setString(data->heroName.c_str());
 			} else if(m_selectType == 2) {
 				name->setString(hero->name.c_str());
 			}
@@ -719,7 +727,12 @@ void CSelectArmy::addHeroSelectCell(unsigned int uIdx, CGridViewCell* pCell)
 		else if (i==3)
 		{
 			CCSprite *mask = (CCSprite*)child;
-			mask->setTexture(setItemQualityTexture(hero->iColor));
+	
+			if(c_data)
+			{ 
+				mask->setTexture(SetRectColor(c_data->iType1));
+			}
+			
 			CCSprite *head = CCSprite::create(CCString::createWithFormat("headImg/%d.png", hero->thumb)->getCString());
 			if (!head)
 			{
@@ -731,7 +744,7 @@ void CSelectArmy::addHeroSelectCell(unsigned int uIdx, CGridViewCell* pCell)
 			pCell->addChild(head);
 
 			//添加星级
-			CLayout* pStarLayout = getStarLayout(hero->quality);
+			CLayout* pStarLayout = getStarLayout(hero->iColor);
 			mask->addChild(pStarLayout);
 		}
 		else if (i==5)

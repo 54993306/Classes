@@ -50,6 +50,9 @@ const ::google::protobuf::internal::GeneratedMessageReflection*
 const ::google::protobuf::Descriptor* HeroEvolRes_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   HeroEvolRes_reflection_ = NULL;
+const ::google::protobuf::Descriptor* SkillLevelUp_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  SkillLevelUp_reflection_ = NULL;
 const ::google::protobuf::Descriptor* DoResult_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   DoResult_reflection_ = NULL;
@@ -228,7 +231,24 @@ void protobuf_AssignDesc_hero_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(HeroEvolRes));
-  DoResult_descriptor_ = file->message_type(10);
+  SkillLevelUp_descriptor_ = file->message_type(10);
+  static const int SkillLevelUp_offsets_[3] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(SkillLevelUp, heroid_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(SkillLevelUp, skillid_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(SkillLevelUp, itemid_),
+  };
+  SkillLevelUp_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      SkillLevelUp_descriptor_,
+      SkillLevelUp::default_instance_,
+      SkillLevelUp_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(SkillLevelUp, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(SkillLevelUp, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(SkillLevelUp));
+  DoResult_descriptor_ = file->message_type(11);
   static const int DoResult_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DoResult, result_),
   };
@@ -243,7 +263,7 @@ void protobuf_AssignDesc_hero_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(DoResult));
-  HeroResponse_descriptor_ = file->message_type(11);
+  HeroResponse_descriptor_ = file->message_type(12);
   static const int HeroResponse_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(HeroResponse, result_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(HeroResponse, hero_),
@@ -293,6 +313,8 @@ void protobuf_RegisterTypes(const ::std::string&) {
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     HeroEvolRes_descriptor_, &HeroEvolRes::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    SkillLevelUp_descriptor_, &SkillLevelUp::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     DoResult_descriptor_, &DoResult::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     HeroResponse_descriptor_, &HeroResponse::default_instance());
@@ -321,6 +343,8 @@ void protobuf_ShutdownFile_hero_5fprotocol_2eproto() {
   delete HeroEvolReq_reflection_;
   delete HeroEvolRes::default_instance_;
   delete HeroEvolRes_reflection_;
+  delete SkillLevelUp::default_instance_;
+  delete SkillLevelUp_reflection_;
   delete DoResult::default_instance_;
   delete DoResult_reflection_;
   delete HeroResponse::default_instance_;
@@ -352,11 +376,13 @@ void protobuf_AddDesc_hero_5fprotocol_2eproto() {
     "roId\030\001 \002(\005\022\016\n\006itemId\030\002 \002(\005\022\017\n\007itemNum\030\003 "
     "\002(\005\"\035\n\013HeroEvolReq\022\016\n\006heroId\030\001 \002(\005\"@\n\013He"
     "roEvolRes\022\016\n\006result\030\001 \002(\005\022!\n\004hero\030\002 \001(\0132"
-    "\023.protos.common.Hero\"\032\n\010DoResult\022\016\n\006resu"
-    "lt\030\001 \002(\005\"T\n\014HeroResponse\022\016\n\006result\030\001 \002(\005"
-    "\022!\n\004hero\030\002 \001(\0132\023.protos.common.Hero\022\021\n\ts"
-    "killLvUp\030\003 \001(\010B0\n\036anvin.server.gameserve"
-    "r.protosB\014HeroProtocolH\001", 864);
+    "\023.protos.common.Hero\"\?\n\014SkillLevelUp\022\016\n\006"
+    "heroId\030\001 \002(\005\022\017\n\007skillId\030\002 \002(\005\022\016\n\006itemId\030"
+    "\003 \002(\005\"\032\n\010DoResult\022\016\n\006result\030\001 \002(\005\"T\n\014Her"
+    "oResponse\022\016\n\006result\030\001 \002(\005\022!\n\004hero\030\002 \001(\0132"
+    "\023.protos.common.Hero\022\021\n\tskillLvUp\030\003 \001(\010B"
+    "/\n\035dass.server.gameserver.protosB\014HeroPr"
+    "otocolH\001", 928);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "hero_protocol.proto", &protobuf_RegisterTypes);
   HeroListRequest::default_instance_ = new HeroListRequest();
@@ -369,6 +395,7 @@ void protobuf_AddDesc_hero_5fprotocol_2eproto() {
   HeroExpRequest::default_instance_ = new HeroExpRequest();
   HeroEvolReq::default_instance_ = new HeroEvolReq();
   HeroEvolRes::default_instance_ = new HeroEvolRes();
+  SkillLevelUp::default_instance_ = new SkillLevelUp();
   DoResult::default_instance_ = new DoResult();
   HeroResponse::default_instance_ = new HeroResponse();
   HeroListRequest::default_instance_->InitAsDefaultInstance();
@@ -381,6 +408,7 @@ void protobuf_AddDesc_hero_5fprotocol_2eproto() {
   HeroExpRequest::default_instance_->InitAsDefaultInstance();
   HeroEvolReq::default_instance_->InitAsDefaultInstance();
   HeroEvolRes::default_instance_->InitAsDefaultInstance();
+  SkillLevelUp::default_instance_->InitAsDefaultInstance();
   DoResult::default_instance_->InitAsDefaultInstance();
   HeroResponse::default_instance_->InitAsDefaultInstance();
   ::google::protobuf::internal::OnShutdown(&protobuf_ShutdownFile_hero_5fprotocol_2eproto);
@@ -2992,6 +3020,295 @@ void HeroEvolRes::Swap(HeroEvolRes* other) {
   ::google::protobuf::Metadata metadata;
   metadata.descriptor = HeroEvolRes_descriptor_;
   metadata.reflection = HeroEvolRes_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int SkillLevelUp::kHeroIdFieldNumber;
+const int SkillLevelUp::kSkillIdFieldNumber;
+const int SkillLevelUp::kItemIdFieldNumber;
+#endif  // !_MSC_VER
+
+SkillLevelUp::SkillLevelUp()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+}
+
+void SkillLevelUp::InitAsDefaultInstance() {
+}
+
+SkillLevelUp::SkillLevelUp(const SkillLevelUp& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+}
+
+void SkillLevelUp::SharedCtor() {
+  _cached_size_ = 0;
+  heroid_ = 0;
+  skillid_ = 0;
+  itemid_ = 0;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+SkillLevelUp::~SkillLevelUp() {
+  SharedDtor();
+}
+
+void SkillLevelUp::SharedDtor() {
+  if (this != default_instance_) {
+  }
+}
+
+void SkillLevelUp::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* SkillLevelUp::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return SkillLevelUp_descriptor_;
+}
+
+const SkillLevelUp& SkillLevelUp::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_hero_5fprotocol_2eproto();
+  return *default_instance_;
+}
+
+SkillLevelUp* SkillLevelUp::default_instance_ = NULL;
+
+SkillLevelUp* SkillLevelUp::New() const {
+  return new SkillLevelUp;
+}
+
+void SkillLevelUp::Clear() {
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    heroid_ = 0;
+    skillid_ = 0;
+    itemid_ = 0;
+  }
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool SkillLevelUp::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+  ::google::protobuf::uint32 tag;
+  while ((tag = input->ReadTag()) != 0) {
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // required int32 heroId = 1;
+      case 1: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &heroid_)));
+          set_has_heroid();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(16)) goto parse_skillId;
+        break;
+      }
+
+      // required int32 skillId = 2;
+      case 2: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_skillId:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &skillid_)));
+          set_has_skillid();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(24)) goto parse_itemId;
+        break;
+      }
+
+      // required int32 itemId = 3;
+      case 3: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_itemId:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &itemid_)));
+          set_has_itemid();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectAtEnd()) return true;
+        break;
+      }
+
+      default: {
+      handle_uninterpreted:
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          return true;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+  return true;
+#undef DO_
+}
+
+void SkillLevelUp::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // required int32 heroId = 1;
+  if (has_heroid()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->heroid(), output);
+  }
+
+  // required int32 skillId = 2;
+  if (has_skillid()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->skillid(), output);
+  }
+
+  // required int32 itemId = 3;
+  if (has_itemid()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(3, this->itemid(), output);
+  }
+
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+}
+
+::google::protobuf::uint8* SkillLevelUp::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // required int32 heroId = 1;
+  if (has_heroid()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(1, this->heroid(), target);
+  }
+
+  // required int32 skillId = 2;
+  if (has_skillid()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->skillid(), target);
+  }
+
+  // required int32 itemId = 3;
+  if (has_itemid()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(3, this->itemid(), target);
+  }
+
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  return target;
+}
+
+int SkillLevelUp::ByteSize() const {
+  int total_size = 0;
+
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // required int32 heroId = 1;
+    if (has_heroid()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->heroid());
+    }
+
+    // required int32 skillId = 2;
+    if (has_skillid()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->skillid());
+    }
+
+    // required int32 itemId = 3;
+    if (has_itemid()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->itemid());
+    }
+
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void SkillLevelUp::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const SkillLevelUp* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const SkillLevelUp*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void SkillLevelUp::MergeFrom(const SkillLevelUp& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_heroid()) {
+      set_heroid(from.heroid());
+    }
+    if (from.has_skillid()) {
+      set_skillid(from.skillid());
+    }
+    if (from.has_itemid()) {
+      set_itemid(from.itemid());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void SkillLevelUp::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void SkillLevelUp::CopyFrom(const SkillLevelUp& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool SkillLevelUp::IsInitialized() const {
+  if ((_has_bits_[0] & 0x00000007) != 0x00000007) return false;
+
+  return true;
+}
+
+void SkillLevelUp::Swap(SkillLevelUp* other) {
+  if (other != this) {
+    std::swap(heroid_, other->heroid_);
+    std::swap(skillid_, other->skillid_);
+    std::swap(itemid_, other->itemid_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata SkillLevelUp::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = SkillLevelUp_descriptor_;
+  metadata.reflection = SkillLevelUp_reflection_;
   return metadata;
 }
 

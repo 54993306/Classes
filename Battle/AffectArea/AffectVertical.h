@@ -23,7 +23,7 @@ namespace BattleSpace
 		AffectVertical(){};
 		virtual ~AffectVertical(){};
 		UNINITCREATE(AffectVertical);
-		virtual AffectType getAreaType();
+		virtual sAffectType getAreaType();
 		virtual void initArea(AreaCountInfo& pInfo);
 		virtual void moriGridRole(BaseRole* pRole,std::vector<int>& pValids);
 	};

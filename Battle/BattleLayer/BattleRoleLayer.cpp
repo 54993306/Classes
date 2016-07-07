@@ -30,8 +30,8 @@
 #include "Battle/BaseRoleData.h"
 namespace BattleSpace{
 	BattleRoleLayer::BattleRoleLayer()
-		:m_TouchAlive(nullptr),m_grid(0),m_AliveNode(0),m_testState(true)
-		,m_MoveActObject(nullptr),m_TouchAliveBtn(false),m_Manage(nullptr)
+		:m_TouchAlive(nullptr),m_grid(0),m_AliveNode(0),mtestState(true)
+		,m_MoveActObject(nullptr),m_TouchAliveBtn(false),mManage(nullptr)
 		,m_LayerColor(nullptr),m_MoveNode(nullptr),m_TouchOffs(0,0)
 	{}
 	BattleRoleLayer::~BattleRoleLayer()
@@ -46,11 +46,14 @@ namespace BattleSpace{
 		NOTIFICATION->addObserver(this,callfuncO_selector(BattleRoleLayer::LayerShake),B_Shark,nullptr);
 		NOTIFICATION->addObserver(this,callfuncO_selector(BattleRoleLayer::roleEntranceBattle),B_EntranceBattle,nullptr);
 		NOTIFICATION->addObserver(this,callfuncO_selector(BattleRoleLayer::changeTestState),B_ChangeMoveState,nullptr);
+		NOTIFICATION->addObserver(this,callfuncO_selector(BattleRoleLayer::initActobject),MsgCreateRoleObject,nullptr);
+		NOTIFICATION->addObserver(this,callfuncO_selector(BattleRoleLayer::roleStand),MsgRoleStand,nullptr);
+		NOTIFICATION->addObserver(this,callfuncO_selector(BattleRoleLayer::removeMessage),MsgReleaseTouch,nullptr);
 	}
 
 	void BattleRoleLayer::onExit()
 	{
-		CC_SAFE_RELEASE(m_MoveActObject->getAlive());
+		CC_SAFE_RELEASE(m_MoveActObject->getBaseRole());
 		this->unscheduleUpdate();
 		removeEvent();
 		NOTIFICATION->removeAllObservers(this);
@@ -70,7 +73,7 @@ namespace BattleSpace{
 		addChild(m_MoveNode);
 		m_AliveNode = CCNode::create();
 		addChild(m_AliveNode);
-		m_Manage = DataCenter::sharedData()->getWar();
+		mManage = DataCenter::sharedData()->getWar();
 		m_map = DataCenter::sharedData()->getMap()->getCurrWarMap();
 
 		createMoveTarget();
@@ -84,7 +87,7 @@ namespace BattleSpace{
 		BaseRole* alive = BaseRole::create();
 		alive->retain();
 		m_MoveActObject = RoleObject::create();
-		m_MoveActObject->setAlive(alive);
+		m_MoveActObject->setBaseRole(alive);
 		m_MoveActObject->setVisible(false);
 		addChild(m_MoveActObject); 
 	}
@@ -101,69 +104,58 @@ namespace BattleSpace{
 
 	void BattleRoleLayer::createActObjects()
 	{
-		const Members* map_Alive = m_Manage->getMembers();
-		for (auto tPair : *map_Alive)
-		{
-			if (tPair.second->getHp()>0 && tPair.second->getEnemy())
-				initActobject(tPair.second);
-		}
-		initActobject(m_Manage->getAliveByGrid(C_CAPTAINSTAND));
+		vector<BaseRole*>tMonsters;
+		mManage->initMonsters(tMonsters,true);
+		for (auto tMonster : tMonsters)
+			initActobject(tMonster);
+		initActobject(mManage->getAliveByGrid(C_CAPTAINSTAND));
 	}
 
-	void BattleRoleLayer::AliveObEffect(RoleObject* aliveOb,int createType/*=DefaultCreat*/)
+	void BattleRoleLayer::AddActToGrid(RoleObject* pRoleObject,int pGrid)
 	{
-		switch (createType)
+		BaseRole* tRole = pRoleObject->getBaseRole();
+		if (tRole->getDelaytime()>0)pGrid = 0;
+		if (pGrid == INVALID_GRID&&pRoleObject->getEnemy())
 		{
-		case DefaultCreat:
-			{
-				aliveOb->setDropItem(aliveOb->getAlive()->getBaseData()->getRoleDrop());	
-			}break;
-		case SceneTrap:
-			{
-				EffectObject* eff = EffectObject::create("304");
-				eff->setEffAnchorPoint(0.5f,0.5f);
-				eff->setPosition(ccp(0,GRID_HEIGHT*1.0f));
-				aliveOb->addChild(eff);
-				aliveOb->setDropItem(aliveOb->getAlive()->getBaseData()->getRoleDrop());
-				PlayEffectSound(SFX_517);
-			}break;
+			pGrid = CCRANDOM_0_1()*3+1;
+			tRole->setGridIndex(pGrid);
 		}
-	}
-
-	void BattleRoleLayer::AddActToGrid(RoleObject* pAliveOb,int grid)
-	{
-		BaseRole* alive = pAliveOb->getAlive();
-		if (alive->getDelaytime()>0)grid = 0;
-		if (grid == INVALID_GRID&&pAliveOb->getEnemy())
+		pRoleObject->countOffs(m_map->getPoint(pGrid));
+		if(pRoleObject->getParent() == nullptr)
 		{
-			grid = CCRANDOM_0_1()*3+1;
-			alive->setGridIndex(grid);
-		}
-		pAliveOb->countOffs(m_map->getPoint(grid));
-		if(pAliveOb->getParent() == nullptr)
-		{
-			m_AliveNode->addChild(pAliveOb);
-			pAliveOb->initMoveObject(m_MoveNode);
+			m_AliveNode->addChild(pRoleObject);
+			pRoleObject->initMoveObject(m_MoveNode);
+			NOTIFICATION->postNotification(MsgRoleGridChange,tRole);				//武将首次进入战场做位置刷新处理
 		}
 	}
 	//绘制战场武将
-	void BattleRoleLayer::initActobject(BaseRole* alive,int createType)
+	void BattleRoleLayer::initActobject(CCObject* ob)
 	{
-		if (alive->getRoleObject())
+		if ( !ob )return;
+		BaseRole* pRole = (BaseRole*)ob;
+		if (pRole->getRoleObject())
 		{
-			CCLOG("[ *TIPS ] WarAliveLayer::createAlive alive Actobject Repeat");
+			CCLOG("[ *TIPS ] BattleRoleLayer::createAlive alive Actobject Repeat");
 			return;
 		}
-		RoleObject* aliveOb = RoleObject::create();							//创建显示的对象
-		aliveOb->setAlive(alive);											//显示对象与逻辑对象绑定
-		alive->setRoleLayer(this);
-		AliveObEffect(aliveOb,createType);
-		AddActToGrid(aliveOb,alive->getGridIndex());
+		RoleObject* tRoleObject = RoleObject::create();							//创建显示的对象
+		tRoleObject->setBaseRole(pRole);											//显示对象与逻辑对象绑定
+		pRole->setRoleLayer(this);
+		if (pRole->getEnemy() || pRole->getFatherID())
+		{
+			//EffectObject* eff = EffectObject::create("304");
+			//eff->setEffAnchorPoint(0.5f,0.5f);
+			//eff->setPosition(ccp(0,GRID_HEIGHT*1.0f));
+			//tRoleObject->addChild(eff);
+			//tRoleObject->setDropItem(tRoleObject->getAlive()->getBaseData()->getRoleDrop());
+			//PlayEffectSound(SFX_517);
+		}
+		AddActToGrid(tRoleObject,pRole->getGridIndex());
 	}
 	void BattleRoleLayer::addEvent(){ this->setTouchEnabled(true); }
 	void BattleRoleLayer::removeEvent(){ this->setTouchEnabled(false); }
 
-	void BattleRoleLayer::removeMessage()
+	void BattleRoleLayer::removeMessage(CCObject* ob)
 	{
 		ccTouchCancelled(nullptr,nullptr);
 		removeEvent();
@@ -208,7 +200,7 @@ namespace BattleSpace{
 			m_MoveActObject->setoffs(aliveOb->getoffs());		//武将原来相对于格子的偏移量
 			m_MoveActObject->getBody()->setScale(aliveOb->getBody()->getScale());
 		}
-		if (aliveOb->getAlive()->getGridIndex())
+		if (aliveOb->getBaseRole()->getGridIndex())
 		{
 			if(aliveOb->getMoveObject())
 				m_MoveActObject->setPosition(aliveOb->getMoveObject()->getPosition());
@@ -225,33 +217,32 @@ namespace BattleSpace{
 		CCARRAY_FOREACH(ob_Arr,obj)
 		{
 			RoleObject* act = (RoleObject*)obj;
-			BaseRole* t_alive = act->getAlive();	
-			if (t_alive->getCaptain())continue;
+			BaseRole* tRole = act->getBaseRole();	
+			if (tRole->getCaptain())continue;
 			setEnableRecursiveCascading(act->getArmature(),true,ccc3(255,255,255),255);
 			if (lucency)
 				setEnableRecursiveCascading(act->getArmature(),true,ccc3(255,255,255),100);
 		}
 	}
 
-	void BattleRoleLayer::initTouchAlive(BaseRole* alive)
+	void BattleRoleLayer::initTouchAlive(BaseRole* pBaseRole)
 	{
-		m_TouchAlive = alive;
-		RoleObject* aliveOb = alive->getRoleObject();										//指针复制，复制被触摸武将
-		alive->setTouchGrid(alive->getGridIndex());
-		aliveOb->showThis();
-		NOTIFICATION->postNotification(B_RoleAttackCostArea, alive);
-		initMoveActObject(aliveOb);
-		if (!alive->getBattle())								//上阵武将才做透明处理
+		m_TouchAlive = pBaseRole;
+		pBaseRole->setTouchGrid(pBaseRole->getGridIndex());
+		pBaseRole->getRoleObject()->showThis();
+		NOTIFICATION->postNotification(B_RoleAttackCostArea, pBaseRole);
+		initMoveActObject(pBaseRole->getRoleObject());
+		if (!pBaseRole->getBattle())								//上阵武将才做透明处理
 			return;
 		lucencyActObject(true);
 	}
 
-	bool BattleRoleLayer::touchInAlive( int grid,CCPoint& p )
+	bool BattleRoleLayer::touchInAlive( int grid, const CCPoint& p )
 	{
-		vector<BaseRole*>* Vec = m_Manage->getVecHeros();
+		vector<BaseRole*>* Vec = mManage->inBattleHeros();
 		for (auto i : *Vec)
 		{
-			if (i->getCallType()!=CommonType)continue;
+			if (i->getCallType()!=sCallType::eCommon)continue;
 			MoveObject* mo = i->getMoveObject();
 			if (!mo)continue;
 			for (auto j :mo->grids)
@@ -276,7 +267,7 @@ namespace BattleSpace{
 		}
 		CCPoint p = this->convertToNodeSpace(pTouch->getLocation());
 		int grid = m_map->getGridIndex(p);
-		return touchInAlive(grid,pTouch->getLocation());
+		return touchInAlive(grid,  pTouch->getLocation());
 	}
 
 	int BattleRoleLayer::getTouchGrid( CCTouch* pTouch )
@@ -317,7 +308,7 @@ namespace BattleSpace{
 		NOTIFICATION->postNotification(B_CancelCostArea,nullptr);
 		lucencyActObject(false);
 		m_grid = getTouchGrid(pTouch);
-		m_TouchAlive->setTouchEndGrid(m_grid);
+		m_TouchAlive->setCommandGrid(m_grid);
 	}
 
 	BaseRole* BattleRoleLayer::getAliveByMoveGrid( int pGrid )
@@ -377,7 +368,7 @@ namespace BattleSpace{
 			act->setUserObject(nullptr);
 		}
 	}
-
+	
 	void BattleRoleLayer::heroWinAction()
 	{
 		CCArray* arr = getAlivesOb(AliveType_Hero);
@@ -385,27 +376,20 @@ namespace BattleSpace{
 		CCARRAY_FOREACH(arr,obj)
 		{
 			RoleObject* act = (RoleObject*)obj;
-			act->TurnStateTo(E_StateCode::eVictoryState);
+			act->TurnStateTo(sStateCode::eVictoryState);
 		}
 	}
 
 	void BattleRoleLayer::createBatchMonster( int batchNumber )
 	{
-		CCArray* arr =m_Manage->getAlivesByCamp(true,true);
+		CCArray* arr = mManage->getMonsters(true);
 		CCObject* obj = nullptr;
 		CCARRAY_FOREACH(arr,obj)
 		{
 			BaseRole* alive = (BaseRole*)obj;
 			if(alive->getAliveID() >= C_BatchMonst+batchNumber*100)
-				initActobject(alive,SceneTrap);
+				initActobject(alive);
 		}
-	}
-
-	void BattleRoleLayer::roleWantIntoBattle( BaseRole* pRole )
-	{
-		AliveObEffect(pRole->getRoleObject());
-		AddActToGrid(pRole->getRoleObject(),pRole->getGridIndex());
-		pRole->roleIntoBattle();
 	}
 
 	void BattleRoleLayer::changeLight( bool pLight )
@@ -423,11 +407,23 @@ namespace BattleSpace{
 	void BattleRoleLayer::SkillCreateRole( CCObject* ob )
 	{
 		BaseRole* tRole = (BaseRole*)ob;
-		initActobject(tRole,SceneTrap);
+		initActobject(tRole);
 	}
 
 	void BattleRoleLayer::changeTestState( CCObject* ob )
 	{
-		m_testState = !m_testState;
+		mtestState = !mtestState;
+	}
+
+	void BattleRoleLayer::roleStand( CCObject* ob )
+	{
+		CCArray* pRoleObjects = getAlivesOb();
+		CCObject* obj = nullptr;
+		CCARRAY_FOREACH(pRoleObjects,obj)
+		{
+			RoleObject* tRoleObject = (RoleObject*)obj;
+			tRoleObject->setMoveState(sStateCode::eNullState);
+			tRoleObject->TurnStateTo(sStateCode::eStandState);
+		}
 	}
 };

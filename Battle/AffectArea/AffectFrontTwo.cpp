@@ -16,9 +16,9 @@
 
 namespace BattleSpace
 {
-	AffectType AffectFrontTwo::getAreaType()
+	sAffectType AffectFrontTwo::getAreaType()
 	{
-		return AffectType::eFrontTow;
+		return sAffectType::eFrontTow;
 	}
 
 	void AffectFrontTwo::initArea(AreaCountInfo& pInfo)

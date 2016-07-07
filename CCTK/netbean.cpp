@@ -4,7 +4,8 @@
 ///构造函数，初始化默认值
 CNetBean::CNetBean():
 m_nnPort(0),
-m_nConnectStatus(ENULL)
+m_nConnectStatus(ENULL),
+m_isIp(false)
 {
 #if CLIP_PACKET
 	m_nRecvPackLength = 0;
@@ -16,10 +17,11 @@ CNetBean::~CNetBean(){}
 
 
 ///设置于服务器连接的地址与端口
-void CNetBean::setAddress(const char* ip, unsigned short port)
+void CNetBean::setAddress(const char* ip, unsigned short port,bool isIp)
 {
 	this->m_nnPort = port;
 	this->m_nnAddress = ip;
+	this->m_isIp = isIp;
 }
 
 ///开始无阻塞方式连接
@@ -36,7 +38,7 @@ bool CNetBean::connect()
 	if(!m_Sock.Create()) {
 		return false;
 	}
-	if(!m_Sock.Connect(this->m_nnAddress.c_str(), this->m_nnPort)) {
+	if(!m_Sock.Connect(this->m_nnAddress.c_str(), this->m_nnPort,m_isIp)) {
 		return false;
 	}
 	//set the connecting status
@@ -48,6 +50,7 @@ bool CNetBean::connect()
 
 	return true;
 }
+
 
 ///是否处于连接状态
 bool CNetBean::isConnected()

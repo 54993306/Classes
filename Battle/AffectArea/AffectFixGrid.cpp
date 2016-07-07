@@ -17,9 +17,9 @@
 namespace BattleSpace
 {
 	//随机固定格子
-	AffectType AffectAnyFixGrid::getAreaType()
+	sAffectType AffectAnyFixGrid::getAreaType()
 	{
-		return AffectType::eAnyFixGrid;
+		return sAffectType::eAnyFixGrid;
 	}
 
 	void AffectAnyFixGrid::initArea(AreaCountInfo& pInfo)
@@ -40,9 +40,9 @@ namespace BattleSpace
 	/***************************************************************************/
 
 	//随机固定格子区域
-	AffectType AffectAnyFixGridDisperse::getAreaType()
+	sAffectType AffectAnyFixGridDisperse::getAreaType()
 	{
-		return AffectType::eAnyFixGridDisperse;
+		return sAffectType::eAnyFixGridDisperse;
 	}
 
 	void AffectAnyFixGridDisperse::initArea(AreaCountInfo& pInfo)

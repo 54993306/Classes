@@ -127,7 +127,7 @@ void showScrollTip(const char* str, CCNode * _parent)
 
 }
 
-CPopTip* ShowPopTextTip(const char* str,const ccColor3B& color)
+CPopTip* ShowPopTextTip(const char* str,const ccColor3B& color, bool isAutoClose)
 {
 	CPopTip *pop = CPopTip::create();
 	pop->setVisible(true);
@@ -142,12 +142,13 @@ CPopTip* ShowPopTextTip(const char* str,const ccColor3B& color)
 	//CScene* scene = CSceneManager::sharedSceneManager()->getRunningScene();
 	//scene->addChild(pop,50,2);
 	//pop->runScaleAction();
-
-	CCDelayTime *delay = CCDelayTime::create(1.5f);
-	CCScaleTo *smal = CCScaleTo::create(0.2f,0.0f);
-	CCSequence *seque = CCSequence::create(delay,smal, CCCallFuncO::create(pop,callfuncO_selector(CPopTip::onClose), nullptr), nullptr);
-	pop->runActionWithUi(seque);
-
+	if (isAutoClose)
+	{	
+		CCDelayTime *delay = CCDelayTime::create(1.5f);
+		CCScaleTo *smal = CCScaleTo::create(0.2f,0.0f);
+		CCSequence *seque = CCSequence::create(delay,smal, CCCallFuncO::create(pop,callfuncO_selector(CPopTip::onClose), nullptr), nullptr);
+		pop->runActionWithUi(seque);
+	}
 	return pop;
 }
 

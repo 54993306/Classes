@@ -3,6 +3,8 @@
 
 #include "cocos2d.h"
 
+USING_NS_CC;
+
 /**
 @brief    The cocos2d Application.
 
@@ -32,6 +34,8 @@ public:
     */
     virtual void applicationWillEnterForeground();
 	void initPlatformConfig();
+
+	static int m_iMsecInBackground;
 };
 
 #endif // _APP_DELEGATE_H_

@@ -18,7 +18,7 @@
 #include "Battle/BaseRole.h"
 namespace BattleSpace{
 	CombatGuideLayer::CombatGuideLayer()
-		:m_Step(nullptr),m_root(nullptr),m_mapData(nullptr)
+		:m_Step(nullptr),m_root(nullptr),m_mapData(nullptr),mManage(nullptr)
 		,m_RenderTexture(nullptr),m_Scene(nullptr),m_LayerColor(nullptr)
 	{}
 
@@ -36,6 +36,7 @@ namespace BattleSpace{
 		this->setTouchPriority(guideLayerPriority);
 		this->setTouchEnabled(true);
 		this->setIsShowBlack(false);
+		mManage = DataCenter::sharedData()->getWar();
 		m_root = CCNode::create();
 		m_root->setContentSize(CCSizeMake(1138, 640));
 		m_root->setAnchorPoint(ccp(0.5f, 0.5f));
@@ -201,7 +202,7 @@ namespace BattleSpace{
 		char bg_path[60] = {0};
 		sprintf(bg_path,"888%d",imagedata.spineID);
 		spSkeletonData* data = nullptr;
-		SpData* pData = DataCenter::sharedData()->getWar()->getSpineData(bg_path);
+		SpData* pData = mManage->getSpineData(bg_path);
 		if (pData)
 		{
 			data = pData->first;
@@ -266,10 +267,10 @@ namespace BattleSpace{
 	{
 		if(!step->getBlackBottom())
 			return;
-		CCSprite* bg = CCSprite::create("public/duihuakuang (2).png");
+		CCSprite* bg = CCSprite::create("public/mask.png");
 		CCSize size = CCDirector::sharedDirector()->getWinSize();
 		bg->setPosition(ccp(size.width/2,bg->getContentSize().height/2));
-		//CCSprite* bg2 = CCSprite::create("public/duihuakuang (2).png");
+		//CCSprite* bg2 = CCSprite::create("public/mask.png");
 		//bg2->setFlipY(true);
 		//bg2->setPosition(ccp(size.width/2,size.height-bg->getContentSize().height/2));
 		//m_root->addChild(bg2);
@@ -310,7 +311,7 @@ namespace BattleSpace{
 			return;
 		CCSprite* arrows = CCSprite::create("public/guide/arrows.png"); 
 		arrows->setAnchorPoint(ccp(0.8f,0.5f));
-		BaseRole* alive = DataCenter::sharedData()->getWar()->getAliveByGrid(C_CAPTAINSTAND);
+		BaseRole* alive = mManage->getAliveByGrid(C_CAPTAINSTAND);
 		CCPoint p = alive->getRoleObject()->getPosition();									//得到点阵图坐标
 		CCPoint point(p.x-GRID_WIDTH,p.y+GRID_HEIGHT);										//得到偏移坐标
 		CCPoint point_offset = m_root->convertToNodeSpace(m_AliveLayer->convertToWorldSpace(point));					//在warAliveLayer上的点都会默认减去地图的一半,因此直接转化世界坐标就可以，因为m_root的关系，这里还是转为相对坐标
@@ -341,29 +342,29 @@ namespace BattleSpace{
 	{
 		if (!step->getReset())						//是否重置武将处理
 			return;
-		m_AliveLayer->removeMessage();														//释放掉触摸消息
+		NOTIFICATION->postNotification(MsgReleaseTouch);									//释放掉触摸消息
 		CCMoveTo* mt = CCMoveTo::create(0.2f,ccp(MAP_MINX(DataCenter::sharedData()->getMap()->getCurrWarMap()),0));	//飞到最右侧
 		m_Scene->getMoveLayer()->runAction(mt);
-		CCArray* arr = DataCenter::sharedData()->getWar()->getAlivesByCamp(false);
+		CCArray* arr = mManage->getHeros();
 		CCObject* obj = nullptr;
 		vector<BaseRole*>VecAlive;
 		CCARRAY_FOREACH(arr,obj)
 		{
-			BaseRole* alive = (BaseRole*)obj;
-			if (alive->getCaptain())														//重置我方数据
+			BaseRole* tRole = (BaseRole*)obj;
+			if (tRole->getCaptain())														//重置我方数据
 				continue;
-			VecAlive.push_back(alive);
-			if (alive->getHp()<=0||!alive->getBattle()||!alive->getRoleObject())
+			VecAlive.push_back(tRole);
+			if (!tRole->getBattle()||!tRole->getRoleObject())
 				continue;
 			CCPoint p = m_mapData->getPoint(INVALID_GRID);
-			if (alive->getMoveObject())
-				alive->getMoveObject()->setPosition(p);										//可重构点,这些操作都应该封装在武将的内部执行的
-			alive->getRoleObject()->setPosition(p);											//在视野外进行死亡处理
-			if (!alive->getEnemy()&&alive->getCriAtk())
-				NOTIFICATION->postNotification(B_CritEnd,alive);
-			alive->getRoleObject()->AliveDie();
-			alive->getRoleObject()->setReset(true);
-			alive->setRoleObject(nullptr);
+			if (tRole->getMoveObject())
+				tRole->getMoveObject()->setPosition(p);										//可重构点,这些操作都应该封装在武将的内部执行的
+			tRole->getRoleObject()->setPosition(p);											//在视野外进行死亡处理
+			if (!tRole->getEnemy()&&tRole->getCriAtk())
+				NOTIFICATION->postNotification(B_CritEnd,tRole);
+			tRole->getRoleObject()->AliveDie();
+			tRole->getRoleObject()->setReset(true);
+			tRole->setRoleObject(nullptr);
 		}
 		creaAliveByVector(VecAlive,step);
 	}
@@ -379,8 +380,8 @@ namespace BattleSpace{
 		resetAlive(step);
 		if (step->getAddCost())
 		{
-			NOTIFICATION->postNotification(B_ChangeCostNumber,CCInteger::create(-10000));//置空处理
-			NOTIFICATION->postNotification(B_ChangeCostNumber,CCInteger::create(step->getAddCost()));
+			mManage->changeCost(-10000);
+			mManage->changeCost(step->getAddCost());
 		}
 	}
 

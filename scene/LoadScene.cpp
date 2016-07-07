@@ -96,7 +96,7 @@ void LoadScene::onEnter()
 	sprintf(path,"warScene/LoadImage/%d.png",newID);
 	if (!backgroundImage->initWithFile(path))
 	{
-		CCLOG("[ *ERROR ] LoadWar::BackImage BMG initWithFile Fail");
+		CCLOG("[ *ERROR ] LoadBattleResource::BackImage BMG initWithFile Fail");
 		backgroundImage->initWithFile("warScene/LoadImage/0.jpg");			//容错性处理
 	}
 }
@@ -130,7 +130,7 @@ void LoadScene::load(float fdetal)
 				LoadResourceInfo res;
 				res.FileName = model;
 				res.FilePath = url;
-				res.Loadtype = LoadType::Load_Effect;
+				res.Loadtype = sLoadType::eEffect;
 				m_resVec.push_back(res);
 			}
 			++m_currNum;
@@ -178,11 +178,11 @@ void LoadScene::load2( float fdetal )
 
 		CCSpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile(res.FilePath.c_str());//将plist文件加载进入缓存
 		CCLOG("load mode %s ,\n",res.FileName.c_str());
-		if(res.Loadtype == LoadType::Load_FrameAnimation)
+		if(res.Loadtype == sLoadType::eFrameAnimation)
 		{
 			AnimationManager::sharedAction()->ParseAnimation(res.FileName.c_str(),eFrameRole);
 		}
-		else if(res.Loadtype == LoadType::Load_Effect)
+		else if(res.Loadtype == sLoadType::eEffect)
 		{
 			AnimationManager::sharedAction()->ParseAnimation(res.FileName.c_str());
 		}

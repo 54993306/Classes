@@ -1,6 +1,11 @@
-﻿
-#ifndef _MONSTERINFO_H
-#define _MONSTERINFO_H
+﻿#pragma once
+
+/******************************************************
+*文件名称:	MonsterInfo.h
+*编写日期:	2016-6-14-11:45
+*编写作者:	YPF
+*功能描述:	英雄或敌人的信息悬浮框显示
+*******************************************************/
 
 #include "AppUI.h"
 #include "scene/layer/LayerManager.h"
@@ -30,5 +35,3 @@ private:
 	CLayout *m_ui;
 	int m_iBaseDescFontSize;
 };
-
-#endif

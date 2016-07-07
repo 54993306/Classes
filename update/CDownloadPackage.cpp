@@ -17,6 +17,10 @@ CDownloadPackage::CDownloadPackage()
 	,m_pathToSave("")
 	,m_pDownloadPacakgeDelegate(nullptr)
 	,m_iPackageIndex(0)
+	,m_iPackageMax(0)
+	,m_iCurrentIPixelndex(0)
+	,m_iMaxPixel(0)
+	,m_iPercent(0)
 {
 
 }
@@ -45,6 +49,11 @@ bool CDownloadPackage::init()
 
 		m_iPackageIndex = CCUserDefault::sharedUserDefault()->getIntegerForKey(PACKAGE_DOWNLOAD_INDEX, 0);
 
+		m_VersionJson = new CPackageVersionJson;
+
+		schedule(schedule_selector(CDownloadPackage::updateForChangePic), 30);
+		scheduleUpdate();
+
 		return true;
 	}
 	return false;
@@ -61,7 +70,9 @@ void CDownloadPackage::onEnter()
 
 	//进度条
 	m_progress = (CProgressBar*)m_ui->findWidgetById("progress");
-	m_progress->setMaxValue(100);
+	m_iMaxPixel = m_progress->getContentSize().width;
+	m_progress->setMinValue(0);
+	m_progress->setMaxValue(m_iMaxPixel);
 
 	////僵尸跳
 	//CCAnimation *pZombieEffect = AnimationManager::sharedAction()->getAnimation("9049");
@@ -86,6 +97,8 @@ void CDownloadPackage::onEnter()
 void CDownloadPackage::onExit()
 {
 	BaseLayer::onExit();
+
+	CCTextureCache::sharedTextureCache()->removeUnusedTextures();
 }
 
 
@@ -96,6 +109,121 @@ void CDownloadPackage::initDownloadDir()
 	CCLOG("Path: %s", m_pathToSave.c_str());
 	CCLOG("initDownloadDir end");
 }
+
+//判断当前版本是否需要更新
+bool CDownloadPackage::checkIsNeedPackage( )
+{
+	bool bPackage = CCUserDefault::sharedUserDefault()->getBoolForKey(PACKAGE_DOWNLOAD_OPEN, true);
+	if(bPackage)
+	{
+		int iPackageIndex = CCUserDefault::sharedUserDefault()->getIntegerForKey(PACKAGE_DOWNLOAD_INDEX, 0);
+		int iPackageNeedMax = CCUserDefault::sharedUserDefault()->getIntegerForKey(PACKAGE_DOWNLOAD_MAX, 0);
+		//包没有下载够，或者还没开始下载
+		if(iPackageIndex<iPackageNeedMax || iPackageIndex==0 || iPackageNeedMax==0)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+void CDownloadPackage::downLoadPackage()
+{
+	requestVersionInfo();
+}
+
+void CDownloadPackage::requestVersionInfo()
+{
+	std::string sUpdateServer = CCUserDefault::sharedUserDefault()->getStringForKey(SERVER_FOR_UPDATE);
+	CCString* pUrl = CCString::createWithFormat("%s%s?r=%ld", sUpdateServer.c_str(), PACKAGE_VERSION_FILE, getCurrentTime());
+	CCHttpRequest* request = new CCHttpRequest();
+	request->setUrl(pUrl->getCString());
+	request->setRequestType(CCHttpRequest::kHttpGet);
+	request->setResponseCallback(this, httpresponse_selector(CDownloadPackage::requestVersionInfoCallBack));
+	CCHttpClient::getInstance()->send(request);
+	request->release();
+}
+
+void CDownloadPackage::requestVersionInfoCallBack( cocos2d::extension::CCHttpClient *sender, cocos2d::extension::CCHttpResponse *response )
+{
+	if (!response)
+	{
+		requestVersionInfo();
+		return;
+	}
+
+	if (!response->isSucceed())
+	{
+		ShowPopTextTip(GETLANGSTR(287));
+		requestVersionInfo();
+		return;
+	}
+
+	//请求到的数据
+	vector<char> *buffer = response->getResponseData();  
+
+	// 数据转存本地
+	string path = m_pathToSave+"/" +PACKAGE_VERSION_FILE;
+	string buff(buffer->begin(), buffer->end());
+	CCLOG("path: %s", path.c_str());
+	FILE *fp = fopen(path.c_str(), "wb+");
+	fwrite(buff.c_str(), 1, buffer->size(),  fp);
+	fclose(fp);
+
+	//加载json数据
+	m_VersionJson->reloadFile(path);
+
+	//开始更新
+	startDownload();
+}
+
+
+void CDownloadPackage::startDownload()
+{
+	//获取需要更新的目标版本
+	std::string sApkVersion = CJniHelper::getInstance()->getVersionName();
+	m_versionNeedData = m_VersionJson->getAimPackageVersion(sApkVersion);
+	//检测目标package信息是否有误
+	if(m_versionNeedData.sVersion.compare("")==0 || m_versionNeedData.iZipNum==0)
+	{
+		m_pLabel->setString("Package Version Error !");
+		return;
+	}
+
+	//记录最大zip数量
+	m_iPackageMax = m_versionNeedData.iZipNum;
+	CCUserDefault::sharedUserDefault()->setIntegerForKey(PACKAGE_DOWNLOAD_MAX, m_iPackageMax);
+	CCUserDefault::sharedUserDefault()->flush();
+
+	//开始依次更新包
+	downloadVersionByIndex();
+
+	//更新Label显示
+	updateTextShow();
+}
+
+void CDownloadPackage::downloadVersionByIndex()
+{
+	if(m_pAssetManager)					//保证Asstmanage是最新的
+	{
+		CC_SAFE_DELETE(m_pAssetManager);
+	}
+
+	m_iPackageIndex++;
+
+	onProgress(0);
+
+	CCString* strPackageName = CCString::createWithFormat(PACKAGE_NAME, m_iPackageIndex);
+
+	std::string sUpdateServer = CCUserDefault::sharedUserDefault()->getStringForKey(SERVER_FOR_UPDATE);
+	m_pAssetManager = new AssetsManager(CCString::createWithFormat("%s%s/%s?r=%ld", sUpdateServer.c_str(), m_versionNeedData.sVersion.c_str(), strPackageName->getCString(), getCurrentTime())->getCString() , m_pathToSave.c_str());
+	m_pAssetManager->setZipFileName(CCString::createWithFormat("%s", strPackageName->getCString())->getCString());
+	m_pAssetManager->setDelegate(this);
+	//m_pAssetManager->setConnectionTimeout(3);			//3S内没有回调则报错调用 onError
+	m_pAssetManager->update();
+}
+
 
 void CDownloadPackage::onError( AssetsManagerErrorCode errorCode )
 {
@@ -125,15 +253,21 @@ void CDownloadPackage::onError( AssetsManagerErrorCode errorCode )
 void CDownloadPackage::onProgress( int percent )
 {
 	if (percent < 0)
+	{
 		return;
+	}
+	CCLOG("%d", percent);	
+
+	m_iPercent = percent;
+	//显示百分比
 	char progress[20];
-	snprintf(progress, 20, "%d%%", percent);
+	snprintf(progress, 20, "%d%%", m_iPercent);
 	m_pLabel->setString(progress);
-	m_progress->setValue(percent);
-	//僵尸位置
-	//m_pZombieSprite->setPositionX(m_progress->getPositionX()+m_progress->getContentSize().width*percent/100-5);
-	CCLOG("%f", percent);
+
+	//转换为像素百分比
+	m_iCurrentIPixelndex = (m_iMaxPixel*m_iPercent)/100;
 }
+
 //下载成功
 void CDownloadPackage::onSuccess()
 {
@@ -144,7 +278,7 @@ void CDownloadPackage::onSuccess()
 	CCUserDefault::sharedUserDefault()->flush();
 
 	//是否已经下载完所有包
-	if(m_iPackageIndex<PACKAGE_COUNT)
+	if(m_iPackageIndex<m_iPackageMax)
 	{
 		downloadVersionByIndex();
 		updateTextShow();
@@ -157,48 +291,6 @@ void CDownloadPackage::onSuccess()
 	}
 }
 
-//判断当前版本是否需要更新
-bool CDownloadPackage::checkIsNeedPackage( )
-{
-	bool bPackage = CCUserDefault::sharedUserDefault()->getBoolForKey(PACKAGE_DOWNLOAD_OPEN, true);
-	if(bPackage)
-	{
-		int iPackageIndex = CCUserDefault::sharedUserDefault()->getIntegerForKey(PACKAGE_DOWNLOAD_INDEX, 0);
-		if(iPackageIndex<PACKAGE_COUNT)
-		{
-			return true;
-		}
-	}
-	return false;
-}
-
-void CDownloadPackage::downLoadPackage()
-{
-	downloadVersionByIndex();
-	updateTextShow();
-}
-
-
-void CDownloadPackage::downloadVersionByIndex()
-{
-	if(m_pAssetManager)					//保证Asstmanage是最新的
-	{
-		CC_SAFE_DELETE(m_pAssetManager);
-	}
-
-	m_iPackageIndex++;
-
-	CCString* strPackageName = CCString::createWithFormat(PACKAGE_NAME, m_iPackageIndex);
-
-	std::string sUpdateServer = CCUserDefault::sharedUserDefault()->getStringForKey(SERVER_FOR_UPDATE);
-	m_pAssetManager = new AssetsManager(CCString::createWithFormat("%s%s?r=%ld", sUpdateServer.c_str(), strPackageName->getCString(), getCurrentTime())->getCString() , m_pathToSave.c_str(), "http://www.baidu.com/version.php");
-	m_pAssetManager->setZipFileName(CCString::createWithFormat("%s", strPackageName->getCString())->getCString());
-	m_pAssetManager->setDelegate(this);
-	//m_pAssetManager->setConnectionTimeout(3);			//3S内没有回调则报错调用 onError
-	m_pAssetManager->update();
-}
-
-
 void CDownloadPackage::callBackForSuccess()
 {
 	if(m_pDownloadPacakgeDelegate)
@@ -210,5 +302,37 @@ void CDownloadPackage::callBackForSuccess()
 
 void CDownloadPackage::updateTextShow()
 {
-	m_pInfoLabel->setString(CCString::createWithFormat("resource updating - [%d/%d]", m_iPackageIndex, PACKAGE_COUNT)->getCString());
+	m_pInfoLabel->setString(CCString::createWithFormat("resource updating - [%d/%d]", m_iPackageIndex, m_iPackageMax)->getCString());
 }
+
+void CDownloadPackage::updateForChangePic( float dt )
+{
+	CCSprite* pSprite = dynamic_cast<CCSprite*>(m_ui->findWidgetById("bg"));
+	ChangePicture(pSprite);
+}
+
+
+void CDownloadPackage::update( float dt )
+{
+	if(m_iCurrentIPixelndex==0 || m_iCurrentIPixelndex==m_iMaxPixel)
+	{
+		m_progress->setValue(m_iCurrentIPixelndex);
+		return;
+	}
+
+	int iValue = m_progress->getValue();
+	if(iValue<m_iCurrentIPixelndex)
+	{
+		int iGap = (m_iCurrentIPixelndex-iValue)/30;//确保到达目标值的时间控制在30帧
+		iGap +=1;
+		iValue += iGap;
+		if(iValue<=m_iMaxPixel)
+		{
+			m_progress->setValue(iValue);
+		}
+	}
+
+	//僵尸位置
+	//m_pZombieSprite->setPositionX(m_progress->getPositionX()+m_progress->getContentSize().width*percent/100-5);
+}
+

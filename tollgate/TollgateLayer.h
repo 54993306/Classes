@@ -35,6 +35,7 @@ public:
 	void selectChapter(int iLastChapterCount, int iIndexChapter);
 
 	CC_SYNTHESIZE(bool, m_bExitWithNoHardChapter, ExitWithNoHardChapter);
+	void setLastChapter(int chapter);
 
 private:
 	//关闭
@@ -73,6 +74,7 @@ private:
 
 	//是否是章节最后一个关卡
 	bool isLasStageInChapter(const CStage& stage);
+
 	
 private:
 	CLayout *m_ui;
@@ -101,8 +103,13 @@ private:
 	int m_iCurrentPrizeType;
 	//关卡奖励按钮
 	CButton* m_pCurrentStagePrizeBtn;
+	//精英关卡特殊奖励按钮
+	CImageView *m_pSpeciallPrizeBtn;
+
+	int m_currChapterIndex;
 	//当前开放的章节数量
 	int m_iOpenChapterCount[2];
+	int m_currChapter;
 
 };
 

@@ -20,6 +20,9 @@
 #include "common/CGameSound.h"
 #include "Resources.h"
 #include "model/DataPool.h"
+#include "pvp_ui/SelectPvpArmy.h"
+#include "battle/AnimationManager.h"
+using namespace BattleSpace;
 
 CTollgatePreview::CTollgatePreview():
 	m_stageId(0),m_tableView(nullptr)
@@ -109,6 +112,7 @@ void CTollgatePreview::onEnter()
 	this->runCloudAction();
 
 	CSceneManager::sharedSceneManager()->addMsgObserver(UPDATE_HERO, this, GameMsghandler_selector(CTollgatePreview::roleUpdate));
+
 }
 
 void CTollgatePreview::onClose(CCObject* pSender)
@@ -180,12 +184,12 @@ void CTollgatePreview::tableCell(CTableViewCell *pCell, unsigned int uIdx)
 		else if (i==2)
 		{
 			CCSprite *mask = (CCSprite*)child;
-			mask->setTexture(setItemQualityTexture(prize.color));
+			SmartSetRectPrizeColor(mask, &prize);
 
 			//添加星星
 			if(prize.quality > 0)
 			{
-				CLayout* pStarLayout = getStarLayout(prize.quality);
+				CLayout* pStarLayout = SmartGetStarLayout(&prize);
 				mask->addChild(pStarLayout);
 			}
 		}
@@ -324,9 +328,18 @@ void CTollgatePreview::showEffect()
 	m_pBody->setVisible(false);
 	m_pBody->setScale(2.0);
 	m_pBody->runAction(CCSequence::create(CCDelayTime::create(0.6f), CCShow::create(), CCCallFunc::create(this, callfunc_selector(CTollgatePreview::callBackForSound425)),CCEaseBackOut::create(CCScaleTo::create(0.3f, 1.0f)), nullptr));
-
-
 	this->runAction(CCSequence::createWithTwoActions(CCDelayTime::create(1.2f), CCCallFunc::create(this, callfunc_selector(CTollgatePreview::showEffectCallBack))));
+	
+// 	CCAnimation *bgAnim = AnimationManager::sharedAction()->getAnimation("8041");
+// 	CCSprite *bg = createAnimationSprite("skill/8041.png",VCENTER,bgAnim,true);
+// 	bg->setScale(5.0f);
+// 	pBgLayer->addChild(bg,-1);
+// 
+// 	CCAnimation *lightAnim = AnimationManager::sharedAction()->getAnimation("8040");
+// 	CCSprite *light = createAnimationSprite("skill/8040.png",VCENTER,lightAnim,true);
+// 	light->setScale(2.2f);
+// 	pBgLayer->addChild(light,-1);
+
 }
 
 void CTollgatePreview::showEffectCallBack()
@@ -358,6 +371,20 @@ void CTollgatePreview::showEffectNormal()
 	pLayerFrontDown->runAction(CCSequence::createWithTwoActions(CCDelayTime::create(0.2f), CCMoveBy::create(0.2f, ccp(0, 400))));
 
 	this->runAction(CCSequence::createWithTwoActions(CCDelayTime::create(0.5f), CCCallFunc::create(this, callfunc_selector(CTollgatePreview::showEffectNormalCallBack))));
+	
+	CLayout* pBgLayer = (CLayout*)findWidgetById("layer_back");
+
+// 	CCAnimation *lightAnim = AnimationManager::sharedAction()->getAnimation("7038");
+// // 	lightAnim->setDelayPerUnit(0.15f);
+// 	CCSprite *light = createAnimationSprite("skill/7038.png",VCENTER,lightAnim,true);
+// 	light->setScale(2.1f);
+// 	pBgLayer->addChild(light);
+
+// 	CCSprite *circle = CCSprite::create("warPreview/s1.png");
+// 	circle->setPosition(VCENTER);
+// 	circle->setScale(1.8f);
+// 	circle->runAction(CCRepeatForever::create(CCSequence::createWithTwoActions(CCScaleBy::create(0.4,1.6),CCScaleTo::create(0.4,1.8f))));
+// 	m_ui->addChild(circle);
 }
 
 void CTollgatePreview::showEffectNormalCallBack()
@@ -404,8 +431,8 @@ void CTollgatePreview::onCombatEffectCallBack()
 
 	//onClose(nullptr);
 
-	CSelectArmy *selArmy = CSelectArmy::create();
-	LayerManager::instance()->push(selArmy);
+ 	CSelectArmy *selArmy = CSelectArmy::create();
+ 	LayerManager::instance()->push(selArmy);
 	CPlayerControl::getInstance().sendUnion(m_stageId,m_questId);
 	selArmy->setStagId(m_stageId,m_questId);
 
@@ -518,12 +545,14 @@ void CTollgatePreview::showStageInfo(CStageInfoRes &stageInfo)
 				((SndButton*)hero)->setPlaySound(false);
 				hero->setUserData(&m_monstList.at(i));
 			}
-			mask->setTexture(setItemQualityTexture(m_monstList.at(i).quality));
 
-			//增加类型
+
 			const HeroInfoData *data = DataCenter::sharedData()->getHeroInfo()->getCfg(m_monstList.at(i).thumb);
-			if (data)
+			if(data)
 			{
+
+				mask->setTexture(SetRectColor(data->iType1));
+
 				CCTexture2D* pTexture = CCTextureCache::sharedTextureCache()->addImage(CCString::createWithFormat("common/type_%d_%d.png", m_monstList.at(i).roletype, data->iType2)->getCString());
 				if(pTexture)
 				{

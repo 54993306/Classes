@@ -1,5 +1,12 @@
 ﻿#pragma once
 
+/******************************************************
+*文件名称:	CUpdateLayer.h
+*编写日期:	2016-6-14-11:51
+*编写作者:	YPF
+*功能描述:	游戏版本更新
+*******************************************************/
+
 #include "AppUI.h"
 #include "scene/layer/LayerManager.h"
 #include "AssetsManager/AssetsManager.h"
@@ -9,7 +16,6 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #endif
-
 
 class CUpdateLayer : public BaseLayer, public AssetsManagerDelegateProtocol
 {
@@ -42,7 +48,9 @@ private:
 	void initDownloadDir();
 	void startDownload();
 	void downloadVersion();
-	
+	void updateForChangePicture(float dt);
+	void update(float dt);
+
 private:
 	CProgressBar*							m_progress;
 	//CCSprite*									m_pZombieSprite;
@@ -55,15 +63,14 @@ private:
 	CVersionJson*							m_VersionJson;
 	vector<CVersionData>			m_versionNeedData;
 	int												m_iIndexVersion;
+	int												m_iCurrentIPixelndex;
+	int												m_iMaxPixel;
+	int												m_iPercent;
 };
 
-inline void AddPathToSearchPath(std::string& path)
-{
-	vector<string> searchPaths = CCFileUtils::sharedFileUtils()->getSearchPaths();
-	vector<string>::iterator iter = searchPaths.begin();
-	searchPaths.insert(iter, path);
-	CCFileUtils::sharedFileUtils()->setSearchPaths(searchPaths);
 
+inline void CheckPathDir(std::string& path)
+{
 #if (CC_TARGET_PLATFORM != CC_PLATFORM_WIN32)
 	DIR *pDir = NULL;
 	pDir = opendir(path.c_str());
@@ -77,5 +84,14 @@ inline void AddPathToSearchPath(std::string& path)
 		CreateDirectoryA(path.c_str(), 0);
 	}
 #endif
+}
 
+inline void AddPathToSearchPath(std::string& path)
+{
+	vector<string> searchPaths = CCFileUtils::sharedFileUtils()->getSearchPaths();
+	vector<string>::iterator iter = searchPaths.begin();
+	searchPaths.insert(iter, path);
+	CCFileUtils::sharedFileUtils()->setSearchPaths(searchPaths);
+
+	CheckPathDir(path);
 }

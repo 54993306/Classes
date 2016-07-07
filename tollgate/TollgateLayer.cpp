@@ -21,10 +21,12 @@
 #include "Resources.h"
 #include "common/ShaderDataHelper.h"
 #include "common/CSpecialProgress.h"
+#include "SharpTollgate.h"
+#include "Global.h"
 
 CTollgateLayer::CTollgateLayer():m_selectChapterIndex(0),m_isStory(true),m_iCurrentTouchDir(TollgateTouchDirNull)
 	,m_iLastNormlChapter(-1), m_iLastSpecialChapter(-1),m_bTouchLock(false),m_iPreChapterIndex(1),m_iCurrentPrizeType(1)
-	,m_bExitWithNoHardChapter(false)
+	,m_bExitWithNoHardChapter(false),m_currChapter(0), m_currChapterIndex(0), m_pSpeciallPrizeBtn(nullptr)
 {
 	m_nowChapter[0] = 0;
 	m_nowChapter[1] = 0;
@@ -125,15 +127,16 @@ void CTollgateLayer::onEnter()
 
 
 	UserData *user = DataCenter::sharedData()->getUser()->getUserData();
-	//user->setNewStep(7);
+// 	 	user->setNewStep(5);
 	if (user->getNewStep()>0)
 	{
 #if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
-	 this->scheduleOnce(schedule_selector(CTollgateLayer::runGuideStep),0.4f);
+		this->scheduleOnce(schedule_selector(CTollgateLayer::runGuideStep),0.4f);
 #else
-	 this->scheduleOnce(schedule_selector(CTollgateLayer::runGuideStep),0.4f);
+		this->scheduleOnce(schedule_selector(CTollgateLayer::runGuideStep),0.4f);
 #endif
 	}
+	NOTIFICATION->postNotification(HIDE_TOP_LAYER);
 }
 
 
@@ -145,30 +148,44 @@ void CTollgateLayer::onExit()
 	{	
 		CSceneManager::sharedSceneManager()->PostMessageA(SHOW_HEAD,0,nullptr,nullptr);
 	}
+	NOTIFICATION->postNotification(SHOW_TOP_LAYER);
+
 	//NOTIFICATION->postNotification(SHOW_MAIN_SCENE);
 }
 
 void CTollgateLayer::onLeftStage(CCObject* pSender)
 {
-	if (m_selectChapterIndex>1)
+	if (m_isStory)
 	{
-		StageMap::iterator iter = m_stageMap.find(m_isStory?m_selectChapterIndex-1:m_selectChapterIndex+200-1);
-		if (iter!=m_stageMap.end())
+		if (m_selectChapterIndex>1)
 		{
-			m_selectChapterIndex--;
-			CCPoint pos = m_pageView->getContentOffset();
-			m_pageView->setContentOffset(ccp(-(m_selectChapterIndex-1)*m_pageView->getSizeOfCell().width,0));
-			m_pageView->reloadData();	
-			updateChapter(&m_chapterList[m_isStory].at(m_selectChapterIndex-1));
+			StageMap::iterator iter = m_stageMap.find(m_isStory?m_selectChapterIndex-1:m_selectChapterIndex+200-1);
+			if (iter!=m_stageMap.end())
+			{
+				m_selectChapterIndex--;
+				CCPoint pos = m_pageView->getContentOffset();
+				m_pageView->setContentOffset(ccp(-(m_selectChapterIndex-1)*m_pageView->getSizeOfCell().width,0));
+				m_pageView->reloadData();	
+				updateChapter(&m_chapterList[m_isStory].at(m_selectChapterIndex-1));
+				checkLeftAndRightButton();
+			}
+			else
+			{
+				m_iCurrentTouchDir = TollgateTouchDirLeft;
+				GetTcpNet->sendStageList(m_isStory?m_selectChapterIndex-1:m_selectChapterIndex+200-1);
+			}
+
+			//showBookAnimate(m_ui, false);
+		}
+	}
+	else
+	{
+		if (m_currChapterIndex>=1)
+		{
+			m_currChapterIndex--;
+			m_pageView->reloadData();
 			checkLeftAndRightButton();
 		}
-		else
-		{
-			m_iCurrentTouchDir = TollgateTouchDirLeft;
-			GetTcpNet->sendStageList(m_isStory?m_selectChapterIndex-1:m_selectChapterIndex+200-1);
-		}
-
-		//showBookAnimate(m_ui, false);
 	}
 }
 
@@ -187,25 +204,38 @@ void CTollgateLayer::runGuideStep(float dt)
 
 void CTollgateLayer::onRightStage(CCObject* pSender)
 {
-	if (m_selectChapterIndex<m_chapterList[m_isStory].size()&&m_chapterList[m_isStory].at(m_selectChapterIndex).isOpen)
+	if (m_isStory)
 	{
-		StageMap::iterator iter = m_stageMap.find(m_isStory?m_selectChapterIndex+1:m_selectChapterIndex+200+1);
-		if (iter!=m_stageMap.end())
+		if (m_selectChapterIndex<m_chapterList[m_isStory].size()&&m_chapterList[m_isStory].at(m_selectChapterIndex).isOpen)
 		{
-			m_selectChapterIndex++;
-			CCPoint pos = m_pageView->getContentOffset();
-			m_pageView->setContentOffset(ccp(-(m_selectChapterIndex-1)*m_pageView->getSizeOfCell().width,0));
-			m_pageView->reloadData();	
-			updateChapter(&m_chapterList[m_isStory].at(m_selectChapterIndex-1));
+			StageMap::iterator iter = m_stageMap.find(m_isStory?m_selectChapterIndex+1:m_selectChapterIndex+200+1);
+			if (iter!=m_stageMap.end())
+			{
+				m_selectChapterIndex++;
+				CCPoint pos = m_pageView->getContentOffset();
+				m_pageView->setContentOffset(ccp(-(m_selectChapterIndex-1)*m_pageView->getSizeOfCell().width,0));
+				m_pageView->reloadData();	
+				updateChapter(&m_chapterList[m_isStory].at(m_selectChapterIndex-1));
+				checkLeftAndRightButton();
+			}
+			else
+			{
+				m_iCurrentTouchDir = TollgateTouchDirRight;
+				GetTcpNet->sendStageList(m_isStory?m_selectChapterIndex+1:m_selectChapterIndex+200+1);
+			}
+		}
+		
+		//showBookAnimate(m_ui, true);
+	}
+	else 
+	{
+		int page = m_chapterList[m_isStory].size()%4==0?m_chapterList[m_isStory].size()/4:m_chapterList[m_isStory].size()/4+1;
+		if (m_currChapterIndex<page-1)
+		{
+			m_currChapterIndex++;
+			m_pageView->reloadData();
 			checkLeftAndRightButton();
 		}
-		else
-		{
-			m_iCurrentTouchDir = TollgateTouchDirRight;
-			GetTcpNet->sendStageList(m_isStory?m_selectChapterIndex+1:m_selectChapterIndex+200+1);
-		}
-
-		//showBookAnimate(m_ui, true);
 	}
 }
 
@@ -237,7 +267,7 @@ CCObject* CTollgateLayer::pageviewDataSource(CCObject* pConvertCell, unsigned in
 
 void CTollgateLayer::addCell(unsigned int uIdx, CPageViewCell * pCell)
 {
-	// 	if (uIdx==0)
+	if (m_isStory)
 	{
 		const vector<StageWidget> *data = DataCenter::sharedData()->getStageData()
 			->getStageWidgets(m_chapterList[m_isStory][m_selectChapterIndex-1].id);
@@ -357,7 +387,7 @@ void CTollgateLayer::addCell(unsigned int uIdx, CPageViewCell * pCell)
 						CStage &stage = m_stageMap[m_chapterList[m_isStory][m_selectChapterIndex-1].id].at(widget.stageId-1);
 						pNode->setUserData(&m_stageMap[m_chapterList[m_isStory][m_selectChapterIndex-1].id].at(widget.stageId-1));
 
-						if (!stage.isOpen&&widget.tag>1&&widget.widgetId.find("prize")==string::npos)
+						if (!stage.isOpen&&widget.tag>=1&&widget.widgetId.find("prize")==string::npos)
 						{
 							if (widget.type=="btn")
 							{
@@ -392,11 +422,11 @@ void CTollgateLayer::addCell(unsigned int uIdx, CPageViewCell * pCell)
 						if (widget.stageType==0&&stage.isOpen&&stage.star>0&&i>0)
 						{
 							pNode->setVisible(true);
-//#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
-//							pNode->setVisible(true);
-//#else
-//							pNode->setVisible(false);
-//#endif		
+							//#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+							//							pNode->setVisible(true);
+							//#else
+							//							pNode->setVisible(false);
+							//#endif		
 						}
 						if (stage.isOpen&&stage.star==0&&i>0&&m_isStory)
 						{
@@ -430,55 +460,196 @@ void CTollgateLayer::addCell(unsigned int uIdx, CPageViewCell * pCell)
 				}
 			}
 			//CCGrayUtil::addGray(pNode);
-
 		}
-	}
-
-	
-
-	//标题和背景放在pageView上面
-	CCSprite* pName = nullptr;
-	if (m_isStory)
-	{
-		CLayout* lay = (CLayout*)(m_ui->findWidgetById("lay_title"));
-		CLayout *Layer = UICloneMgr::cloneLayout(lay);
-		CCSprite* pNameBg = (CCSprite*)Layer->findWidgetById("name_bg");
-		Layer->removeChild(pNameBg);
-		pCell->addChild(pNameBg, -2);
-		pNameBg->setPosition(m_pageView->convertToNodeSpace(pNameBg->getPosition()));
-		pName = (CCSprite*)Layer->findWidgetById("name");
-		Layer->removeChild(pName);
-		pCell->addChild(pName, -1);
-		pName->setPosition(m_pageView->convertToNodeSpace(pName->getPosition()));
+		CCNode *star1 = m_ui->findWidgetById("star1");
+		star1->setVisible(m_isStory);
+		CCNode *star2 = m_ui->findWidgetById("star2");
+		star2->setVisible(!m_isStory); 
 	}
 	else
 	{
-		CLayout* lay = (CLayout*)(m_ui->findWidgetById("lay_title1"));
-		CLayout *Layer = UICloneMgr::cloneLayout(lay);
-		CCSprite* pNameBg = (CCSprite*)Layer->findWidgetById("name_bg1");
-		Layer->removeChild(pNameBg);
-		pCell->addChild(pNameBg, -2);
-		pNameBg->setPosition(m_pageView->convertToNodeSpace(pNameBg->getPosition()));
-		pName = (CCSprite*)Layer->findWidgetById("name1");
-		Layer->removeChild(pName);
-		pCell->addChild(pName, -1);
-		pName->setPosition(m_pageView->convertToNodeSpace(pName->getPosition()));
-	}
-	CCNode *star1 = m_ui->findWidgetById("star1");
-	star1->setVisible(m_isStory);
-	CCNode *star2 = m_ui->findWidgetById("star2");
-	star2->setVisible(!m_isStory); 
-	//章节标题
-	CChapter *chapter = &m_chapterList[m_isStory][m_selectChapterIndex-1];
-	CCTexture2D *texture = CCTextureCache::sharedTextureCache()->addImage(CCString::createWithFormat("tollgate/chapter_%d.png",chapter->id/*>200?chapter->id-200:chapter->id*/)->getCString());
-	if(!texture)
-	{
-		texture = CCTextureCache::sharedTextureCache()->addImage("tollgate/chapter_1.png");
-	}
-	pName->setTexture(texture);
-	pName->setTextureRect(CCRectMake(0,0,texture->getContentSize().width,texture->getContentSize().height));
-}
+		vector<CChapter> *chapterList = &m_chapterList[m_isStory]; 
+		int tag = 0;
+		if (m_currChapterIndex==0)
+		{
+			tag=10000;
+		}
+		else
+		{
+			tag=10000+m_currChapterIndex;
+		}
 
+		const vector<StageWidget> *data = DataCenter::sharedData()->getStageData()
+			->getStageWidgets(tag);
+
+		if (!data) return;
+		for (int i = 0; i < data->size(); i++)
+		{
+			CImageView *sprite = nullptr;
+			CButton *btn = nullptr;
+			CCNode *pNode = nullptr;
+			StageWidget widget = data->at(i);
+			//CStage &stage = m_stageMap[m_chapterList[m_selectChapterIndex-1].id].at(widget.stageId-1);
+			if (widget.type=="image")
+			{
+				pNode = CImageView::create(widget.normalImage.c_str());
+				pNode->setZOrder(-3);
+				if(!pNode)
+				{
+					CCLOG("ERROR  CTollgateLayer::addCell");
+					pNode = CImageView::create("tollgate/map001.png");
+				}
+				sprite = (CImageView*)pNode;
+			}
+			else if (widget.type=="btn")
+			{
+				pNode = CButton::create(widget.normalImage.c_str());
+				btn = (CButton*)pNode;
+			}
+
+			btn = dynamic_cast<CButton*>(pNode);
+			if (btn)
+			{
+				CChapter *chapter = &chapterList->at(widget.stageId-1);
+				btn->setUserData(chapter);
+				btn->setOnClickListener(this,ccw_click_selector(CTollgateLayer::onBattle));
+				btn->setZOrder(widget.stageType);
+				btn->setEnabled(chapter->isOpen);
+			}
+
+			if (pNode)
+			{
+				pNode->setPosition(ccpAdd(widget.position,ccp(20,68)));
+
+				if (widget.tag>0)
+				{
+					pNode->setTag(widget.tag);
+				}
+				pNode->setScaleX(widget.scaleX);
+				pNode->setScaleY(widget.scaleY);
+				if (widget.widgetId!="")
+				{
+					// 					((CWidget *)pNode)->setId(widget.widgetId.c_str());
+					if (widget.widgetId.find("hero")!=string::npos)
+					{
+						btn->setId(widget.widgetId.c_str());
+						pNode->setAnchorPoint(ccp(0.5,0.0));
+						pNode->setPositionY(pNode->getPositionY()-pNode->getContentSize().height/2);
+
+						//人物会动
+						CCScaleTo *tobig = CCScaleTo::create(0.55f,1.0*widget.scaleX,1.0*widget.scaleY);
+						CCScaleTo *toSmall = CCScaleTo::create(0.55f,0.96*widget.scaleX, 0.96*widget.scaleY);
+						pNode->stopAllActions();
+						pNode->runAction(CCRepeatForever::create(CCSequence::create(toSmall,tobig,nullptr)));
+						CChapter *chapter = &chapterList->at(widget.stageId-1);
+						if (!chapter->isOpen)
+						{
+							CButton *pHero = (CButton *)pNode;
+							((CCNodeRGBA*)pHero->getNormalImage())->setColor(ccc3(0, 0, 0));
+							((CCNodeRGBA*)pHero->getNormalImage())->setOpacity(230);
+						}
+					}
+					else if (widget.widgetId.find("prize")!=string::npos)
+					{
+						
+						if (widget.stageId<=chapterList->size())
+						{
+							CChapter *chapter = &chapterList->at(widget.stageId-1);
+							//0 没有道具，1 有道具、可领取，2 有道具、不可领取
+							pNode->setTag(100+widget.stageId);					
+							pNode->setZOrder(2);
+
+							if (chapter->prize==0)
+							{
+								CImageView *prizeBtn = (CImageView*)pNode;
+								prizeBtn->setShaderProgram(ShaderDataMgr->getShaderByType(ShaderStone));
+								CCSequence *seque = CCSequence::createWithTwoActions(CCMoveBy::create(0.44f,ccp(0, -8)),CCMoveBy::create(0.44f,ccp(0, 8)));
+								prizeBtn->runAction(CCRepeatForever::create(seque));
+							}
+							else if (chapter->prize==2)
+							{
+ 								pNode->setVisible(false);
+// 								CImageView *prizeBtn = (CImageView*)pNode;
+// 								prizeBtn->setShaderProgram(ShaderDataMgr->getShaderByType(ShaderStone));
+							}
+							else if (chapter->prize==1)
+							{
+								CImageView *prizeBtn = (CImageView*)pNode;
+								prizeBtn->setUserData(chapter);
+								prizeBtn->setTouchEnabled(true);
+								prizeBtn->setOnClickListener(this,ccw_click_selector(CTollgateLayer::onChapterPrize));
+								CImageView* pImage = CImageView::create(widget.normalImage.c_str());
+								pImage->setPosition(ccp(prizeBtn->getContentSize().width/2, prizeBtn->getContentSize().height/2));
+								prizeBtn->addChild(pImage, 11, 11);
+								int begin =widget.normalImage.find_first_of('/');
+								int end = widget.normalImage.find_first_of('_');
+								string sub_img = widget.normalImage.substr(begin+1,end-begin-1);
+								CCAnimation *anim = AnimationManager::sharedAction()->getAnimation(sub_img.c_str());
+								anim->setDelayPerUnit(0.2f);
+								CCSequence *seque = CCSequence::createWithTwoActions(CCMoveBy::create(0.6f,ccp(0, -10)),CCMoveBy::create(0.6f,ccp(0, 10)));
+								pImage->runAction(CCRepeatForever::create(CCAnimate::create(anim)));
+								prizeBtn->setUserObject(CCInteger::create(atoi(sub_img.c_str())));
+								prizeBtn->runAction(CCRepeatForever::create(seque));
+							}
+							CLabel *starLab = CLabel::create(CCString::createWithFormat("%d/%d",chapter->star,chapter->totalStar)->getCString(),DEFAULT_FONT,18);
+							starLab->setPositionX(pNode->getPositionX()-65);
+							starLab->setPositionY(pNode->getPositionY()-12);
+							pCell->addChild(starLab,1);
+						}
+					}
+				}
+				pCell->addChild(pNode);
+			}
+		}
+		}
+
+
+		//标题和背景放在pageView上面
+		CCSprite* pName = nullptr;
+		if (m_isStory)
+		{
+			CLayout* lay = (CLayout*)(m_ui->findWidgetById("lay_title"));
+			CLayout *Layer = UICloneMgr::cloneLayout(lay);
+			CCSprite* pNameBg = (CCSprite*)Layer->findWidgetById("name_bg");
+			Layer->removeChild(pNameBg);
+			pCell->addChild(pNameBg, -2);
+			pNameBg->setPosition(m_pageView->convertToNodeSpace(pNameBg->getPosition()));
+			pName = (CCSprite*)Layer->findWidgetById("name");
+			Layer->removeChild(pName);
+			pCell->addChild(pName, -1);
+			pName->setPosition(m_pageView->convertToNodeSpace(pName->getPosition()));
+		}
+		else
+		{
+// 			CLayout* lay = (CLayout*)(m_ui->findWidgetById("lay_title1"));
+// 			CLayout *Layer = UICloneMgr::cloneLayout(lay);
+// 			CCSprite* pNameBg = (CCSprite*)Layer->findWidgetById("name_bg1");
+// 			Layer->removeChild(pNameBg);
+// 			pCell->addChild(pNameBg, -2);
+// 			pNameBg->setPosition(m_pageView->convertToNodeSpace(pNameBg->getPosition()));
+// 			pName = (CCSprite*)Layer->findWidgetById("name1");
+// 			Layer->removeChild(pName);
+// 			pCell->addChild(pName, -1);
+// 			pName->setPosition(m_pageView->convertToNodeSpace(pName->getPosition()));
+		}
+		CCNode *star1 = m_ui->findWidgetById("star1");
+		star1->setVisible(m_isStory);
+		CCNode *star2 = m_ui->findWidgetById("star2");
+		star2->setVisible(!m_isStory); 
+		//章节标题
+		CChapter *chapter = &m_chapterList[m_isStory][m_selectChapterIndex-1];
+		CCTexture2D *texture = CCTextureCache::sharedTextureCache()->addImage(CCString::createWithFormat("tollgate/chapter_%d.png",chapter->id/*>200?chapter->id-200:chapter->id*/)->getCString());
+		if(!texture)
+		{
+			texture = CCTextureCache::sharedTextureCache()->addImage("tollgate/chapter_1.png");
+		}
+		if (pName)
+		{		
+			pName->setTexture(texture);
+			pName->setTextureRect(CCRectMake(0,0,texture->getContentSize().width,texture->getContentSize().height));
+		}
+	 
+}
 void CTollgateLayer::updateChapter(CChapter *chapter)
 {
 	if (chapter)
@@ -486,7 +657,7 @@ void CTollgateLayer::updateChapter(CChapter *chapter)
 		//当前关卡获得的星星比例
 		CLabel *level = (CLabel *)(m_ui->findWidgetById("level"));
 		level->setString(CCString::createWithFormat("%d/%d",chapter->star,chapter->totalStar)->getCString());
-		
+
 		//星星比例进度条显示
 		CProgressBar *process = (CProgressBar *)(m_ui->findWidgetById("process"));
 		process->setMinValue(0);
@@ -580,20 +751,24 @@ void CTollgateLayer::onSwitchBtn( CCObject *pSender, bool bChecked )
 			}
 			else
 			{
-				m_selectChapterIndex = m_iLastSpecialChapter;
-
-				StageMap::iterator iter = m_stageMap.find(m_isStory?m_selectChapterIndex:m_selectChapterIndex+200);
-				if (iter!=m_stageMap.end())
-				{
-					CCPoint pos = m_pageView->getContentOffset();
-					m_pageView->setContentOffset(ccp(-(m_selectChapterIndex-1)*m_pageView->getSizeOfCell().width,0));
-					m_pageView->reloadData();	
-					updateChapter(&m_chapterList[m_isStory].at(m_selectChapterIndex-1));
-					checkLeftAndRightButton();
-					showEffectStoryOrNot();
-				}
+// 				m_selectChapterIndex = m_iLastSpecialChapter;
+// 
+// 				StageMap::iterator iter = m_stageMap.find(m_isStory?m_selectChapterIndex:m_selectChapterIndex+200);
+// 				if (iter!=m_stageMap.end())
+// 				{
+// 					CCPoint pos = m_pageView->getContentOffset();
+// 					m_pageView->setContentOffset(ccp(-(m_selectChapterIndex-1)*m_pageView->getSizeOfCell().width,0));
+// 					m_pageView->reloadData();	
+// 					updateChapter(&m_chapterList[m_isStory].at(m_selectChapterIndex-1));
+// 					checkLeftAndRightButton();
+// 					showEffectStoryOrNot();
+// 				}
+				m_pageView->reloadData();
+				checkLeftAndRightButton();
 			}
 		}
+		CLayout *prizeLay = (CLayout*)(m_ui->findWidgetById("prizeLay"));
+		prizeLay->setVisible(m_isStory);
 	}
 }
 
@@ -665,6 +840,7 @@ void CTollgateLayer::ProcessMsg(int type, google::protobuf::Message *msg)
 		else
 		{
 			m_iLastSpecialChapter = m_selectChapterIndex;
+			m_currChapterIndex = (m_iOpenChapterCount[m_isStory]-1)/4;
 		}
 
 		//没有数据，返回
@@ -686,7 +862,7 @@ void CTollgateLayer::ProcessMsg(int type, google::protobuf::Message *msg)
 		m_pageView->reloadData();
 
 		updateChapter(&m_chapterList[m_isStory].at(m_selectChapterIndex-1));
-		
+
 		//设置左右按钮状态
 		checkLeftAndRightButton();
 	}
@@ -706,13 +882,22 @@ void CTollgateLayer::ProcessMsg(int type, google::protobuf::Message *msg)
 			stage.read(info);
 			m_currStageList.push_back(stage);
 		}
-
-		m_stageMap[m_chapterList[m_isStory][m_selectChapterIndex-1].id] = m_currStageList;
-		m_pageView->setContentOffset(ccp(-(m_selectChapterIndex-1)*m_pageView->getSizeOfCell().width,0));
-		m_pageView->reloadData();
-		updateChapter(&m_chapterList[m_isStory].at(m_selectChapterIndex-1));
-
-		checkLeftAndRightButton();
+		if (m_isStory)
+		{
+			m_stageMap[m_chapterList[m_isStory][m_selectChapterIndex-1].id] = m_currStageList;
+			m_pageView->setContentOffset(ccp(-(m_selectChapterIndex-1)*m_pageView->getSizeOfCell().width,0));
+			m_pageView->reloadData();
+			updateChapter(&m_chapterList[m_isStory].at(m_selectChapterIndex-1));
+			checkLeftAndRightButton(); 
+		}
+		else
+		{
+			m_stageMap[m_currChapter] = m_currStageList; 
+			CSharpTollgate *cst =CSharpTollgate::create();
+			LayerManager::instance()->push(cst);	
+			cst->setStageList(m_currStageList,m_currChapter, m_iOpenChapterCount[m_isStory]);
+		}
+		
 	}
 	//请求的奖励数据，直接弹窗显示
 	else if (type==GetStagePrize)
@@ -744,18 +929,39 @@ void CTollgateLayer::ProcessMsg(int type, google::protobuf::Message *msg)
 		//章节领奖
 		else
 		{
-			//宝箱
-			CImageView *maskBg = (CImageView*)(m_ui->findWidgetById("item1"));
-			CImageView* prize = (CImageView*)(m_ui->findWidgetById("prize"));
-			maskBg->setVisible(false);
-			prize->setVisible(false);
 
-			//特效
-			CCSprite* pEffect = CCSprite::create("common/cell.png");
-			pEffect->setPosition(ccp(maskBg->getPositionX()+maskBg->getContentSize().width/2-5, maskBg->getPositionY()+maskBg->getContentSize().height/2+5));
-			prize->getParent()->addChild(pEffect, maskBg->getZOrder());
-			CCAnimation *anim = AnimationManager::sharedAction()->getAnimation(ToString(9001));
-			pEffect->runAction(CCSequence::createWithTwoActions(CCRepeat::create(CCAnimate::create(anim),2),CCRemoveSelf::create()));
+			//精英关卡章节奖励
+			if(m_pSpeciallPrizeBtn != nullptr)
+			{
+				//变灰
+				m_pSpeciallPrizeBtn->setShaderProgram(ShaderDataMgr->getShaderByType(ShaderStone));
+				//添加节点
+
+				//播动画
+				CCSprite* pEffect = CCSprite::create("common/cell.png");
+				pEffect->setPosition(ccp(m_pSpeciallPrizeBtn->getPositionX()+m_pSpeciallPrizeBtn->getContentSize().width/2-5, m_pSpeciallPrizeBtn->getPositionY()+m_pSpeciallPrizeBtn->getContentSize().height/2+5));
+				m_pSpeciallPrizeBtn->getParent()->addChild(pEffect, m_pSpeciallPrizeBtn->getZOrder());
+				CCAnimation *anim = AnimationManager::sharedAction()->getAnimation(ToString(9001));
+				pEffect->runAction(CCSequence::createWithTwoActions(CCRepeat::create(CCAnimate::create(anim),2),CCRemoveSelf::create()));
+
+
+				m_pSpeciallPrizeBtn = nullptr;
+			}
+			else
+			{
+				//宝箱
+				CImageView *maskBg = (CImageView*)(m_ui->findWidgetById("item1"));
+				CImageView* prize = (CImageView*)(m_ui->findWidgetById("prize"));
+				maskBg->setVisible(false);
+				prize->setVisible(false);
+
+				//特效
+				CCSprite* pEffect = CCSprite::create("common/cell.png");
+				pEffect->setPosition(ccp(maskBg->getPositionX()+maskBg->getContentSize().width/2-5, maskBg->getPositionY()+maskBg->getContentSize().height/2+5));
+				prize->getParent()->addChild(pEffect, maskBg->getZOrder());
+				CCAnimation *anim = AnimationManager::sharedAction()->getAnimation(ToString(9001));
+				pEffect->runAction(CCSequence::createWithTwoActions(CCRepeat::create(CCAnimate::create(anim),2),CCRemoveSelf::create()));
+			}
 
 			//更新缓存的当前章节的礼包状态
 			m_chapterList[m_isStory].at(m_selectChapterIndex-1).prize = 2;
@@ -788,36 +994,56 @@ void CTollgateLayer::ProcessMsg(int type, google::protobuf::Message *msg)
 void CTollgateLayer::onBattle(CCObject* pSender)
 {
 	PlayEffectSound(SFX_Button);
-
-	CButton *btn = (CButton*)pSender;
-	CStage *stage = (CStage*)btn->getUserData();
-	int zorder = btn->getZOrder();
-	if (stage&&stage->isOpen)
+	if (m_isStory)
 	{
-		//DataCenter::sharedData()->getWar()->setChapter(m_chapterList[m_isStory][m_selectChapterIndex-1]);
-		DataCenter::sharedData()->getWar()->setLastStageId(stage->id); 
-		if (stage->star>=1)
-			DataCenter::sharedData()->getWar()->setFirstStage(false);
-		//DataCenter::sharedData()->getWar()->setTollgate(*stage); 
-		DataCenter::sharedData()->getWar()->setStageType(zorder);
-		DataCenter::sharedData()->getWar()->setNormal(m_isStory);
-		DataCenter::sharedData()->getWar()->setChapterIndex(m_selectChapterIndex);
-		DataCenter::sharedData()->getWar()->setChapterCount(m_iOpenChapterCount[m_isStory]);
-
-		CTollgatePreview *preview = CTollgatePreview::create();
-		preview->setIsLastStageInChapter(isLasStageInChapter(*stage));
-		LayerManager::instance()->push(preview);
-		preview->setStage(stage->id, stage->name.c_str());
-		CStageInfoRes *ir = DATAPOOL->getStageInfoById(stage->id);		
-		preview->setNormal(m_isStory);
-		if (ir&&!CGuideManager::getInstance()->getIsRunGuide())
+		CButton *btn = (CButton*)pSender;
+		CStage *stage = (CStage*)btn->getUserData();
+		int zorder = btn->getZOrder();
+		if (stage&&stage->isOpen)
 		{
-			preview->showStageInfo(*ir);
+			//DataCenter::sharedData()->getWar()->setChapter(m_chapterList[m_isStory][m_selectChapterIndex-1]);
+			DataCenter::sharedData()->getWar()->setLastStageId(stage->id); 
+			if (stage->star>=1)
+				DataCenter::sharedData()->getWar()->setFirstStage(false);
+			//DataCenter::sharedData()->getWar()->setTollgate(*stage); 
+			DataCenter::sharedData()->getWar()->setStageType(zorder);
+			DataCenter::sharedData()->getWar()->setNormal(m_isStory);
+			DataCenter::sharedData()->getWar()->setChapterIndex(m_selectChapterIndex);
+			DataCenter::sharedData()->getWar()->setChapterCount(m_iOpenChapterCount[m_isStory]);
+
+			CTollgatePreview *preview = CTollgatePreview::create();
+			preview->setIsLastStageInChapter(isLasStageInChapter(*stage));
+			LayerManager::instance()->push(preview);
+			preview->setStage(stage->id, stage->name.c_str());
+			CStageInfoRes *ir = DATAPOOL->getStageInfoById(stage->id);		
+			preview->setNormal(m_isStory);
+			if (ir&&!CGuideManager::getInstance()->getIsRunGuide())
+			{
+				preview->showStageInfo(*ir);
+			}
+			else
+			{
+				CPlayerControl::getInstance().sendStageInfo(stage->id);
+			}
+		} 
+	}
+	else
+	{
+		CButton *btn = (CButton*)pSender;
+		CChapter *chapter = (CChapter*)btn->getUserData();
+
+		StageMap::iterator iter = m_stageMap.find(chapter->id);
+		m_currChapter = chapter->id;
+		if (iter!= m_stageMap.end() && iter->second.size()>0)
+		{
+			CSharpTollgate *cst =CSharpTollgate::create();
+			LayerManager::instance()->push(cst);	
+			cst->setStageList(iter->second,chapter->id, m_iOpenChapterCount[m_isStory]);
 		}
 		else
 		{
-			CPlayerControl::getInstance().sendStageInfo(stage->id);
-		}
+			GetTcpNet->sendStageList(chapter->id);
+		}	
 	}
 }
 
@@ -832,24 +1058,46 @@ void CTollgateLayer::onGetPrize(CCObject* pSender)
 	m_iCurrentPrizeType = 1;
 }
 
-//请求章节奖励
+//请求章节奖励765
 void CTollgateLayer::onChapterPrize(CCObject* pSender)
 {
-	CImageView *btn =(CImageView*)(pSender);
-	CChapter *chapter= (CChapter*)btn->getUserData();
-	CPlayerControl::getInstance().sendGetStagePrize(2,chapter->id);
-	//btn->setVisible(false);
+	if (m_isStory)
+	{
+		CImageView *btn =(CImageView*)(pSender);
+		CChapter *chapter= (CChapter*)btn->getUserData();
+		CPlayerControl::getInstance().sendGetStagePrize(2, chapter->id);
+		//btn->setVisible(false);
+		m_iCurrentPrizeType = 2;
+	}
+	else
+	{
+		CImageView *btn =(CImageView*)(pSender);
+		CChapter *chapter= (CChapter*)btn->getUserData();
+		CPlayerControl::getInstance().sendGetStagePrize(2, chapter->id);
+		btn->setVisible(false);
 
-	m_iCurrentPrizeType = 2;
+		m_iCurrentPrizeType = 2;
+		m_pSpeciallPrizeBtn = btn;
+	}
 }
 
 void CTollgateLayer::checkLeftAndRightButton()
 {
 	//只有一章节
-	CButton* leftbtn = (CButton*)(m_ui->findWidgetById("left"));
-	leftbtn->setVisible(m_selectChapterIndex!=1);
-	CButton* rightbtn = (CButton*)(m_ui->findWidgetById("right"));
-	rightbtn->setVisible(m_selectChapterIndex!=m_iOpenChapterCount[m_isStory]);
+	if (m_isStory)
+	{	
+		CButton* leftbtn = (CButton*)(m_ui->findWidgetById("left"));
+		leftbtn->setVisible(m_selectChapterIndex!=1);
+		CButton* rightbtn = (CButton*)(m_ui->findWidgetById("right"));
+		rightbtn->setVisible(m_selectChapterIndex!=m_iOpenChapterCount[m_isStory]);
+	}
+	else
+	{
+		CButton* leftbtn = (CButton*)(m_ui->findWidgetById("left"));
+		leftbtn->setVisible(m_currChapterIndex>=1);
+		CButton* rightbtn = (CButton*)(m_ui->findWidgetById("right"));
+		rightbtn->setVisible(m_currChapterIndex<1&&m_chapterList[m_isStory].at(4).isOpen);
+	}
 }
 
 void CTollgateLayer::showEffectStoryOrNot()
@@ -863,6 +1111,8 @@ void CTollgateLayer::showEffectStoryOrNot()
 	radioBtn1->setChecked(m_isStory);
 	radioBtn2->setChecked(!m_isStory);
 	m_bTouchLock = false;
+	CLayout *prizeLay = (CLayout*)(m_ui->findWidgetById("prizeLay"));
+	prizeLay->setVisible(m_isStory);
 }
 
 void CTollgateLayer::setStory( bool bStory )
@@ -894,4 +1144,9 @@ bool CTollgateLayer::isLasStageInChapter( const CStage& stage )
 	bool bLast = (lastStage.id == stage.id);
 	bool bNoStar = stage.star<=0;
 	return bLast && bNoStar;
+}
+
+void CTollgateLayer::setLastChapter(int chapter)
+{
+	m_currChapter = chapter;
 }

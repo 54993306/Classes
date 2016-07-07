@@ -43,7 +43,7 @@ public:
 
 public:
 	//设置于服务器连接的地址与端口
-	void setAddress(const char* ip, unsigned short port);
+	void setAddress(const char* ip, unsigned short port, bool isIp);
 
 public:
 	///开始无阻塞方式连接
@@ -76,7 +76,6 @@ public:
 private:
 	///读数据
 	void read(char* buff, int len);
-
 protected:
 	///枚举连接状态
 	enum {
@@ -108,7 +107,7 @@ protected:
 	string m_nnAddress;
 	///服务器端口号
 	unsigned short m_nnPort;
-
+	bool m_isIp;
 protected:
 	///IO操作
 	CSocket	m_Sock;

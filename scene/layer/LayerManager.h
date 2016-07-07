@@ -73,7 +73,7 @@ public:
 	void closeAll();
 	BaseLayer* getCurrLayer();
 	BaseLayer* getLayer(const char* name);
-	void setPriority(int priority);
+	void setPriority(int priority);			//默认基础优先级（最大的）
 	inline int getPriority(){return m_Priority;}
 	void release();
 
@@ -83,6 +83,8 @@ public:
 	void showLayerUnBeCovered(BaseLayer* pLayer);
 
 	void removeInvalidPopLayer();
+
+	int getLayerManagerMinPriority(); //获取所有push层中的最小触摸优先级
 
 protected:
 	void updatePriority();

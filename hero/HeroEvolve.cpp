@@ -1,9 +1,7 @@
 ﻿#include "HeroEvolve.h"
 #include "scene/layer/LayerManager.h"
 #include "net/CNetClient.h"
-#include "scene/layer/LayerManager.h"
 #include "model/DataCenter.h"
-#include "Battle/ActionNameDefine.h"
 #include "tools/UICloneMgr.h"
 #include "netcontrol/CPlayerControl.h"
 #include "HeroControl.h"
@@ -13,7 +11,6 @@
 #include "tollgate/SelectArmy.h"
 #include "common/CommonFunction.h"
 #include "mainCity/CCompaseLayer.h"
-#include "Battle/AnimationManager.h"
 #include "Global.h"
 #include "netcontrol/CPlayerControl.h"
 #include "scene/UITools.h"
@@ -21,11 +18,20 @@
 #include "mainCity/CNewHero.h"
 #include "common/CGameSound.h"
 #include "Resources.h"
-using namespace BattleSpace;
-CHeroEvolve::CHeroEvolve()
-	:m_iType(1),m_itemNeedNum(0), m_bAskNextQualityHero(false),m_pNewHero(nullptr),m_pHeroArmature(nullptr)
-{
+#include "hero/HeroEvolveDataPanel.h"
+#include "hero/HeroEvolveEffectLayer.h"
+#include "tools/CCShake.h"
 
+CHeroEvolve::CHeroEvolve()
+	:m_ui(nullptr), m_pNewHero(nullptr), m_pHeroArmature(nullptr), m_pCircleBar(nullptr),m_bAskNextQualityHero(false)
+	,m_fBallRadius(0.0f),m_fCircleBarRadius(0.0f),m_fAngleGap(0.0f), m_pCurrentRankHeroData(nullptr), m_iCurrentTouchBallIndex(-1)
+	,m_pEffectLayer(nullptr)
+{
+	for(int i=0; i<HERO_EVOLVE_RANK_MAX; i++)
+	{
+		m_pBall[i] = nullptr;
+	}
+	resetHeroData();
 }
 
 bool CHeroEvolve::init()
@@ -39,48 +45,172 @@ bool CHeroEvolve::init()
 		m_ui->setPosition(VCENTER);
 		this->addChild(m_ui);
 
+		//进阶按钮
+		CButton *pEvolve =(CButton*)(m_ui->findWidgetById("evolve"));
+		pEvolve->setOnClickListener(this,ccw_click_selector(CHeroEvolve::onEvolveBtn));
+
+		//添加魂石按钮
+		CButton *pAddStone =(CButton*)(m_ui->findWidgetById("add"));
+		pAddStone->setOnClickListener(this,ccw_click_selector(CHeroEvolve::heroCall));
+
+
+		//数据面板
+		m_pDataPanel = CHeroEvolveDataPanel::create();
+		//m_pDataPanel->setPosition(VCENTER);
+		this->addChild(m_pDataPanel, 2);
+
+		//初始化进度条相关
+		initProgressAndBall();
+
 		return true;
 	}
 	return false;
 }
 
+
+void CHeroEvolve::initProgressAndBall()
+{
+	//拿到太极层
+	CLayout *pTaiJiLayer = (CLayout*)m_ui->findWidgetById("taiji");
+
+	//根据标记精灵初始化圆形进度条
+	CImageView *pPosRead = (CImageView*)pTaiJiLayer->findWidgetById("taiji_center");
+	//中心位置
+	CCPoint pCenterPos = pPosRead->getPosition();
+
+	CCSprite* pSpriteBar = CCSprite::create("heroEvolve/tri_ring.png");
+	m_pCircleBar = CCProgressTimer::create(pSpriteBar);
+	m_pCircleBar->setAnchorPoint(CCPointCenter);
+	m_pCircleBar->setPosition(pCenterPos);
+	m_pCircleBar->setType(kCCProgressTimerTypeRadial);
+	pPosRead->getParent()->addChild(m_pCircleBar, pPosRead->getZOrder()+1);
+
+	//拿到半径长度
+	m_fCircleBarRadius = pSpriteBar->getContentSize().width*pSpriteBar->getScale()/2;
+
+	//圆形平均分割为五个圆心角,//计算五个球的位置，并初始化
+	for(int i=0; i<HERO_EVOLVE_RANK_MAX; i++)
+	{
+		float fAngle = CC_DEGREES_TO_RADIANS(HERO_EVOLVE_ANGLE_GAP*i);
+
+		//计算 x,y 偏移坐标（x = sinX, y = cosX）
+		float fOffX = m_fCircleBarRadius*sin(fAngle);
+		float fOffY = m_fCircleBarRadius*cos(fAngle); 
+		CCPoint pRealPos = pCenterPos+ccp(fOffX, fOffY);
+
+		//初始化球
+		CImageView* pBall = CImageView::create("heroEvolve/starup_2_lock.png");
+		pBall->setAnchorPoint(CCPointCenter);
+		pBall->setPosition(pRealPos);
+		pBall->setScale(HERO_EVOLVE_BALL_SCALE);
+		pBall->setTag(i);
+		pBall->setTouchEnabled(true);
+		//pBall->setOpacity(40);
+		pBall->setOnPressListener(this, ccw_press_selector(CHeroEvolve::onPressBallData));
+		m_pCircleBar->getParent()->addChild(pBall, m_pCircleBar->getZOrder()+1);
+		m_pBall[i] = pBall;
+
+		if(m_fBallRadius==0.0f)
+		{
+			m_fBallRadius = pBall->getContentSize().width*HERO_EVOLVE_BALL_SCALE/2-10;
+		}
+	}
+
+
+	//计算进度条的基础参数
+	m_fAngleGap = CC_RADIANS_TO_DEGREES(asin(m_fBallRadius/m_fCircleBarRadius));
+
+	//文字转动
+	CImageView *pImageWords = (CImageView*)pTaiJiLayer->findWidgetById("taiji_words");
+	pImageWords->runAction(CCRepeatForever::create(CCRotateBy::create(8.0f, 360)));
+	pImageWords->runAction(CCRepeatForever::create(CCSequence::createWithTwoActions(CCFadeTo::create(0.55f, 130), CCFadeTo::create(0.55f, 255))));
+
+}
+
+
+void CHeroEvolve::updateProgressAndBalll()
+{
+	//当前进阶等级
+	int iRank = m_pCurrentRankHeroData->quality;
+
+	//当前魂石收集比例
+	float fProgressStone = 0;
+	if(m_pCurrentRankHeroData->itemNum2>0)
+	{
+		fProgressStone = (float)m_pCurrentRankHeroData->itemNum1/(float)m_pCurrentRankHeroData->itemNum2;
+	}	
+
+	//小于5%的angle约等于5%,前提是最少有一个魂石
+	if(m_pCurrentRankHeroData->itemNum1>=1)
+	{
+		fProgressStone = fProgressStone<0.05f?0.05f:fProgressStone;
+	}
+	fProgressStone = fProgressStone>1.0f?1.0f:fProgressStone;
+
+	//判断进度条位置
+	float fAngleStart = (iRank-1)*HERO_EVOLVE_ANGLE_GAP+m_fAngleGap;
+	float fAngleRange = HERO_EVOLVE_ANGLE_GAP-m_fAngleGap*2;
+
+	float fAngleReal = fAngleStart + fAngleRange*fProgressStone;
+
+	m_pCircleBar->setPercentage(100.0f*fAngleReal/360.f);
+
+	//关于球-已升/到了未升/未升
+	for(int i=0; i<HERO_EVOLVE_RANK_MAX; i++)
+	{
+		m_pBall[i]->removeAllChildrenWithCleanup(true);
+		m_pBall[i]->setTexture(CCTextureCache::sharedTextureCache()->addImage(CCString::createWithFormat("heroEvolve/starup_%d_lock.png", i+1)->getCString()));
+
+		//已升
+		if(iRank>i)
+		{
+			CCTexture2D* pTexture = CCTextureCache::sharedTextureCache()->addImage(CCString::createWithFormat("heroEvolve/starup_%d_on.png", i+1)->getCString());
+			m_pBall[i]->setTexture(pTexture);
+		}
+		//未升
+		else
+		{
+			//收集中
+			if(iRank == i)
+			{
+				//收集够,闪烁
+				if(fProgressStone>=1.0f)
+				{
+					m_pBall[i]->removeAllChildrenWithCleanup(true);
+					CCSprite* pBlinkiMage = CCSprite::create(CCString::createWithFormat("heroEvolve/starup_%d_off.png", i+1)->getCString());
+					pBlinkiMage->runAction(CCRepeatForever::create(CCSequence::createWithTwoActions(CCFadeTo::create(0.3f, 50), CCFadeTo::create(0.3f, 255))));
+					m_pBall[i]->addChild(pBlinkiMage);
+					NodeFillParent(pBlinkiMage);
+				}
+				//未收集够
+				else
+				{
+					//不处理
+				}
+			}
+			//未到
+			else
+			{
+				//不处理
+			}
+		}
+	}
+}
+
+
 void CHeroEvolve::onEvolveBtn(CCObject* pSender)
 {
-	if(checkHeroEvolveOpen(m_hero))
+	if(checkHeroEvolveOpen(m_pCurrentRankHeroData))
 	{
 		((CHeroAttribute*)(this->getParent()))->getDelegate()->onEvolveHero();
 		CCLOG("ERROR  CHeroEvolve::onEvolveBtn");
 	}
-	//showEvoleEffect();
-}
-
-void CHeroEvolve::onClose(CCObject* pSender)
-{
-	PlayEffectSound(SFX_Ensure);
-
-	LayerManager::instance()->pop();
-	LayerManager::instance()->pop();
+	//evolveSuccess( &m_pHero[3]);
 }
 
 void CHeroEvolve::onEnter()
 {
 	BaseLayer::onEnter();
-
-	CButton *evolve =(CButton*)(m_ui->findWidgetById("evolve"));
-	if (evolve)
-	{
-		evolve->setOnClickListener(this,ccw_click_selector(CHeroEvolve::onEvolveBtn));
-	}
-
-	CButton * add =(CButton*)(m_ui->findWidgetById("add"));
-	add->setOnClickListener(this,ccw_click_selector(CHeroEvolve::heroCall));
-
-	//退出
-	CButton* pClose = CButton::create("common/back.png", "common/back.png");
-	pClose->getSelectedImage()->setScale(1.1f);
-	pClose->setPosition(VLEFT+50, VTOP-50);
-	pClose->setOnClickListener(this,ccw_click_selector(CHeroEvolve::onClose));
-	this->addChild(pClose, 999);
 
 	CSceneManager::sharedSceneManager()->addMsgObserver(UPDATE_HEROINFO, this, GameMsghandler_selector(CHeroEvolve::updateHeroInfo));	
 
@@ -88,20 +218,6 @@ void CHeroEvolve::onEnter()
 
 }
 
-void CHeroEvolve::updateHeroInfo(const TMessage& tMsg)
-{
-	CHero *hero = (CHero*)tMsg.lParam;
-	if (tMsg.nMsg == 1)
-	{
-		showHeroHead(hero);
-	}
-	else
-	{
-		showHeroQuality(hero);
-	}
-
-	updateAttr(hero);
-}
 
 void CHeroEvolve::onExit()
 {
@@ -109,111 +225,92 @@ void CHeroEvolve::onExit()
 	CSceneManager::sharedSceneManager()->removeMsgObserver(UPDATE_HEROINFO,this);
 	NOTIFICATION->removeAllObservers(this);
 
-	CCArmatureDataManager::sharedArmatureDataManager()->removeAnimationData("recruit/jinjie.ExportJson");
+	//CCArmatureDataManager::sharedArmatureDataManager()->removeArmatureFileInfo("heroEvolve/jinjie.ExportJson");
+	//for(int i=0; i<HERO_EVOLVE_RANK_MAX; i++)
+	//{
+	//	CCSpriteFrameCache::sharedSpriteFrameCache()->removeSpriteFramesFromFile(
+	//		CCString::createWithFormat("heroEvolve/r%d.plist", i+1)->getCString()
+	//		);
+	//}
+	//CCTextureCache::sharedTextureCache()->removeUnusedTextures();
+}
+
+void CHeroEvolve::updateHeroInfo(const TMessage& tMsg)
+{
+	CHero *pHero = (CHero*)tMsg.lParam;
+	
+	//第一次初始化, 
+	//除了魂石数量增加（有其他回调）和第一次传数据以外
+	//没有其他非当前界面操作可以影响英雄数据，没必要接受更新
+	if(tMsg.nMsg == 1)
+	{
+		updateEvolve(pHero);
+	}
+	else
+	{
+		//nMsg == 0
+	}
 }
 
 
-void CHeroEvolve::showHeroHead(CHero *hero)
+void CHeroEvolve::updateEvolve( CHero *pHero )
 {
-	m_hero = hero;
+	//TODO
+	//重置英雄数据
+	resetHeroData();
+	saveHeroData(pHero);
+
+	//更新头像
+	updateHead(pHero);
+	
+	//更新石头数量
+	updateStoneNum(pHero);
+
+	//更新进阶按钮状态
+	updateEvolveButtonStatus();
+
+	//更新进度条和球
+	updateProgressAndBalll();
+
+}
+
+
+
+void CHeroEvolve::updateHead(CHero *pHero)
+{
 	CImageView *itembg1 = (CImageView *)(m_ui->findWidgetById("itembg1"));
-	CCSprite *head = CCSprite::create(CCString::createWithFormat("headImg/%d.png", hero->thumb)->getCString());
+	CCSprite *head = CCSprite::create(CCString::createWithFormat("headImg/%d.png", pHero->thumb)->getCString());
 	if (!head)
 	{
 		head = CCSprite::create("headImg/101.png");
-		CCLOG("[ ERROR ] CHeroEvolve::showHeroHead Lost Image = %d",hero->thumb);
+		CCLOG("[ ERROR ] CHeroEvolve::showHeroHead Lost Image = %d",pHero->thumb);
 	}
 	itembg1->removeChildByTag(1);
 	head->setScale(90.0f/100.0f);
 	head->setTag(1);
 	head->setPosition(ccp(itembg1->getContentSize().width/2, itembg1->getContentSize().height/2));
 	itembg1->addChild(head);
-	showHeroQuality(hero);
+}
 
+void CHeroEvolve::updateStoneNum(CHero * pHero)
+{
 	CLabel* val = (CLabel *)(m_ui->findWidgetById("expVal"));
-	val->setString(CCString::createWithFormat("%d/%d",hero->itemNum1,hero->itemNum2)->getCString());
-
-	CProgressBar* process = (CProgressBar *)(m_ui->findWidgetById("exp_process"));
-	process->setMaxValue(hero->itemNum2);
-	process->setValue(hero->itemNum1);
-}
-
-void CHeroEvolve::showHeroQuality(CHero * hero)
-{
-	CImageView *mask1 = (CImageView *)(m_ui->findWidgetById("mask1"));
-	mask1->setTexture(setItemQualityTexture(hero->iColor));
-
-	CLabel* val = (CLabel *)(m_ui->findWidgetById("expVal"));
-	val->setString(CCString::createWithFormat("%d/%d",hero->itemNum1,hero->itemNum2)->getCString());
-
-	CProgressBar* process = (CProgressBar *)(m_ui->findWidgetById("exp_process"));
-	process->setMaxValue(hero->itemNum2);
-	process->setValue(hero->itemNum1);
-
-}
-
-void CHeroEvolve::showItem(CItem * item)
-{
-	CImageView *itembg1 = (CImageView *)(m_ui->findWidgetById("itembg1"));
-	CCSprite *head = CCSprite::create(CCString::createWithFormat("headImg/%d.png", item->iconId)->getCString());
-	if (!head)
-	{
-		head = CCSprite::create("headImg/101.png");
-		CCLOG("[ ERROR ] CHeroEvolve::showHeroHead Lost Image = %d",item->iconId);
+	if (pHero->itemNum2>0)
+	{	
+		val->setString(CCString::createWithFormat("%d/%d",pHero->itemNum1,pHero->itemNum2)->getCString());
 	}
-	itembg1->removeChildByTag(1);
-	head->setScale(90.0f/100.0f);
-	head->setTag(1);
-	head->setPosition(ccp(itembg1->getContentSize().width/2, itembg1->getContentSize().height/2));
-	itembg1->addChild(head);
-
-	const ItemData * itemData = DataCenter::sharedData()->getItemDesc()->getCfg(item->itemId);
-	if (itemData)
+	else
 	{
-		CLabel* name = (CLabel *)(m_ui->findWidgetById("name"));
-		name->setString(itemData->itemName.c_str());
+		val->setString(CCString::createWithFormat("%d/?",pHero->itemNum1)->getCString());
 	}
-	
-	CImageView *mask1 = (CImageView *)(m_ui->findWidgetById("mask1"));
-	mask1->setTexture(setItemQualityTexture(item->quality));
-
-	CLabel* val = (CLabel *)(m_ui->findWidgetById("expVal"));
-	val->setString(CCString::createWithFormat("%d/%d",item->itemNum,m_itemNeedNum)->getCString());
-
-	CProgressBar* process = (CProgressBar *)(m_ui->findWidgetById("exp_process"));
-	process->setMaxValue(m_itemNeedNum);
-	process->setValue(item->itemNum);
 }
 
-bool CHeroEvolve::ccTouchBegan( CCTouch *pTouch, CCEvent *pEvent )
-{
-	bool res = CWidgetWindow::ccTouchBegan(pTouch, pEvent);
-	
-	if(m_iType!=2)return res;
-
-	CCPoint pTouchPos = m_ui->convertToNodeSpace(pTouch->getLocation());
-
-	CCSprite *bgSpr = (CCSprite*)m_ui->findWidgetById("bg");
-	if( !res && !bgSpr->boundingBox().containsPoint(pTouchPos))
-	{
-		res = true;
-		onClose(nullptr);
-	}
-	return res;
-}
-
-
-void CHeroEvolve::setNeedNum(int num)
-{
-	m_itemNeedNum = num;
-}
-
-bool CHeroEvolve::checkHeroEvolveOpen(CHero * hero)
+bool CHeroEvolve::checkHeroEvolveOpen(CHero * pHero)
 {
 	//检查英雄进阶条件
 	///*等级是否足够*/，碎片是否足够
-	bool isLevelOk = /*hero->level>=hero->maxLevel*/true;
-	bool isShardsOk = hero->itemNum1>=hero->itemNum2;
+	bool isLevelOk = /*pHero->level>=pHero->maxLevel*/true;
+	bool isShardsOk = pHero->itemNum1>=pHero->itemNum2;
 	if(!isLevelOk && !isShardsOk)
 	{
 		ShowPopTextTip(GETLANGSTR(1019));
@@ -235,102 +332,199 @@ bool CHeroEvolve::checkHeroEvolveOpen(CHero * hero)
 	}
 }
 
-void CHeroEvolve::levelSkillUp( CHero* hero,const Hero* pHero )
+void CHeroEvolve::evolveSuccess( CHero *pHero)
 {
-	//int atk = pHero->atk() - hero->atk;
-	//int hp = pHero->hp() - hero->hp;
-	//int def = pHero->def() - hero->def;
-	//const char *str = nullptr;
-	//if (atk>0)
-	//{
-	//	str = CCString::createWithFormat(GETLANGSTR(278), atk)->getCString();
-	//	CLabel *lab = CLabel::create(str,DEFAULT_FONT,20);
-	//	lab->setPosition(ccp(VCENTER.x+380,VCENTER.y-150));
-	//	lab->setColor(RGB_GREEN);
-	//	runAnimation(0.5f,lab);
-	//}
-	//if (hp>0)
-	//{
-	//	str = CCString::createWithFormat(GETLANGSTR(279),hp)->getCString();
-	//	CLabel *lab = CLabel::create(str,DEFAULT_FONT,20);
-	//	lab->setPosition(ccp(VCENTER.x+380,VCENTER.y-150));
-	//	lab->setColor(RGB_GREEN);
-	//	runAnimation(0.8f,lab);
-	//}
-	//if (def>0)
-	//{
-	//	str = CCString::createWithFormat(GETLANGSTR(280),def)->getCString();
-	//	CLabel *lab = CLabel::create(str,DEFAULT_FONT,20);
-	//	lab->setPosition(ccp(VCENTER.x+380,VCENTER.y-150));
-	//	lab->setColor(RGB_GREEN);
-	//	runAnimation(1.1f,lab);
-	//}
+	//TODO
+	//考虑数据怎么接入
+	
+	CHero *pOldHero = m_pCurrentRankHeroData;
+	CHero *pNewHero = pHero;
 
-	//CCSprite *skillspr = CCSprite::create("common/word_07.png");
-	//skillspr->setPosition(ccp(VCENTER.x+380,VCENTER.y-150));
-	//runAnimation(1.4f,skillspr);
+	//存储数据
+	saveHeroData(pHero, true);
 
-	showEvoleEffect();
+	//更新魂石数量
+	updateStoneNum(pHero);
+
+	//更新进度条和球-回调更新
+	//updateProgressAndBalll();
+
+	//更新按钮状态
+	updateEvolveButtonStatus();
+
+	//播放特效
+	showEvoleEffect(pOldHero, pNewHero);
 }
 
-void CHeroEvolve::showUpLevelAnimation()
-{
-	//if (m_ui->getChildByTag(1000))
-	//{
-	//	// 		m_ui->removeChildByTag(1000);
-	//	CCAnimation *anim = AnimationManager::sharedAction()->getAnimation("shenji");
-	//	CCAction *action = CCAnimate::create(anim);
-	//	action->setTag(1);
-	//	CCNode *shenjiSpr = m_ui->getChildByTag(1000);
-	//	shenjiSpr->runAction(action);
-	//}
-	//else if (!m_ui->getChildByTag(1000))
-	//{
-	//	CCAnimation *anim = AnimationManager::sharedAction()->getAnimation("shenji");
-	//	CCSprite *shenjiSpr = CCSprite::create("skill/shenji.png");
-	//	shenjiSpr->setPosition(((CCNode*)(m_ui->findWidgetById("ying")))->getPosition());
-	//	shenjiSpr->setPositionY(shenjiSpr->getPositionY()+50);
-	//	shenjiSpr->setTag(1000);
-	//	CCAction *action = CCAnimate::create(anim);
-	//	action->setTag(1);
-	//	shenjiSpr->runAction(action);
-	//	m_ui->addChild(shenjiSpr,0,1000);
-	//}
-}
 
-void CHeroEvolve::runAnimation( float dt, CCNode * node )
-{
-	//this->addChild(node);
-	//node->setVisible(false);
-	//CCFiniteTimeAction* fly = CCSpawn::create(
-	//	CCMoveBy::create(1.3f, ccp(0, 130)),
-	//	CCSequence::create(CCScaleTo::create(0.15f,1.1f),CCDelayTime::create(0.5f),CCScaleTo::create(0.15f,1.0f),CCFadeTo::create(0.3f, 150), NULL),
-	//	NULL);
-	//CCFiniteTimeAction* action = CCSequence::create(CCDelayTime::create(dt),CCShow::create(),fly,CCRemoveSelf::create(),
-	//	NULL);
-	//node->runAction(action);
-}
 
 void CHeroEvolve::compaseSuccess( CCObject* pObj )
 {
-	m_hero->itemNum1++;
-	CLabel* val = (CLabel *)(m_ui->findWidgetById("expVal"));
-	val->setString(CCString::createWithFormat("%d/%d",m_hero->itemNum1,m_hero->itemNum2)->getCString());
-	CProgressBar* process = (CProgressBar *)(m_ui->findWidgetById("exp_process"));
-	process->setMaxValue(m_hero->itemNum2);
-	process->setValue(m_hero->itemNum1);
+	//更新数量
+	m_pCurrentRankHeroData->itemNum1++;
+	updateStoneNum(m_pCurrentRankHeroData);
+
+	//更新显示状态
+	updateProgressAndBalll();
 }
 
-void CHeroEvolve::updateAttr( CHero * hero )
+void CHeroEvolve::heroCall( CCObject* pSender )
 {
-	m_hero = hero;
+	CHeroCall *evolveLayer = CHeroCall::create();
+	evolveLayer->setNeedNum(m_pCurrentRankHeroData->itemNum2);
+	LayerManager::instance()->push(evolveLayer);
+	CPlayerControl::getInstance().sendItemInfo(m_pCurrentRankHeroData->itemId);
+}
 
+
+void CHeroEvolve::onPressBallData( CCObject* pSender, CTouchPressState iState )
+{
+	CCNode* pNode = (CCNode*)pSender;
+	int iTag = pNode->getTag();
+	
+	switch (iState)
+	{
+	case cocos2d::cocoswidget::CTouchPressOn:
+		{
+			if(m_iCurrentTouchBallIndex != -1)
+			{
+				return;
+			}
+
+			m_iCurrentTouchBallIndex = iTag;
+
+			//如果已经有数据
+			if(m_pHero[m_iCurrentTouchBallIndex].id != -1)
+			{
+				m_pDataPanel->show(m_pCurrentRankHeroData, &m_pHero[m_iCurrentTouchBallIndex]);
+			}
+			//没有数据
+			else
+			{
+				//请求数据, 这里还不能显示面板(+1因为qulity从1开始)
+				askForRankData(m_iCurrentTouchBallIndex+1);
+			}
+		}
+		break;
+	case cocos2d::cocoswidget::CTouchPressOff:
+		{
+			m_iCurrentTouchBallIndex = -1;
+			m_pDataPanel->hide();
+		}
+		break;
+	default:
+		break;
+	}
+}
+
+void CHeroEvolve::showEvoleEffect(CHero *pOldHero, CHero *pNewHero)
+{
+	//特效层加载
+	if(m_pEffectLayer == nullptr)
+	{
+		m_pEffectLayer = CHeroEvolveEffectLayer::create();
+		this->addChild(m_pEffectLayer);
+	}
+	//绑定回调-是否需要？
+	//TODO
+
+	//执行特效
+	int iAimRank = pNewHero->quality;
+	m_pEffectLayer->bindBallChangeCallBack(this, evolveEffectSelector(CHeroEvolve::ballChangeBegin));
+	m_pEffectLayer->showEffect(
+		pOldHero,
+		pNewHero,
+		m_pBall[iAimRank-1]->getPosition(),
+		m_pDataPanel->createSkillPanel(pOldHero, pNewHero, m_pEffectLayer->getSkillPanel()),
+		m_pDataPanel->getUnLockTypeWithRank(iAimRank)
+		);
+}
+
+void CHeroEvolve::showEvoleEffectCallBack()
+{
+	//TODO
+
+}
+
+void CHeroEvolve::askForRankData( int iRank )
+{
+	setAskNextQualityHero(true);
+	CPlayerControl::getInstance().sendGetHeroInfo(m_pCurrentRankHeroData->id, 0, 0, iRank);
+}
+
+void CHeroEvolve::askForRankDataCallBack( CHero* pHero )
+{
+	setAskNextQualityHero(false);
+
+	//更新英雄阶段信息
+	saveHeroData(pHero);
+
+	//是当前的触摸球,就更新显示， 不判断可能会有问题，quality如果能跟请求一样就好了
+	if(m_iCurrentTouchBallIndex+1 == pHero->quality)
+	{
+		m_pDataPanel->show(m_pCurrentRankHeroData, pHero, true);
+	}
+}
+
+void CHeroEvolve::saveHeroData( CHero * pHero, bool bResetCurrentHero/*=false*/ )
+{
+	int iRank = pHero->quality;
+	if(iRank>HERO_EVOLVE_RANK_MAX)
+	{
+		CCLOG("CHeroEvolve::saveHeroData---RANK-DATA-ERROR");
+		return;
+	}
+	m_pHero[iRank-1] = *pHero;
+
+	setCurrentHeroData(iRank, bResetCurrentHero);
+}
+
+void CHeroEvolve::setCurrentHeroData( int iRank, bool bForce/*=false*/ )
+{
+	//更新当前的英雄数据指向
+	if(m_pCurrentRankHeroData==nullptr || m_pCurrentRankHeroData->id==-1  || bForce)
+	{
+		m_pCurrentRankHeroData = &m_pHero[iRank-1];
+
+		uiChangeWhenHeroRankChange();
+	}
+}
+
+void CHeroEvolve::uiChangeWhenHeroRankChange()
+{
+	//是否到达最高等级
+	if(m_pCurrentRankHeroData->quality == HERO_EVOLVE_RANK_MAX)
+	{
+		//太极转动
+		CLayout *pData = (CLayout *)m_ui->findWidgetById("taiji");
+		CImageView *pImage = (CImageView*)pData->findWidgetById("taiji_center");
+		pImage->runAction(CCRepeatForever::create(CCRotateBy::create(10.0f, -360)));
+	}
+	else
+	{
+		//太极不动
+		CLayout *pData = (CLayout *)m_ui->findWidgetById("taiji");
+		CImageView *pImage = (CImageView*)pData->findWidgetById("taiji_center");
+		pImage->stopAllActions();
+	}
+}
+
+void CHeroEvolve::resetHeroData()
+{
+	for(int i=0; i<HERO_EVOLVE_RANK_MAX; i++)
+	{
+		m_pHero[i].id = -1;
+	}
+}
+
+void CHeroEvolve::updateEvolveButtonStatus()
+{
 	//按钮那边的变化，满级以后不再显示按钮
 	CButton* evolve = (CButton*)(m_ui->findWidgetById("evolve"));
 	CLabel* pEvolveLabel = (CLabel*)(m_ui->findWidgetById("evolve_label"));
 	CLabel* pEvolveTips = (CLabel*)(m_ui->findWidgetById("wrong_tip"));
 
-	if(m_hero->quality == 5)
+	if(m_pCurrentRankHeroData->quality == 5)
 	{
 		evolve->setVisible(false);
 		pEvolveLabel->setVisible(false);
@@ -342,187 +536,23 @@ void CHeroEvolve::updateAttr( CHero * hero )
 		pEvolveLabel->setVisible(true);
 		pEvolveTips->setVisible(false);
 	}
-
-	//当前属性更新
-	CLabel* pLevel = (CLabel*)(m_ui->findWidgetById("level"));
-	pLevel->setString(CCString::createWithFormat("%d/%d", m_hero->level, m_hero->maxLevel)->getCString());
-	if(m_hero->level < m_hero->maxLevel && m_hero->quality != 5)
-	{
-		pLevel->stopAllActions();
-		pLevel->runAction(CCRepeatForever::create(CCSequence::createWithTwoActions(CCFadeTo::create(0.2f, 120), CCFadeTo::create(0.2f, 255))));
-	}
-	else
-	{
-		pLevel->stopAllActions();
-		pLevel->setOpacity(255);
-	}
-
-	CLabel* pHp = (CLabel*)(m_ui->findWidgetById("hp"));
-	pHp->setString(ToString(m_hero->hp));
-	CLabel* pAtk = (CLabel*)(m_ui->findWidgetById("attack"));
-	pAtk->setString(ToString(m_hero->atk));
-	CLabel* pDefense = (CLabel*)(m_ui->findWidgetById("defend"));
-	pDefense->setString(ToString(m_hero->def));
-
 }
 
-void CHeroEvolve::updateNextQualityAttr( CHero* hero )
+void CHeroEvolve::ballChangeBegin()
 {
-	//更新下一阶段的数据
-	CLabel* pLevel = (CLabel*)(m_ui->findWidgetById("addlevel"));
-	pLevel->setString(CCString::createWithFormat("%d/%d", 1, hero->maxLevel)->getCString());
-	CLabel* pHp = (CLabel*)(m_ui->findWidgetById("addhp"));
-	pHp->setString(ToString(hero->hp));
-	CLabel* pAtk = (CLabel*)(m_ui->findWidgetById("addatk"));
-	pAtk->setString(ToString(hero->atk));
-	CLabel* pDefense = (CLabel*)(m_ui->findWidgetById("adddef"));
-	pDefense->setString(ToString(hero->def));
-	if(m_hero->quality == 5)
-	{
-		pLevel->setString("??/??");
-		pHp->setString("???");
-		pAtk->setString("???");
-		pDefense->setString("???");
-	}
+	//延时0.1s执行
+	runAction(CCSequence::create(
+		CCDelayTime::create(0.1f),
+		CCCallFunc::create(this, callfunc_selector(CHeroEvolve::updateProgressAndBalll)),
+		nullptr
+		));
+	//立即震动
+	CCDirector::sharedDirector()->getRunningScene()->setScale(1.05f);
+	CCDirector::sharedDirector()->getRunningScene()->runAction(CCSequence::create(
+		CCShake::create(0.3f, 8),
+		CCScaleTo::create(0.0f, 1.0f),
+		CCMoveTo::create(0.0f, CCPointZero),
+		nullptr
+		));
 }
 
-void CHeroEvolve::askForData()
-{
-	if(m_hero->quality==5)
-	{
-		//上限了，
-		updateNextQualityAttr(m_hero);
-	}
-	else
-	{
-		//请求更新数据
-		if (this->isVisible())
-		{	
-			runAction(CCSequence::create(CCDelayTime::create(0.8f), CCCallFunc::create(this, callfunc_selector(CHeroEvolve::askForDataCallBack)),nullptr));
-		}
-	}
-}
-
-void CHeroEvolve::askForDataCallBack()
-{
-	setAskNextQualityHero(true);
-	CPlayerControl::getInstance().sendGetHeroInfo(m_hero->id, 0, 0, m_hero->quality+1);
-}
-
-void CHeroEvolve::heroCall( CCObject* pSender )
-{
-	CHeroCall *evolveLayer = CHeroCall::create();
-	evolveLayer->setNeedNum(m_hero->itemNum2);
-	LayerManager::instance()->push(evolveLayer);
-	CPlayerControl::getInstance().sendItemInfo(m_hero->itemId);
-}
-
-void CHeroEvolve::showEvoleEffect()
-{
-	//加载资源
-	CCArmatureDataManager::sharedArmatureDataManager()->addArmatureFileInfo("recruit/jinjie.ExportJson");
-
-	//屏蔽层
-	MaskLayer* lay = MaskLayer::create("showEvoleEffect");
-	lay->setContentSize(CCSizeMake(1138,640));
-	lay->setAnchorPoint(ccp(0.5f, 0.5f));
-	lay->setPosition(VCENTER);
-	lay->setOpacity(0);
-	lay->setTouchPriority(-13);
-	this->addChild(lay, 9999, 9999);
-
-	//效果
-	CCArmature* pEffect = CCArmature::create("jinjie");
-	pEffect->setPosition(ccp(lay->getContentSize().width/2 - 18, lay->getContentSize().height/2));
-	lay->addChild(pEffect);
-	pEffect->getAnimation()->setFrameEventCallFunc(this, frameEvent_selector(CHeroEvolve::frameEventCallBack));
-	pEffect->getAnimation()->playWithIndex(0, 0.01f);
-	CCBone* pBone = pEffect->getBone("fog2");
-
-
-	//人物
-	CCArmature* Armature = CCArmature::create(ToString(m_hero->thumb));
-	Armature->getAnimation()->play(Stand_Action,0.01f);
-	float zoom = m_hero->zoom*0.01f;
-	if (!zoom)
-		zoom = 300.0/Armature->getContentSize().height;			//容错性处理
-	Armature->setScale(zoom+0.3f);
-	CCPoint pos = ccp(0, -235);
-	Armature->setPosition(pos);
-	pEffect->addChild(Armature, pBone->getZOrder());
-	m_pHeroArmature = Armature;
-
-}
-
-void CHeroEvolve::showEvoleEffectCallBack()
-{
-	removeChildByTag(9999);
-}
-
-void CHeroEvolve::frameEventCallBack( CCBone* pBone, const char* sEvent, int iTag1, int iTag2 )
-{
-	if(strcmp(sEvent, "in") == 0)
-	{
-		MaskLayer* lay = (MaskLayer*)getChildByTag(9999);
-
-		m_pHeroArmature->runAction(CCFadeOut::create(0.15f));
-
-		//人物变鬼火，非进去
-		int animId = 8033;	
-		if (m_hero->quality < 10)
-		{
-			animId = (m_hero->iColor-1)*10 +8003;
-		}
-
-		CCAnimation *soulAnim = AnimationManager::sharedAction()->getAnimation(ToString(animId));
-		CCSprite *soulMove = createAnimationSprite(CCString::createWithFormat("skill/%d.png", animId)->getCString(), ccp(1138/2, 250), soulAnim, true);
-		soulMove->setScale(1.0f);
-		soulMove->setOpacity(0);
-		soulMove->runAction(CCSequence::create(CCFadeIn::create(0.15f), 
-			CCEaseBackInOut::create(CCSpawn::createWithTwoActions(CCMoveBy::create(0.15f, ccp(0, 230)), CCScaleTo::create(0.15f, 0.0f))),  CCRemoveSelf::create(), nullptr));
-		lay->addChild(soulMove);
-
-	}
-	else if(strcmp(sEvent, "out") == 0)
-	{
-		MaskLayer* lay = (MaskLayer*)getChildByTag(9999);
-
-		////人物变鬼火，非进去
-		//int animId = 8033;	
-		//if (m_hero->quality < 10)
-		//{
-		//	animId = (m_hero->quality-1)*10 +8003;
-		//}
-
-		//CCAnimation *soulAnim = AnimationManager::sharedAction()->getAnimation(ToString(animId));
-		//CCSprite *soulMove = createAnimationSprite(CCString::createWithFormat("skill/%d.png", animId)->getCString(), ccp(1138/2, 450), soulAnim, true);
-		//soulMove->setScale(0.0f);
-		//soulMove->runAction(CCSequence::create(
-		//	CCEaseBackInOut::create(CCSpawn::createWithTwoActions(CCMoveBy::create(0.15f, ccp(0, -230)), CCScaleTo::create(0.15f, 1.0f))), CCRemoveSelf::create(), 
-		//	CCCallFunc::create(this, callfunc_selector(CHeroEvolve::outCallBack)), nullptr));
-		//lay->addChild(soulMove, 222);
-		outCallBack();
-		//this->runAction(CCSequence::create(
-		//	CCDelayTime::create(0.2f),
-		//	CCCallFunc::create(this, callfunc_selector(CHeroEvolve::outCallBack)), nullptr));
-	}
-}
-
-void CHeroEvolve::outCallBack()
-{
-	MaskLayer* lay = (MaskLayer*)getChildByTag(9999);
-
-	//人物出场
-	m_pNewHero = CNewHero::create();
-	m_pNewHero->setVisible(false);
-	lay->addChild(m_pNewHero, 200);
-	m_pNewHero->setVisible(false);
-
-	HeroLotteryData data;
-	data.heroType = m_hero->roletype;
-	data.thumb = m_hero->thumb;
-	data.quality = m_hero->quality;
-	m_pNewHero->setEvolve(true);
-	m_pNewHero->showNewHeroEffect(&data);
-	m_pNewHero->runAction(CCSequence::createWithTwoActions(CCDelayTime::create(2.5f), CCCallFunc::create(this, callfunc_selector(CHeroEvolve::showEvoleEffectCallBack))));
-}

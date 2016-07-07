@@ -194,14 +194,14 @@ void CVipPower::addGridCell(unsigned int uIdx, CGridViewCell* pCell)
 				//添加星星
 				if(prize.quality >0)
 				{
-					CLayout* pStarLayout = getStarLayout(prize.quality);
+					CLayout* pStarLayout = SmartGetStarLayout(&prize);
 					child->addChild(pStarLayout);
 				}
 			}
 			break;
 		case 2:
 			{
-				((CImageView*)child)->setTexture(setItemQualityTexture(prize.color));
+				SmartSetRectPrizeColor(((CImageView*)child), &prize);
 			}
 			break;
 		case 3:

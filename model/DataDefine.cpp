@@ -111,6 +111,18 @@ void UserData::read(const protos::common::Role& role)
 	{
 		this->m_bFirstLogin = role.firstlogin();
 	}
+	if (role.has_rolemoney())
+	{
+		this->m_roleMoney = role.rolemoney();
+	}
+	if (role.has_rolepoints())
+	{
+		this->m_rolePoints = role.rolepoints();
+	}
+	if(role.has_goolebilling())
+	{
+		m_bGoogleBilling = role.goolebilling();
+	}
 // 	this->m_thumb = 0;
 // 	this->m_fbId = "677158805720606";
 }
@@ -119,5 +131,5 @@ UserData::UserData()
 	:m_raceType(0),m_level(0),m_roleFood(0),m_Friends(0),m_newStep(0),m_roleId(0)
 	,m_coin(0),m_exp(0),m_nextExp(0),m_roleAction(0),m_mapId(0),m_roleGold(0),m_roleName("")
 	,m_actionLimit(0),m_interval(0),m_vip(0),m_combat(0),m_thumb(0),m_inviteFriend(0)
-	,m_isFBLogin(false),m_mobileShop(false),m_bFirstLogin(false)
+	,m_isFBLogin(false),m_mobileShop(false),m_bFirstLogin(false),m_roleMoney(0),m_rolePoints(0),m_bGoogleBilling(false)
 {}

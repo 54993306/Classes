@@ -15,6 +15,7 @@
 #include "Hero/HeroList.h"
 
 #include "bag/ItemTip.h"
+#include "battle/AnimationManager.h"
 
 //品质高优先/等级大优先/绑定英雄优先
 bool SortItem(const CItem* pItem1, const CItem* pItem2)
@@ -27,7 +28,7 @@ bool SortItem(const CItem* pItem1, const CItem* pItem2)
 }
 
 CStrengthenItem::CStrengthenItem():m_type(0),m_item(nullptr),m_pSelectListener(nullptr),m_itemSelectHander(nullptr),m_toHero(0),m_iCountEquipStock(0),m_iEquipType(0)
-	,m_pItemTip(nullptr),m_iAskType(CStrengthenItemTypeOthers)
+	,m_pItemTip(nullptr),m_iAskType(CStrengthenItemTypeOthers),m_bAutoRoll(false)
 {
 	for (int i=1; i<=7; i++)
 	{
@@ -56,6 +57,8 @@ bool CStrengthenItem::init()
 		m_pItemTip->hideBg();
 		//m_pItemTip->hideHeroEquipHead();
 		m_pItemTip->hideButton();
+		
+		setVisible(false);
 
 		return true;
 	}
@@ -106,6 +109,10 @@ void CStrengthenItem::onExit()
 	BaseLayer::onExit();
 	GetTcpNet->unRegisterAllMsgHandler(this);
 	CSceneManager::sharedSceneManager()->removeMsgObserver("updateFilter",this);
+	if(isVisible())
+	{
+		NOTIFICATION->postNotification(SHOW_TOP_LAYER);	
+	}
 }
 
 void CStrengthenItem::onSetFilter(const TMessage& tMsg)
@@ -189,6 +196,8 @@ void CStrengthenItem::addTableCell(unsigned int uIdx, CTableViewCell * pCell)
 	CLayout *lay = UICloneMgr::cloneLayout(m_cell);
 
 	CItem &item =  *(m_itemList.at(uIdx));// m_itemData.itemList.at(uIdx);
+
+	pCell->setTag(uIdx);
 
 	const ItemData * itemData = DataCenter::sharedData()->getItemDesc()->getCfg(item.itemId);
 
@@ -329,22 +338,33 @@ void CStrengthenItem::addTableCell(unsigned int uIdx, CTableViewCell * pCell)
 				child->setVisible(true);
 			}
 		}
+		else if( i ==10)
+		{
+			CCNode* pCombatTip = (CCNode*)child;
+			pCombatTip->setVisible(item.armor.armorType != 5);
+		}
 		else if (i==11)
 		{
 			CLabelAtlas* pLabel = (CLabelAtlas*)child;
 			pLabel->setAnchorPoint(ccp(0, 0.5f));
 			pLabel->setString(ToString(item.armor.combat));
+			pLabel->setVisible(item.armor.armorType != 5);
 		}
 	}
 }
 
 void CStrengthenItem::recItemData(int type, google::protobuf::Message *msg)
 {
-	//this->setVisible(true);
+	if(!this->isVisible())
+	{
+		this->setVisible(true);
+		NOTIFICATION->postNotification(HIDE_TOP_LAYER);
+	}
 
 	WareHouseResponse *res = (WareHouseResponse*)msg;
 	m_itemData.read(*res);
 
+	//1把可用的先加进来（其实不可用也应该加进来显示，因为引导的情况特殊，放在下面进行补加）
 	for (int i=0; i<m_itemData.itemList.size(); ++i)
 	{
 		if (m_itemData.itemList.at(i).canUse)
@@ -352,6 +372,9 @@ void CStrengthenItem::recItemData(int type, google::protobuf::Message *msg)
 			m_itemList.push_back(&(m_itemData.itemList.at(i)));
 		}
 	}
+
+
+	//2.引导有特殊处理的地方，并把不可用的补加进来
 	bool isInsert = false;
 	for (int i=0; i<m_itemData.itemList.size(); ++i)
 	{
@@ -369,27 +392,14 @@ void CStrengthenItem::recItemData(int type, google::protobuf::Message *msg)
 		}
 	}
 
-	//排序
-	if (!CGuideManager::getInstance()->getIsRunGuide())
-	{
-		std::sort(m_itemList.begin(), m_itemList.end(), SortItem);
-	}
-	m_tableView->setCountOfCell(m_itemData.itemList.size());
-	m_tableView->reloadData();
-
-	if (m_itemList.size()>0)
-	{
-		CTableViewCell *cell = (CTableViewCell*)m_tableView->getCells()->objectAtIndex(0);
-		onTouchItem(cell->getChildByTag(1));
-		this->setVisible(true);
-	}
-	else
+	//列表为空，弹窗告知
+	if (m_itemList.size()<=0)
 	{
 		int iType = m_iAskType;
 
 		LayerManager::instance()->pop();
 		LayerManager::instance()->pop();
-		
+
 		switch (iType)
 		{
 		case CStrengthenItemTypeItemLevelUp:ShowPopTextTip(GETLANGSTR(1225));
@@ -403,7 +413,26 @@ void CStrengthenItem::recItemData(int type, google::protobuf::Message *msg)
 		default:
 			break;
 		}
+
+		return;
 	}
+
+	//有引导的情况不排序
+	if (!CGuideManager::getInstance()->getIsRunGuide())
+	{
+		std::sort(m_itemList.begin(), m_itemList.end(), SortItem);
+	}
+	m_tableView->setCountOfCell(m_itemData.itemList.size());
+	bool isAutoRoll = autoRoll();
+
+	if(!isAutoRoll)
+	{
+		m_tableView->reloadData();
+		CTableViewCell *cell = (CTableViewCell*)m_tableView->getCells()->objectAtIndex(0);
+		onTouchItem(cell->getChildByTag(1));
+	}		
+	
+	this->setVisible(true);
 }
 
 
@@ -563,4 +592,43 @@ void CStrengthenItem::processNetMessage(int type, google::protobuf::Message *msg
 void CStrengthenItem::setAskType( CStrengthenItemType type )
 {
 	m_iAskType = type;
+}
+
+void CStrengthenItem::setAutoRolling( bool bAutoRoll )
+{
+	m_bAutoRoll = bAutoRoll;
+}
+
+bool CStrengthenItem::autoRoll()
+{
+	if(!m_bAutoRoll)
+	{
+		return false;
+	}
+
+	for(unsigned int i=0; i<m_tableView->getCountOfCell(); i++)
+	{
+		CItem &item =  *(m_itemList.at(i));// m_itemData.itemList.at(uIdx);
+		if(item.armor.hero == m_toHero)
+		{
+			int iGap = m_tableView->getCountOfCell()-i;
+			float fOff = m_tableView->getContentSize().height-iGap*m_tableView->getSizeOfCell().height;
+			fOff = fOff>0?0:fOff;
+			m_tableView->reloadData();
+			m_tableView->setContentOffset(ccp(0, fOff));
+			CCNode* pCell = m_tableView->getContainer()->getChildByTag(i);
+			if(pCell)
+			{
+				CButton* pButton = (CButton*)pCell->getChildByTag(1);
+				if(pButton)
+				{
+					onTouchItem(pButton);
+					return true;
+				}
+			}
+			break;
+		}
+	}
+
+	return false;
 }

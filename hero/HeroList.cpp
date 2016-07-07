@@ -35,9 +35,9 @@ bool CHeroList::init()
 {
 	if (BaseLayer::init())
 	{
-		MaskLayer* lay = MaskLayer::create("herolistMask");
-		lay->setContentSize(CCSizeMake(2824,640));
-		LayerManager::instance()->push(lay);
+		//MaskLayer* lay = MaskLayer::create("herolistMask");
+		//lay->setContentSize(CCSizeMake(2824,640));
+		//LayerManager::instance()->push(lay);
 
 		m_ui = LoadComponent("HeroList.xaml");  //  SelectSkill
 		m_ui->setPosition(VCENTER);
@@ -264,7 +264,11 @@ void CHeroList::addGridCell(unsigned int uIdx, CGridViewCell* pCell)
 		else if (i==3)
 		{
 			CCSprite *mask = (CCSprite*)child;
-			mask->setTexture(setItemQualityTexture(hero->iColor));
+			if(data)
+			{
+				mask->setTexture(SetRectColor(data->iType1));
+			}
+			
 			CCSprite *head = CCSprite::create(CCString::createWithFormat("headImg/%d.png", hero->thumb)->getCString());
 			if (!head)
 			{
@@ -281,7 +285,7 @@ void CHeroList::addGridCell(unsigned int uIdx, CGridViewCell* pCell)
 			NodeFillParent(pBoard);
 
 			//添加星星
-			CLayout* pStarLayout = getStarLayout(hero->quality);
+			CLayout* pStarLayout = getStarLayout(hero->iColor);
 			mask->addChild(pStarLayout);
 		}
 		else if (i==5)
@@ -305,7 +309,7 @@ void CHeroList::addGridCell(unsigned int uIdx, CGridViewCell* pCell)
 		}
 		else if (i==9)
 		{
-			child->setVisible(hero->evol);
+			child->setVisible(hero->evol||hero->remove);
 		}
 	}
 // 
@@ -332,13 +336,14 @@ void CHeroList::addArmorForCell( CGridViewCell* pCell, CLayout* pLayout, CHero* 
 	pLayout->removeFromParent();
 	pCell->addChild(pLayout);
 
-	for(unsigned int i=0; i<4; i++)
+	for(unsigned int i=0; i<5; i++)
 	{
 		CItem* pItem;
 		if(i==0) pItem = &pHero->armor1;
 		if(i==1) pItem = &pHero->armor2;
 		if(i==2) pItem = &pHero->armor3;
 		if(i==3) pItem = &pHero->armor4;
+		if(i==4) pItem = &pHero->armor5;
 
 		//100.锁住 200.解锁了没装备 300.解锁了有装备 400.库里有可用装备
 		int iParam = pItem->itparam;
@@ -352,16 +357,22 @@ void CHeroList::addArmorForCell( CGridViewCell* pCell, CLayout* pLayout, CHero* 
 			iParam = 200;
 		}
 
+		//底板
+		CImageView* pItemBg = (CImageView*)(pLayout->findWidgetById("itembg5"));
+		pItemBg->setVisible(true);
+
 		//添加
 		CCSprite* pAdd = (CCSprite*)(pLayout->findWidgetById(CCString::createWithFormat("add%d", i+1)->getCString()));
+		pAdd->setVisible(true);
 
 		//锁
 		CImageView* pLock = (CImageView*)(pLayout->findWidgetById(CCString::createWithFormat("_lock%d", i+1)->getCString()));
+		pLock->setVisible(true);
 
 		//边框
 		CImageView* pMask = (CImageView*)(pLayout->findWidgetById(CCString::createWithFormat("mask%d", i+1)->getCString()));
-		pMask->removeChildByTag(1);
-		pMask->removeChildByTag(2);
+		pMask->removeAllChildren();
+		pMask->setVisible(true);
 
 		//未装备字样
 		pAdd->removeAllChildren();
@@ -429,6 +440,18 @@ void CHeroList::addArmorForCell( CGridViewCell* pCell, CLayout* pLayout, CHero* 
 			//pLock->setOnClickListener(this, ccw_click_selector(CHeroAttribute::onTipsForUnlockArmor));
 			//pLock->setTag(i);
 		}
+
+		//宝物特殊处理
+		if( i == 4 && pHero->iColor <= 2)
+		{
+			pAdd->setVisible(false);
+			pLock->setVisible(false);
+			pMask->setVisible(false);
+
+			//底板
+			CImageView* pItemBg = (CImageView*)(pLayout->findWidgetById("itembg5"));
+			pItemBg->setVisible(false);
+		}
 	}
 }
 
@@ -472,7 +495,11 @@ void CHeroList::addCallCell(unsigned int uIdx, CGridViewCell* pCell)
 			else if (i==3)
 			{
 				CCSprite *mask = (CCSprite*)child;
-				mask->setTexture(setItemQualityTexture(hero->iColor));
+				if(data)
+				{
+					mask->setTexture(SetRectColor(data->iType1));
+				}
+				
 				CCSprite *head = CCSprite::create(CCString::createWithFormat("headImg/%d.png", hero->thumb)->getCString());
 				if (!head)
 				{
@@ -488,6 +515,10 @@ void CHeroList::addCallCell(unsigned int uIdx, CGridViewCell* pCell)
 				head->addChild(pBoard, -1);
 				NodeFillParent(pBoard);
 				head->setShaderProgram(ShaderDataMgr->getShaderByType(ShaderStone));
+
+				//添加星星
+				CLayout* pStarLayout = getStarLayout(hero->iColor);
+				mask->addChild(pStarLayout);
 			}
 			else if (i==5)
 			{

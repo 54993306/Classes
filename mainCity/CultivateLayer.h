@@ -11,7 +11,7 @@ public:
 	CCultivateLayer():m_selectHero(0),
 		m_time(nullptr),m_second(0),m_pCoinBatch(nullptr),
 		m_iCurrentGetMoney(0),m_iCurrentMoneyRank(0),
-		m_bAddMoneyScheduleLock(false),m_fCultivateTime(0),m_iNow(0),m_iMax(0),m_fSpeed(0)
+		m_bAddMoneyScheduleLock(false),m_fCultivateTime(0),m_iBase(0),m_iNow(0),m_iMax(0),m_fSpeed(0)
 	{}
 	~CCultivateLayer(){}
 	CREATE_LAYER(CCultivateLayer);
@@ -56,6 +56,9 @@ protected:
 	void showGetMoneyHeapEffectCallBack();
 
 	void showGiftWave( CCString* pStr, CCPoint pBasePos, CCPoint pAimPos );
+
+	void updateGetMoneyButtonStatus();
+
 private:
 	CLayout *m_ui;
 	CCity m_city;
@@ -67,6 +70,7 @@ private:
 	int m_iCurrentMoneyRank;
 	bool m_bAddMoneyScheduleLock;
 	float m_fCultivateTime;
+	int m_iBase;
 	int m_iNow;
 	int m_iMax;
 	float m_fSpeed;

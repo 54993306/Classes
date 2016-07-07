@@ -21,7 +21,7 @@
 
 #include "common/CGameSound.h"
 #include "Resources.h"
-
+#include "common/CGameSound.h"
 
 CSetLayer::CSetLayer():m_bSoundLock(false)
 {
@@ -111,12 +111,13 @@ void CSetLayer::onBgMusic(CCObject *pSender, bool bChecked)
 
 void CSetLayer::onExchange(CCObject* pSender)
 {
-	if(m_bSoundLock)
-	{
-		PlayEffectSound(SFX_Button);
-	}
+	//if(m_bSoundLock)
+	//{
+	//	PlayEffectSound(SFX_Button);
+	//}
 
 	CExchangeCode *exchange = CExchangeCode::create();
+	exchange->loadExchangeByType(ExCode);
 	LayerManager::instance()->push(exchange);
 }
 

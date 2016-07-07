@@ -33,7 +33,7 @@ const SkillCfg* SkillGM::getCfg(int id)
 	}
 
 	//没有找到，默认返回首个
-	CCLOG("ERROR——const SkillCfg* SkillGM::getCfg(int id)");
+	CCLOG("[ *ERROR ] SkillGM::getCfg Lost %d Info",id);
 	return m_cfg.begin()->second;
 }
 void SkillGM::parse()

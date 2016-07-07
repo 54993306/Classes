@@ -106,7 +106,11 @@ void CGuideLayer::setTipMoveToPosition(CCNode *node, GuideTask task, const CCPoi
 		return;
 	}
 	addStencil(task, rect, pos);
-	m_finger->setVisible(true);
+	if (CGuideManager::getInstance()->getCurrTask()==1&&CGuideManager::getInstance()->getCurrStep()==7)
+	{
+		m_finger->setVisible(false);
+	}
+	else  m_finger->setVisible(true);
 	//m_selectSpr->setVisible(true);
 	m_selectSpr->stopActionByTag(1);
 	CCPoint point = this->convertToNodeSpace(pos);	
@@ -194,7 +198,7 @@ void CGuideLayer::ccTouchEnded(CCTouch* pTouch, CCEvent* pEvent)
 		task->isFinish = true;
 		CGuideManager::getInstance()->nextStep();
 	}
-	else if(m_finger->isVisible())
+	else if(m_finger->isVisible()||(CGuideManager::getInstance()->getCurrTask()==1&&CGuideManager::getInstance()->getCurrStep()==7))
 	{
 		CCNode* pNode = getClickBoundNode();
 		if(pNode)
@@ -466,6 +470,12 @@ void CGuideLayer::callNextGuide(CCNode *node)
 
 	int open = CGuideManager::getInstance()->getOpenFunction();
 	CSceneManager::sharedSceneManager()->PostMessageA(UPDATE_FUNCTIONOPEN,open,nullptr,nullptr);
+
+	if (CGuideManager::getInstance()->getCurrTask()==19)
+	{
+		CGuideManager::getInstance()->getGuideTaskData()->isFinish = true;
+		CGuideManager::getInstance()->nextStep();
+	}
 }
 
 void CGuideLayer::update( float dt )

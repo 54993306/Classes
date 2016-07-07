@@ -1,5 +1,10 @@
 ﻿#pragma once
-
+/******************************************************
+*文件名称:	WBossLayer.h
+*编写日期:	2016-6-12-18:31
+*编写作者:	YPF
+*功能描述:	世界boss操作界面
+*******************************************************/
 #include "AppUI.h"
 #include "scene/layer/LayerManager.h"
 #include "net/CNetClient.h"
@@ -48,6 +53,9 @@ public:
 	int getBossId();
 
 	void SpineComplete( int trackIndex,int loopCount );
+
+	void timeInBackground(CCObject* pObj);
+
 private:
 	void updateOneSecond(float dt);
 	

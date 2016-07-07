@@ -15,7 +15,7 @@ CursorTextField::CursorTextField()
 	isPsw = false;
 	m_designedSize = CCSize();
 	m_limitNum = -1;
-	m_nInputType=1;
+	m_nInputType=RandomType;
 }
 
 CursorTextField::~CursorTextField()
@@ -177,14 +177,15 @@ bool CursorTextField::onTextFieldInsertText(cocos2d::CCTextFieldTTF *pSender, co
 	{
 		return false;
 	}
-	if (m_pInputText->length() > (unsigned int)m_limitNum) 
+
+	if (m_pInputText->length() > (unsigned int)m_limitNum||!checkInput(text)) 
 	{
 #ifndef _WIN32
-		LOGD("%d",m_pInputText->length());
-		LOGD("%d",m_limitNum);
+		CCLOG("%d",m_pInputText->length());
+		CCLOG("%d",m_limitNum);
 #endif
 		return true;
-	}
+	}		
 	else
 	{
 		std::string tempStr = m_pInputText->substr();
@@ -192,7 +193,7 @@ bool CursorTextField::onTextFieldInsertText(cocos2d::CCTextFieldTTF *pSender, co
 	}
 	m_pInputText->append(text);
 #ifndef _WIN32
-	LOGD(text);
+	CCLOG(text);
 #endif
 	if (isPsw) 
 	{
@@ -360,4 +361,32 @@ void CursorTextField::setPriority(int nPriority)
 {
 	CCDirector::sharedDirector()->getTouchDispatcher()->addTargetedDelegate(this,nPriority,true);
 	this->setDelegate(this);
+}
+
+bool CursorTextField::checkInput(const char * text)
+{
+	bool isRight = false;
+	if (!text)
+	{
+		return isRight;
+	}
+	switch (m_nInputType)
+	{
+	case CharNumAnd_:
+		isRight = (*text>=65&&*text<=90)||(*text>=97&&*text<=122);
+		isRight = isRight||(*text>='0'&&*text<='9')||(*text=='_');
+		break;
+	case NumberType:
+		isRight = *text>='0'&&*text<='9';
+		break;
+	case CharType:
+		isRight = (*text>=65&&*text<=90)||(*text>=97&&*text<=122);
+		break;
+	case RandomType:		
+		isRight =true;
+		break;
+	default:
+		break;
+	}
+	return isRight;
 }

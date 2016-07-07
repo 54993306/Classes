@@ -64,7 +64,7 @@ namespace BattleSpace{
 		void TextureThreadCallBack(CCObject* pSender);								//图片异步加载回调
 
 		void CocosBoneCallBack(float dt);
-		void TextureThread(const char* url, const char* model, LoadType type = LoadType::Load_Effect);		//异步加载处理
+		void TextureThread(const char* url, const char* model, sLoadType type = sLoadType::eEffect);		//异步加载处理
 		void SkillParse(const BaseRoleData* pRole,vector<int>&VecEffect,vector<int>&VecBuff);
 		void LoadBeingAnimation();
 		void ProgressEnd();

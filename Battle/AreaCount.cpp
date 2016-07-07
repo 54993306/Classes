@@ -61,7 +61,7 @@ namespace BattleSpace{
 			else
 				iter++;
 		}
-		VectorRemoveRepeat(mVector);											//包括了正向遍历和除去重复
+		VectorUnique(mVector);											//包括了正向遍历和除去重复
 		if (!mAlive->getEnemy() && !mAlive->getOpposite())
 			sort(mVector.begin(),mVector.end(),greater<int>());					//我方武将正向攻击的情况(对格子进行反向排序)
 	}
@@ -108,7 +108,7 @@ namespace BattleSpace{
 		vector<int> tVector;													//不能在遍历中添加元素
 		for (auto tGrid : getVector())										
 		{
-			if (getAlive()->standInGrid(tGrid))									//武将站立区域不做分散处理
+			if (getAlive()->inStandGrid(tGrid))									//武将站立区域不做分散处理
 				continue;														
 			int tRow = tGrid % C_GRID_ROW;
 			int tCol = tGrid / C_GRID_ROW;

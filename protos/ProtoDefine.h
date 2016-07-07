@@ -121,7 +121,16 @@ enum protoTag{
 
 	RisingDataRequestMsg = 92,			//装备升星数据
 	RisingRequestMsg = 93,					//请求装备升星
+	CBExchangeMsg = 94,
+	RechargeMsg = 100,
+	AskPvpTeamDataMsg = 101, //101获取
+	SendPvpTeamDataMsg = 102, //102设置
 
+	PvpDataMsg = 103,			//请求PVP战斗数据
+	PvpPrizeListMsg = 104,
+	PvpOppTeamMsg = 105,
+	SkillLvUpMsg = 106,
+	ValidateBillingMsg =107,	//验证订单
 	GameTipMsg = 1000,
 	Reconnect = 1001,		//断线重连
 	ServerListMsg = 1111		//版本号+服务器列表
@@ -228,9 +237,17 @@ static ProtoDefine protoDef[] ={
 
 	{RisingDataRequestMsg,"protos.RisingResponse"},
 	{RisingRequestMsg,"protos.RisingResponse"},
-
+	{CBExchangeMsg,"protos.CardExchangeRes"},{95,""},{96,""},{97,""},{98,""},{99,""},
+	{RechargeMsg,"protos.RechargeRes"},//充值
+	{AskPvpTeamDataMsg, "protos.PvpTeamData"}, //玩家PVP防守阵容
+	{SendPvpTeamDataMsg, "protos.PvpTeamData"}, //玩家PVP防守阵容
+	{PvpDataMsg, "protos.PvpDataRes"},				//PVP战斗数据(103)
+	{PvpPrizeListMsg,"protos.PvpPrizeList"},
+	{PvpOppTeamMsg,"protos.OppTeamRes"},
+	{SkillLvUpMsg,"protos.DoResult"},
+	{ValidateBillingMsg, "protos.ValidateRes"},			//验证订单
 	{GameTipMsg,"protos.GameTips"},
-	{Reconnect,"protos.ReconnectResponse"}, //断线重连
+	{Reconnect,"protos.ReconnectResponse"},		//断线重连
 	{ServerListMsg,"protos.ServerList"}					//请求服务器列表
 };
 

@@ -86,7 +86,7 @@ namespace BattleSpace{
 	void HPObject::initHp(AliveObject* pAlive)
 	{
 		m_ActObject = pAlive;
-		m_Alive = pAlive->getAlive();
+		m_Alive = pAlive->getBaseRole();
 		initBackground("public/black.png");
 		initSkinByEnemy();
 		this->setHpNumberMax(m_Alive->getMaxHp());

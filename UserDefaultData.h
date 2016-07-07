@@ -1,12 +1,21 @@
 #pragma once
 
+/******************************************************
+*文件名称:	UserDefaultData.h
+*编写日期:	2016-6-14-11:54
+*编写作者:	YPF
+*功能描述:	存储相关 key 值
+*******************************************************/
+
 #define VERSION	"VERSION"
 #define USER_NAME "userName"
+#define FACEBOOK_ID "facebookId"
 #define PASSWORD "password"
 #define BG_MUSIC "bg_music"
 #define EFF_MUSIC "eff_music"
 #define PACKAGE_DOWNLOAD_OPEN "PACKAGE_DOWNLOAD_OPEN"
 #define PACKAGE_DOWNLOAD_INDEX "PACKAGE_DOWNLOAD_INDEX"
+#define PACKAGE_DOWNLOAD_MAX "PACKAGE_DOWNLOAD_MAX"
 
 #define TELEPHONE "TELEPHONE"
 #define DEVICE_ID "DEVICE_ID"

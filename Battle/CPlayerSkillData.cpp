@@ -16,8 +16,9 @@ const CFrameActionData& CPlayerSkillData::getDataById( int iId )
 			return frameActionData;
 		}
 	}
+	CCLOG("[ *ERROR ] CPlayerSkillData::getDataById Lost %d",iId);
 	return _data[0];
-	CCLOG("CPlayerSkillData::getDataById_Not find data By this Id");
+	
 }
 
 void CPlayerSkillData::reloadFile()

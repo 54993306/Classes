@@ -280,87 +280,19 @@ void TerrainManager::AttributeDispose(BaseRole* alive,Terrain* ter)
 	}
 	if(!atbType)return;
 
-	switch (atbType)
-	{
-	case atb_attak:
-		{
-			if (dispose)
-			{
-				if (!usType)alive->setAtk(alive->getAtk() + atbTypeNum);
-			}else{
-				alive->setAtk(alive->getAtk() - atbTypeNum);
-			}
-		}
-		break;
-	case atb_def:
-		{
-			if (dispose)
-			{
-				if (!usType)alive->setDef(alive->getDef() + atbTypeNum);
-			}else{
-				alive->setDef(alive->getDef() - atbTypeNum);
-			}
-		}
-		break;
-	case atb_hp:
-		{
-			if (dispose)
-			{
-				if (!usType)alive->setMaxHp(alive->getMaxHp() + atbTypeNum);
-			}else{
-				alive->setMaxHp(alive->getMaxHp() - atbTypeNum);
-			}
-		}
-		break;
-	case atb_hit:
-		{
-			if (dispose)
-			{
-				if (!usType)alive->setHit(alive->getHit() + atbTypeNum);
-			}else{
-				alive->setHit(alive->getHit() - atbTypeNum);
-			}
-		}
-		break;
-	case atb_crit:
-		{
-			if (dispose)
-			{
-				if (!usType)alive->setCrit(alive->getCrit() + atbTypeNum);
-			}else{
-				alive->setCrit(alive->getCrit() - atbTypeNum);
-			}
-		}
-		break;
-	case atb_move:		
-		{
-			/*if (dispose)
-			{
-			if (!usType)alive->setMove(alive->getMove() + atbTypeNum);
-			}else{
-			alive->setMove(alive->getMove() - atbTypeNum);
-			}*/
-		}
-		break;
-	case atb_addhrt:
-	case atb_cuther:
-		{
-			if (dispose)
-			{
-				if (!usType)alive->setHrt(alive->getHrt() + atbTypeNum);
-			}else{
-				alive->setHrt(alive->getHrt() - atbTypeNum);
-			}
-		}
-		break;
-	case atb_hp_recover:
-		{
-			if (dispose)alive->setHp(alive->getHp() + atbTypeNum);
-		}
-		break;
-	default:
-		break;
-	}
+	//switch (atbType)
+	//{
+	//case sAttribute::eAttack:
+	//	{
+	//		if (dispose)
+	//		{
+	//			if (!usType)alive->setAtk(alive->getAtk() + atbTypeNum);
+	//		}else{
+	//			alive->setAtk(alive->getAtk() - atbTypeNum);
+	//		}
+	//	}
+	//	break;
+	//}
 	if (dispose)
 	{
 		alive->setTerType(atbType);

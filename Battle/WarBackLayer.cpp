@@ -10,6 +10,7 @@
 #include "jni/CJniHelper.h"
 #include "Battle/ComBatLogic.h"
 #include "Battle/BattleMessage.h"
+#include "common/CGameSound.h"
 
 WarBackLayer::WarBackLayer()
 {
@@ -53,7 +54,7 @@ bool WarBackLayer::init()
 		ison = GameSound->isMusicOn();
 		bgMusic->setChecked(ison);
 		showBgMusicLab(ison);
-		m_bSoundLock = true;
+		//m_bSoundLock = true;
 
 		//继续战斗
 		CButton * pResumeBattle = (CButton*)(m_ui->findWidgetById("resume"));
@@ -118,8 +119,7 @@ void WarBackLayer::returnCity(CCObject* ob)
 		WarManager* Manage = DataCenter::sharedData()->getWar();
 		if(Manage->getWorldBoss())
 		{
-			CombatLogic* pLogic = Manage->getLogicObj();
-			pLogic->combatResult(CCBool::create(false));
+			NOTIFICATION->postNotification(MsgWordBossExit,CCBool::create(false));
 			return;
 		}
 
@@ -169,17 +169,6 @@ void WarBackLayer::onExitBattle( CCObject* pSender )
 	}
 
 	touchExit();
-
-	//WarScene* Wscene = (WarScene*)this->getParent();
-	//CScene* scene = GETSCENE(LoadWar);
-	//if (DataCenter::sharedData()->getWar()->getStageID())
-	//{
-	//	((LoadWar*)scene)->setRelease(true,SkipcityScene);
-	//	CPlayerControl::getInstance().sendBattleFinish(2,false,0,0);
-	//}else{
-	//	((LoadWar*)scene)->setRelease(true,SkipLoginScene);
-	//}
-	//CSceneManager::sharedSceneManager()->replaceScene(scene);
 }
 
 void WarBackLayer::onResumeBattle( CCObject* pSender )

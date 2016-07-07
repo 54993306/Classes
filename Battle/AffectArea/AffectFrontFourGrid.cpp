@@ -16,9 +16,9 @@
 
 namespace BattleSpace
 {
-	AffectType AffectFrontFourGrid::getAreaType()
+	sAffectType AffectFrontFourGrid::getAreaType()
 	{
-		return AffectType::eFrontFourGrid;
+		return sAffectType::eFrontFourGrid;
 	}
 
 	void AffectFrontFourGrid::initArea(AreaCountInfo& pInfo)

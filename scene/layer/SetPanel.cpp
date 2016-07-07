@@ -53,27 +53,33 @@ void SetPanel::onClick(CCObject* ob)
 		{
 			if(this->getParent())
 				this->getParent()->removeChild(this);
-		}break;
+		}
+		break;
 	case 2:
 		{
 			CNetClient::getShareInstance()->sendDataType(RoleExitMsg);
+			//CSceneManager::sharedSceneManager()->getScene("CityScene")->release();
 			CCDirector::sharedDirector()->replaceScene(GETSCENE(LoginScene));
-		}break;
+		}
+		break;
 	case 3:
 		{
 			CNetClient::getShareInstance()->sendDataType(RoleExitMsg);
 			CCDirector::sharedDirector()->end();
-		}break;
+		}
+		break;
 	case 4:
 		{
 			CCMessageBox(GETLANGSTR(1012), GETLANGSTR(1005));
 			//ShowTexttip(U8("此功能尚未开放，敬请期待"),RGB_RED);
-		}break;
+		}
+		break;
 	case 5:
 		{
 			CCMessageBox(GETLANGSTR(1012), GETLANGSTR(1005));
 			//ShowTexttip(U8("此功能尚未开放，敬请期待"),RGB_RED);
-		}break;
+		}
+		break;
 	default:
 		break;
 	}
@@ -86,10 +92,12 @@ void SetPanel::onEnter()
 {
 	CCNode::onEnter();
 	CCDirector::sharedDirector()->getTouchDispatcher()->addTargetedDelegate(this,-3,true);
+	//CocosDenshion::SimpleAudioEngine::sharedEngine()->pauseBackgroundMusic();
 }
 void SetPanel::onExit()
 {
 	CCNode::onExit();
 	CCDirector::sharedDirector()->getTouchDispatcher()->removeDelegate(this);
 	CCDirector::sharedDirector()->resume();
+	//CocosDenshion::SimpleAudioEngine::sharedEngine()->resumeBackgroundMusic();
 }

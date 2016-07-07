@@ -55,6 +55,8 @@ public:
 	virtual void setSliderSpriteFrame(CCSpriteFrame* pFrame);
 	virtual void setSliderSpriteFrameName(const char* pSpriteName);
 	void setSliderPosition(CCPoint pos);
+	void setDragable(bool bDragable);
+
 public:
 	virtual CWidgetTouchModel onTouchBegan(CCTouch *pTouch);
 	virtual void onTouchMoved(CCTouch *pTouch, float fDuration);
@@ -72,6 +74,7 @@ public:
 protected:
 	bool m_bDrag;
 	CCSprite* m_pSlider;
+	bool m_bDragable;
 };
 
 

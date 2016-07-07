@@ -32,7 +32,7 @@ public:
 	void Disconnect();
 
 	///请求连接一个地址，无阻塞
-	bool Connect(const char* pIp, unsigned short uPort);
+	bool Connect(const char* pIp, unsigned short uPort, bool isIp);
 	///请求连接一个地址，无阻塞
 	bool Connect(unsigned int uIp, unsigned short uPort);
 	///绑定本地一个端口（暂没有测试）
@@ -54,7 +54,7 @@ public:
 	int	IsConnected();
 	///检测是否接受到连接（暂没有测试）
 	bool IsAcceptable();
-
+	bool ConnectHost(const char* host, unsigned short uPort);
 protected:
 	///IO对象
 	SOCKET	m_Socket;

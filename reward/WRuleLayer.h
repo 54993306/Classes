@@ -1,5 +1,10 @@
 ﻿#pragma once
-
+/******************************************************
+*文件名称:	WRuleLayer.h
+*编写日期:	2016-6-12-18:32
+*编写作者:	YPF
+*功能描述:	世界BOSS规则界面
+*******************************************************/
 #include "AppUI.h"
 #include "scene/layer/LayerManager.h"
 #include "net/CNetClient.h"

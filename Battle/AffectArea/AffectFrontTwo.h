@@ -23,7 +23,7 @@ namespace BattleSpace
 		AffectFrontTwo(){};
 		virtual ~AffectFrontTwo(){};
 		UNINITCREATE(AffectFrontTwo);
-		virtual AffectType getAreaType();
+		virtual sAffectType getAreaType();
 		virtual void initArea(AreaCountInfo &pInfo);
 		
 	};

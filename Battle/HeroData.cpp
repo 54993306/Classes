@@ -21,7 +21,7 @@ namespace BattleSpace{
 	{
 		this->setServerID(hero->id());
 		this->setRoleModel(hero->thumb());
-		this->setRoleType(hero->herotype());
+		this->setProperty(hero->herotype());
 		if (hero->posy())
 			this->setRoleRow(hero->posy());
 		if (hero->posx())

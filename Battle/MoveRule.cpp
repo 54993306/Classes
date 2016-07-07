@@ -18,8 +18,6 @@ namespace BattleSpace{
 
 	bool MoveRule::MonstMoveExcute(BaseRole* monster)
 	{
-		if (!monster->getMove()||monster->getAliveStat() == INVINCIBLE)
-			return false;
 		int grid = monsterMove(monster);
 		if( grid!= INVALID_GRID && grid < C_CAPTAINGRID)	
 		{		
@@ -33,7 +31,7 @@ namespace BattleSpace{
 	int MoveRule::monsterMove(BaseRole* alive)
 	{
 		//怪物的移动处理是，哪个最先返回值不是INVALID_GRID就以哪个为标准，后面的不做处理了
-		if (alive->getAliveType() == E_ALIVETYPE::eWorldBoss)
+		if (alive->getMonsterSpecies() == sMonsterSpecies::eWorldBoss)
 			return INVALID_GRID;
 		int index = alive->getGridIndex();
 		if (index/C_GRID_ROW >= C_GRID_COL-1)
@@ -202,7 +200,7 @@ namespace BattleSpace{
 			}else{
 				if (!DataCenter::sharedData()->getWar()->getAliveByGrid(pGrid))			//得到当前格子为无人格子
 				{
-					CCArray* arr = DataCenter::sharedData()->getWar()->getAlivesByCamp(false,true);
+					CCArray* arr = DataCenter::sharedData()->getWar()->getHeros(true);
 					CCObject* obj = nullptr;
 					bool pMoveGrid = false;
 					CCARRAY_FOREACH(arr,obj)

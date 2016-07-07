@@ -70,15 +70,19 @@ bool CSocket::Create()
 }
 
 ///请求连接一个地址，无阻塞
-bool CSocket::Connect(const char* pIp, unsigned short uPort)
+bool CSocket::Connect(const char* pIp, unsigned short uPort, bool isIp)
 {
 	if(pIp == NULL)
 	{
 		return false;
 	}
-	else
+	else if (isIp)
 	{
 		return Connect(inet_addr(pIp), uPort);
+	}
+	else 
+	{
+		return ConnectHost(pIp,uPort);
 	}
 }
 
@@ -94,6 +98,47 @@ bool CSocket::Connect(unsigned int uIp, unsigned short uPort)
 	oAddr.SetIP(uIp);
 	oAddr.SetPorT(uPort);
     
+	int nRet = connect(m_Socket, oAddr, oAddr.GetLength());
+	if(nRet == 0)
+	{
+		return true;
+	}
+	else
+	{
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32 || CC_TARGET_PLATFORM == CC_PLATFORM_WP8 || CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
+		int nError = WSAGetLastError();
+		if(nError ==  WSAEWOULDBLOCK)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+#else
+		if(nRet == SOCKET_ERROR && errno == EINPROGRESS)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+#endif
+	}
+}
+
+bool CSocket::ConnectHost(const char* host, unsigned short uPort)
+{
+	if(m_Socket == INVALID_SOCKET)
+	{
+		return false;
+	}
+
+	CInetAddress oAddr;
+	oAddr.SetHost(host);
+	oAddr.SetPorT(uPort);
+
 	int nRet = connect(m_Socket, oAddr, oAddr.GetLength());
 	if(nRet == 0)
 	{

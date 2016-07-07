@@ -68,11 +68,16 @@ namespace BattleSpace{
 		CLabel *name = (CLabel*)(m_ui->findWidgetById("name"));
 		CLabel *level = (CLabel*)(m_ui->findWidgetById("level"));
 		CLabel *desc = (CLabel*)(m_ui->findWidgetById("desc"));
+		CLabel* level2 = (CLabel*)((m_ui->findWidgetById("level2")));
+		level2->setVisible(false);
 		this->setVisible(true);
 		this->setPosition(ccpAdd(point,ccp(-326,-85)));
 		const RoleSkill* skill = alive->getBaseData()->getActiveSkill();
 		if (level)
+		{
 			level->setString(ToString(skill->getSkillLevel()));
+			level->setVisible(false);
+		}
 		const SkillCfg *cfg = DataCenter::sharedData()->getSkill()->getCfg(skill->getSkillID());
 		if (cfg)
 		{

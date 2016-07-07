@@ -16,16 +16,15 @@
 
 namespace BattleSpace
 {
-	AffectType AffectTArea::getAreaType()
+	sAffectType AffectTArea::getAreaType()
 	{
-		return AffectType::eTArea;
+		return sAffectType::eTArea;
 	}
 
 	void AffectTArea::initArea(AreaCountInfo& pInfo)
 	{
 		vector<int> tAliveCountGrids;
 		initValidGrids(pInfo.getAlive(),tAliveCountGrids);
-		vector<int>& tStandVec = pInfo.getAlive()->mStandGrids;
 		for (auto tGrid : tAliveCountGrids)								//不是每种攻击类型都跟武将有效区域有关的			
 		{
 			int tCol = pInfo.getColByInfo(tGrid);

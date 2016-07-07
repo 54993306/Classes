@@ -13,7 +13,7 @@ CMultLanguage* CMultLanguage::getInstance()
 }
 
 CMultLanguage::CMultLanguage()
-	:m_langType(1)
+	:m_langType(1),m_sDefault("")
 {
 
 }
@@ -102,7 +102,7 @@ void CMultLanguage::parseFromJson(const char* strFile)
 	}
 }
 
-std::string CMultLanguage::getString(int strId)
+const std::string& CMultLanguage::getString(int strId)
 {
 	if (strId == 1090)
 	{
@@ -140,7 +140,7 @@ std::string CMultLanguage::getString(int strId)
 			return iter->second;
 		}
 	}
-	return "";
+	return m_sDefault;
 }
 
 void CMultLanguage::setLangType(int type)

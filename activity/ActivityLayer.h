@@ -1,6 +1,10 @@
-﻿
-#ifndef __ACTIVITY_LAYER_
-#define __ACTIVITY_LAYER_
+﻿#pragma once
+/******************************************************
+*文件名称:	ActivityLayer.h
+*编写日期:	2016-6-14-10:58
+*编写作者:	YPF
+*功能描述:	活动界面
+*******************************************************/
 
 #include "AppUI.h"
 #include "scene/layer/LayerManager.h"
@@ -8,6 +12,10 @@
 #include "ActivityData.h"
 #include "HttpLoadImage.h"
 #include "ActivityControl.h"
+
+class ILineEffect;
+
+class CActivityCollectLayer;
 
 class CActivityLayer: public BaseLayer, public HttpLoadImageDelegate
 {
@@ -75,9 +83,14 @@ private:
 
 	void buyGiftPopTipBack(CCObject* pSender);
 
+	bool ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent);
+
 private:
 	string getImageReadPath(ActivityTabType activityType, CActivity& activity, ActivityLoadImageTag imageTag);
 	/*int threadFunc();*/
+	void hideAllCollectLayer();
+	CActivityCollectLayer* getCActivityCollectLayerById(int iId);
+
 private:
 	CLayout* m_ui;
 
@@ -110,6 +123,7 @@ private:
 
 	CCNode* m_pLoading;
 
+	ILineEffect* m_pLineEffect;
 	//HttpGetImg* p1;
+	std::map<int, CActivityCollectLayer*> m_mapCollectLayer;
 };
-#endif

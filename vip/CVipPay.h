@@ -2,10 +2,10 @@
 
 #include "AppUI.h"
 #include "scene/layer/LayerManager.h"
-
+#include "activity/HttpLoadImage.h"
 class CursorTextField;
 
-class CVipPay:public BaseLayer
+class CVipPay:public BaseLayer,public HttpLoadImageDelegate
 {
 public:
 	CVipPay();
@@ -17,10 +17,16 @@ public:
 	void showErrorCode(string sErrorCode);
 	void setCardId(int iCardId);
 	void setStep1Success(bool bSuccess);
+
+	void setConfirmState(bool bSuccess);
+
 	void showTimeClock();
 	void onClose( CCObject * pSender );
 	bool getStep1Success();
 	void enableSmsCodeBtn();
+	void imageLoadSuccessCallBack(string sTag, vector<char>* pBuffer);
+	void showVerifyCode(const char* str);
+	void setPayItem(const char* name, const char* desc, int price);
 
 private:
 	void hideErrorCode();
@@ -32,7 +38,8 @@ private:
 	void onConfirm( CCObject * pSender );
 	void onCancel( CCObject * pSender );
 	void onGetSecurityCode(CCObject * pSender);
-	
+	bool isFloatStr(const char* str);
+	void onCheckMoney(CCObject *pSender, bool bChecked);
 private:
 	CLayout* m_ui;
 	CursorTextField* m_pTelInput;
@@ -42,4 +49,6 @@ private:
 	std::string m_sTelNumber;
 	bool m_bStep1Success;
 	int m_iTimeRemain;
+	int m_buyMoney;
+	int m_payStep;
 };

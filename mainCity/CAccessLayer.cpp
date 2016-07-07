@@ -3,6 +3,7 @@
 #include "common/CGameSound.h"
 #include "Resources.h"
 #include "UserDefaultData.h"
+#include "set/ExchangeCode.h"
 
 CAccessLayer::CAccessLayer():m_ui(nullptr),m_pMask(nullptr), m_pCheck(nullptr)
 	,m_iLockIndex(0)
@@ -41,7 +42,7 @@ void CAccessLayer::onEnter()
 {
 	BaseLayer::onEnter();
 
-	setTouchPriority(-2);
+	setTouchPriority(LayerManager::instance()->getPriority());
 
 	if(CCUserDefault::sharedUserDefault()->getBoolForKey(ACCESS_UI_OPEN))
 	{
@@ -53,6 +54,8 @@ void CAccessLayer::onEnter()
 void CAccessLayer::onExit()
 {
 	BaseLayer::onExit();
+
+	CCSpriteFrameCache::sharedSpriteFrameCache()->removeSpriteFramesFromFile("skill/9062.plist");
 }
 
 void CAccessLayer::initAccess()
@@ -64,13 +67,22 @@ void CAccessLayer::initAccess()
 
 	CImageViewScale9* pMaskTouch = (CImageViewScale9*)m_ui->findWidgetById("mask_touch");
 	pMaskTouch->setTouchEnabled(true);
-
-	for(unsigned int i=AccessTypeSign; i<AccessTypeMax; i++)
+	int count = AccessTypeMax;
+	if (CMultLanguage::getInstance()->getLangType()==2)
 	{
-		CButton* pButton = (CButton*)m_ui->getChildByTag(i);
-		pButton->setOnClickListener(this, ccw_click_selector(CAccessLayer::onTouchAccess));
-		pButton->setVisible(false);
-		m_pButtonVec.push_back(pButton);
+		count =2;
+	}
+	for(unsigned int i=AccessTypeSign; i<count; i++)
+	{
+		CButton* pImage = (CButton*)m_ui->getChildByTag(i);
+		pImage->setTouchEnabled(true);
+		pImage->setOnClickListener(this, ccw_click_selector(CAccessLayer::onTouchAccess));
+		pImage->setVisible(false);
+		m_pButtonVec.push_back(pImage);
+		if(i==AccessTypeSign)
+		{
+			pImage->runAction(CCRepeatForever::create(CCSequence::createWithTwoActions(CCScaleTo::create(0.3f,1.1f),CCScaleTo::create(0.3f,1.0f))));
+		}
 	}
 
 	m_pMask = (CImageViewScale9*)m_ui->findWidgetById("mask");
@@ -189,6 +201,8 @@ void CAccessLayer::updateForScale9Mask( float dt )
 
 void CAccessLayer::onTouchAccess( CCObject *pSender )
 {
+	PlayEffectSound(SFX_Button);
+
 	if(!m_pCheck->isEnabled()) return;
 
 	CCNode* pNode = (CCNode*)pSender;
@@ -203,6 +217,13 @@ void CAccessLayer::onTouchAccess( CCObject *pSender )
 			LayerManager::instance()->push(sign);
 			GetTcpNet->sendDataType(SignDataMsg,true);
 		}break;
+	case AccessExchange:
+		{
+			CExchangeCode *exchange = CExchangeCode::create();
+			exchange->loadExchangeByType(CBCode);
+			LayerManager::instance()->push(exchange);
+		}
+		break;
 	default:
 		break;
 	}

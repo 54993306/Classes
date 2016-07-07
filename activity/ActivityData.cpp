@@ -9,4 +9,5 @@ void CActivity::read(const Activity& activity)
 	this->sIconFile = activity.icon();
 	this->sInfoFile = activity.pic();
 	this->iExtraParam = activity.param();
+	this->exlist = activity.exchange();
 }

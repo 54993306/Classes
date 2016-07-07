@@ -1,5 +1,12 @@
 ﻿#pragma once
 
+/******************************************************
+*文件名称:	WorldBoss.h
+*编写日期:	2016-6-14-11:43
+*编写作者:	YPF
+*功能描述:	世界BOSS主菜单界面
+*******************************************************/
+
 #include "AppUI.h"
 #include "scene/layer/LayerManager.h"
 #include "net/CNetClient.h"
@@ -18,17 +25,18 @@ class CWRuleLayer;
 class CWShopLayer;
 class ArmatureEventDataMgr;
 class ArmatureEventData;
+
 class CWorldBoss: public BaseLayer
 {
 public:
 	CWorldBoss();
 	~CWorldBoss();
-
+	
 	CREATE_LAYER(CWorldBoss);
 
-	virtual bool init();
-	void onEnter();
-	void onExit();
+    virtual bool init();
+    void onEnter();
+    void onExit();
 
 	void movementCallBack(CCArmature *armature, MovementEventType type, const char *data);
 

@@ -18,6 +18,7 @@
 
 #include "common/CGameSound.h"
 #include "Resources.h"
+#include "cctk/scenemanager.h"
 
 CShopBuy::CShopBuy()
 	:m_buyNum(1),m_maxNum(1)
@@ -34,12 +35,6 @@ bool CShopBuy::init()
 		lay->setContentSize(CCSizeMake(2824,640));
 		LayerManager::instance()->push(lay);
 
-		m_ui = LoadComponent("ShopBuy.xaml");  //  SelectSkill
-		m_ui->setPosition(VCENTER);
-		this->addChild(m_ui);
-
-		m_armorLay =(CLayout *)m_ui->findWidgetById("armor");
-		m_itemLay =(CLayout *)m_ui->findWidgetById("item");
 		this->setVisible(true);
 		return true;
 	}
@@ -60,10 +55,10 @@ void CShopBuy::onEnter()
 
 	//加特效
 	{
-		CCAnimation *batAnim = AnimationManager::sharedAction()->getAnimation("9016");
+		CCAnimation *batAnim = AnimationManager::sharedAction()->getAnimation("8050");//9016
 		batAnim->setDelayPerUnit(0.05f);
-		CCSprite *batLight = createAnimationSprite("skill/9016.png", ccp(1138/2, 640/2), batAnim, true);
-		batLight->setScale(3.0f);
+		CCSprite *batLight = createAnimationSprite("skill/8050.png", ccp(1138/2, 640/2), batAnim, true);
+		batLight->setScale(2.0f);
 		m_ui->addChild(batLight, -1);
 
 		PlayEffectSound(SFX_432);
@@ -273,6 +268,15 @@ void CShopBuy::onBuy(CCObject* pSender)
 			}
 		}
 		break;
+	case 5:
+		{
+			if (DataCenter::sharedData()->getUser()->getUserData()->getRolePoints()<item->buyPrice)
+			{			
+				ShowPopTextTip(GETLANGSTR(1224));
+				return;
+			}
+		}
+		break;
 	default:
 		break;
 	}
@@ -296,6 +300,13 @@ void CShopBuy::onBuy(CCObject* pSender)
 	   LayerManager::instance()->pop();
 	   LayerManager::instance()->pop();
 	}
+
+	CCAnimation *lightAnim = AnimationManager::sharedAction()->getAnimation("8050");
+	CCSprite *light = CCSprite::create("skill/8050.png");
+	light->setPosition(VCENTER);
+	light->setScale(2.2f);
+	light->runAction(CCSequence::createWithTwoActions(CCAnimate::create(lightAnim)->reverse(),CCRemoveSelf::create()));
+	CSceneManager::sharedSceneManager()->getCurrScene()->addChild(light);
 }
 
 bool CShopBuy::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
@@ -431,9 +442,31 @@ void CShopBuy::updateArmorAttr(CItem * item)
 void CShopBuy::setShopType(int type, int maxNum/*=0*/)
 {
 	m_buyType = type;
-	CLayout *sliderLay = (CLayout*)(m_ui->findWidgetById("blid"));
-	if (type==3)
+
+	if (type<4)
 	{
+		m_ui = LoadComponent("ShopBuy.xaml"); 
+		m_ui->setPosition(VCENTER);
+		this->addChild(m_ui);
+	}
+	else
+	{
+		m_ui = LoadComponent("PvpShopBuy.xaml"); 
+		m_ui->setPosition(VCENTER);
+		this->addChild(m_ui);
+	}
+	
+	m_armorLay =(CLayout *)m_ui->findWidgetById("armor");
+	m_itemLay =(CLayout *)m_ui->findWidgetById("item");
+
+	CLayout *sliderLay = (CLayout*)(m_ui->findWidgetById("blid"));
+	CCNode *bg =m_ui->findWidgetById("bg");
+	CCNode *bg1 =m_ui->findWidgetById("bg1");
+
+	if (type==3||type==4)
+	{	
+		bg->setVisible(type==3);
+		bg1->setVisible(type==4);
 		CSlider *slider = (CSlider*)(m_ui->findWidgetById("slider"));
 		sliderLay->setVisible(true);
 		slider->setOnValueChangedListener(this,ccw_valuechanged_selector(CShopBuy::sliderChange));
@@ -447,7 +480,10 @@ void CShopBuy::setShopType(int type, int maxNum/*=0*/)
 		add->setOnClickListener(this,ccw_click_selector(CShopBuy::addNum));
 		if (maxNum==0)
 		{
-			sliderLay->setVisible(false);
+			//sliderLay->setVisible(false);
+			slider->setDragable(false);
+			slider->setMaxValue(1);
+			slider->setMinValue(1);
 		}
 		else
 		{

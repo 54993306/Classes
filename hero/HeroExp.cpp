@@ -279,7 +279,10 @@ void CHeroExp::onSetHero(CHero *hero, bool bReset)
 	{
 		m_hero.exp = -1;
 	}
-
+	if (isVisible())
+	{
+		CNetClient::getShareInstance()->registerMsgHandler(RoleBag,this, CMsgHandler_selector(CHeroExp::processMessage));
+	}
 	updateHeroExp(hero);
 }
 

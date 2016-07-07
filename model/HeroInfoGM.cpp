@@ -59,7 +59,8 @@ void HeroInfoGM::parse()
 		cfg->heroDesc = file->get(i,2);
 		cfg->iType1 = atoi(file->get(i, 3));
 		cfg->iType2 = atoi(file->get(i, 4));
-		cfg->heroStory = file->get(i, 5);
+		cfg->iType3 = atoi(file->get(i, 5));
+		cfg->heroStory = file->get(i, 6);
 		m_cfg[id] = cfg;
 	}
 	FileUtils::sharedFileUtils()->releaseFile(CSV_ROOT("heroDesc.csv"));

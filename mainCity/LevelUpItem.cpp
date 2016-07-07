@@ -92,10 +92,11 @@ void CLevelUpItem::onEnter()
 	CButton *btn = dynamic_cast<CButton*>(m_ui->findWidgetById("bgBtn"));
 	btn->setOnClickListener(this,ccw_click_selector(CLevelUpItem::onSelectItem));
 
-	//火焰效果
+	//旋转圈
 	CImageView *circleFire = (CImageView*)(m_ui->findWidgetById("fire_circle"));
-	circleFire->setScale(1.65f);
+	circleFire->setScale(1.95f);
 	circleFire->runAction(CCRepeatForever::create(CCRotateBy::create(1.0f, 60)));
+	circleFire->runAction(CCRepeatForever::create(CCSequence::createWithTwoActions(CCScaleTo::create(1.2f, 2.1f), CCScaleTo::create(1.2f, 1.95f))));
 
 	//获取参考位置
 	CCNode* pNode = circleFire;

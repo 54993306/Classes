@@ -264,7 +264,7 @@ void CTopLayer::onAddResourceBtn(CCObject* pSender)
 	}
 	else if(!strcmp(btn->getId(),"btn_add_friendship"))
 	{
-		CPopTip* TopLayerText = ShowPopTextTip(GETLANGSTR(1114));
+		CPopTip* TopLayerText = ShowPopTextTip(GETLANGSTR(1114),ccWHITE,false);
 		TopLayerText->setName("BuyResourceText");
 	}
 	else{

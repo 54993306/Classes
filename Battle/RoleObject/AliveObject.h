@@ -10,7 +10,7 @@
  *
  *		Author : Lin_Xiancheng
  *
- *		Description : 用于做武将显示对象处理的地方,和数据对象waralive构成一个完整的ActObject
+ *		Description : 用于做武将显示对象处理的地方,和数据对象waralive构成一个完整的RoleObject
  *
  *
  *************************************************************/
@@ -54,7 +54,7 @@ namespace BattleSpace{
 		void countOffs(CCPoint pMapPoint);
 		void monsterSoleSprite();
 	public:
-		CC_SYNTHESIZE(BaseRole*,mRole,Alive);								//设置逻辑对象
+		CC_SYNTHESIZE(BaseRole*,mRole,BaseRole);							//设置逻辑对象
 		CC_SYNTHESIZE(MoveObject*,mMoveObj,MoveObject);						//设置移动对象
 		CC_SYNTHESIZE(bool,mEnemy,Enemy);									//阵营
 		CC_SYNTHESIZE(int,mModel,Model);									//角色模型ID( 子类重写 )
@@ -71,7 +71,7 @@ namespace BattleSpace{
 		CC_PROPERTY(int,m_Direction,RoleDirection);							//武将方向
 		CC_PROPERTY(HPObject*,m_HpObject,Hp);								//血量对象
 		CC_SYNTHESIZE(CCPoint,m_offs,offs);									//实际位置相对于
-		CC_SYNTHESIZE(E_StateCode,m_MoveState,MoveState);					//刷新位置执行的动作
+		CC_SYNTHESIZE(sStateCode,m_MoveState,MoveState);					//刷新位置执行的动作
 		CC_SYNTHESIZE(CCPoint,m_Speed,Speed);								//移动速度
 		CC_SYNTHESIZE(bool,m_IsSpine,IsSpine);								//spine动画
 	private:

@@ -79,8 +79,9 @@ void CNetClient::onConnected()
 		m_reConnectType = ReconnNull;
 		string userName = CCUserDefault::sharedUserDefault()->getStringForKey(USER_NAME);
 		string psw = CCUserDefault::sharedUserDefault()->getStringForKey(PASSWORD);
+		string openId = CCUserDefault::sharedUserDefault()->getStringForKey(FACEBOOK_ID);
 		CCLOG("roleId %d", DataCenter::sharedData()->getUser()->getUserData()->getRoleID());
-		this->sendLogin(userName,psw, "", true, DataCenter::sharedData()->getUser()->getUserData()->getRoleID());
+		this->sendLogin(userName,psw, "", true, DataCenter::sharedData()->getUser()->getUserData()->getRoleID(),openId);
 	}else{
 		m_reConnectType = ReconnNull;
 	}

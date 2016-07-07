@@ -23,7 +23,7 @@ namespace BattleSpace
 		AffectNearby(){};
 		virtual ~AffectNearby(){};
 		UNINITCREATE(AffectNearby);
-		virtual AffectType getAreaType();
+		virtual sAffectType getAreaType();
 		virtual void initArea(AreaCountInfo& pInfo);
 		virtual void moriGridRole(BaseRole* pRole,std::vector<int>& pValids);
 	};
@@ -34,7 +34,7 @@ namespace BattleSpace
 		AffectNearbyUnself(){};
 		virtual ~AffectNearbyUnself(){};
 		UNINITCREATE(AffectNearbyUnself);
-		virtual AffectType getAreaType();
+		virtual sAffectType getAreaType();
 		virtual void initArea(AreaCountInfo &pInfo);
 
 	};

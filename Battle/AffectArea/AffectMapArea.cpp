@@ -17,9 +17,9 @@
 namespace BattleSpace
 {
 	//地图中心两行攻击范围
-	AffectType AffectMapCenterTwoLine::getAreaType()
+	sAffectType AffectMapCenterTwoLine::getAreaType()
 	{
-		return AffectType::eMapCenterTwoLine;
+		return sAffectType::eMapCenterTwoLine;
 	}
 
 	void AffectMapCenterTwoLine::initArea(AreaCountInfo& pInfo)
@@ -45,9 +45,9 @@ namespace BattleSpace
 	/***************************************************************************/
 
 	//地图中任意两行攻击范围
-	AffectType AffectMapAnyDoubleLine::getAreaType()
+	sAffectType AffectMapAnyDoubleLine::getAreaType()
 	{
-		return AffectType::eMapAnyDoubleLine;
+		return sAffectType::eMapAnyDoubleLine;
 	}
 
 	void AffectMapAnyDoubleLine::initArea(AreaCountInfo& pInfo)

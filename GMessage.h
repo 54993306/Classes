@@ -9,6 +9,8 @@ const char MAIL_NOTICE[]				= "MAIL_NOTICE";
 
 const char UPDATE_BUILD[]				= "UPDATE_BUILD";
 
+const char UPDATE_RECRUIT[]				= "UPDATE_RECRUIT";   //招募
+
 const char DELETE_TASK[]				= "DELETE_TASK";
 
 const char UPDATE_WEIRD[]				= "UPDATE_WEIRD";
@@ -25,6 +27,10 @@ const char SHOW_MAIN_SCENE[]				= "SHOW_MAIN_SCENE";				//显示主场景背景
 
 const char HIDE_RECRUIT[]				= "HIDE_RECRUIT";				//隐藏酒馆层
 const char SHOW_RECRUIT[]				= "SHOW_RECRUIT";				//显示酒馆层
+
+const char OPENE_SELECT_ARMY[]				= "OPENE_SELECT_ARMY";				//队伍选择界面打开消息
+const char CLOSE_SELECT_ARMY[]				= "CLOSE_SELECT_ARMY";				//队伍选择界面关闭消息
+
 
 const char SHOW_TOP_LAYER[]				= "SHOW_TOP_LAYER";				//显示toplayer
 const char HIDE_TOP_LAYER[]				= "HIDE_TOP_LAYER";				//隐藏toplayer
@@ -45,5 +51,7 @@ const char UPDATE_ITEM_DATA[]				= "UPDATE_ITEM_DATA";		//更新装备信息
 
 const char HIDE_ROLE_INFO[]				= "HIDE_ROLE_INFO";					//隐藏角色信息界面
 const char SHOW_ROLE_INFO[]				= "SHOW_ROLE_INFO";			//显示角色信息界面
+
+const char TIME_IN_BACKGROUND[]				= "TIME_IN_BACKGROUND";			//切入后台的时间差
 
 #endif // !_MESSAGE_H_

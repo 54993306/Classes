@@ -1059,7 +1059,7 @@ void SpineboyExample::SpineComplete( int trackIndex,int loopCount )
 			return;
 		m_skeletonNode->setAnimation(0,Stand_Action,true);
 	}else{
-		CCLOG("[ *ERROR ] ActObject::SpineComplete spTrackEntry NULL");
+		CCLOG("[ *ERROR ] RoleObject::SpineComplete spTrackEntry NULL");
 	}
 }
 

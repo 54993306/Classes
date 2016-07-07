@@ -156,16 +156,14 @@ void CRewardHardLayer::onStage(CCObject* pSender)
 	{
 		CStage stage;
 		stage.id = bounty->id;
-		//DataCenter::sharedData()->getWar()->setTollgate(stage); 
 		CChapter chapter;
 		chapter.id = getChapterId();
-		//DataCenter::sharedData()->getWar()->setChapter(chapter); 
 		DataCenter::sharedData()->getWar()->setLastStageId(-1); 
 		CPlayerControl::getInstance().sendStageInfo(bounty->id);
 		CTollgatePreview *preview = CTollgatePreview::create();
 		LayerManager::instance()->push(preview);
 		preview->setStage(bounty->id, "");
-		preview->setNormal(false);
+		preview->setNormal(true);
 	}
 	else
 	{

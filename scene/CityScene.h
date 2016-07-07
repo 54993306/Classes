@@ -54,5 +54,6 @@ protected:
 	//SetPanel* m_setPanel;
 	CCPoint m_cloudPos;
 	CCPoint m_cloudAPos;
+
 };
 #endif // !_CITY_SCENE_H_

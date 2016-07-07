@@ -52,6 +52,8 @@ public:
 	void hide(CCObject* pObj);
     void imageLoadSuccessCallBack(string sTag, vector<char>* pBuffer);
 
+	void checkShowActivity(CCObject* pObj);
+
 private: 
 	void runMoveAction(int fromTag, int toTag, float moveTime);
 	void runMovePreAction(int tag);
@@ -90,6 +92,7 @@ public:
 	void setShowHeadPart(bool isSHow);
 	void showHead(const TMessage& tMsg);
 	CCSprite * maskedSprite(CCSprite *textureSprite);
+	void exchangeMsg(int type, google::protobuf::Message *msg);
 };
 
 

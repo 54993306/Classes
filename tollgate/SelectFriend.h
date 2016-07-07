@@ -1,5 +1,4 @@
-﻿#ifndef __FRIEND_LAYER_
-#define __FRIEND_LAYER_
+﻿#pragma once
 
 #include "AppUI.h"
 #include "scene/layer/LayerManager.h"
@@ -37,7 +36,3 @@ private:
 	vector<CUnion> m_unionList;
 	int m_stagId;
 };
-
-
-
-#endif // !__GOLDMINE_LAYER_

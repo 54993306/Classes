@@ -54,12 +54,13 @@ void protobuf_AssignDesc_gate_5fprotocol_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(ServerList));
   Server_descriptor_ = file->message_type(1);
-  static const int Server_offsets_[5] = {
+  static const int Server_offsets_[6] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Server, server_name_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Server, server_host_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Server, server_port_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Server, server_status_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Server, selected_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Server, open_time_),
   };
   Server_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -109,11 +110,11 @@ void protobuf_AddDesc_gate_5fprotocol_2eproto() {
     "\n\023gate_protocol.proto\022\006protos\"^\n\nServerL"
     "ist\022\024\n\014game_version\030\001 \002(\t\022#\n\013server_list"
     "\030\002 \003(\0132\016.protos.Server\022\025\n\rupdate_server\030"
-    "\003 \001(\t\"p\n\006Server\022\023\n\013server_name\030\001 \002(\t\022\023\n\013"
-    "server_host\030\002 \002(\t\022\023\n\013server_port\030\003 \002(\005\022\025"
-    "\n\rserver_status\030\004 \001(\005\022\020\n\010selected\030\005 \001(\010B"
-    "1\n\037anvin.gateway.gateserver.protosB\014Gate"
-    "ProtocolH\001", 290);
+    "\003 \001(\t\"\203\001\n\006Server\022\023\n\013server_name\030\001 \002(\t\022\023\n"
+    "\013server_host\030\002 \002(\t\022\023\n\013server_port\030\003 \002(\005\022"
+    "\025\n\rserver_status\030\004 \001(\005\022\020\n\010selected\030\005 \001(\010"
+    "\022\021\n\topen_time\030\006 \001(\004B0\n\036dass.gateway.gate"
+    "server.protosB\014GateProtocolH\001", 309);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "gate_protocol.proto", &protobuf_RegisterTypes);
   ServerList::default_instance_ = new ServerList();
@@ -464,6 +465,7 @@ const int Server::kServerHostFieldNumber;
 const int Server::kServerPortFieldNumber;
 const int Server::kServerStatusFieldNumber;
 const int Server::kSelectedFieldNumber;
+const int Server::kOpenTimeFieldNumber;
 #endif  // !_MSC_VER
 
 Server::Server()
@@ -487,6 +489,7 @@ void Server::SharedCtor() {
   server_port_ = 0;
   server_status_ = 0;
   selected_ = false;
+  open_time_ = GOOGLE_ULONGLONG(0);
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -541,6 +544,7 @@ void Server::Clear() {
     server_port_ = 0;
     server_status_ = 0;
     selected_ = false;
+    open_time_ = GOOGLE_ULONGLONG(0);
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
@@ -629,6 +633,22 @@ bool Server::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(48)) goto parse_open_time;
+        break;
+      }
+
+      // optional uint64 open_time = 6;
+      case 6: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_open_time:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint64, ::google::protobuf::internal::WireFormatLite::TYPE_UINT64>(
+                 input, &open_time_)));
+          set_has_open_time();
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -684,6 +704,11 @@ void Server::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteBool(5, this->selected(), output);
   }
 
+  // optional uint64 open_time = 6;
+  if (has_open_time()) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt64(6, this->open_time(), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -725,6 +750,11 @@ void Server::SerializeWithCachedSizes(
   // optional bool selected = 5;
   if (has_selected()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(5, this->selected(), target);
+  }
+
+  // optional uint64 open_time = 6;
+  if (has_open_time()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt64ToArray(6, this->open_time(), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -771,6 +801,13 @@ int Server::ByteSize() const {
       total_size += 1 + 1;
     }
 
+    // optional uint64 open_time = 6;
+    if (has_open_time()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::UInt64Size(
+          this->open_time());
+    }
+
   }
   if (!unknown_fields().empty()) {
     total_size +=
@@ -813,6 +850,9 @@ void Server::MergeFrom(const Server& from) {
     if (from.has_selected()) {
       set_selected(from.selected());
     }
+    if (from.has_open_time()) {
+      set_open_time(from.open_time());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -842,6 +882,7 @@ void Server::Swap(Server* other) {
     std::swap(server_port_, other->server_port_);
     std::swap(server_status_, other->server_status_);
     std::swap(selected_, other->selected_);
+    std::swap(open_time_, other->open_time_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

@@ -254,5 +254,10 @@ void LayerManager::removeInvalidPopLayer()
 	}
 }
 
+int LayerManager::getLayerManagerMinPriority()
+{
+	return m_Priority-m_list->count();
+}
+
 
 

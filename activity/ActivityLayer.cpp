@@ -19,14 +19,19 @@
 #include "update/CUpdateLayer.h"
 #include "common/CGameSound.h"
 #include "Resources.h"
+#include "sign/SignLayer.h"
+#include "tollgate/TollgateLayer.h"
+#include "netcontrol/CPlayerControl.h"
+#include "ActivityCollect.h"
+#include "vip/CPaySelect.h"
 //#include <thread>
 //#include <future>
-using namespace BattleSpace;
+
 bool SortActivity(const CActivity& activity1, const CActivity& activity2)
 {
 	return activity1.iStatus<activity2.iStatus;
 }
-
+using namespace BattleSpace;
 CActivityLayer::CActivityLayer():
 m_ui(nullptr),m_pLoading(nullptr)
 {
@@ -73,6 +78,17 @@ bool CActivityLayer::init()
 		m_ui->setPosition(VCENTER);
 		this->addChild(m_ui);
 
+		//线条特效
+		m_pLineEffect = new CLineLightEffect();
+		m_pLineEffect->bindUI(m_ui);
+		m_pLineEffect->bindRectEffect(m_ui->findWidgetById("scroll_info"));
+		this->addChild(m_pLineEffect, 999);
+
+
+		std::string pathToSave = OTHER_DOWNLOAD_FILE_PATH;
+		pathToSave += "/activity/";
+		CheckPathDir(pathToSave);
+
 		return true;
 	}
 
@@ -87,7 +103,7 @@ void CActivityLayer::onEnter()
 	AnimationManager::sharedAction()->ParseAnimation("loading");
 
 	//loading贴图
-	EffectObject* pLoadEffect = EffectObject::create("loading",PLAYERTYPE::Repeat);
+	EffectObject* pLoadEffect = EffectObject::create("loading",sPlayType::eRepeat);
 	pLoadEffect->setPosition(dynamic_cast<CCNode*>(m_ui->findWidgetById("loading"))->getPosition());
 	pLoadEffect->setEffAnchorPoint(0.5f,0.5f);
 	pLoadEffect->setScale(0.6f);
@@ -96,13 +112,13 @@ void CActivityLayer::onEnter()
 	m_pLoading->setVisible(false);
 
 	//选项卡
-	CRadioBtnGroup *radioGroup = (CRadioBtnGroup *)m_ui->getChildByTag(1);
-	for (unsigned int i=0; i<ActivityTabMax; i++)
-	{
-		CRadioButton *radioBtn= (CRadioButton*)(radioGroup->getChildByTag(i));
-		radioBtn->setOnCheckListener(this,ccw_check_selector(CActivityLayer::onSwitchBtn));
-		m_pRadioButton[i] = radioBtn;
-	}
+	//CRadioBtnGroup *radioGroup = (CRadioBtnGroup *)m_ui->getChildByTag(1);
+	//for (unsigned int i=0; i<ActivityTabMax; i++)
+	//{
+	//	CRadioButton *radioBtn= (CRadioButton*)(radioGroup->getChildByTag(i));
+	//	radioBtn->setOnCheckListener(this,ccw_check_selector(CActivityLayer::onSwitchBtn));
+	//	m_pRadioButton[i] = radioBtn;
+	//}
 
 	//初始化战斗活动和销售活动版块
 	initTabPart();
@@ -166,7 +182,7 @@ void CActivityLayer::onExit()
 	//移除无用的资源
 	CCTextureCache::sharedTextureCache()->removeUnusedTextures();
 
-	NOTIFICATION->postNotification(SHOW_MAIN_SCENE);
+	//NOTIFICATION->postNotification(SHOW_MAIN_SCENE);
 	CSceneManager::sharedSceneManager()->PostMessageA(SHOW_HEAD,0,nullptr,nullptr);
 
 }
@@ -237,7 +253,7 @@ void CActivityLayer::selectTabPanel( ActivityTabType iType, bool bForce )
 	{
 		bool isSelected = i==iType;
 		m_tableView[i]->setVisible(isSelected);
-		m_pRadioButton[i]->setChecked(isSelected);
+		//m_pRadioButton[i]->setChecked(isSelected);
 	}
 
 	//更新展示区域
@@ -247,8 +263,13 @@ void CActivityLayer::selectTabPanel( ActivityTabType iType, bool bForce )
 void CActivityLayer::onClose( CCObject* pSender )
 {
 	PlayEffectSound(SFX_Ensure);
-	LayerManager::instance()->pop();
-	LayerManager::instance()->pop();
+
+	if(m_pLineEffect->isTouchLock())
+	{
+		return;
+	}
+
+	m_pLineEffect->hideEffect();
 }
 
 void CActivityLayer::processNetMsg( int type, google::protobuf::Message *msg )
@@ -257,9 +278,9 @@ void CActivityLayer::processNetMsg( int type, google::protobuf::Message *msg )
 	if(!isVisible())
 	{
 		this->setVisible(true);
-		NOTIFICATION->postNotification(HIDE_MAIN_SCENE);
-
-		showBookAnimate(m_ui);
+		//NOTIFICATION->postNotification(HIDE_MAIN_SCENE);
+		m_pLineEffect->showEffect();
+		//showBookAnimate(m_ui);
 	}
 	
 	switch (type)
@@ -268,25 +289,36 @@ void CActivityLayer::processNetMsg( int type, google::protobuf::Message *msg )
 		{
 			ActListRes *res = (ActListRes*)msg;
 
-			int iRequestActivityType = res->tab()-1;
+			//int iRequestActivityType = res->tab()-1;
 
-			m_activity_type = (ActivityTabType)iRequestActivityType;
+			/*m_activity_type = (ActivityTabType*iRequestActivityType;*/
 
-			m_base_url[iRequestActivityType] = res->baseurl();
+			m_activity_type = ActivityTabSale;
 
-			m_activity_list[iRequestActivityType].clear();
+			m_base_url[m_activity_type] = res->baseurl();
+
+			m_activity_list[m_activity_type].clear();
 			for (unsigned int i = 0; i < res->actlist_size(); i++)
 			{
 				CActivity activity;
 				activity.read(res->actlist(i));
-				m_activity_list[iRequestActivityType].push_back(activity);
+				m_activity_list[m_activity_type].push_back(activity);
+			}
+
+			//如果没有活动，退出，弹框提示
+			if(res->actlist_size()<=0)
+			{
+				LayerManager::instance()->pop();
+				LayerManager::instance()->pop();
+				ShowPopTextTip(GETLANGSTR(265));
+				return;
 			}
 
 			//排序
-			std::sort(m_activity_list[iRequestActivityType].begin(), m_activity_list[iRequestActivityType].end(), SortActivity);
+			std::sort(m_activity_list[m_activity_type].begin(), m_activity_list[m_activity_type].end(), SortActivity);
 
-			m_tableView[iRequestActivityType]->setCountOfCell(m_activity_list[iRequestActivityType].size());
-			m_tableView[iRequestActivityType]->reloadData();
+			m_tableView[m_activity_type]->setCountOfCell(m_activity_list[m_activity_type].size());
+			m_tableView[m_activity_type]->reloadData();
 			
 			//更新展示区
 			updateShowArea();
@@ -317,6 +349,14 @@ void CActivityLayer::processNetMsg( int type, google::protobuf::Message *msg )
 
 					//收集货币
 					collectMoneyFromPrize(prizers);
+
+					//如果当前界面有显示的ActivityCollect
+					CActivity& activity =  m_activity_list[m_activity_type].at(m_index_selected[m_activity_type]);
+					CActivityCollectLayer* pLayer = getCActivityCollectLayerById(activity.iActId);
+					if(pLayer!=nullptr)
+					{
+						pLayer->restData();
+					}
 
 					//ShowPopTextTip(GETLANGSTR(264));
 				}break;
@@ -384,10 +424,6 @@ void CActivityLayer::addTableCell( unsigned int uIdx, CTableViewCell * pCell )
 		case 1:
 			{
 				CImageView* pBoard = (CImageView*)child;
-				if(uIdx==m_index_selected[m_activity_type])
-				{
-					pBoard->setTexture(CCTextureCache::sharedTextureCache()->addImage(activity_select_panel));
-				}
 				pBoard->setTouchEnabled(true);
 				pBoard->setOnClickListener(this, ccw_click_selector(CActivityLayer::activityCellClick));
 			}
@@ -411,31 +447,40 @@ void CActivityLayer::addTableCell( unsigned int uIdx, CTableViewCell * pCell )
 				item->addChild(pShow);
 			}
 			break;
-			//活动图标
+			//活动图标-选中框
 		case 4:
 			{
-				CCSprite *item = (CCSprite*)child;
-				
-				//没有图片，不读取，用默认
-				if(pInfo.sIconFile.size()<=0)
+				if(uIdx==m_index_selected[m_activity_type])
 				{
-					continue;
-				}
-				//获取showInfo的本地路径
-				string infoFile = getImageReadPath(m_activity_type, pInfo, ActivityLoadImageTagIcon);
-				//更新图片
-				CCSprite* pAnswer = HttpLoadImage::getInstance()->SetSpriteTextureWithLocalFile(infoFile, item);
-				if(!pAnswer)
-				{
-					//发起网络获取
-					HttpLoadImage::getInstance()->requestUrlImage(
-						m_base_url[m_activity_type]+pInfo.sIconFile, 
-						linkUrlImageTag(m_activity_type, pInfo, ActivityLoadImageTagIcon).c_str());
+					child->setVisible(true);
 				}
 				else
 				{
-					item = pAnswer;
+					child->setVisible(false);
 				}
+
+				//CCSprite *item = (CCSprite*)child;
+				//
+				////没有图片，不读取，用默认
+				//if(pInfo.sIconFile.size()<=0)
+				//{
+				//	continue;
+				//}
+				////获取showInfo的本地路径
+				//string infoFile = getImageReadPath(m_activity_type, pInfo, ActivityLoadImageTagIcon);
+				////更新图片
+				//CCSprite* pAnswer = HttpLoadImage::getInstance()->SetSpriteTextureWithLocalFile(infoFile, item);
+				//if(!pAnswer)
+				//{
+				//	//发起网络获取
+				//	HttpLoadImage::getInstance()->requestUrlImage(
+				//		m_base_url[m_activity_type]+pInfo.sIconFile, 
+				//		linkUrlImageTag(m_activity_type, pInfo, ActivityLoadImageTagIcon).c_str());
+				//}
+				//else
+				//{
+				//	item = pAnswer;
+				//}
 			}
 			break;
 		default:
@@ -479,14 +524,14 @@ void CActivityLayer::updateTableSelected( CTableView* pTable, int iSelected )
 	CCARRAY_FOREACH(pTable->getContainer()->getChildren(), pObj)
 	{
 		CCNode* pNode = (CCNode*)pObj;
-		CImageView* pBoard = (CImageView*)pNode->getChildByTag(1);
+		CImageView* pBoard = (CImageView*)pNode->getChildByTag(4);
 		if(pNode->getTag()==iSelected)
 		{
-			pBoard->setTexture(CCTextureCache::sharedTextureCache()->addImage(activity_select_panel));
+			pBoard->setVisible(true);
 		}
 		else
 		{
-			pBoard->setTexture(CCTextureCache::sharedTextureCache()->addImage(activity_unselect_panel));
+			pBoard->setVisible(false);
 		}
 	}
 }
@@ -525,6 +570,15 @@ void CActivityLayer::updateShowArea()
 	m_join_activity_label->setVisible(false);
 	m_join_activity->setVisible(false);
 
+	//隐藏掉所有的collectory
+	hideAllCollectLayer();
+
+	//如果界面还在加载图片，其他信息也不显示先
+	if(!pAnswer)
+	{
+		return;
+	}
+
 	//如果活动正在进行
 	if(activity.iStatus == ActivityTabSale_under_way)
 	{
@@ -560,6 +614,31 @@ void CActivityLayer::updateShowArea()
 				m_join_activity_label->setVisible(true);
 				m_join_activity->setVisible(true);
 			}break;
+			//关卡
+		case 5:
+			{
+
+				m_join_activity_label->setString(GETLANGSTR(269));
+				m_join_activity_label->setVisible(true);
+				m_join_activity->setVisible(true);
+			}break;
+			//收集类型
+		case 100:
+			{
+				//额外显示
+				CActivityCollectLayer* pLayer = getCActivityCollectLayerById(activity.iActId);
+				if(pLayer==nullptr)
+				{
+					pLayer = CActivityCollectLayer::create();
+					pLayer->setTouchPriority(LayerManager::instance()->getPriority()-3);
+					pLayer->initBaseData(activity.exlist, activity.iActId);
+					pLayer->setPosition(m_ui->convertToNodeSpace(pLayer->getPosition()));
+					m_ui->addChild(pLayer, 9999);
+					m_mapCollectLayer.insert(std::pair<int, CActivityCollectLayer*>(activity.iActId, pLayer));
+				}
+				pLayer->setVisible(true);
+
+			}break;
 		default:
 			break;
 		}
@@ -590,12 +669,17 @@ void CActivityLayer::onJoinActivity( CCObject* pSender )
 		//充值
 	case 2:
 		{
-			CVipLayer *vipLayer= CVipLayer::create();
-			if(LayerManager::instance()->push(vipLayer))
-			{
-				GetTcpNet->sendDataType(VipInfoMsg,true);
-				GetTcpNet->sendDataType(VipShopMsg,true);
-			}
+// 			CVipLayer *vipLayer= CVipLayer::create();
+// 			if(LayerManager::instance()->push(vipLayer))
+// 			{
+// 				GetTcpNet->sendDataType(VipInfoMsg,true);
+// 				GetTcpNet->sendDataType(VipShopMsg,true);
+// 			}
+			CPaySelect *pay = CPaySelect::create();
+			LayerManager::instance()->push(pay);
+			NOTIFICATION->postNotification(HIDE_TOP_LAYER);
+			NOTIFICATION->postNotification(HIDE_TOP_LAYER);
+
 		}break;
 		//悬赏府
 	case 3:
@@ -616,6 +700,14 @@ void CActivityLayer::onJoinActivity( CCObject* pSender )
 		{
 			CRecruit *recr = CRecruit::create();
 			LayerManager::instance()->push(recr);
+		}break;
+		//关卡
+	case 5:
+		{
+			CTollgateLayer* pLayer = CTollgateLayer::create();
+			LayerManager::instance()->push(pLayer);
+			//pLayer->setStory(true);
+			CPlayerControl::getInstance().sendChapterList(0);
 		}break;
 	default:
 		break;
@@ -646,6 +738,7 @@ void CActivityLayer::imageLoadSuccessCallBack( string sTag,  vector<char>* pBuff
 	string path = getImageSavePath(activityType, activity, imageTag);
 	string buff(pBuffer->begin(), pBuffer->end());
 	CCLOG("path: %s", path.c_str());
+
 	FILE *fp = fopen(path.c_str(), "wb+");
 	fwrite(buff.c_str(), 1, pBuffer->size(),  fp);
 	fclose(fp);
@@ -686,8 +779,11 @@ void CActivityLayer::imageLoadSuccessCallBack( string sTag,  vector<char>* pBuff
 				if(m_activity_list[m_activity_type].at(m_index_selected[m_activity_type]).iActId == activity.iActId)
 				{
 					CCLOG("网络图片加载成功");
-					updateShowInfoPicWithTexture(texture);
-					m_pLoading->setVisible(false);
+					//updateShowInfoPicWithTexture(texture);
+					//m_pLoading->setVisible(false);
+
+					updateShowArea();
+
 				}
 			}
 		}
@@ -794,6 +890,46 @@ void CActivityLayer::buyGiftPopTipBack( CCObject* pSender )
 	}
 
 	((CPopTip*)(pBtn->getParent()->getParent()))->onClose(nullptr);
+}
+
+bool CActivityLayer::ccTouchBegan( CCTouch *pTouch, CCEvent *pEvent )
+{
+	if(m_pLineEffect->isTouchLock())
+	{
+		return true;
+	}
+
+	bool res = CWidgetWindow::ccTouchBegan(pTouch,pEvent);
+
+	CCPoint pTouchPos = m_ui->convertToNodeSpace(pTouch->getLocation());
+
+	CCSprite *bgSpr = (CCSprite*)m_ui->findWidgetById("scroll_info");
+	if( !res && !bgSpr->boundingBox().containsPoint(pTouchPos))
+	{
+		res = true;
+		onClose(nullptr);
+	}
+	return res;
+}
+
+void CActivityLayer::hideAllCollectLayer()
+{
+	std::map<int, CActivityCollectLayer*>::iterator iteratorMap = m_mapCollectLayer.begin();
+	for(;iteratorMap!=m_mapCollectLayer.end(); iteratorMap++)
+	{
+		CActivityCollectLayer* pLayer = (*iteratorMap).second;
+		pLayer->setVisible(false);
+	}
+}
+
+CActivityCollectLayer* CActivityLayer::getCActivityCollectLayerById( int iId )
+{
+	std::map<int, CActivityCollectLayer*>::iterator itr = m_mapCollectLayer.find(iId);
+	if(itr!=m_mapCollectLayer.end())
+	{
+		return itr->second;
+	}
+	return nullptr;
 }
 
 
