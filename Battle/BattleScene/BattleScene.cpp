@@ -240,17 +240,6 @@ namespace BattleSpace
 
 	void BattleScene::OnBattleFinish( int pType, google::protobuf::Message *msg )
 	{
-		if(pType != BossFinishReqMsg)
-			return;
-		mBattleClose->setRecvFinish(true);
-		BattleFinishRep *res = (BattleFinishRep*)msg;
-		WorldBossEndLayer * layer = WorldBossEndLayer::create();
-		this->addChild(layer);
-		layer->processBattleFinish(pType, msg);
-	}
-
-	void BattleScene::onWordBossFinish( int pType, google::protobuf::Message *msg )
-	{
 		if(pType != ExitStage)
 			return;
 		mBattleClose->setRecvFinish(true);
@@ -264,6 +253,17 @@ namespace BattleSpace
 			WarFailLayer *layer = WarFailLayer::create();
 			this->addChild(layer);
 		}
+	}
+
+	void BattleScene::onWordBossFinish( int pType, google::protobuf::Message *msg )
+	{
+		if(pType != BossFinishReqMsg)
+			return;
+		mBattleClose->setRecvFinish(true);
+		BattleFinishRep *res = (BattleFinishRep*)msg;
+		WorldBossEndLayer * layer = WorldBossEndLayer::create();
+		this->addChild(layer);
+		layer->processBattleFinish(pType, msg);
 	}
 
 };

@@ -102,7 +102,7 @@ namespace BattleSpace
 #if CC_PLATFORM_WIN32 == CC_TARGET_PLATFORM
 				return eWidgetTouchTransient;
 #else
-				if (user->getLevel() <= 14)
+				if (user->getLevel() <= 14 )
 				{
 					string str = GETLANGSTR(2017);
 					ShowPopTextTip(str.c_str());
@@ -192,13 +192,13 @@ namespace BattleSpace
 		m_ControLayer->addChild(tGuideTest);
 
 		CButton* MoveTest = CButton::create("public/btn_tihuanwujiang_01.png","public/btn_tihuanwujiang_02.png");
-		MoveTest->setPosition(ccpAdd(tStarButton->getPosition(),ccp(200,60)));
+		MoveTest->setPosition(ccpAdd(tStarButton->getPosition(),ccp(300,60)));
 		MoveTest->setTag(TEST_MoveState);
 		MoveTest->setOnClickListener(this,ccw_click_selector(WarControl::OnClick));
 		m_ControLayer->addChild(MoveTest);
 
 		CButton* tRoleTest = CButton::create("public/btn_tihuanwujiang_01.png","public/btn_tihuanwujiang_02.png");
-		tRoleTest->setPosition(ccpAdd(tStarButton->getPosition(),ccp(200,0)));
+		tRoleTest->setPosition(ccpAdd(tStarButton->getPosition(),ccp(300,0)));
 		tRoleTest->setTag(TEST_Role);
 		tRoleTest->setOnClickListener(this,ccw_click_selector(WarControl::OnClick));
 		m_ControLayer->addChild(tRoleTest);
@@ -296,6 +296,7 @@ namespace BattleSpace
 		BaseRole* boss = mManage->getAliveByType(sMonsterSpecies::eWorldBoss);
 		if (boss)
 		{
+			tAutoPlay->setVisible(false);
 			m_ControLayer->findWidgetById("layer_up_boss")->setVisible(true);
 			m_ControLayer->findWidgetById("layer_up_normal")->setVisible(false);
 			updateTimeCountUI(180);																			//时间
