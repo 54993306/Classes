@@ -66,8 +66,8 @@ namespace BattleSpace{
 		BaseRole* getAliveByMoveGrid(int grid);
 		/*************************************************************************/
 		void clearAlivesPauseMark();
-		void heroWinAction();
-		void createBatchMonster(int batchNumber);
+		void heroWinAction(CCObject* ob);
+		void createBatchMonster(CCObject* ob);
 		void createMoveTarget();
 		void createLayerColor();
 		void createActObjects();
@@ -75,7 +75,7 @@ namespace BattleSpace{
 		void lucencyActObject(bool lucency);												//对其他武将执行透明操作
 		bool touchInAlive(int grid , const CCPoint& p);
 
-		void changeLight(bool pLight);
+		void changeLight(CCObject* ob);
 		void SkillCreateRole(CCObject* ob);
 		void changeTestState(CCObject* ob);
 		void roleStand(CCObject* ob);

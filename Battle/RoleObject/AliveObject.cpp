@@ -163,10 +163,7 @@ namespace BattleSpace{
 	//这个方法不属于数据类，也不属于显示类，但是应该在武将自身的身上，每个武将的死亡处理都不一样。
 	void AliveObject::AliveDie()
 	{
-		if (!mRole->getRoleObject() || !mRole->getAliveState())
-			return;
 		mRole->clearHitAlive();
-		mRole->setAliveState(false);
 		mRole->setHp(0);
 		mRole->setBattle(false);
 		mRole->setGridIndex(INVALID_GRID);

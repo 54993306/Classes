@@ -101,7 +101,7 @@ namespace BattleSpace{
 
 		void AliveBattlefield(BaseRole* alive);						//role log in battlefield or leave
 
-		void updateBatchNumber(int currbatch);						//update batch number
+		void updateBatchNumber(CCObject* ob);						//update batch number
 
 		void postButtonState(CCObject* ob);
 
@@ -110,6 +110,9 @@ namespace BattleSpace{
 		void upAutoSkillState(float dt);
 
 		void showFlyCostToBar(CCObject* ob);
+
+		void battleBegin();
+		void updateOneSecond(float dt);
 		CC_SYNTHESIZE(CCPoint, m_goldIconPos, GoldIconPos);
 		CC_SYNTHESIZE(CCPoint, m_boxIconPos, BoxIconPos);
 		CC_SYNTHESIZE(CCSpriteBatchNode*, m_batchNodeEffect, BatchNodeEffect);
@@ -133,6 +136,8 @@ namespace BattleSpace{
 		int			m_ContinuousNum;
 		int			m_iAimCost;
 		bool		mAutoState;
+		int			m_iGameTimeCount;
+		bool		m_bCountDown;
 	};
 	enum TrapResumeType
 	{

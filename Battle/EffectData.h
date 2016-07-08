@@ -1,7 +1,9 @@
 ﻿#ifndef EFFECTLOAD_H_
 #define EFFECTLOAD_H_
 #include "AppUI.h"
-namespace BattleSpace{
+#include "Battle/BattleConfigMacro.h"
+namespace BattleSpace
+{
 	/************************************************************************/
 	/*         
 	效果信息管理
@@ -161,13 +163,6 @@ namespace BattleSpace{
 		CC_SYNTHESIZE(bool,m_ShowTalkBg,ShowTalkBg);		//是否显示谈话底框背景
 		CC_SYNTHESIZE(bool,m_Shark,Shark);					//震动
 	};
-
-	enum struct StoryType
-	{
-		eBeginStory = 1,
-		eMoveEndStory,
-		eOverStory,
-	};			//剧情类型,根据不同类型会有不同结束处理
 
 	class StoryData : public CCObject
 	{

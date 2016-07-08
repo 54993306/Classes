@@ -274,7 +274,7 @@ namespace BattleSpace
 		TurnStateTo(sStateCode::eStandState);
 		if (mRole->getCritEffect()&&!mEnemy)		
 			bNotification->postNotification(B_CritEnd,mRole);
-		if (mRole->getHp()<=0)
+		if (mRole->getHp()<=0 || !mRole->getAliveState())
 			this->AliveDie();									//释放完技能后自己死亡的情况处理
 		else if (mRole->getBaseData()->getCallType() == sCallType::eAutoSkill||
 			mRole->getBaseData()->getCallType() == sCallType::eOnlyOnce)				//陨石类释放攻击后死亡OnlyOnces
@@ -577,10 +577,14 @@ namespace BattleSpace
 
 	void RoleObject::AliveDie()
 	{
-		AliveObject::AliveDie();
-		setMoveState(sStateCode::eNullState);
-		TurnStateTo(sStateCode::eStandState);
-		TurnStateTo(sStateCode::eDeathState);
+		if ( mRole->getAliveState() )
+		{
+			mRole->setAliveState(false);
+			setMoveState(sStateCode::eNullState);
+			TurnStateTo(sStateCode::eStandState);
+			TurnStateTo(sStateCode::eDeathState);
+			AliveObject::AliveDie();
+		}
 	}
 
 	bool RoleObject::TurnStateTo( sStateCode pCode )

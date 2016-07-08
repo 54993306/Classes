@@ -45,6 +45,8 @@ namespace BattleSpace
 		NOTIFICATION->addObserver(this,callfuncO_selector(WarAssist::PlayBeginAnimation),B_PlayBeginAnimation,nullptr);
 		NOTIFICATION->addObserver(this,callfuncO_selector(WarAssist::bigMonsterInBattle),MsgRoleGridChange,nullptr);
 		NOTIFICATION->addObserver(this,callfuncO_selector(WarAssist::starActionEnd),MsgStarActionEnd,nullptr);
+		NOTIFICATION->addObserver(this,callfuncO_selector(WarAssist::WinEffect),MsgPlayWinEffect,nullptr);
+		NOTIFICATION->addObserver(this,callfuncO_selector(WarAssist::displayBossWarningBegin),MsgShowStageWarning,nullptr);
 		mManage = DataCenter::sharedData()->getWar();
 		return true;
 	}
@@ -76,7 +78,7 @@ namespace BattleSpace
 
 		//战斗逻辑关闭
 		mManage->setLogicState(false);
-
+		m_scene->setMoveState(false);
 		//流程不对，不能多线一起执行，考虑单线动画，CCSequence-( CCArray )..动作拼接太麻烦，多写几个callback吧
 		//执行动画
 		//model!=0 标记为章节最后关卡的大BOSS
@@ -195,7 +197,7 @@ namespace BattleSpace
 
 		//战斗逻辑开放
 		mManage->setLogicState(true);
-
+		m_scene->setMoveState(true);
 		mBossRole = nullptr;
 		m_bShowWarning = false;
 
@@ -829,8 +831,8 @@ namespace BattleSpace
 		CCEaseBounceOut * es= CCEaseBounceOut::create(cs1);
 		CCCallFuncO* ef2 = CCCallFuncO::create(this,callfuncO_selector(WarAssist::shake),m_ui);
 		CCDelayTime* dly = CCDelayTime::create(1.5f);
-		CCCallFuncO* RoundOver = CCCallFuncO::create(m_scene->getCombatLogic(), callfuncO_selector(CombatLogic::combatResult), this);
-		CCSequence* sqe = CCSequence::create(es,ef2,dly,RoundOver, nullptr);
+		CCCallFunc* win = CCCallFunc::create(this,callfunc_selector(WarAssist::battleWin));
+		CCSequence* sqe = CCSequence::create(es,ef2,dly,win, nullptr);
 		//ziti->setPosition(ccp(-size.width/2,size.height/2));
 		//CCMoveTo* mt = CCMoveTo::create(0.5f,ccp(size.width/2,size.height/2));
 		//CCEaseBounceOut * es= CCEaseBounceOut::create(mt);
@@ -845,6 +847,11 @@ namespace BattleSpace
 
 		_win->runAction(CCSequence::create(CCDelayTime::create(1.6f), CCFadeOut::create(1.0f), nullptr));
 		mo->runAction(CCSequence::create(CCDelayTime::create(1.6f), CCFadeOut::create(1.0f), nullptr));
+	}
+
+	void WarAssist::battleWin()
+	{
+		NOTIFICATION->postNotification(MsgBattleOver,CCBool::create(true));
 	}
 
 	void WarAssist::playerMusic(CCObject* ob)

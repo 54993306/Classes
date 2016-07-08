@@ -33,12 +33,21 @@
 #include "tools/CCShake.h"
 #include "Battle/BattleMessage.h"
 #include "Battle/RoleMacro.h"
+#include "Battle/WarBackLayer.h"
+#include "google/protobuf/descriptor.h"
+#include "google/protobuf/message.h"
+#include "netcontrol/CPlayerControl.h"
+#include "Battle/WarFailLayer.h"
+#include "Battle/WarWinLayer.h"
+#include "Battle/WorldBossEndLayer.h"
+#include "Battle/BattleClose.h"
+
 namespace BattleSpace
 {
 	BattleScene::BattleScene()
-		:m_MapLayer(nullptr),m_AliveLayer(nullptr),m_StoryLayer(nullptr)
-		,m_MoveLayer(nullptr),m_UILayer(nullptr),_dropItem(nullptr)
-		,m_Loginc(nullptr),m_Touch(nullptr)
+	:m_MapLayer(nullptr),m_AliveLayer(nullptr),m_StoryLayer(nullptr)
+	,m_MoveLayer(nullptr),m_UILayer(nullptr),_dropItem(nullptr),mMoveState(true)
+	,m_Loginc(nullptr),m_Touch(nullptr),mBackLayer(nullptr),mBattleClose(nullptr)
 	{}
 	BattleScene::~BattleScene()
 	{
@@ -101,6 +110,13 @@ namespace BattleSpace
 
 		m_Loginc = CombatLogic::create();
 		addChild(m_Loginc);									//添加到父类才能开启定时器
+
+		mBackLayer = WarBackLayer::create();
+		mBackLayer->setVisible(false);
+		addChild(mBackLayer);
+
+		mBattleClose = BattleClose::create();
+		addChild(mBattleClose);
 	}
 	//添加事件处理监听等
 	void BattleScene::AddEvent()
@@ -109,6 +125,9 @@ namespace BattleSpace
 		if( m_UILayer ) m_UILayer->AddEvent();
 		if( m_AliveLayer ) m_AliveLayer->addEvent();
 		if( m_MapLayer ) m_MapLayer->addEvent();
+		bNotification->addObserver(this,callfuncO_selector(BattleScene::cReturnLayer),MsgReturnLayer,nullptr);
+		CNetClient::getShareInstance()->registerMsgHandler(ExitStage,this,CMsgHandler_selector(BattleScene::OnBattleFinish));
+		CNetClient::getShareInstance()->registerMsgHandler(BossFinishReqMsg,this,CMsgHandler_selector(BattleScene::onWordBossFinish));
 	}
 	//移除事件
 	void BattleScene::RemoveEvent()
@@ -118,6 +137,8 @@ namespace BattleSpace
 		if( m_UILayer ) m_UILayer->RemoveEvent();
 		if( m_AliveLayer) m_AliveLayer->removeEvent();
 		if( m_MapLayer ) m_MapLayer->removeEvent();
+		bNotification->removeAllObservers(this);
+		CNetClient::getShareInstance()->unRegisterAllMsgHandler(this);
 	}
 
 	bool BattleScene::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
@@ -136,7 +157,7 @@ namespace BattleSpace
 		if (!DataCenter::sharedData()->getWar()->getNormal())
 			return;
 #endif
-		if (m_Touch != pTouch)
+		if (m_Touch != pTouch || !mMoveState)
 			return ;
 		CCPoint pMove = m_Touch->getLocation();
 		float dx = pMove.x - m_StartPos.x;							//地图只能x轴移动
@@ -192,15 +213,6 @@ namespace BattleSpace
 	{
 #if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
 		bNotification->postNotification(MsgCreateStory,ob);
-		//if (DataCenter::sharedData()->getWar()->getStageID())
-		//{
-		//	CCNotificationCenter::sharedNotificationCenter()->postNotification(LAYERMOVEEND,ob);
-		//}else{
-		//	if (((CCInteger*)ob)->getValue() == beginStory)
-		//		CCNotificationCenter::sharedNotificationCenter()->postNotification(PLAYERBEGINANIMATION);
-		//	else
-		//		CCNotificationCenter::sharedNotificationCenter()->postNotification(LAYERMOVEEND,ob);
-		//}
 #else
 		if (DataCenter::sharedData()->getWar()->getStageID())
 		{
@@ -213,4 +225,45 @@ namespace BattleSpace
 		}
 #endif
 	}
+
+	void BattleScene::cReturnLayer( CCObject* ob )
+	{
+		if (mBackLayer->isVisible())
+		{
+			mBackLayer->hide();
+			m_Loginc->onResume();
+		}else{
+			mBackLayer->show();
+			m_Loginc->onPause();
+		}
+	}
+
+	void BattleScene::OnBattleFinish( int pType, google::protobuf::Message *msg )
+	{
+		if(pType != BossFinishReqMsg)
+			return;
+		mBattleClose->setRecvFinish(true);
+		BattleFinishRep *res = (BattleFinishRep*)msg;
+		WorldBossEndLayer * layer = WorldBossEndLayer::create();
+		this->addChild(layer);
+		layer->processBattleFinish(pType, msg);
+	}
+
+	void BattleScene::onWordBossFinish( int pType, google::protobuf::Message *msg )
+	{
+		if(pType != ExitStage)
+			return;
+		mBattleClose->setRecvFinish(true);
+		BattleFinishRep *res = (BattleFinishRep*)msg;
+		if (res->win())
+		{
+			WarWinLayer *layer = WarWinLayer::create();
+			this->addChild(layer);
+			layer->processBattleFinish(pType, msg);
+		}else{
+			WarFailLayer *layer = WarFailLayer::create();
+			this->addChild(layer);
+		}
+	}
+
 };

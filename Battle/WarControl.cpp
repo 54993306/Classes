@@ -47,7 +47,7 @@ namespace BattleSpace
 		,m_pCostChange(nullptr),m_LayerColor(nullptr),m_ArmatureTips(nullptr)
 		,m_fdetal(0),m_costTime(0),m_ContinuousNum(0),m_pCostNum(nullptr),m_pBossBar2(nullptr)
 		,m_goldIconPos(CCPointZero), m_boxIconPos(CCPointZero),m_pAllDamage(nullptr)
-		,m_batchNodeEffect(nullptr),mAutoState(false)
+		,m_batchNodeEffect(nullptr),mAutoState(false),m_iGameTimeCount(0),m_bCountDown(false)
 	{}
 
 	WarControl::~WarControl(){}
@@ -58,13 +58,14 @@ namespace BattleSpace
 		bNotification->addObserver(this,callfuncO_selector(WarControl::ChangeBoxGoldNum),B_DropItem,nullptr);
 		bNotification->addObserver(this,callfuncO_selector(WarControl::upContinuousNumber),B_ContinuousNumber,nullptr);
 		bNotification->addObserver(this,callfuncO_selector(WarControl::AliveBattleDispose),MsgRoleBattleState,nullptr);
-		bNotification->addObserver(this,callfuncO_selector(WarControl::showMonsterTips),B_MonsterTips,nullptr);
+		bNotification->addObserver(this,callfuncO_selector(WarControl::showMonsterTips),MsgMonsterTips,nullptr);
 		bNotification->addObserver(this,callfuncO_selector(WarControl::CaptainHit),B_CaptainHurt,nullptr);
 		bNotification->addObserver(this,callfuncO_selector(WarControl::SkillMask),B_SKILL_MASK,nullptr);
 		bNotification->addObserver(this,callfuncO_selector(WarControl::postButtonState),MsgGetButtonState,nullptr);
 		bNotification->addObserver(this,callfuncO_selector(WarControl::RemoveEvent),MsgControlRemove,nullptr);
 		bNotification->addObserver(this,callfuncO_selector(WarControl::showFlyCostToBar),MsgMonsterDie,nullptr);
 		bNotification->addObserver(this,callfuncO_selector(WarControl::hideUiUpPart),MsgHideControlUp,nullptr);
+		bNotification->addObserver(this,callfuncO_selector(WarControl::updateBatchNumber),MsgUpBatchNumber,nullptr);
 	}
 
 	void WarControl::onExit()
@@ -120,7 +121,7 @@ namespace BattleSpace
 		{
 		case CL_Menu:
 			{
-				bNotification->postNotification(B_ReturnLayer);
+				bNotification->postNotification(MsgReturnLayer);
 			}break;
 		case CL_StarBtn:
 			{
@@ -140,7 +141,7 @@ namespace BattleSpace
 			{
 				char path[60] = {0};
 				sprintf(path,"%d_%d",0,7);														//覆盖高亮区域的图片
-				DataCenter::sharedData()->getCombatGuideMg()->setGuide(path);
+				DataCenter::sharedData()->getCombatGuideMg()->setCurrBatchGuide(path);
 			}break;
 		case TEST_MoveState:
 			{
@@ -156,11 +157,11 @@ namespace BattleSpace
 					{
 						//tPair.second->setAtk(500000);
 						tPair.second->setMaxHp(500000);
-						tPair.second->setHp(500000);		//第一次进来是满血状态
+						tPair.second->setHp(500000);	
 					}else{
 						//tPair.second->setAtk(500000);
 						tPair.second->setMaxHp(500000);
-						tPair.second->setHp(500000);			//第一次进来是满血状态
+						tPair.second->setHp(500000);	
 					}
 				}
 #endif;
@@ -340,7 +341,10 @@ namespace BattleSpace
 	}
 	//初始化世界bossUI
 	void WarControl::initWorldBossAbove(BaseRole* boss)
-	{											
+	{			
+		m_iGameTimeCount = 180;			//世界boss打180s,3min
+		m_bCountDown = true;
+
 		CLabel* pDamageText = (CLabel*)m_ControLayer->findWidgetById("attack_index");					//伤害
 		m_pAllDamage = CCLabelAtlas::create("0", "worldBoss/no_07.png", 17, 28, 48);
 		m_pAllDamage->setAnchorPoint(ccp(1.0f, 0.5f));
@@ -1013,15 +1017,14 @@ namespace BattleSpace
 		m_ControLayer->getChildByTag(CL_AutoPlay)->setVisible(false);
 	}
 
-	void WarControl::updateBatchNumber( int currbatch )
+	void WarControl::updateBatchNumber( CCObject* ob )
 	{
 		CLayout* m_pNormal = (CLayout*)m_ControLayer->findWidgetById("layer_up_normal");
 		CCNode* node = m_pNormal->getChildByTag(CL_Batch);
 		node->setVisible(false);
 		char path[60] = {0};
-		sprintf(path,"%d/%d",currbatch,mManage->getBatch()+1);											
+		sprintf(path,"%d/%d",mManage->getCurrBatch()+1,mManage->getBatch()+1);											
 		CCLabelAtlas* BatchNum = CCLabelAtlas::create(path,"label/wave_number2.png", 22, 24, 47);
-		//BatchNum->setScale(0.6f);
 		BatchNum->setAnchorPoint(ccp(0.5f,0.43f));
 		BatchNum->setPosition(node->getPosition());
 		BatchNum->setTag(CL_Batch);
@@ -1038,4 +1041,30 @@ namespace BattleSpace
 			CCDirector::sharedDirector()->getScheduler()->setTimeScale(2);
 		}
 	}
+
+	void WarControl::battleBegin()
+	{
+		this->setVisible(true);
+		if(m_bCountDown)
+			schedule(schedule_selector(WarControl::updateOneSecond), 1.0f);
+	}
+
+	void WarControl::updateOneSecond( float dt )
+	{
+		if(!m_bCountDown)
+			return;
+		m_iGameTimeCount--;
+		if (m_iGameTimeCount%5 == 0)
+			mManage->saveWordBossHurt();
+		if( m_iGameTimeCount < 0 )
+		{
+			unschedule(schedule_selector(WarControl::updateOneSecond));
+			mManage->setLogicState(false);
+			PlayBackgroundMusic(SFX_Win,false);
+			NOTIFICATION->postNotification(MsgBattleOver);
+		}else{
+			updateTimeCountUI(m_iGameTimeCount);							//更新计时器
+		}
+	}
+
 };

@@ -49,6 +49,9 @@ namespace BattleSpace{
 		NOTIFICATION->addObserver(this,callfuncO_selector(BattleRoleLayer::initActobject),MsgCreateRoleObject,nullptr);
 		NOTIFICATION->addObserver(this,callfuncO_selector(BattleRoleLayer::roleStand),MsgRoleStand,nullptr);
 		NOTIFICATION->addObserver(this,callfuncO_selector(BattleRoleLayer::removeMessage),MsgReleaseTouch,nullptr);
+		NOTIFICATION->addObserver(this,callfuncO_selector(BattleRoleLayer::createBatchMonster),MsgNextBatchEnemy,nullptr);
+		NOTIFICATION->addObserver(this,callfuncO_selector(BattleRoleLayer::heroWinAction),MsgPlayWinEffect,nullptr);
+		NOTIFICATION->addObserver(this,callfuncO_selector(BattleRoleLayer::changeLight),MsgChangeLayerLight,nullptr);
 	}
 
 	void BattleRoleLayer::onExit()
@@ -369,7 +372,7 @@ namespace BattleSpace{
 		}
 	}
 	
-	void BattleRoleLayer::heroWinAction()
+	void BattleRoleLayer::heroWinAction(CCObject* ob)
 	{
 		CCArray* arr = getAlivesOb(AliveType_Hero);
 		CCObject* obj = nullptr;
@@ -380,20 +383,21 @@ namespace BattleSpace{
 		}
 	}
 
-	void BattleRoleLayer::createBatchMonster( int batchNumber )
+	void BattleRoleLayer::createBatchMonster( CCObject* ob )
 	{
 		CCArray* arr = mManage->getMonsters(true);
 		CCObject* obj = nullptr;
 		CCARRAY_FOREACH(arr,obj)
 		{
 			BaseRole* alive = (BaseRole*)obj;
-			if(alive->getAliveID() >= C_BatchMonst+batchNumber*100)
+			if(alive->getAliveID() >= C_BatchMonst+mManage->getCurrBatch()*100)
 				initActobject(alive);
 		}
 	}
 
-	void BattleRoleLayer::changeLight( bool pLight )
+	void BattleRoleLayer::changeLight( CCObject* ob )
 	{
+		bool pLight = ((CCBool*)ob)->getValue();
 		m_LayerColor->setVisible(pLight);
 		if (pLight)
 		{

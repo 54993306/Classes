@@ -32,6 +32,7 @@ namespace BattleSpace{
 		void bigMonsterInBattle(CCObject* ob);
 		void starActionEnd(CCObject* ob);
 		bool isBigBoss(BaseRole* pRole);
+		void battleWin();
 	private:
 
 		void changeUiVisiable( bool bVisiable );

@@ -16,6 +16,11 @@
  *************************************************************/
 #include "AppUI.h"
 #include "Global.h"
+namespace google {
+	namespace protobuf{
+		class Message;
+	}
+}
 namespace BattleSpace
 {
 	class StoryLayer;
@@ -26,6 +31,8 @@ namespace BattleSpace
 	class CombatLogic;
 	class DropItem;
 	class WarControl;
+	class WarBackLayer;
+	class BattleClose;
 	enum WarSceneTouchPriority
 	{
 		guideLayerPriority = -11,		//引导层
@@ -33,23 +40,6 @@ namespace BattleSpace
 		GameEditorPriority,
 		WarControlPriority,				//UI层
 		AliveLayerPriority,				//人物层优先级
-	};
-
-	enum warScengtag
-	{
-		gono = 0,
-		win,	
-		fail,
-		sendBatch,
-		m_alive_tag,		
-		effec_tag,				//必杀技光环
-		effec1_tag,
-		effec2_tag,
-		criticon_tag,
-		attackicon_tag,
-		fire_tag,
-		batch_tag,
-		backLayer_tag,
 	};
 
 	class BattleScene : public CScene,public CCTargetedTouchDelegate
@@ -69,6 +59,7 @@ namespace BattleSpace
 		virtual void ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent);
 		virtual void ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent);
 		virtual void ccTouchCancelled(CCTouch *pTouch, CCEvent *pEvent);
+		void cReturnLayer(CCObject* ob);
 	public:
 		CC_SYNTHESIZE(CCNode*,m_MoveLayer,MoveLayer);
 		CC_SYNTHESIZE(BattleMapLayer*,m_MapLayer,BattleMapLayer);
@@ -78,11 +69,16 @@ namespace BattleSpace
 		CC_SYNTHESIZE(StoryLayer*,m_StoryLayer,StoryLayer);
 		CC_SYNTHESIZE(CombatLogic*,m_Loginc,CombatLogic);
 		CC_SYNTHESIZE(CombatGuideLayer*,m_GuideLayer,CombatGuideLayer);
+		CC_SYNTHESIZE(bool,mMoveState,MoveState);
 		CCArray* getTaskArray();
+		void OnBattleFinish(int type, google::protobuf::Message *msg);
+		void onWordBossFinish(int type, google::protobuf::Message *msg);
 	protected:
 		CCPoint m_StartPos;				//记录触摸起始点
 		DropItem* _dropItem;
 		CCTouch * m_Touch;
+		WarBackLayer* mBackLayer;
+		BattleClose* mBattleClose;
 	};
 };
 #endif // !_WAR_SCENE_H_

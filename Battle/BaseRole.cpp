@@ -275,10 +275,21 @@ namespace BattleSpace
 		if (mGridIndex < C_BEGINGRID && pGrid >= C_BEGINGRID)
 			bNotification->postNotification(MsgRoleEnterBattle,this);
 		mGridIndex = pGrid;
-		if (mGridIndex > INVALID_GRID && !getCaptain())
+		if (mGridIndex <= INVALID_GRID)
+			return;
+		setBattle(true);
+		if (getCaptain())
 		{
+			mStandGrids.clear();
+			for (int tRow=0;tRow<getBaseData()->getRoleRow();tRow++)
+			{
+				if (pGrid + tRow>C_ENDGRID)
+					continue;
+				mStandGrids.push_back(pGrid + tRow);
+			}
+			sort(mStandGrids.begin(),mStandGrids.end());
+		}else{
 			initContainGrid(mGridIndex,mStandGrids);
-			setBattle(true);
 			bNotification->postNotification(MsgRoleGridChange,this);
 		}
 	}
@@ -778,7 +789,7 @@ namespace BattleSpace
 			tAlive->getRoleObject()->setMoveState(sStateCode::eNullState);
 			tAlive->getRoleObject()->TurnStateTo(sStateCode::eStandState);
 		}
-		getRoleLayer()->changeLight(true);
+		bNotification->postNotification(MsgChangeLayerLight,CCBool::create(true));
 		bNotification->postNotification(B_RoleSkill,this);
 		mRoleLayer->removeEvent();
 	}
@@ -1017,8 +1028,8 @@ namespace BattleSpace
 	bool BaseRole::unCommonAlive()
 	{
 		if ( getCallType() != sCallType::eCommon		&& 
-			 mGuideManage->moveGuideJudge(mCommandGrid)	&&
-			 mManage->inMoveArea(mCommandGrid)			)
+			mGuideManage->moveGuideJudge(mCommandGrid)	&&
+			mManage->inMoveArea(mCommandGrid)			)
 		{
 			mGuideManage->moveGuideJudge(mCommandGrid,true);
 			setMoveGrid(mCommandGrid);
@@ -1063,7 +1074,7 @@ namespace BattleSpace
 			if ( pGrid >= C_CAPTAINGRID )							//我方武将边缘处理
 				return true;
 			if ( !getEnemy() && !getFatherID() &&
-				 pGrid<C_GRID_ROW+C_BEGINGRID )
+				pGrid<C_GRID_ROW+C_BEGINGRID )
 				return true;
 		}
 		int tRow = pVector.at(0) % C_GRID_ROW;							//最小格子的站位

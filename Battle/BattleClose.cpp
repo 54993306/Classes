@@ -22,19 +22,23 @@
 #include "Battle/BaseRoleData.h"
 #include "Battle/BattleScene/LoadBattleResource.h"
 #include "common/CommonFunction.h"
+#include "Battle/BattleConfigMacro.h"
+#include "Battle/CombatGuideManage.h"
 
+#include "tools/ShowTexttip.h"
 #include "model/DataCenter.h"
+
 #include "model/WarManager.h"
 #include "common/CGameSound.h"
 #include "netcontrol/CPlayerControl.h"
 namespace BattleSpace
 {
-	BattleClose::BattleClose():mManage(nullptr)
+	BattleClose::BattleClose():mManage(nullptr),mRecvFinish(false)
 	{}
 
 	BattleClose::~BattleClose()
 	{
-		enentRemove();
+		eventRemove();
 	}
 
 	bool BattleClose::init()
@@ -47,11 +51,51 @@ namespace BattleSpace
 	void BattleClose::eventMonitor()
 	{
 		bNotification->addObserver(this,callfuncO_selector(BattleClose::roleDieMsg),MsgRoleDie,nullptr);
+		bNotification->addObserver(this,callfuncO_selector(BattleClose::displayRoundTips),MsgMonsterTips,nullptr	);
+		bNotification->addObserver(this,callfuncO_selector(BattleClose::battleResult),MsgBattleOver,nullptr);
+		bNotification->addObserver(this,callfuncO_selector(BattleClose::roleObjectRemove),B_ActObjectRemove,nullptr);
 	}
 
-	void BattleClose::enentRemove()
+	void BattleClose::eventRemove()
 	{
 		bNotification->removeAllObservers(this);
+	}
+
+	void BattleClose::NextBatch( float dt )
+	{
+		srandNum();																	//设置随机种子
+		mManage->setCurrBatch(mManage->getCurrBatch() + 1);
+		mManage->initMonsterByBatch(mManage->getCurrBatch());								//初始化批次武将数据
+		bNotification->postNotification(MsgUpBatchNumber);
+		bNotification->postNotification(MsgNextBatchEnemy);
+		if ( !mManage->lastBatch())
+			displayRoundTips(nullptr);
+		DataCenter::sharedData()->getCombatGuideMg()->setCurrBatchGuide(nullptr);
+		if(mManage->lastBatch() && !mManage->getAliveByType(sMonsterSpecies::eBoss))
+			bNotification->postNotification(MsgShowStageWarning);
+	}
+
+	void BattleClose::displayRoundTips( CCObject* ob )
+	{
+		CCLabelAtlas* labAt = CCLabelAtlas::create(ToString(mManage->getCurrBatch()+1),"label/wave_number.png", 81, 84, '0');
+		ShowTexttip(labAt, ccc3(255, 255, 255), ROUNDNUM, CCPointZero, 0, 0, 0, 200);
+	}
+
+	void BattleClose::roleObjectRemove( CCObject* ob )
+	{
+		BaseRole* alive = (BaseRole*)ob;
+		if (alive->getEnemy() && alive->getLastAlive())
+		{
+			if (!mManage->lastBatch())										//可能会出现的一个bug，两个人同时死亡的间隔太近，会多次调用这个方法。应该从逻辑处进行最后一个死亡武将的判定而不应该从这里进行处理
+			{
+				this->scheduleOnce(schedule_selector(BattleClose::NextBatch),1);				//打下一批次延时时间
+			}else{
+				mManage->setLogicState(false);
+				bNotification->postNotification(MsgHideControlUp);
+				bNotification->postNotification(MsgCreateStory,CCInteger::create((int)StoryType::eOverStory));
+				CCDirector::sharedDirector()->getScheduler()->setTimeScale(1);
+			}
+		}
 	}
 
 	void BattleClose::roleDieMsg( CCObject* ob )
@@ -79,7 +123,7 @@ namespace BattleSpace
 		if (mManage->checkMonstOver())
 		{
 			pRole->setLastAlive(true);
-			if (mManage->getBatch() > m_CurrBatchNum)				//判断最后一回合
+			if (!mManage->lastBatch())				//判断最后一回合
 				return;
 			mManage->setLogicState(false);
 			bNotification->postNotification(MsgControlRemove);
@@ -115,17 +159,15 @@ namespace BattleSpace
 
 	void BattleClose::scheduleForRequesBossFinish()
 	{
-		if(m_bRecvFinish)
+		if(mRecvFinish)
 			return;
-		int hurt = mManage->getBossHurtCount();
-		int checkNum = mManage->getVerifyNum();
-		if ((checkNum + hurt) != 97231000)
+		if ((mManage->getVerifyNum() + mManage->getBossHurtCount()) != 97231000)
 		{
 			CCLOG("[ *ERROR ] CombatLoginc::scheduleForRequesBossFinish");				//验证造成的伤害是否被修改内存
 			return;
 		}
-		vector<int>* vec= mManage->getBossHurtVec();
-		CPlayerControl::getInstance().sendWorldBossFinish(hurt, checkNum, *vec);
+		CPlayerControl::getInstance().sendWorldBossFinish(
+			mManage->getBossHurtCount(), mManage->getVerifyNum(), *mManage->getBossHurtVec());
 	}
 
 	void BattleClose::normalStage( CCObject* ob )
@@ -156,9 +198,6 @@ namespace BattleSpace
 	{
 		PlayBackgroundMusic(SFX_Win,false);	
 		BaseRole* tRole = mManage->getAliveByGrid(C_CAPTAINGRID);	
-		int hp = tRole->getHp();
-		if (hp>tRole->getBaseData()->getRoleHp())
-			hp = tRole->getBaseData()->getRoleHp();
 		m_finishData.res = true;
 		m_finishData.roundNum = tRole->getBaseData()->getRoleHp();							//这个验证并没有什么意义
 		scheduleForRequestFinish();
@@ -181,34 +220,9 @@ namespace BattleSpace
 
 	void BattleClose::scheduleForRequestFinish()
 	{
-		if(m_bRecvFinish)
+		if(mRecvFinish)
 			return;
 		CPlayerControl::getInstance().sendBattleFinish(1, m_finishData.res, m_finishData.roundNum);
 	}
-
-	void BattleClose::roleObjectRemove( CCObject* ob )
-	{
-		BaseRole* alive = (BaseRole*)ob;
-		if (alive->getEnemy() && alive->getLastAlive())
-		{
-			if (mManage->getBatch() > m_CurrBatchNum)										//可能会出现的一个bug，两个人同时死亡的间隔太近，会多次调用这个方法。应该从逻辑处进行最后一个死亡武将的判定而不应该从这里进行处理
-			{
-				srandNum();																	//设置随机种子
-				mManage->initMonsterByBatch(m_CurrBatchNum+1);								//初始化批次武将数据(必须马上初始化数据,但是绘制可以延迟,否则多个武将连续死亡会直接战斗胜利出现)
-				this->scheduleOnce(schedule_selector(BattleClose::NextBatch),1);				//打下一批次延时时间
-			}else{
-				mManage->setLogicState(false);
-				bNotification->postNotification(MsgHideControlUp);
-				CCDirector::sharedDirector()->getScheduler()->setTimeScale(1);
-				bNotification->postNotification(MsgCreateStory,CCInteger::create((int)StoryType::eOverStory));
-			}
-		}
-	}
-
-	void BattleClose::NextBatch( float dt )
-	{
-
-	}
-
 	
 }

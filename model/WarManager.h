@@ -60,6 +60,7 @@ namespace BattleSpace
 		SpData* getSpineData(string Name);
 		MapSkeletonData& getSpineMap(){return mSpineData;}
 		/*************************************************/
+		void saveWordBossHurt();
 		vector<int>* getBossHurtVec(){return &m_VecBossHurt;}
 		vector<int>* getMoveVec(){return &mMoveArea;}
 		vector<int>* getNndefinedArea(){return &mUndefinedArea;}
@@ -85,11 +86,13 @@ namespace BattleSpace
 		bool inAddCostArea(int pGrid);
 		bool inMoveArea(int pGrid);
 		bool inUnDefineArea(int pGrid);
+		bool lastBatch();
 	public:
 		CC_SYNTHESIZE(int, m_iWorldBossRank, WorldBossRank);			//世界BOSS狂暴状态
 		CC_SYNTHESIZE(int,m_LoadImage,LoadImage);						//用于记录加载图片的id
 		CC_SYNTHESIZE(int,mStageID,StageID);							//关卡ID
-		CC_SYNTHESIZE(int,mBatch,Batch);								//批次ID
+		CC_SYNTHESIZE(int,mBatch,Batch);								//关卡批次(从0开始计数)
+		CC_SYNTHESIZE(int,mCurrBatch,CurrBatch);						//当前批次(从0开始计数)
 		CC_SYNTHESIZE(int, m_iLastStageId, LastStageId);				//上一次关卡信息(-1标记悬赏府)
 		CC_SYNTHESIZE(int, m_StageType, StageType);						//大关卡还是小关卡
 		CC_SYNTHESIZE(bool, m_bNormal, Normal);							//精英还是普通

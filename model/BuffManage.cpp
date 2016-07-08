@@ -64,7 +64,7 @@ namespace BattleSpace{
 
 	void BuffManage::AddBuff(BuffData& buf)
 	{
-		if (!m_alive->getBattle()||!m_alive->getRoleObject())
+		if (!m_alive->getBattle() || !m_alive->getRoleObject())
 		{
 			CCLOG("[ TIPS ] BuffManage::AddBuff Add Faild");
 			return;											//统一的做安全性判断处理

@@ -37,7 +37,7 @@ namespace BattleSpace
 		virtual bool init();
 		CREATE_FUNC(BattleClose);
 		void eventMonitor();
-		void enentRemove();
+		void eventRemove();
 		void roleDieMsg(CCObject* ob);
 		void monsterDie(BaseRole* pRole);
 		void battleResult(CCObject* ob);
@@ -50,10 +50,10 @@ namespace BattleSpace
 		void scheduleForRequestFinish();
 		void roleObjectRemove(CCObject* ob);
 		void NextBatch(float dt);
+		void displayRoundTips(CCObject* ob);
+		CC_SYNTHESIZE(bool,mRecvFinish,RecvFinish);
 	private:
 		WarManager* mManage;
-		int	m_CurrBatchNum;				//记录当前战斗批次
-		bool m_bRecvFinish;				//是否接收到服务器结算信息
 		GameFinishData m_finishData;
 	};
 };

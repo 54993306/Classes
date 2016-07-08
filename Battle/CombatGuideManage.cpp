@@ -4,10 +4,12 @@
 #include "Battle/BattleScene/BattleScene.h"
 #include "Battle/BattleLayer/BattleRoleLayer.h"
 #include "Battle/ConstNum.h"
+#include "model/WarManager.h"
+#include "model/DataCenter.h"
 #include "common/CGameSound.h"
 namespace BattleSpace{
 	CombatGuideManage::CombatGuideManage()
-		:m_CurrStepIndex(0),mGuideState(false),m_GuideLayer(nullptr)
+		:m_CurrStepID(0),mGuideState(false),m_GuideLayer(nullptr)
 	{}
 
 	CombatGuideManage::~CombatGuideManage()
@@ -369,9 +371,21 @@ namespace BattleSpace{
 		return nullptr;
 	}
 
-	void CombatGuideManage::setGuide(const char* FilePath,int beginStep /*= 1*/)
+	void CombatGuideManage::setCurrBatchGuide(const char* FilePath)
 	{
-		m_CurrStepIndex = beginStep;
+		WarManager* manage = DataCenter::sharedData()->getWar();
+		if (!FilePath)
+		{
+			if (!manage->getStageID())
+			{
+				char path[60] = {0};
+				sprintf(path,"%d_%d",0,manage->getCurrBatch()+1);										//覆盖高亮区域的图片
+				FilePath = path;
+			}else{
+				return ;
+			}
+		}
+		m_CurrStepID = 1;
 		if ( ! LoadJsonFile(FilePath))			//根据剧情id加载剧情文件
 		{
 			mGuideState = false;
@@ -383,7 +397,7 @@ namespace BattleSpace{
 
 	void CombatGuideManage::EnterGuide()							//让剧情层表现出剧情的信息
 	{
-		CombatGuideStep* step = getGuideStep(m_CurrStepIndex);
+		CombatGuideStep* step = getGuideStep(m_CurrStepID);
 		if (!step)
 		{
 			CCLOG("[ *ERROR ] CombatGuideManage::EnterGuide Step Is NULL");
@@ -400,7 +414,7 @@ namespace BattleSpace{
 	{
 		PlayEffectSound(SFX_423);	
 
-		CombatGuideStep* Curr_step = getGuideStep(m_CurrStepIndex);
+		CombatGuideStep* Curr_step = getGuideStep(m_CurrStepID);
 		if (Curr_step)
 		{
 			Curr_step->setFinish(true);
@@ -422,7 +436,7 @@ namespace BattleSpace{
 		CombatGuideStep* next_step = getGuideStep(Curr_step->getNextID());
 		if (next_step)
 		{
-			m_CurrStepIndex = Curr_step->getNextID();
+			m_CurrStepID = Curr_step->getNextID();
 			m_GuideLayer->ClearGuideLayer();
 			m_GuideLayer->setGuideStep(next_step);
 		}else{
@@ -440,9 +454,9 @@ namespace BattleSpace{
 
 	CombatGuideStep* CombatGuideManage::getCurrStep()
 	{
-		if (getGuideStep(m_CurrStepIndex))
+		if (getGuideStep(m_CurrStepID))
 		{
-			return getGuideStep(m_CurrStepIndex);
+			return getGuideStep(m_CurrStepID);
 		}
 		return nullptr;
 	}

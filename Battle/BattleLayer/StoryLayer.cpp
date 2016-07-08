@@ -205,10 +205,10 @@ namespace BattleSpace{
 		talkConten->setTag(pangbai_tag);
 		talkConten->setPosition(getPointIntag(pangbai_tag));
 		m_ui->addChild(talkConten);
-		//旁白自动步骤,
-		if(m_StoryStep->gettime()<0.5f)
-			m_StoryStep->settime(0.5f);
-		talkConten->runAction(CCSequence::createWithTwoActions(CCDelayTime::create(m_StoryStep->gettime()), CCCallFunc::create(this, callfunc_selector(StoryLayer::updateForAutoStep))));
+		////旁白自动步骤,
+		//if(m_StoryStep->gettime()<0.5f)
+		//	m_StoryStep->settime(0.5f);
+		//talkConten->runAction(CCSequence::createWithTwoActions(CCDelayTime::create(m_StoryStep->gettime()), CCCallFunc::create(this, callfunc_selector(StoryLayer::updateForAutoStep))));
 	}
 	//刷新文字内容
 	void StoryLayer::updateContent()
@@ -431,6 +431,7 @@ namespace BattleSpace{
 	//不断创建新的对象,而不是使用同一个对象执行淡入淡出操作,就不会出现冲突的情况了
 	void StoryLayer::step()
 	{
+		CGameSound::getInstance()->stopAllEffects();
 		storymusic();						//音乐音效
 		backGround();						//背景图片
 		content();							//文字内容
@@ -447,6 +448,7 @@ namespace BattleSpace{
 
 	void StoryLayer::PostEnd(CCObject* ob)
 	{ 
+		CGameSound::getInstance()->stopAllEffects();
 		clearNode();
 		this->setVisible(false);
 		m_isStory = false;

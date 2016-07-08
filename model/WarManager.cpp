@@ -34,8 +34,8 @@
 namespace BattleSpace
 {
 	WarManager::WarManager()
-	:m_efdata(nullptr),m_armatureEventDataMgr(nullptr),mMaxCost(0)
-	,mStageID(-1),mBatch(-1),m_iLastStageId(0),m_StageType(0),mLogicState(false)
+	:m_efdata(nullptr),m_armatureEventDataMgr(nullptr),mMaxCost(0),mCurrBatch(0)
+	,mStageID(-1),mBatch(0),m_iLastStageId(0),m_StageType(0),mLogicState(false)
 	,m_bNormal(true),m_ChapterCount(0),m_ChapterIndex(0), m_BossModel(false),mCostSpeed(0)
 	,m_VerifyNum(0),m_BossHurtCount(0),mBossHurtPe(0),m_iWorldBossRank(0),mCurrCost(0)
 	,mBattleOver(false),mFirstStage(true),mStoryData(nullptr),mBuffData(nullptr)
@@ -50,7 +50,8 @@ namespace BattleSpace
 			CC_SAFE_RELEASE(tRole.second);
 		}
 		mBattleRole.clear();
-		mBatch = -1;
+		mBatch = 0;
+		mCurrBatch = 0;
 		//mStageID = -1;
 		mBattleHeros.clear();
 		mBattleMonsters.clear();
@@ -517,6 +518,18 @@ namespace BattleSpace
 	{
 		mCurrCost += pCost; 
 		costUpdate(0);
+	}
+
+	bool WarManager::lastBatch()
+	{
+		if (getCurrBatch() < getBatch())
+			return false;
+		return true;
+	}
+
+	void WarManager::saveWordBossHurt()
+	{
+		m_VecBossHurt.push_back(m_BossHurtCount);
 	}
 
 }

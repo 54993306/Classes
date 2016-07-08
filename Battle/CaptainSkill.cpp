@@ -15,7 +15,7 @@ namespace BattleSpace
 	{
 		BaseRole* alive  = DataCenter::sharedData()->getWar()->getAliveByGrid(C_CAPTAINGRID);
 		CCArray* arr = DataCenter::sharedData()->getWar()->getHeros(true);
-		if (!alive||!arr||alive->getBaseData()->hasCaptainSkill())
+		if (!alive||!arr|| !alive->getBaseData()->hasCaptainSkill())
 			return;
 		const RoleSkill* skill = alive->getBaseData()->getCaptainSkill();							//需同时满足种族限制且满足属性限制
 		CCArray* RaceArr = RaceJudgeCap(arr,skill->getTargetType());			//种族限制判定
