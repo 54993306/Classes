@@ -60,8 +60,16 @@ const GooglePayProduct GOOGLE_PRODUCT[] =
 //7.消耗成功，购买流程走完
 
 
-const	int G_PAY					= 0x1001;				//支付
-const	int G_CONCUME		= 0x1002;				//消耗订单
+const	int G_PAY												= 0x1001;				//支付
+const	int G_CONCUME									= 0x1002;				//消耗订单
+const	int START_CONSUME_TROUBLE			= 0x1003;				//登录后开始消耗问题订单
+
+enum GooglePaySdkTag
+{
+	GooglePayTagNull = -1,						//默认标记
+	GooglePayTagCheckPurchase,				//成功，验证订单
+	GooglePayTagPayFailed						//购买失败
+};
 
 class GooglePaySDK : public CCObject 
 {
@@ -72,6 +80,7 @@ public:
 	static GooglePaySDK *getInstance();
 	static void  destroy();
 
+	void updateForPurchase( float dt );
 public:
 
 	void init();
@@ -86,7 +95,10 @@ public:
 	void checkPurchase(string sProductID, string sSignData, string sPurchaseInfo);
 
 	//消耗订单
-	void concumePurchase(int iMsg, string sPurchaseInfo); 
+	void concumePurchase(int iMsg, string sPurchaseInfo);
+
+	//登录后开始消耗问题订单
+	void startConsumeTroublePurchaes();
 
 	//支付失败
 	void payFail(string sProductID);
@@ -107,4 +119,7 @@ private:
 private:
 	static GooglePaySDK			*m_pInstance;
 	string								m_sPurchaseInfo;	//原始订单信息
+	string								m_sProductID;		//产品ID
+	string								m_sSignData;		//签名数据
+	GooglePaySdkTag				m_iPayTag;				//pay_tag
 };

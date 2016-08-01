@@ -22,6 +22,7 @@ namespace BattleSpace
 {
 	class WarManager;
 	class BaseRole;
+	class PvEStrategy;
 	class AutoData : public CCObject
 	{
 	public:
@@ -39,6 +40,7 @@ namespace BattleSpace
 	public:
 		virtual ~TotalStrategy();
 		CREATE_FUNC(TotalStrategy);
+		CC_SYNTHESIZE(bool,mExcute,Excute);
 		virtual bool init();
 		void addEvent();
 		void removeEvent();
@@ -86,6 +88,7 @@ namespace BattleSpace
 		AutoData* mAutoData;
 		vector<int> mCrossArea;
 		BaseRole* mSkillRole;
+		PvEStrategy* mPveStrategy;
 	};
 };
 #endif

@@ -502,3 +502,31 @@ void SmartSetRectPrizeColor( CCSprite* pSprite, const CPrize* pPrize, const Priz
 		pSprite->setTexture(setItemQualityTexture(iColor));
 	}
 }
+
+//核对日期是否到来
+bool CheckDay( const char *str )
+{
+	struct   tm  * tm ;  
+	time_t  timep;  
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)   
+	time(&timep);  
+#else   
+	struct  cc_timeval now;   
+	CCTime::gettimeofdayCocos2d(&now, NULL);   
+	timep = now.tv_sec;  
+#endif   
+
+	tm  = localtime(&timep);  
+	int  year =  tm ->tm_year + 1900;  
+	int  month =  tm ->tm_mon + 1;  
+	int  day =  tm ->tm_mday;  
+	int  hour= tm ->tm_hour;  
+
+	CCString* sDay = CCString::createWithFormat("%d-%s%d-%s%d-%s%d", year, month>9?"":"0", month, day>9?"":"0", day, hour>9?"":"0", hour);
+	if(sDay->compare(str)>=0)
+	{
+		return true;
+	}
+
+	return false;
+}

@@ -1,5 +1,6 @@
 ﻿#ifndef _SELECT_HERO_SCENE_H_
 #define _SELECT_HERO_SCENE_H_
+
 #include "AppUI.h"
 #include "net/MessageHandler.h"
 #include "common/CursorTextField.h"

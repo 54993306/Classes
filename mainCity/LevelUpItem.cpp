@@ -28,6 +28,7 @@
 #include "common/CCRollLabelAction.h"
 #include "StarUpItem.h"
 
+
 CLevelUpItem::CLevelUpItem():m_strenLeft(nullptr),m_itemAttr(nullptr),m_smeltLay(nullptr)
 	,m_isHpAdding(false),m_isAtkAdding(false),m_isDefAdding(false),m_isOneKey(false)
 	,m_pCellInfo(nullptr)
@@ -68,6 +69,13 @@ bool CLevelUpItem::init()
 		CCPoint pBasePos = ccp(1281, 115);
 		//初始化基础属性四条
 		initItemInfo(pBasePos, m_pBaseInfo, 4);
+
+		//添加动画
+		SkeletonAnimation *pSkeletonAnimation = SkeletonAnimation::createWithFile("strengthen/5002.json", "strengthen/5002.atlas", 1);
+		pSkeletonAnimation->setPosition(ccp(887, -2));
+		pSkeletonAnimation->setAnimation(0, "stand", true);
+		m_ui->addChild(pSkeletonAnimation, 3);
+		m_pSpineHero = pSkeletonAnimation;
 
 		return true;
 	}
@@ -317,8 +325,7 @@ void CLevelUpItem::showItem()
 {
 	CLabel *tip = dynamic_cast<CLabel*>(m_ui->findWidgetById("tip"));
 	tip->setVisible(false);
-	CCNode *hero = dynamic_cast<CCNode*>(m_ui->findWidgetById("hero"));
-	hero->setVisible(false);
+	m_pSpineHero->setVisible(false);
 
 	CLayout *attribute = (CLayout*)(m_ui->findWidgetById("attr"));
 	attribute->setVisible(true);
@@ -769,8 +776,7 @@ void CLevelUpItem::clearEquip()
 {
 	CLabel *tip = dynamic_cast<CLabel*>(m_ui->findWidgetById("tip"));
 	tip->setVisible(true);
-	CCNode *hero = dynamic_cast<CCNode*>(m_ui->findWidgetById("hero"));
-	hero->setVisible(true);
+	m_pSpineHero->setVisible(true);
 
 	CLayout *attribute = (CLayout*)(m_ui->findWidgetById("attr"));
 	attribute->setVisible(false);

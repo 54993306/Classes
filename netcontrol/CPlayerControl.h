@@ -29,25 +29,21 @@ public:
 	~CPlayerControl();
 	bool init();
 	virtual bool ProcessMsg(int type, google::protobuf::Message *msg);
-	void roleMove(google::protobuf::Message *msg);
-	void roleOnlineList(google::protobuf::Message *msg);
 	void showBullet(float delt);
 	
 
 	void sendChapterList(int type);   //获取章节列表  (0 普通关卡，1 精英关卡）
 	
 	void sendEnterStageForBoss(int hero1,int hero2, int hero3, int hero4, int hero5); //进入世界BOSS关卡
-
+	void sendPvEBattleInfo(int pRoleID,bool pAiState,vector<int>& pHeroID);
 	void sendEnterStage(int stageId,int hero1,int hero2, int hero3, int hero4, int hero5=0, int fid=0, int questId=0); //进入关卡 , //选择参战的好友ID, //选择参战的好友英雄ID
 	void sendStageInfo(int stageId); //获取关卡预览信息(64)
 	/*0 全部， 1 出战英雄， 2 未出战, 3 可驻守  4 可招募*/
 	void sendHeroList(int mask,int unionId=0,int roleId=0); //请求获取玩家英雄列表
 	void SendLotteryType(int type);
-	void sendSkillList(int heroId);//请求英雄所有可用技能列表
-	void sendChangeSkill(int type, int skillId,int heroId);//请求更换技能
-	void sendChangeHero(int nionId, int pos, int heroId); //设置出战英雄
 	void sendBattleFinish(int reason, bool res,int roundNum);
 	void sendWorldBossFinish(int hurt,int checkNum,vector<int>&vec);
+	void sendPveBattleFinish( bool bBattleResult, int iBattleTime, int iEnemyLeaderHp, int iSelfLeaderHp );	//pvp结算,1战斗结果 2战斗时间 3敌方主帅血量 4我方主帅血量
 
 	void sendChangeArmor(int heroId, int pos,int armorId);//请求更换装备;
 	void sendMonterList(int batch);// 伏兵
@@ -71,13 +67,6 @@ public:
 	//请求升星
 	void sendArmorStartUp(int armorId, int itemId, bool useGold);	//装备ID，特殊素材ID，是否用勾玉
 
-	//角色退出
-	void roleExit(google::protobuf::Message *msg);
-	//关卡列表
-	void stageListResponse(Message *msg);
-
-	void battleInfo(Message * msg);		//关卡战斗信息
-	void BossBattleInfo(Message * msg);	//世界boss
 	//请求签到
 	void sendSignReq(bool resign);
 	//更改角色名称 (60)
@@ -118,6 +107,9 @@ public:
 
 	//请求挑战队伍数据
 	void askForPvpChallenge(bool bFirst=true);
+protected:
+	void rechargeRes(int type, google::protobuf::Message *msg);
+	void paySuccess(int money, RechargeRes *res);
 
 private:
 	CPlayerControl();

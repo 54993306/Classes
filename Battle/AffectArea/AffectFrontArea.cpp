@@ -23,7 +23,7 @@ namespace BattleSpace
 
 	void AffectFrontSingle::initArea(AreaCountInfo& pInfo)
 	{
-		vector<BaseRole*>* tRoles = pInfo.getAlive()->getSkillTargets();
+		vector<BaseRole*>* tRoles = pInfo.getAlive()->getCurrSkillTargets();
 		for (auto tRole : *tRoles)
 		{
 			if (!tRole->getCaptain())

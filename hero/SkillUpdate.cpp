@@ -66,14 +66,14 @@ void CSkillUpdate::heroSkill(CHero *hero, CSkill *skill)
 
 	level->setString(CCString::createWithFormat("Lv.%d",skill->level)->getCString());
 	level1->setString(CCString::createWithFormat("Lv.%d",skill->level+1)->getCString());
-	const SkillCfg *cfg1 = DataCenter::sharedData()->getSkill()->getCfg(skill->skillId+skill->level);
+	const SkillCfg *cfg1 = DataCenter::sharedData()->getSkill()->getCfg(skill->skillId/*+skill->level*/);
 	if(cfg1)
 	{
 		name1->setString(cfg1->name.c_str());
 		desc1->setString(cfg1->desc.c_str());
 	}
 
-	const SkillCfg *cfg2 = DataCenter::sharedData()->getSkill()->getCfg(skill->skillId+skill->level+1);
+	const SkillCfg *cfg2 = DataCenter::sharedData()->getSkill()->getCfg(skill->skillId/*+skill->level+1*/);
 	if(cfg2)
 	{
 		name2->setString(cfg2->name.c_str());
@@ -109,13 +109,22 @@ void CSkillUpdate::heroSkill(CHero *hero, CSkill *skill)
 	skill2->setPositionY(skill2->getPositionY()-370);
 	skill2->setScale(1.2f);
 	skill1->runAction(CCSequence::create(CCEaseBackIn::create(CCMoveBy::create(0.2f,ccp(0,370))),CCScaleTo::create(0.2f,1.0f),nullptr));
-	skill2->runAction(CCSequence::create(CCEaseBackIn::create(CCSpawn::create(CCMoveBy::create(0.2f,ccp(0,230)),CCScaleTo::create(0.2f,1.0f))),CCDelayTime::create(0.3f),CCEaseBackIn::create(CCMoveBy::create(0.2f,ccp(0,139))),nullptr));
+	skill2->runAction(CCSequence::create(
+		CCEaseBackIn::create(
+			CCSpawn::createWithTwoActions(
+				CCMoveBy::create(0.2f,ccp(0,370)),
+				CCScaleTo::create(0.2f,1.0f))),
+		CCDelayTime::create(0.3f),
+		CCEaseBackIn::create(CCMoveBy::create(0.2f,ccp(0,139))),
+		nullptr));
+
 	this->scheduleOnce(schedule_selector(CSkillUpdate::skillActionExit),3.0f);
 }
 
 void CSkillUpdate::skillActionExit(float dt)
 {	
 	this->unschedule(schedule_selector(CSkillUpdate::skillActionExit));
+	this->stopAllActions();
 	LayerManager::instance()->pop();
 	LayerManager::instance()->pop();
 }

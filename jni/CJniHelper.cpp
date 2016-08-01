@@ -104,7 +104,7 @@ std::string CJniHelper::getVersionName()
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 	return c_get_version_name();
 #endif
-	return "1.0.0";
+	return "1.0.1";
 }
 
 
@@ -170,5 +170,32 @@ bool CJniHelper::isNeedDownloadPackage()
 #endif
 	CCAssert(false, "Wrong : should be call on android platform!");
 	return true;
+}
+
+int CJniHelper::getPlatform()
+{
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+	//获取需要更新的所有版本
+	std::string sDefalutVersion = CJniHelper::getInstance()->getVersionName();
+	if(sDefalutVersion.compare("1.0.2")>0)
+	{
+		//1.0.2以下的包，没有平台判断方法，
+		return c_getPlatform();
+	}
+#endif
+	return 0;
+}
+
+void CJniHelper::downloadNewVersionFromGooglePlay()
+{
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+	//获取需要更新的所有版本
+	std::string sDefalutVersion = CJniHelper::getInstance()->getVersionName();
+	if(sDefalutVersion.compare("1.0.2")>0)
+	{
+		//1.0.2以下的包，没有平台判断方法，
+		return c_down_new_version_from_google_play();
+	}
+#endif
 }
 

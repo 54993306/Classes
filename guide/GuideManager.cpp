@@ -51,14 +51,8 @@ void CGuideManager::enterGuide()
 	}
 	if (m_guideTask==2&&LayerManager::instance()->getLayer("CTollgateLayer"))
 	{
-// 		m_guideStep+=3;
-// 		task = m_guideData.getTaskByStep(m_guideTask,m_guideStep);
 	}
-// 	while (task&&task->isFinish)
-// 	{
-// 		m_guideStep++;
-// 		task = m_guideData.getTaskByStep(m_guideTask,m_guideStep);
-// 	}
+
 	CCLOG("enter %d, %d",m_guideTask,m_guideStep);
 
 	if (m_guideStep>m_guideData.getGuideTasks(m_guideTask).size())
@@ -71,9 +65,7 @@ void CGuideManager::enterGuide()
 	{
 		mainScene->addChild(m_guideLayer,100,100001);
 	}
-// 	CMainScene *mainScene = (CMainScene*)CSceneManager::sharedSceneManager()->getScene("CMainScene");
-	
-	/*CCDirector::sharedDirector()->getRunningScene()->addChild();*/
+
 	if (task->type=="story")
 	{
 		m_isRunGuiding = true;
@@ -84,18 +76,8 @@ void CGuideManager::enterGuide()
 		CCNode *widget = getStepNode(*task);
 		if (!widget)
 		{
-// 			if (task->className=="CTollgateLayer"&&task->widgetId=="close"&&m_isBeginGuide)
-// 			{
-// 				task->isFinish = true;
-// 				m_isRunGuiding = true;
-// 				nextStep();
-// 				return;
-// 			}
-// 			else
-			{
-				exitGuide();
-				return;
-			}
+			exitGuide();
+			return;
 		}
 		CScrollView *scroll = dynamic_cast<CScrollView*>(widget->getParent()->getParent());
 		CGridPageView *pageView = dynamic_cast<CGridPageView*>(widget->getParent()->getParent()->getParent()->getParent());
@@ -136,13 +118,7 @@ void CGuideManager::enterGuide()
 void CGuideManager::nextStep()
 {
 	GuideTask *task = CGuideManager::getInstance()->getGuideTaskData();
-	if (m_guideTask==2&&m_guideStep==8)
-	{
-	//	m_guideLayer->runDelayStep();
-// 		m_guideLayer->setVisible(false);
-// 		exitGuide();
-//  		return;
-	}
+
     if (!task->isFinish) return;
 	m_guideStep++;
 
@@ -185,7 +161,6 @@ void CGuideManager::nextStep()
 				}
 				
 			}
-	// 		m_stepPos = widget->getParent()->getParent()->convertToWorldSpace(widget->getPosition());
 			CListView *scroll = dynamic_cast<CListView*>(widget->getParent()->getParent());
 			if (scroll)
 			{
@@ -242,13 +217,8 @@ void CGuideManager::exitGuide()
 	UserData *user = DataCenter::sharedData()->getUser()->getUserData();
 	if (m_guideTask>0&&user->getNewStep()!=m_guideTask)
 	{
-// 		user->setNewStep(user->getNewStep);
 		CGuideManager::getInstance()->setTaskStep(user->getNewStep(),1);
 		CGuideManager::getInstance()->enterGuide();
-	}
-	else
-	{
-		//user->setNewStep(0);
 	}
 	setJumpStep(false);
 
@@ -312,6 +282,7 @@ CCNode* CGuideManager::getStepNode(const GuideTask &task)
 CCNode* CGuideManager::findStepWidget(BaseLayer * layer, const GuideTask &task)
 {
 	CLayout *ui = dynamic_cast<CLayout*>(layer->findWidgetById("UI"));
+	//根据type,tag查找节点
 	if (task.widgetId!= "")
 	{
 		if (task.type=="btn"||task.type=="radio"||task.type=="open")
@@ -406,56 +377,6 @@ CCNode* CGuideManager::findStepWidget(BaseLayer * layer, const GuideTask &task)
 			}
 			return (CCNode*)ui->getChildByTag(task.tag);
 		}
-// 		else if (task.type == "table")
-// 		{
-// 			CTableView *table = NULL;
-// 			if (task.tag1>0)
-// 			{
-// 				table = (CTableView*)ui->getChildByTag(task.tag)->getChildByTag(task.tag1);
-// 			}
-// 			else
-// 			{
-// 				table = (CTableView*)ui->getChildByTag(task.tag);
-// 			}
-// 			if (table->getChildrenCount()>0)
-// 			{
-// 				return table->cellAtIndex(task.tag);
-// 			}
-// 			return table;
-// 		}
-// 		else if (task.type == "grid")
-// 		{
-// 			CGridView *gridView = nullptr;
-// 			if (task.tag1>0)
-// 			{
-// 				gridView = (CGridView*)ui->getChildByTag(task.tag)->getChildByTag(task.tag1);
-// 			}
-// 			else
-// 			{
-// 				gridView = (CGridView*)ui->getChildByTag(task.tag);
-// 			}
-// 			if (gridView->getChildrenCount()>0)
-// 			{
-// 				return gridView->cellAtIndex(task.tag);
-// 			}
-// 			return gridView;
-// 		}
-// 		else if (task.type == "list")
-// 		{
-// 			CListView *listView = nullptr;
-// 			if (task.tag1>0)
-// 			{
-// 				listView = (CListView*)ui->getChildByTag(task.tag)->getChildByTag(task.tag1);
-// 			}
-// 			else
-// 			{
-// 				listView = (CListView*)ui->getChildByTag(task.tag);
-// 			}
-// 			if (listView->getChildrenCount()>0)
-// 			{
-// 				return listView->getNodeAtIndex(task.tag);
-// 			}
-// 		}
 	}
 	return nullptr;
 }

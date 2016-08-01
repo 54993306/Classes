@@ -1772,6 +1772,22 @@ class StageInfo : public ::google::protobuf::Message {
   inline ::google::protobuf::int32 prize() const;
   inline void set_prize(::google::protobuf::int32 value);
 
+  // repeated string friends = 9;
+  inline int friends_size() const;
+  inline void clear_friends();
+  static const int kFriendsFieldNumber = 9;
+  inline const ::std::string& friends(int index) const;
+  inline ::std::string* mutable_friends(int index);
+  inline void set_friends(int index, const ::std::string& value);
+  inline void set_friends(int index, const char* value);
+  inline void set_friends(int index, const char* value, size_t size);
+  inline ::std::string* add_friends();
+  inline void add_friends(const ::std::string& value);
+  inline void add_friends(const char* value);
+  inline void add_friends(const char* value, size_t size);
+  inline const ::google::protobuf::RepeatedPtrField< ::std::string>& friends() const;
+  inline ::google::protobuf::RepeatedPtrField< ::std::string>* mutable_friends();
+
   // @@protoc_insertion_point(class_scope:protos.StageInfo)
  private:
   inline void set_has_id();
@@ -1801,9 +1817,10 @@ class StageInfo : public ::google::protobuf::Message {
   bool ismain_;
   ::google::protobuf::int32 action_;
   ::google::protobuf::int32 prize_;
+  ::google::protobuf::RepeatedPtrField< ::std::string> friends_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(8 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(9 + 31) / 32];
 
   friend void  protobuf_AddDesc_stage_5fprotocol_2eproto();
   friend void protobuf_AssignDesc_stage_5fprotocol_2eproto();
@@ -3423,6 +3440,50 @@ inline ::google::protobuf::int32 StageInfo::prize() const {
 inline void StageInfo::set_prize(::google::protobuf::int32 value) {
   set_has_prize();
   prize_ = value;
+}
+
+// repeated string friends = 9;
+inline int StageInfo::friends_size() const {
+  return friends_.size();
+}
+inline void StageInfo::clear_friends() {
+  friends_.Clear();
+}
+inline const ::std::string& StageInfo::friends(int index) const {
+  return friends_.Get(index);
+}
+inline ::std::string* StageInfo::mutable_friends(int index) {
+  return friends_.Mutable(index);
+}
+inline void StageInfo::set_friends(int index, const ::std::string& value) {
+  friends_.Mutable(index)->assign(value);
+}
+inline void StageInfo::set_friends(int index, const char* value) {
+  friends_.Mutable(index)->assign(value);
+}
+inline void StageInfo::set_friends(int index, const char* value, size_t size) {
+  friends_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* StageInfo::add_friends() {
+  return friends_.Add();
+}
+inline void StageInfo::add_friends(const ::std::string& value) {
+  friends_.Add()->assign(value);
+}
+inline void StageInfo::add_friends(const char* value) {
+  friends_.Add()->assign(value);
+}
+inline void StageInfo::add_friends(const char* value, size_t size) {
+  friends_.Add()->assign(reinterpret_cast<const char*>(value), size);
+}
+inline const ::google::protobuf::RepeatedPtrField< ::std::string>&
+StageInfo::friends() const {
+  return friends_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::std::string>*
+StageInfo::mutable_friends() {
+  return &friends_;
 }
 
 // -------------------------------------------------------------------

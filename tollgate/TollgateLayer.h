@@ -6,6 +6,8 @@
 #include "scene/layer/LayerManager.h"
 #include "Chapter.h"
 #include "StageData.h"
+#include "activity/HttpLoadImage.h"
+#include "FaceBookImg.h"
 
 //章节切换方向
 enum TollgateTouchDir
@@ -15,7 +17,7 @@ enum TollgateTouchDir
 	TollgateTouchDirRight
 };
 
-class CTollgateLayer: public BaseLayer	
+class CTollgateLayer: public BaseLayer, public HttpLoadImageDelegate
 {
 public:
 	CREATE_LAYER(CTollgateLayer);
@@ -36,6 +38,7 @@ public:
 
 	CC_SYNTHESIZE(bool, m_bExitWithNoHardChapter, ExitWithNoHardChapter);
 	void setLastChapter(int chapter);
+	void imageLoadSuccessCallBack(string sTag, vector<char>* pBuffer);//好友头像下载回调
 
 private:
 	//关闭
@@ -47,6 +50,8 @@ private:
 	//tableview相关
 	CCObject* pageviewDataSource(CCObject* pConvertCell, unsigned int uIdx);
 	void addCell(unsigned int uIdx, CPageViewCell * pCell);
+
+	void addFaceBookImg(CStage &stage, CImageView * fbBg);
 
 	//左/右按钮切换到上一章/下一章
 	void onLeftStage(CCObject* pSender);
@@ -74,8 +79,11 @@ private:
 
 	//是否是章节最后一个关卡
 	bool isLasStageInChapter(const CStage& stage);
-
+	void onFaceImg(CCObject* pSender);
 	
+	//弹提示框
+	void showTips(CCNode *pNode, const std::string sInfo);
+
 private:
 	CLayout *m_ui;
 	CTableView *m_pageView;
@@ -110,7 +118,9 @@ private:
 	//当前开放的章节数量
 	int m_iOpenChapterCount[2];
 	int m_currChapter;
-
+	CFacebookImg *m_fbImgLayer;
+	int		m_iFirstLockedStage;			//即将要打但是没有开放的关卡
+	CLayout *m_pTips;
 };
 
 

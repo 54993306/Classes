@@ -29,7 +29,7 @@
 
 #include "pvp_ui/PvpGateLayer.h"
 
-#include "GamePlatfomDefine.h"
+#include "SDK/GamePlatformManager.h"
 #include "mainCity/mainScene.h"
 #include "tools/CCShake.h"
 
@@ -57,10 +57,6 @@ bool CMainCityBuild::init()
 	m_cityUi->setTouchPriority(-2);
 	this->addChild(m_cityUi,0,20010);
 // 	LayerManager::instance()->push(m_cityUi);
-	
-	m_pTopLay = CTopLayer::create();
-	m_pTopLay->setTouchPriority(-2);
-	this->addChild(m_pTopLay, 100, 2000);
 
 	show(nullptr);
 
@@ -98,6 +94,8 @@ void CMainCityBuild::onEnter()
 	//绑定场景隐藏和显示的消息
 	NOTIFICATION->addObserver(this, callfuncO_selector(CMainCityBuild::show), SHOW_MAIN_SCENE, nullptr);
 	NOTIFICATION->addObserver(this, callfuncO_selector(CMainCityBuild::hide), HIDE_MAIN_SCENE, nullptr);
+	
+	NOTIFICATION->addObserver(this, callfuncO_selector(CMainCityBuild::backFromPvp), "CMainCityBuild::backFromPvp", nullptr);
 
 	PlayBackgroundMusic(BGM_MainCity,true);
 
@@ -126,7 +124,7 @@ void CMainCityBuild::onEnter()
 		if (user->getFirstMobileShop())
 		{		
 			m_frontLay->setPositionX(m_maxX);
-			m_bgLay->setPositionX(1822);
+			m_bgLay->setPositionX(m_iBgLayerMaxLeftBasePos);
 			user->setFirstMobileShop(false);
 		}
 	}
@@ -139,7 +137,7 @@ void CMainCityBuild::onEnter()
 #endif
 
 	//正在引导，不自动弹窗
-	if(user->getNewStep()>0/*CGuideManager::getInstance()->getIsRunGuide()*/)
+	if(user->getNewStep()>0 && user->getNewStep()!=100)
 	{
 		DataCenter::sharedData()->setCityActionType(CA_None);
 	}
@@ -180,9 +178,19 @@ void CMainCityBuild::onEnter()
 	CSceneManager::sharedSceneManager()->addMsgObserver(UPDATE_GAMETIP,this,GameMsghandler_selector(CMainCityBuild::updateGameTip));
 	showNoticeTip(CTaskControl::getInstance()->getGameTips());
 
-#if G_PLATFORM_TARGET == G_PLATFORM_UC
-	LoginLayerUC::click_show_fb(nullptr);
-#endif
+	//显示平台悬浮窗
+	GamePlatformMgr->ShowPlatformFloatWindow();
+
+	//弹出PVP界面
+	if(DataCenter::sharedData()->getCityActionType() == CA_PVP)
+	{
+		//自动上天
+		runAction(CCSequence::createWithTwoActions(
+			CCDelayTime::create(0.1f),
+			CCCallFunc::create(this, callfunc_selector(CMainCityBuild::autoToPvp))
+			));
+		DataCenter::sharedData()->setCityActionType(CA_None);
+	}
 
 }
 
@@ -209,10 +217,13 @@ void CMainCityBuild::moveEvent(CCArmature *armature, MovementEventType movementT
 	else if (movementType==COMPLETE&&strcmp(movementID,"baozha")==0)
 	{
 		//m_armature->getAnimation()->play("tiao");
-		CShopLayer *shpLayer = CShopLayer::create();
-		shpLayer->setShopType(2);
-		LayerManager::instance()->push(shpLayer);
-		CMainCityControl::getInstance()->sendShopRequest(2);
+		if( LayerManager::instance()->getLayer("CShopLayer") == nullptr )
+		{
+			CShopLayer *shpLayer = CShopLayer::create();
+			shpLayer->setShopType(2);
+			LayerManager::instance()->push(shpLayer);
+			CMainCityControl::getInstance()->sendShopRequest(2);
+		}
 		m_armature->getAnimation()->play("xunhuan",-1,-1,1);
 	}
 } 
@@ -261,6 +272,8 @@ void CMainCityBuild::updateGarrsionHero(const TMessage& tMsg)
 
 void CMainCityBuild::onClickButton(CCObject* pSender)
 {
+	if(m_bTouchLock) return;
+
 	CButton *btn = dynamic_cast<CButton*>(pSender);
 	map<int,CCity>::iterator iter = m_cityMap.find(btn->getTag());
 
@@ -402,7 +415,7 @@ void CMainCityBuild::onClickButton(CCObject* pSender)
 	case   Btn_Tower:
 		{
 			//ShowPopTextTip(GETLANGSTR(202));
-			
+
 			//Pvp进入
 			showPvp();
 
@@ -631,9 +644,9 @@ void CMainCityBuild::onExit()
 
 	NOTIFICATION->removeAllObservers(this);
 
-#if G_PLATFORM_TARGET == G_PLATFORM_UC
-	LoginLayerUC::click_hide_fb(nullptr);
-#endif
+	//隐藏平台悬浮窗
+	GamePlatformMgr->HidePlatformFloatWindow();
+
 }
  
 bool CMainCityBuild::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
@@ -642,7 +655,6 @@ bool CMainCityBuild::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
 	{
 		return false;
 	}
-	m_bTouchLock = true;
 
 	m_preMovePos = m_ui->convertToNodeSpace(pTouch->getLocation());
 	m_beginPos = m_preMovePos;
@@ -760,15 +772,17 @@ void CMainCityBuild::ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent)
 	if (m_isTouchShop&&m_armature->boundingBox().containsPoint(m_frontLay->convertToNodeSpace(pTouch->getLocation())))
 	{
 		CCLOG("sg");
+		if(m_armature->getAnimation()->getCurrentMovementID() != "baozha")
+		{
+			m_armature->getAnimation()->play("baozha");
+		}
 		m_isTouchShop =  false;
-		m_armature->getAnimation()->play("baozha");
 	}
-	m_bTouchLock = false;
 }
 
 void CMainCityBuild::ccTouchCancelled( CCTouch *pTouch, CCEvent *pEvent )
 {
-	m_bTouchLock = false;
+	
 }
 
 void CMainCityBuild::onGetButton(CCObject* pSender)
@@ -1412,17 +1426,29 @@ void CMainCityBuild::showPvp()
 
 	unscheduleUpdate();
 
-	float fPosX = m_maxX - 100;
-	float fTime = fabs(m_frontLay->getPositionX()-fPosX)/700;
+	float fFgPosX = m_maxX - 100;
+	float fBgPosX = m_iBgLayerMaxLeftBasePos - 70;
+
+	float fTime = fabs(m_frontLay->getPositionX()-fFgPosX)/700;
+
 	m_frontLay->runAction(
-		CCEaseSineInOut::create(CCMoveTo::create(fTime, ccp(fPosX, m_frontLay->getPositionY())))
+		CCEaseSineInOut::create(CCMoveTo::create(fTime, ccp(fFgPosX, m_frontLay->getPositionY())))
 		);
 	m_bgLay->runAction(
-		CCEaseSineInOut::create(CCMoveTo::create(fTime, ccp(fPosX, m_fogLay->getPositionY())))
+		CCEaseSineInOut::create(CCMoveTo::create(fTime, ccp(fBgPosX, m_fogLay->getPositionY())))
 		);
 	
 	m_cityUi->setVisible(false);
-	m_pTopLay->setVisible(false);
+	NOTIFICATION->postNotification(HIDE_TOP_LAYER);
+
+	//先初始化资源，避免动画过程中卡顿
+	CMainScene *pScene = dynamic_cast<CMainScene*>(CSceneManager::sharedSceneManager()->getCurrScene());
+	if( pScene )
+	{
+		CPvpGateLayer *pLayer = pScene->addPvpGateLayer();
+		int iLevel = CMainCityControl::getInstance()->getCityDataById(Btn_Tower).level;
+		pLayer->setGateLevel(iLevel);
+	}
 
 	m_ui->runAction(CCSequence::create(
 		CCDelayTime::create(fTime),
@@ -1438,6 +1464,16 @@ void CMainCityBuild::showPvp()
 }
 
 
+void CMainCityBuild::resetPosToTower( CCObject *pSender )
+{
+	float fFgPosX = m_maxX - 100;
+	float fBgPosX = m_iBgLayerMaxLeftBasePos - 70;
+
+	m_frontLay->setPositionX(fFgPosX);
+	m_bgLay->setPositionX(fBgPosX);
+}
+
+
 void CMainCityBuild::showPvpCallbackForResetAnchorPoint()
 {
 	ResetAnchorPointAndKeepSamePos(m_ui, ccp(0.5f, 0.7f));
@@ -1448,7 +1484,79 @@ void CMainCityBuild::showPvpCallBack()
 {
 	//TODO
 	CMainScene *pScene = dynamic_cast<CMainScene*>(CSceneManager::sharedSceneManager()->getCurrScene());
-	CPvpGateLayer *pPvpGateLayer = pScene->addPvpGateLayer();
+	CPvpGateLayer *pPvpGateLayer = pScene->getPvpGateLayer();
 	//播放动画
 	pPvpGateLayer->showEffectIn();
+}
+
+void CMainCityBuild::backFromPvp( CCObject *pSender )
+{
+	m_bTouchLock = true;
+
+	unscheduleUpdate();
+
+	resetPosToTower(nullptr);
+	m_cityUi->setVisible(false);
+
+	//先重置位置，上去时设置过的
+	m_ui->setScale(1.0f);
+	backFromPvpForResetAnchorPoint();
+
+	m_ui->setPosition( VCENTER );
+	ResetAnchorPointAndKeepSamePos(m_ui, ccp(0.5f, 0.7f));
+	m_ui->setScale( 2.3f );
+
+	m_ui->runAction(CCSequence::create(
+		CCDelayTime::create(0.4f),
+		CCScaleTo::create(1.5f, 1.0f),
+		CCCallFunc::create(this, callfunc_selector(CMainCityBuild::backFromPvpForResetAnchorPoint)),
+		CCCallFunc::create(this, callfunc_selector(CMainCityBuild::backFormPvpCallBack)),
+		nullptr));
+}
+
+void CMainCityBuild::backFormPvpCallBack()
+{
+	m_cityUi->setVisible(true);
+	NOTIFICATION->postNotification(SHOW_TOP_LAYER);
+
+	m_bTouchLock = false;
+
+	scheduleUpdate();
+
+	//移除无用的资源
+	CCTextureCache::sharedTextureCache()->removeUnusedTextures();
+}
+
+void CMainCityBuild::backFromPvpForResetAnchorPoint()
+{
+	ResetAnchorPointAndKeepSamePos(m_ui, ccp(0.5f, 0.5f));
+}
+
+void CMainCityBuild::autoToPvp()
+{
+	//TODO
+	//隐藏UI窗口
+	//滑动屏幕到悬浮塔为水平中心
+	//重置锚点到塔上面( 0.5f, 0.6f)
+	//塔慢慢移动到屏幕中间偏上方并进行放大
+	//生成PVP场景，用层，不用场景，可能有些东西还需要显示
+	//PVP场景进场动画
+
+	m_bTouchLock = true;
+
+	unscheduleUpdate();
+
+	m_cityUi->setVisible(false);
+	NOTIFICATION->postNotification(HIDE_TOP_LAYER);
+
+	//先初始化资源，避免动画过程中卡顿
+	CMainScene *pScene = dynamic_cast<CMainScene*>(CSceneManager::sharedSceneManager()->getCurrScene());
+	if( pScene )
+	{
+		CPvpGateLayer *pLayer = pScene->addPvpGateLayer();
+		int iLevel = CMainCityControl::getInstance()->getCityDataById(Btn_Tower).level;
+		pLayer->setGateLevel(iLevel);
+	}
+
+	showPvpCallBack();
 }

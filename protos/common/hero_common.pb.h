@@ -37,6 +37,7 @@ void protobuf_AssignDesc_common_2fhero_5fcommon_2eproto();
 void protobuf_ShutdownFile_common_2fhero_5fcommon_2eproto();
 
 class Hero;
+class HPos;
 
 // ===================================================================
 
@@ -546,6 +547,15 @@ class Hero : public ::google::protobuf::Message {
   inline bool evol() const;
   inline void set_evol(bool value);
 
+  // optional .protos.common.HPos heroPos = 66;
+  inline bool has_heropos() const;
+  inline void clear_heropos();
+  static const int kHeroPosFieldNumber = 66;
+  inline const ::protos::common::HPos& heropos() const;
+  inline ::protos::common::HPos* mutable_heropos();
+  inline ::protos::common::HPos* release_heropos();
+  inline void set_allocated_heropos(::protos::common::HPos* heropos);
+
   // @@protoc_insertion_point(class_scope:protos.common.Hero)
  private:
   inline void set_has_id();
@@ -670,6 +680,8 @@ class Hero : public ::google::protobuf::Message {
   inline void clear_has_color();
   inline void set_has_evol();
   inline void clear_has_evol();
+  inline void set_has_heropos();
+  inline void clear_has_heropos();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
@@ -733,10 +745,11 @@ class Hero : public ::google::protobuf::Message {
   ::google::protobuf::int32 prate_;
   ::protos::common::Item* armor4_;
   ::protos::common::Item* armor5_;
+  ::protos::common::HPos* heropos_;
   ::google::protobuf::int32 color_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(61 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(62 + 31) / 32];
 
   friend void  protobuf_AddDesc_common_2fhero_5fcommon_2eproto();
   friend void protobuf_AssignDesc_common_2fhero_5fcommon_2eproto();
@@ -744,6 +757,98 @@ class Hero : public ::google::protobuf::Message {
 
   void InitAsDefaultInstance();
   static Hero* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class HPos : public ::google::protobuf::Message {
+ public:
+  HPos();
+  virtual ~HPos();
+
+  HPos(const HPos& from);
+
+  inline HPos& operator=(const HPos& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const HPos& default_instance();
+
+  void Swap(HPos* other);
+
+  // implements Message ----------------------------------------------
+
+  HPos* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const HPos& from);
+  void MergeFrom(const HPos& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required int32 x = 1;
+  inline bool has_x() const;
+  inline void clear_x();
+  static const int kXFieldNumber = 1;
+  inline ::google::protobuf::int32 x() const;
+  inline void set_x(::google::protobuf::int32 value);
+
+  // required int32 y = 2;
+  inline bool has_y() const;
+  inline void clear_y();
+  static const int kYFieldNumber = 2;
+  inline ::google::protobuf::int32 y() const;
+  inline void set_y(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:protos.common.HPos)
+ private:
+  inline void set_has_x();
+  inline void clear_has_x();
+  inline void set_has_y();
+  inline void clear_has_y();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::int32 x_;
+  ::google::protobuf::int32 y_;
+
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+
+  friend void  protobuf_AddDesc_common_2fhero_5fcommon_2eproto();
+  friend void protobuf_AssignDesc_common_2fhero_5fcommon_2eproto();
+  friend void protobuf_ShutdownFile_common_2fhero_5fcommon_2eproto();
+
+  void InitAsDefaultInstance();
+  static HPos* default_instance_;
 };
 // ===================================================================
 
@@ -2300,6 +2405,92 @@ inline bool Hero::evol() const {
 inline void Hero::set_evol(bool value) {
   set_has_evol();
   evol_ = value;
+}
+
+// optional .protos.common.HPos heroPos = 66;
+inline bool Hero::has_heropos() const {
+  return (_has_bits_[1] & 0x20000000u) != 0;
+}
+inline void Hero::set_has_heropos() {
+  _has_bits_[1] |= 0x20000000u;
+}
+inline void Hero::clear_has_heropos() {
+  _has_bits_[1] &= ~0x20000000u;
+}
+inline void Hero::clear_heropos() {
+  if (heropos_ != NULL) heropos_->::protos::common::HPos::Clear();
+  clear_has_heropos();
+}
+inline const ::protos::common::HPos& Hero::heropos() const {
+  return heropos_ != NULL ? *heropos_ : *default_instance_->heropos_;
+}
+inline ::protos::common::HPos* Hero::mutable_heropos() {
+  set_has_heropos();
+  if (heropos_ == NULL) heropos_ = new ::protos::common::HPos;
+  return heropos_;
+}
+inline ::protos::common::HPos* Hero::release_heropos() {
+  clear_has_heropos();
+  ::protos::common::HPos* temp = heropos_;
+  heropos_ = NULL;
+  return temp;
+}
+inline void Hero::set_allocated_heropos(::protos::common::HPos* heropos) {
+  delete heropos_;
+  heropos_ = heropos;
+  if (heropos) {
+    set_has_heropos();
+  } else {
+    clear_has_heropos();
+  }
+}
+
+// -------------------------------------------------------------------
+
+// HPos
+
+// required int32 x = 1;
+inline bool HPos::has_x() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void HPos::set_has_x() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void HPos::clear_has_x() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void HPos::clear_x() {
+  x_ = 0;
+  clear_has_x();
+}
+inline ::google::protobuf::int32 HPos::x() const {
+  return x_;
+}
+inline void HPos::set_x(::google::protobuf::int32 value) {
+  set_has_x();
+  x_ = value;
+}
+
+// required int32 y = 2;
+inline bool HPos::has_y() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void HPos::set_has_y() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void HPos::clear_has_y() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void HPos::clear_y() {
+  y_ = 0;
+  clear_has_y();
+}
+inline ::google::protobuf::int32 HPos::y() const {
+  return y_;
+}
+inline void HPos::set_y(::google::protobuf::int32 value) {
+  set_has_y();
+  y_ = value;
 }
 
 

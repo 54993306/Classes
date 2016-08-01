@@ -209,6 +209,7 @@ void CHeroAttribute::onEnter()
 
 	CButton* rightbtn = (CButton*)(m_ui->findWidgetById("right"));
 	rightbtn->setOnClickListener(this,ccw_click_selector(CHeroAttribute::onRightHero));
+
 	fade1 = CCFadeTo::create(0.8f,100);
 	fade2 = CCFadeTo::create(0.8f,255);
 	rightbtn->runAction(CCRepeatForever::create(CCSequence::createWithTwoActions(fade1,fade2)));

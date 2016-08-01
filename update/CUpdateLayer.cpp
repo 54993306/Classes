@@ -16,6 +16,7 @@ CUpdateLayer::CUpdateLayer()
 	,m_iCurrentIPixelndex(0)
 	,m_iMaxPixel(0)
 	,m_iPercent(0)
+	,m_iErrorTimes(5)
 {
 
 }
@@ -90,9 +91,6 @@ void CUpdateLayer::onEnter()
 
 	//额外信息
 	m_pInfoLabel = (CLabel*)m_ui->findWidgetById("text"); 
-
-	//请求版本列表信息
-	requestVersionInfo();
 }
 
 void CUpdateLayer::onExit()
@@ -132,11 +130,15 @@ void CUpdateLayer::onError( AssetsManagerErrorCode errorCode )
 	default:
 		break;
 	}
+
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+	showHelpTips(GETLANGSTR(2024), false);
+#endif
 }
 
 void CUpdateLayer::onProgress( int percent )
 {
-	if (percent < 0)
+	if ( percent < 0 || percent>100 )
 	{
 		return;
 	}
@@ -146,7 +148,10 @@ void CUpdateLayer::onProgress( int percent )
 	//显示百分比
 	char progress[20];
 	snprintf(progress, 20, "%d%%", m_iPercent);
-	m_pLabel->setString(progress);
+	if(m_pLabel!=nullptr)
+	{
+		m_pLabel->setString(progress);
+	}
 
 	//转换为像素百分比
 	m_iCurrentIPixelndex = (m_iMaxPixel*m_iPercent)/100;
@@ -179,6 +184,7 @@ void CUpdateLayer::onSuccess()
 	}
 }
 
+
 //判断当前版本是否需要更新
 bool CUpdateLayer::checkUpdate( const char* sVersion )
 {
@@ -186,9 +192,6 @@ bool CUpdateLayer::checkUpdate( const char* sVersion )
 	return false;
 #endif
 
-#if !VERSION_UPDATE
-	return false;
-#endif
 	//默认版本号
 	std::string sDefalutVersion = CJniHelper::getInstance()->getVersionName();
 	std::string sCurrentVersion = CCUserDefault::sharedUserDefault()->getStringForKey(VERSION, sDefalutVersion);
@@ -198,6 +201,7 @@ bool CUpdateLayer::checkUpdate( const char* sVersion )
 	}
 	return false;
 }
+
 
 //请求版本的json文件
 void CUpdateLayer::requestVersionInfo()
@@ -252,6 +256,42 @@ void CUpdateLayer::startDownload()
 	std::string sCurrentVersion = CCUserDefault::sharedUserDefault()->getStringForKey(VERSION, sDefalutVersion);
 	m_versionNeedData = m_VersionJson->getUpdateList(sCurrentVersion, m_sVersion);						//判断间隔了几个版本信息
 
+	//如果没有拿到版本信息,重新拿几次，几次后还是拿不到，显示version-error, 2s钟后重启游戏
+	if( m_versionNeedData.size() <= 0 )
+	{
+		if (m_iErrorTimes > 0)
+		{
+			m_iErrorTimes--;
+			//重新请求数据
+			requestVersionInfo();
+		}
+		else
+		{
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+			showHelpTips(GETLANGSTR(2024), false);
+#endif
+		}
+		return;
+	}
+
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+
+	if(CJniHelper::getInstance()->getVersionName().compare("1.0.2")<=0)
+	{
+		//跳转下载
+		showHelpTips(GETLANGSTR(2025), true);
+		return;
+	}
+
+	//判断是否有一个强制更新版本
+	if( isThereAForceApkVersion(sDefalutVersion) )
+	{
+		showHelpTips(GETLANGSTR(2025), true);
+		return;
+	}
+#endif
+
+
 	//开始依次更新版本
 	m_iIndexVersion = 0;
 
@@ -292,7 +332,7 @@ void CUpdateLayer::callBackForSuccess()
 void CUpdateLayer::updateForChangePicture( float dt )
 {
 	CCSprite* pSprite = dynamic_cast<CCSprite*>(m_ui->findWidgetById("bg"));
-	ChangePicture(pSprite);
+	changeRandPicture(pSprite);
 }
 
 void CUpdateLayer::update( float dt )
@@ -317,4 +357,86 @@ void CUpdateLayer::update( float dt )
 
 	//僵尸位置
 	//m_pZombieSprite->setPositionX(m_progress->getPositionX()+m_progress->getContentSize().width*percent/100-5);
+}
+
+void CUpdateLayer::showHelpTips( const char *str, bool bShowOkOnly )
+{
+	if( CCDirector::sharedDirector()->getRunningScene()->getChildByTag(4562) != nullptr )
+	{
+		return;
+	}
+	CPopTip *pop = CPopTip::create();
+	LayerManager::instance()->pop();
+	pop->setVisible(true);
+	pop->addContentTip(str);
+	pop->setTouchEnabled(true);
+	pop->setTouchPriority(-100);
+	if(bShowOkOnly)
+	{
+		pop->showConfirmOnly();
+	}
+	pop->setButtonLisener(this, ccw_click_selector(CUpdateLayer::showHelpTipsClick));
+	CCDirector::sharedDirector()->getRunningScene()->addChild(pop, 4562);
+}
+
+void CUpdateLayer::showHelpTipsClick( CCObject *pSender )
+{
+	//点击取消重启，点击确定下载新的apk
+	CButton *btn = (CButton*)pSender;
+	if (btn->getTag()!=PopTipConfirm)
+	{
+		//确定
+		runAction(CCCallFunc::create(this, callfunc_selector(CUpdateLayer::callBackForSuccess)));
+	}                                    
+	else
+	{
+		//默认版本
+		std::string sDefalutVersion = CJniHelper::getInstance()->getVersionName();
+		if(sDefalutVersion.compare("1.0.2")>0)
+		{
+			//跳转下载
+			CJniHelper::getInstance()->downloadNewVersionFromGooglePlay();
+		}
+		else
+		{
+			//确定
+			runAction(CCCallFunc::create(this, callfunc_selector(CUpdateLayer::callBackForSuccess)));
+		}
+	}
+}
+
+bool CUpdateLayer::isThereAForceApkVersion( std::string &strApkVersion )
+{
+	 return m_VersionJson->isThereAForceApkUpdateVersion(strApkVersion, m_sVersion);
+}
+
+void CUpdateLayer::changeRandPicture( CCSprite* pSprite )
+{
+	if(pSprite==nullptr)
+	{
+		return;
+	}
+	CCTexture2D* pTexture = pSprite->getTexture();
+	CCTexture2D* pNewTexture = nullptr;
+
+	int iRand = ((int)(CCRANDOM_0_1()*100))%9+1;//首次随机
+	do
+	{
+		pNewTexture = CCTextureCache::sharedTextureCache()->addImage(CCString::createWithFormat("warScene/LoadImage/%d.png", iRand)->getCString());
+		iRand ++;
+		iRand = iRand%9+1;
+		//第二次做按顺序移动操作，保证两次肯定找到新图片
+	}
+	while(pNewTexture==pTexture || pNewTexture==nullptr);
+
+	pSprite->setTexture(pNewTexture);
+
+	pSprite->setZOrder(-2);
+
+	CCSprite* pTranstionSprite = CCSprite::createWithTexture(pTexture);
+	pTranstionSprite->setPosition(pSprite->getPosition());
+	pTranstionSprite->setAnchorPoint(pSprite->getAnchorPoint());
+	pTranstionSprite->setScale(pSprite->getScale());
+	pSprite->getParent()->addChild(pTranstionSprite, pSprite->getZOrder()+1);
+	pTranstionSprite->runAction(CCSequence::createWithTwoActions(CCFadeOut::create(0.6f), CCRemoveSelf::create()));
 }

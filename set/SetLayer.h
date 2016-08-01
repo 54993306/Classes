@@ -4,11 +4,7 @@
 
 #include "AppUI.h"
 #include "scene/layer/LayerManager.h"
-#include "bag/bagData.h"
-#include "model/DataCenter.h"
-#include "common/CursorTextField.h"
-
-#include "model/RoleNameGM.h"
+#include "protos/protocol.h"
 
 #define SET_LAYER_HIDE "SET_LAYER_HIDE"
 #define SET_LAYER_SHOW "SET_LAYER_SHOW"

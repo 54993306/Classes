@@ -8,7 +8,7 @@ namespace BattleSpace{
 
 	BaseRoleData::BaseRoleData()
 		:mServerID(0),mRoleModel(0),mProperty(0),mRoleHp(0),mRoleAttack(0),mRoleDefense(0),mRoleCrit(0),mRoleHit(0),mRoleDodge(0)
-		,mCostSpeed(0),mMaxCost(0),mInitGrid(0),mRoleRow(1),mRoleCol(1),mRoleZoom(0),mRoleDrop(0),mColdDown(0),mExpendCost(0)
+		,mCostSpeed(0),mMaxCost(0),mInitGrid(0),mRoleRow(1),mRoleCol(1),mRoleZoom(0),mRoleDrop(0),mColdDown(0),mExpendCost(0),mOtherCamp(false)
 		,mCritTime(0),mMoveSpeed(0),mCallRole(false),mAlertRange(0),mCallType(sCallType::eCommon),mBehavior(sBehavior::eNormal),mRoleNature(sDataType::eNULL)
 		,mMaxHp(0),mAttackSpeed(0),mCaptain(false),mDelayTime(0),mAlertType(0),mRoleRegain(0),mRoleAgility(0),mInitCost(0)
 	{

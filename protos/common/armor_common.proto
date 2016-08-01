@@ -1,0 +1,51 @@
+package protos.common;
+
+option java_package = "dass.server.gameserver.protos.common";
+option java_outer_classname = "ArmorCommon";
+option optimize_for = SPEED ;
+
+//装备
+message Armor{
+	optional int32 armorType = 1;		//装备类型(1 武器，2 盔甲，3 帽子，4 鞋子)
+	optional int32 strenLv = 2;		//最大强化等级
+	optional int32 hero = 3;		//英雄头像(装备在英雄身上)
+	optional int32 armor_skill = 4;		//装备技能ID
+
+	optional int32 baseHp = 5;		//生命
+	optional int32 baseDef = 6;		//防御
+	optional int32 baseAtk = 7;		//攻击
+	optional int32 baseHit = 8;		//命中
+	optional int32 baseDex = 9;		//敏捷
+	optional int32 baseCrit = 10;		//暴击
+	optional int32 baseRenew = 11;		//回复
+	optional int32 baseDodge = 12;		//闪避
+
+	optional int32 addHp = 13;		//当前强化血量加成 or 特殊血量属性
+	optional int32 addDef = 14;		//当前强化防御加成
+	optional int32 addAtk = 15;		//当前强化攻击加成
+	optional int32 addHit = 16;		//当前强化命中加成
+	optional int32 addDex = 17;		//当前强化敏捷加成
+	optional int32 addCrit = 18;		//当前强化暴击加成
+	optional int32 addRenew = 19;		//当前强化回复加成
+	optional int32 addDodge = 20;		//当前强化闪避加成
+
+	optional int32 nextAtk = 21;		//下一强化等级攻击加成
+	optional int32 nextHp = 22;		//下一强化等级血量加成
+	optional int32 nextDef = 23;		//下一强化等级防御加成
+	optional int32 nextHit = 24;		//下一强化等级命中加成
+	optional int32 nextDex = 25;		//下一强化等级敏捷加成
+	optional int32 nextCrit = 26;		//下一强化等级暴击加成
+	optional int32 nextRenew = 27;		//下一强化等级回复加成
+	optional int32 nextDodge = 28;		//下一强化等级闪避加成
+
+	optional string atkRange = 29;		//攻击洗炼范围
+	optional string hpRange = 30;		//生命洗炼范围
+	optional string defRange = 31;		//防御洗炼范围
+	optional string dexRange = 32;		//攻速变动范围
+	optional string hitRange = 33;		//命中变动范围
+	optional string critRange = 34;		//暴击变动范围
+	optional string renewRange = 35;	//回复变动范围
+	optional string dodgeRange = 36;	//闪避变动范围
+
+	optional int32 combat = 37;		//装备战力
+}

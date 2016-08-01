@@ -15,18 +15,7 @@ bool CHeroDetail::init()
 		m_ui = LoadComponent("HeroDetail.xaml");  //
 		m_ui->setPosition(VCENTER);
 		this->addChild(m_ui);
-		//m_cell = (CLayout*)(m_ui->findWidgetById("Cell"));
-		//m_cell->retain();
-		//m_ui->removeChild(m_cell);
-
-		//m_tableView = (CTableView *)(m_ui->findWidgetById("scroll"));
-		//m_tableView->setDirection(eScrollViewDirectionVertical);
-		//m_tableView->setSizeOfCell(m_cell->getContentSize());
-		////m_tableView->setSizeOfCell(CCSizeMake(790,115));
-		//m_tableView->setBounceable(false);
-		//m_tableView->setDataSourceAdapter(this,ccw_datasource_adapter_selector(CHeroDetail::tableviewDataSource));	
-		//m_tableView->setCountOfCell(8);
-
+	
 		return true;
 	}
 	return false;
@@ -87,7 +76,6 @@ void CHeroDetail::showHeroInfo(CHero* hero)
 	if (hero->addDex>0)
 	{
 		adddexf->setString(CCString::createWithFormat("+%d",hero->addDex)->getCString());
-		//adddexf->setPositionX(dexf->getPositionX()+dexf->getContentSize().width+10);
 	}
 	else
 	{
@@ -97,7 +85,6 @@ void CHeroDetail::showHeroInfo(CHero* hero)
 	if (hero->addHp>0)
 	{
 		addhp->setString(CCString::createWithFormat("+%d",hero->addHp)->getCString());
-		//addhp->setPositionX(hp->getPositionX()+hp->getContentSize().width+10);
 	}
 	else
 	{
@@ -107,7 +94,6 @@ void CHeroDetail::showHeroInfo(CHero* hero)
 	if (hero->addDef>0)
 	{
 		adddef->setString(CCString::createWithFormat("+%d",hero->addDef)->getCString());
-		//adddef->setPositionX(deffend->getPositionX()+deffend->getContentSize().width+10);
 	}
 	else
 	{
@@ -117,7 +103,6 @@ void CHeroDetail::showHeroInfo(CHero* hero)
 	if (hero->addAtk>0)
 	{
 		addatk->setString(CCString::createWithFormat("+%d",hero->addAtk)->getCString());
-		//addatk->setPositionX(attack->getPositionX()+attack->getContentSize().width+10);
 	}
 	else
 	{
@@ -127,7 +112,6 @@ void CHeroDetail::showHeroInfo(CHero* hero)
 	if (hero->addHit>0)
 	{
 		addhit->setString(CCString::createWithFormat("+%d",hero->addHit)->getCString());
-		//addhit->setPositionX(hit->getPositionX()+hit->getContentSize().width+10);
 	}
 	else
 	{
@@ -137,7 +121,6 @@ void CHeroDetail::showHeroInfo(CHero* hero)
 	if (hero->addCrit>0)
 	{
 		addcrit->setString(CCString::createWithFormat("+%d",hero->addCrit)->getCString());
-		//addcrit->setPositionX(crit->getPositionX()+crit->getContentSize().width+10);
 	}
 	else
 	{
@@ -147,7 +130,6 @@ void CHeroDetail::showHeroInfo(CHero* hero)
 	if (hero->addDodge>0)
 	{
 		adddodge->setString(CCString::createWithFormat("+%d",hero->addDodge)->getCString());
-		//adddodge->setPositionX(dodge->getPositionX()+dodge->getContentSize().width+10);
 	}
 	else
 	{
@@ -157,7 +139,6 @@ void CHeroDetail::showHeroInfo(CHero* hero)
 	if (hero->addRenew>0)
 	{
 		dex->setString(CCString::createWithFormat("+%d",hero->addRenew)->getCString());
-		//dex->setPositionX(firstAtk->getPositionX()+firstAtk->getContentSize().width+10);
 	}
 	else
 	{
@@ -169,8 +150,6 @@ void CHeroDetail::showHeroInfo(CHero* hero)
 	{
 		count--;
 	}
-	//m_tableView->setCountOfCell(count);
-	//m_tableView->reloadData();
 } 
 
 void CHeroDetail::onEnter()
@@ -179,51 +158,6 @@ void CHeroDetail::onEnter()
 	CSceneManager::sharedSceneManager()->addMsgObserver(UPDATE_HEROINFO,this,GameMsghandler_selector(CHeroDetail::updateHeroInfo));
 }
 
-
-//CCObject* CHeroDetail::tableviewDataSource(CCObject* pConvertCell, unsigned int uIdx)
-//{
-//	CTableViewCell* pCell = (CTableViewCell*)pConvertCell;
-//	if (!pCell)
-//	{
-//		pCell = new CTableViewCell();
-//		pCell->autorelease();
-//		pCell->setTag(uIdx);
-//		addTableCell(uIdx,pCell);
-//	}
-//	else
-//	{
-//		pCell->removeAllChildren();
-//		addTableCell(uIdx,pCell);
-//	}
-//	return pCell;
-//}
-
-
-//void CHeroDetail::addTableCell(unsigned int uIdx, CTableViewCell* pCell)
-//{
-//	if (uIdx == 0)
-//	{	
-//		CLayout *lay = UICloneMgr::cloneLayout(m_cell);	
-//		while (lay->getChildrenCount()>0)
-//		{
-//			CCNode * node = (CCNode*)lay->getChildren()->objectAtIndex(0);
-//			lay->removeChild(node);
-//			pCell->addChild(node);
-//		}
-//	}
-//	else
-//	{
-//		CLayout *layout = (CLayout *)m_ui->findWidgetById(CCString::createWithFormat("_%d",uIdx)->getCString());
-//		CLayout *lay = UICloneMgr::cloneLayout(layout);	
-//		while (lay->getChildrenCount()>0)
-//		{
-//			CCNode * node = (CCNode*)lay->getChildren()->objectAtIndex(0);
-//			node->setPositionY(m_cell->getChildByTag(1)->getPositionY());
-//			lay->removeChild(node);
-//			pCell->addChild(node);
-//		}
-//	}
-//}
 
 void CHeroDetail::updateHeroInfo(const TMessage& tMsg)
 {

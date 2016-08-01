@@ -24,6 +24,9 @@
 #include "netcontrol/CPlayerControl.h"
 #include "ActivityCollect.h"
 #include "vip/CPaySelect.h"
+#include "vip/CPayList.h"
+#include "jni/CJniHelper.h"
+#include "SDK/GamePlatformManager.h"
 //#include <thread>
 //#include <future>
 
@@ -669,16 +672,7 @@ void CActivityLayer::onJoinActivity( CCObject* pSender )
 		//充值
 	case 2:
 		{
-// 			CVipLayer *vipLayer= CVipLayer::create();
-// 			if(LayerManager::instance()->push(vipLayer))
-// 			{
-// 				GetTcpNet->sendDataType(VipInfoMsg,true);
-// 				GetTcpNet->sendDataType(VipShopMsg,true);
-// 			}
-			CPaySelect *pay = CPaySelect::create();
-			LayerManager::instance()->push(pay);
-			NOTIFICATION->postNotification(HIDE_TOP_LAYER);
-			NOTIFICATION->postNotification(HIDE_TOP_LAYER);
+			GamePlatformMgr->ShowPayUI();
 
 		}break;
 		//悬赏府

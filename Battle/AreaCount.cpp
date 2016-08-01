@@ -11,13 +11,19 @@ namespace BattleSpace{
 		,mAreaType(0),mAreaRange(0),mDistance(0),mTargetType(0)
 	{
 		setAlive(mAlive);
-		setEnemy(mAlive->getEnemy());
+		if (mAlive->getEnemy() || mAlive->getOtherCamp())
+		{
+			setEnemy(true);
+		}else{
+			setEnemy(false);
+		}
+		
 		setBackAttack(mAlive->getOpposite());
 		setTargetType(mAlive->getCurrEffect()->getTargetType());
 		//setAreaType(mAlive->getCurrEffect()->getAreaType());
 		setAreaRange(mAlive->getCurrEffect()->getAreaSize());
 		setDistance(mAlive->getCurrEffect()->getSpaceRange());
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+#if BATTLE_TEST
 		//setAreaRange(1);
 		//setAreaType(eVertical);
 #endif

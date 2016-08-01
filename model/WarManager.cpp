@@ -24,6 +24,7 @@
 #include "Battle/BattleTools.h"
 /**************************************/
 #include "Battle/BattleDataCenter.h"
+#include "Battle/BattleModel.h"
 #include "Battle/RoleSkill.h"
 #include "Battle/RoleMacro.h"
 #include "Battle/BaseRoleData.h"
@@ -39,6 +40,7 @@ namespace BattleSpace
 	,m_bNormal(true),m_ChapterCount(0),m_ChapterIndex(0), m_BossModel(false),mCostSpeed(0)
 	,m_VerifyNum(0),m_BossHurtCount(0),mBossHurtPe(0),m_iWorldBossRank(0),mCurrCost(0)
 	,mBattleOver(false),mFirstStage(true),mStoryData(nullptr),mBuffData(nullptr)
+	,mCaptainSkill(nullptr)
 	{
 		parseSpineModelFile(m_SpineID);
 	}
@@ -67,6 +69,8 @@ namespace BattleSpace
 		mBattleRoles.clear();
 		mMoveArea.clear();
 		mCostArea.clear();
+		mEnterArea.clear();
+		mOtherEnter.clear();
 		mUndefinedArea.clear();
 		BattleData->releaseRoleData();
 		CC_SAFE_RELEASE(m_efdata);
@@ -77,6 +81,8 @@ namespace BattleSpace
 		mStoryData = nullptr;
 		CC_SAFE_RELEASE(m_armatureEventDataMgr);
 		m_armatureEventDataMgr = nullptr;
+		CC_SAFE_RELEASE(mCaptainSkill);
+		mCaptainSkill = nullptr;
 	}
 
 	void WarManager::ReleaseSpineData()
@@ -137,6 +143,11 @@ namespace BattleSpace
 		return nullptr;
 	}
 
+	void WarManager::executeCaptainSkill( bool mOther /*= false*/ )
+	{
+		mCaptainSkill->ExecuteSkill(mOther);
+	}
+
 	void WarManager::initData()
 	{
 		m_efdata = EffectData::create();									//创建这些对象都需要读取文件，最好是整个战斗过程中只创建一次
@@ -147,10 +158,11 @@ namespace BattleSpace
 		mStoryData->retain();
 		m_armatureEventDataMgr = ArmatureEventDataMgr::create();
 		m_armatureEventDataMgr->retain();
+		mCaptainSkill = CaptainSkill::create();
+		mCaptainSkill->retain();
 		initHeroData();
 		initMonsterByBatch(0);												//开始只创建第0批次怪物
-		CaptainSkill* captain = CaptainSkill::create();
-		captain->ExecuteSkill();
+		executeCaptainSkill();
 	}
 	//添加我方武将
 	void WarManager::initHeroData()
@@ -163,10 +175,25 @@ namespace BattleSpace
 			tRole->setAliveID(tIndex+1);										//战场上武将的唯一id
 			tRole->setEnemy(false);
 			tRole->initAliveData();
-			mMaxCost += tVector.at(tIndex)->getMaxCost();
+			mMaxCost += tRole->getCostMax();
 			if (tRole->getCaptain())
 				mCurrCost = tRole->getInitCost();
 			addBattleRole(tRole);
+		}
+		
+		if (BattleData->getBattleModel()->isPvEBattle())
+		{
+			const vector<HeroData*>tVector = BattleData->getPvPHeros();
+			for (int tIndex = 0 ;tIndex<tVector.size(); tIndex++)
+			{
+				BaseRole* tRole = BaseRole::create();							//创建数据对象
+				tRole->setBaseData(tVector.at(tIndex));
+				tRole->setAliveID(tIndex+1+C_PVEStage);							//战场上武将的唯一id
+				tRole->setEnemy(false);
+				tRole->initAliveData();
+				addBattleRole(tRole);
+			}
+			executeCaptainSkill(true);
 		}
 	}
 	//初始化关卡批次数据到战斗武将列表
@@ -177,21 +204,21 @@ namespace BattleSpace
 		{
 			if (tVector.at(tIndex)->getBatchNumber()!=batch)
 				continue;
-			BaseRole* alive = BaseRole::create();								//创建数据对象
+			BaseRole* tRole = BaseRole::create();								//创建数据对象
 			if (tVector.at(tIndex)->getBossMonster())							//大怪物提示
 				if (m_BossModel)
-					alive->setMonsterSpecies(sMonsterSpecies::eWorldBoss);				//世界boss
+					tRole->setMonsterSpecies(sMonsterSpecies::eWorldBoss);				//世界boss
 				else
-					alive->setMonsterSpecies(sMonsterSpecies::eBoss);					//一般类型大boss
-			alive->setBaseData(tVector.at(tIndex));
-			alive->setAliveID(C_BatchMonst+tIndex+batch*100);
-			alive->setEnemy(true);
-			alive->setBehavior(alive->getBaseData()->getBehavior());
-			if (alive->getBaseData()->getBehavior() == sBehavior::eHide)
-				alive->setCloaking(true);
-			alive->initAliveData();
-			alive->setMove(tVector.at(tIndex)->getMoveState());
-			addBattleRole(alive);
+					tRole->setMonsterSpecies(sMonsterSpecies::eBoss);					//一般类型大boss
+			tRole->setBaseData(tVector.at(tIndex));
+			tRole->setAliveID(C_BatchMonst+tIndex+batch*100);
+			tRole->setEnemy(true);
+			tRole->setBehavior(tRole->getBaseData()->getBehavior());
+			if (tRole->getBaseData()->getBehavior() == sBehavior::eHide)
+				tRole->setCloaking(true);
+			tRole->initAliveData();
+			tRole->setMove(tVector.at(tIndex)->getMoveState());
+			addBattleRole(tRole);
 		}
 	}
 
@@ -212,7 +239,7 @@ namespace BattleSpace
 		for (auto tPair : mBattleRole)
 		{
 			BaseRole* tRole = tPair.second;
-			if (tRole->getEnemy() != pEnemy)
+			if ((pEnemy && !tRole->getEnemy()) || (!pEnemy && tRole->getOtherCamp()))
 				continue;
 			if (isAlive)
 			{
@@ -228,6 +255,8 @@ namespace BattleSpace
 	//冒泡排序
 	void WarManager::sortRole(CCArray* pRoles)
 	{
+		if (!pRoles->count())
+			return;
 		for (int i=0;i < pRoles->count()-1;i++)			//冒泡：判断相邻两个大小关系互换位置
 		{
 			for (int j =0;j<pRoles->count()-i-1;j++)
@@ -249,6 +278,26 @@ namespace BattleSpace
 	{
 		initRoles(pMonsters,pAlive,true);
 	}
+
+	void WarManager::initOtherCamp( vector<BaseRole*>& pOthers,bool pAlive /*= false*/ )
+	{
+		for (auto tPair : mBattleRole)
+		{
+			BaseRole* tRole = tPair.second;
+			if ( !tRole->getOtherCamp() || tRole->getFatherID())
+				continue;
+			if (pAlive)
+			{
+				if ( !tRole->getAliveState())
+					continue;
+				pOthers.push_back(tRole);
+			}else{
+				pOthers.push_back(tRole);
+			}
+		}
+		VectorUnique(pOthers);
+	}
+
 	//此方法频繁使用会否影响系统效率？
 	void WarManager::initRoles( vector<BaseRole*>& pRoles,bool pAlive ,bool pEnemy )
 	{
@@ -318,11 +367,11 @@ namespace BattleSpace
 		return nullptr;
 	}
 
-	bool WarManager::checkMonstOver()
+	bool WarManager::checkBatchOver()
 	{
 		for (auto tPair : mBattleRole)
 		{
-			if (tPair.second->getEnemy() && tPair.second->getAliveState())
+			if (tPair.second->getOtherCamp() && tPair.second->getAliveState())
 				return false;
 		}
 		return true;
@@ -361,7 +410,7 @@ namespace BattleSpace
 			if (!tAlive->getBattle()		||
 				!tAlive->getRoleObject())
 				continue;
-			if (tAlive->getEnemy())
+			if (tAlive->getOtherCamp())
 			{
 				if (tAlive->getGridIndex()<C_MOSTERATKGRID)
 					continue;
@@ -384,7 +433,7 @@ namespace BattleSpace
 	{
 		initData();
 		ReleaseSpineData();													//应该有更好的管理方法
-		ParseMoveGrid(mStageID,mMoveArea,mUndefinedArea);
+		ParseBattleGrid(mStageID,mMoveArea,mUndefinedArea,mEnterArea,mOtherEnter);		//解析的数据使用单一的对象进行管理(重构方向)
 		ParseAddCostGrid(mStageID,mCostArea);
 		mBattleOver = false;
 		mStoryData->initStoryData(mStageID);
@@ -476,13 +525,31 @@ namespace BattleSpace
 
 	bool WarManager::inMoveArea( int pGrid )
 	{
-		vector<int>::iterator tUnDefine = mUndefinedArea.end();
-		if (std::find(mUndefinedArea.begin(),tUnDefine,pGrid) != tUnDefine)
-			return false;						//点不未定义区域内
-
+		if (inUnDefineArea(pGrid))
+			return false;
 		vector<int>::iterator tEnditer = mMoveArea.end();
 		if (std::find(mMoveArea.begin(),tEnditer,pGrid) != tEnditer)
 			return true;						//点不在可移动范围内
+		return false;
+	}
+	//召唤区域和移动区域的关系问题，可以召唤的过去，但是不能再更换位置，或是出来后不能再回去
+	bool WarManager::inEnterArea( int pGrid )
+	{
+		if (inUnDefineArea(pGrid))
+			return false;
+		vector<int>::iterator tEnterIter = mEnterArea.end();
+		if (std::find(mEnterArea.begin(),tEnterIter,pGrid) != tEnterIter)
+			return true;
+		return false;
+	}
+
+	bool WarManager::inOtherEnter( int pGrid )
+	{
+		if (inUnDefineArea(pGrid))
+			return false;
+		vector<int>::iterator tEnterIter = mOtherEnter.end();
+		if (std::find(mOtherEnter.begin(),tEnterIter,pGrid) != tEnterIter)
+			return true;
 		return false;
 	}
 
@@ -499,10 +566,10 @@ namespace BattleSpace
 		mCostSpeed += delta;
 		if ( mCurrCost < mMaxCost )	//放必杀技时cost不发生改变
 		{
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+#if BATTLE_TEST
 			mCurrCost += mCostSpeed * 100;				//系统一直增加cost
 #else
-			mCurrCost += mCostSpeed;
+			mCurrCost += mCostSpeed; 
 #endif	
 		}
 		if ( mCurrCost <= 0 ) //武将移动回我方半屏

@@ -22,6 +22,7 @@
 #include "hero/HeroEvolveEffectLayer.h"
 #include "tools/CCShake.h"
 
+
 CHeroEvolve::CHeroEvolve()
 	:m_ui(nullptr), m_pNewHero(nullptr), m_pHeroArmature(nullptr), m_pCircleBar(nullptr),m_bAskNextQualityHero(false)
 	,m_fBallRadius(0.0f),m_fCircleBarRadius(0.0f),m_fAngleGap(0.0f), m_pCurrentRankHeroData(nullptr), m_iCurrentTouchBallIndex(-1)
@@ -115,7 +116,6 @@ void CHeroEvolve::initProgressAndBall()
 			m_fBallRadius = pBall->getContentSize().width*HERO_EVOLVE_BALL_SCALE/2-10;
 		}
 	}
-
 
 	//计算进度条的基础参数
 	m_fAngleGap = CC_RADIANS_TO_DEGREES(asin(m_fBallRadius/m_fCircleBarRadius));
@@ -245,6 +245,8 @@ void CHeroEvolve::updateHeroInfo(const TMessage& tMsg)
 	if(tMsg.nMsg == 1)
 	{
 		updateEvolve(pHero);
+
+
 	}
 	else
 	{
@@ -257,6 +259,8 @@ void CHeroEvolve::updateEvolve( CHero *pHero )
 {
 	//TODO
 	//重置英雄数据
+	m_pDataPanel->resetAllHeroData();
+
 	resetHeroData();
 	saveHeroData(pHero);
 
@@ -272,6 +276,8 @@ void CHeroEvolve::updateEvolve( CHero *pHero )
 	//更新进度条和球
 	updateProgressAndBalll();
 
+	//太极转动
+	uiChangeWhenHeroRankChange();
 }
 
 
@@ -379,6 +385,14 @@ void CHeroEvolve::heroCall( CCObject* pSender )
 
 void CHeroEvolve::onPressBallData( CCObject* pSender, CTouchPressState iState )
 {
+	if(m_pEffectLayer!=nullptr )
+	{
+		if(m_pEffectLayer->isVisible())
+		{
+			return;
+		}
+	}
+
 	CCNode* pNode = (CCNode*)pSender;
 	int iTag = pNode->getTag();
 	
@@ -391,7 +405,23 @@ void CHeroEvolve::onPressBallData( CCObject* pSender, CTouchPressState iState )
 				return;
 			}
 
+			if(m_pDataPanel->isVisible())
+			{
+				return;
+			}
+
 			m_iCurrentTouchBallIndex = iTag;
+
+			//Warning特殊处理，如果是可转身英雄
+			if(iTag == 5)
+			{
+				int iTemp = m_pCurrentRankHeroData->quality;
+				m_pCurrentRankHeroData->quality = 6;
+				m_pDataPanel->show(m_pCurrentRankHeroData, m_pCurrentRankHeroData, true);
+				m_pCurrentRankHeroData->quality = iTemp;
+				m_pDataPanel->resetAllHeroData();
+				return;
+			}
 
 			//如果已经有数据
 			if(m_pHero[m_iCurrentTouchBallIndex].id != -1)
@@ -486,19 +516,27 @@ void CHeroEvolve::setCurrentHeroData( int iRank, bool bForce/*=false*/ )
 	{
 		m_pCurrentRankHeroData = &m_pHero[iRank-1];
 
-		uiChangeWhenHeroRankChange();
+		//uiChangeWhenHeroRankChange();
 	}
 }
 
 void CHeroEvolve::uiChangeWhenHeroRankChange()
 {
 	//是否到达最高等级
-	if(m_pCurrentRankHeroData->quality == HERO_EVOLVE_RANK_MAX)
+	//if(m_pCurrentRankHeroData->quality == HERO_EVOLVE_RANK_MAX)
+	int iId = m_pCurrentRankHeroData->heroid;
+	if(iId==101 || iId==102 || iId==109 || iId==119 || iId==201 || iId==301)
 	{
 		//太极转动
 		CLayout *pData = (CLayout *)m_ui->findWidgetById("taiji");
 		CImageView *pImage = (CImageView*)pData->findWidgetById("taiji_center");
-		pImage->runAction(CCRepeatForever::create(CCRotateBy::create(10.0f, -360)));
+		if(!pImage->isTouchEnabled())
+		{
+			pImage->setTag(5);
+			pImage->setTouchEnabled(true);
+			pImage->setOnPressListener(this, ccw_press_selector(CHeroEvolve::onPressBallData));
+			pImage->runAction(CCRepeatForever::create(CCRotateBy::create(10.0f, -360)));
+		}
 	}
 	else
 	{
@@ -506,6 +544,7 @@ void CHeroEvolve::uiChangeWhenHeroRankChange()
 		CLayout *pData = (CLayout *)m_ui->findWidgetById("taiji");
 		CImageView *pImage = (CImageView*)pData->findWidgetById("taiji_center");
 		pImage->stopAllActions();
+		pImage->setTouchEnabled(false);
 	}
 }
 

@@ -37,9 +37,6 @@ public:
 	virtual void ccTouchCancelled(CCTouch* pTouch, CCEvent* pEvent);
 
 protected:
-
-	void updateMainSkillDesc();
-
 	void onSwitchBtn(CCObject *pSender, bool bChecked);
 	void onSwitchStrategy(CCObject *pSender, bool bChecked);
 	void updateHeroList();
@@ -52,12 +49,63 @@ protected:
 	void processMessage(int type, google::protobuf::Message *msg);
 	void addHeroSelectCell(unsigned int uIdx, CGridViewCell* pCell);
 
+	//保存队伍信息
+	void saveTeamData();
+
+	//英雄选中状态效果
+	void setSelectHeroEffect( CImageView *pImage, bool bBlack);
+	//根据id获取scrollview中的英雄icon
+	CImageView *getHeroImageFromScrollViewById( int iId );
+	//是否在队伍里
+	bool isHeroSelected( int iId );
+	//更新选中英雄数量
+	void updateSelectHeroNum();
+
 private:
 	void callBackForTouchHold();
 	//初始化格子
-	void initGreen();
+	bool initGreen();
 
+	void createHeroIcon();
 
+	void initHeroIconByMsg();
+	//更新策略
+	void updateStrategy( int iIndex );
+
+	//更新队长技
+	void updateCaptainSkill( CHero *pHero );
+
+	//创建拖动英雄
+	void createDragHero( );
+	//拖动英雄
+	void dragHero( CCTouch* pTouch );
+	//放置英雄
+	void putDownHero( CCTouch* pTouch);
+
+	/*****/
+	int getGridByPoint(CCPoint pPoint);
+
+	CCPoint getPointByGrid(int pGrid);
+
+	CCPoint getPointByTouch(CCTouch* pTouch);
+
+	int getIndexByTouch(CCTouch* pTouch);
+
+	CImageView* hasIconByTouch(CCTouch* pTouch);
+
+	bool captainJudge(CCTouch* pTouch);
+
+	void initIconByTouch(CCTouch* pTouch);
+
+	bool hasInBattle();
+
+	void onTouchIcon(CCObject *pSender);
+
+	void clearIcon();
+
+	void changeFloor(bool pShow);
+
+	void reset(CCObject *pSender);
 private:
 	CLayout *m_ui;
 
@@ -91,5 +139,14 @@ private:
 	//4X4格子
 	CCSpriteBatchNode* m_pBatchGreen;
 	//队长格子
-	CImageView* m_pCaptainTile;
+	CImageView* m_Captain;
+	CLayout* mIconNode;
+	CImageView* mMoveIcon;
+	vector<CImageView*>mHeroIcons;
+	map<int,CCPoint> mIconPoint;
+	int mStrategyIndex;
+	CCPoint mGridSize;
+	bool mgetBattleInfo;
+	bool mgetHeroList;
+	PvpTeamData mPvPData;
 };

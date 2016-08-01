@@ -11,4 +11,7 @@ extern "C"
 
 	//请求消耗掉订单
 	void c_concume_purchase(int iMsg, const char *str);
+
+	//开始消耗问题订单
+	void c_start_consume_trouble_purchaes(int iMsg);
 }

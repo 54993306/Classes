@@ -1,0 +1,65 @@
+package protos.common;
+
+option java_package = "dass.server.gameserver.protos.common";
+option java_outer_classname = "SkillCommon";
+option optimize_for = SPEED ;
+
+//技能
+message Skill{
+	optional int32  skillId = 2;	//技能ID
+	optional string name = 3;	//技能名称
+	optional int32  type = 4;	//技能类型(1 普通攻击，2 特殊攻击，3 必杀技，4 召唤技, 5 主帅技)
+	optional int32  useRate = 5;	//成功施放概率
+	optional int32  cost = 6;	//释放技能的消耗
+	optional int32  level = 7;	//技能等级
+	optional bool   move = 8;	//人物是否位移
+
+	optional int32  maxLevel = 17;	//技能最大等级
+	optional int32  coldDown = 18;	//技能CD
+	optional int32  target = 14;	
+	optional int32  pro_type = 15;	
+	optional int32  pro_rate = 16;
+	
+	optional int32  multiEff = 19;	//多效果触发类型(0 没有多技能效果)
+	repeated Effect effect = 20;	//技能效果列表
+	optional int32  activeQuality = 21;	//技能激活条件(英雄品阶)
+}
+
+//技能效果
+message Effect{
+	optional int32  effectId = 1;	//效果ID
+	optional string name = 2;	//效果名称
+	optional int32  userRate = 3;	//触发概率
+	optional sint32	cost = 4;	//cost影响(消耗或回复)
+	optional sint32  damage = 5;	//效果伤害值
+	optional int32  hurt = 6;	//真实伤害
+	optional int32  target = 7;	//效果影响的对象(1:友方  2:敌方  3:敌我双方
+	optional int32  group = 8;	//技能效果分组
+	optional int32  pos = 9;	//技能效果位置(按序触发)
+	optional int32  pro_type = 10;	//属性影响类型
+	optional int32  pro_rate = 11;	//属性影响频率
+	optional int32  batter = 12;	//连击数
+	optional sint32  repel = 13;	//向前、后击退距离(多少个格子)
+	optional int32	erange = 14;	//伤害浮动值(百分比)
+	optional int32	mode = 15;	//攻击方式(1 直线群体，2 可移动区域，3 纵向格子，4 十字，5 斜线, 6 敌方全体，7 前方向下 N*N，8 我方全体， 9 全图，10 直线单体， 11 前方区域, 12 敌方前排)
+	optional int32  type = 16;	//效果类型
+	optional sint32	distance = 17;	//攻击距离
+	optional int32  range = 18;	//技能范围
+	repeated Buff	buffList = 19;	//Buff列表
+}
+
+//技能Buff
+//影响类型(0:清除DeBuff，1:攻击，2:伤害，3:命中，4:防御，5:血量，6:暴击，7:迟缓，8:减速，9:沉默，10:定身，11:昏迷，12:沉睡，13:冻结，14:混乱，15:能量)
+message Buff{
+	optional int32	buffId = 1;	//buff ID
+	optional int32	type = 2;	//buff影响类型
+	optional string name = 3;	//buff名称
+	optional sint32	damage = 4;	//buff影响数值
+	optional int32	damage_rate = 5;//buff影响百分比
+	optional int32	useRate = 6;	//buff触发概率
+	optional bool	debuf = 7;	//是否为减益buff
+	optional int32	duration = 8;	//buff持续回合数
+	optional int32  target = 9;	//buff作用对象(1:施放者  2:受击者)
+	optional int32  level = 10;	//buff等级
+	optional int32  element = 11;	//对应怪物、英雄种族
+}

@@ -39,7 +39,7 @@ namespace BattleSpace
 		void eventMonitor();
 		void eventRemove();
 		void roleDieMsg(CCObject* ob);
-		void monsterDie(BaseRole* pRole);
+		void otherCampDie(BaseRole* pRole);
 		void battleResult(CCObject* ob);
 		void wordBossFinish();
 		void normalStage(CCObject* ob);
@@ -52,9 +52,9 @@ namespace BattleSpace
 		void NextBatch(float dt);
 		void displayRoundTips(CCObject* ob);
 		CC_SYNTHESIZE(bool,mRecvFinish,RecvFinish);
+		CC_SYNTHESIZE(GameFinishData, m_finishData, FinishData);
 	private:
 		WarManager* mManage;
-		GameFinishData m_finishData;
 	};
 };
 #endif

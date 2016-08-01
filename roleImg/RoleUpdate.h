@@ -4,8 +4,9 @@
 
 #include "AppUI.h"
 #include "scene/layer/LayerManager.h"
-#include "bag/bagData.h"
-#include "model/DataCenter.h"
+#include "protos/protocol.h"
+
+class UserData;
 
 class CRoleUpdate: public BaseLayer
 {

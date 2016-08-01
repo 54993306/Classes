@@ -34,14 +34,17 @@ public:
 protected:
 	CCObject* gridviewDataSource(CCObject* pConvertCell, unsigned int uIdx);
 	void onPageChange(CCObject* pSender, unsigned int nPageIdx);
+	//选择道具显示属性
 	void onSelectBagItem(CCObject *pSender);
 	void onUnlockBag(CCObject *pSender);
 	void onLongSelectItem(CCObject* pSender, CCTouch* pTouch);
 	void onChangeBagType(CCObject* pSender, bool isCheck);
 	CItem* findItemByGrid(int uIdx);
 	void updatePage();
+	//按道具类型过滤
 	void onFilter(CCObject *pSender);
 	void onSetFilter(const TMessage& tMsg);
+	//分解道具消息处理
 	void decomposeArmorRes(const TMessage& tMsg);
 	void onClose(CCObject* pSender);
 	void lockRadioButton();

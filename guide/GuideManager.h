@@ -16,18 +16,18 @@ public:
 	const CCPoint& geStepWidgetPosition();
 	void enterGuide();
 	void nextStep();
-	CCNode* getStepNode(const GuideTask &task);
-	CCNode* findStepWidget(BaseLayer * layer, const GuideTask &task);
+	CCNode* getStepNode(const GuideTask &task);      //查找引导任务的节点所在的layer
+	CCNode* findStepWidget(BaseLayer * layer, const GuideTask &task);//查找layer对应的引导任务的节点
 	void exitGuide();
 
 	void setJumpStep(bool isJump);
 
 	bool getIsRunGuide();
-    bool isAutoNextStep();
+    bool isAutoNextStep(); //是否跳转到下一步
 	int  getCurrTask();
 	int  getCurrStep();
 	GuideTask* getGuideTaskData();
-	int  getOpenFunction();
+	int  getOpenFunction();  //当前开放的系统功能
 protected:
 private:
 	CGuideManager();

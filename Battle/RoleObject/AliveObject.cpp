@@ -57,14 +57,15 @@ namespace BattleSpace{
 
 	void AliveObject::testLabel()
 	{
-		int tageNumber = 3000;
-		CCLabelTTF* AliveID = CCLabelTTF::create(ToString(tageNumber+mRole->getAliveID()),"arial",20);
-		AliveID->setColor(ccc3(255,0,0));
+		char str[30] = {0};
+		sprintf(str,"ID :%d",mRole->getAliveID());
+		CCLabelTTF* AliveID = CCLabelTTF::create(str,"arial",20);
+		AliveID->setColor(ccc3(0,255,0));
 		AliveID->setPosition(ccp(0,60));
 		CCLabelTTF* AliveMode = CCLabelTTF::create(ToString(mModel),"arial",20);
-		AliveMode->setColor(ccc3(255,0,0));
+		AliveMode->setColor(ccc3(0,255,0));
 		AliveMode->setPosition(ccp(0,30));
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+#if BATTLE_TEST
 		this->addChild(AliveMode);
 		this->addChild(AliveID);
 #endif
@@ -123,7 +124,7 @@ namespace BattleSpace{
 			m_Body->addChild( m_NameLabel );
 		}
 		m_NameLabel->setString(m_Name.c_str());
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+#if BATTLE_TEST
 		m_NameLabel->setVisible(true);
 #else
 		m_NameLabel->setVisible(false);
@@ -163,18 +164,9 @@ namespace BattleSpace{
 	//这个方法不属于数据类，也不属于显示类，但是应该在武将自身的身上，每个武将的死亡处理都不一样。
 	void AliveObject::AliveDie()
 	{
-		mRole->clearHitAlive();
-		mRole->setHp(0);
-		mRole->setBattle(false);
-		mRole->setGridIndex(INVALID_GRID);
 		m_HpObject->setHpNumber(0);
-		if (mRole->getMoveObject())
-			mRole->getMoveObject()->removeFromParentAndCleanup(true);
-		mRole->setMoveObject(nullptr);
 		this->setMoveObject(nullptr);
-		mRole->getBuffManage()->Buffclear();
 		NOTIFICATION->postNotification(B_DrpItem,this);
-		NOTIFICATION->postNotification(MsgRoleDie,mRole);
 	}
 	//做受击判断和一个冲锋0号格子特殊处理,攻击音效攻击特效播放,使用了受击数组但是未操作
 	void AliveObject::AtkBegin_Event()
@@ -197,7 +189,7 @@ namespace BattleSpace{
 	//攻击区域必杀技状态才绘制,攻击完毕可以将武将传出去,进行下一个效果的判断或是重置武将信息等
 	void AliveObject::AtkEnd_Event()
 	{
-		if (!m_UpdateState)
+		if (!getUpdateState())
 			return;
 		NOTIFICATION->postNotification(B_CancelDrawAttackArea,mRole);		//取消绘制攻击范围(针对性的取消绘制)
 		if (mRole->mAreaTargets.size())
@@ -257,7 +249,7 @@ namespace BattleSpace{
 			this->addChild(Effect);
 		m_Armature->runAction(CCSequence::create(
 			CCTintTo::create(0.25f,255,0,0),CCTintTo::create(0,255,255,255),NULL));								//变红处理
-		if (mRole->getCaptain())
+		if (mRole->getCaptain() && !mRole->getOtherCamp())
 		{
 			NOTIFICATION->postNotification(B_CaptainHurt,mRole);
 			NOTIFICATION->postNotification(B_Shark,nullptr);
@@ -285,6 +277,8 @@ namespace BattleSpace{
 		if (mRole->getBaseData()->getRoleCol()>1&&!mRole->getCaptain())
 			setPosition(ccpAdd(getPosition(),ccp(GRID_WIDTH/4*mRole->getBaseData()->getRoleCol(),0)));
 		setoffs(getPosition()-pMapPoint);		//算出武将偏移实际站位格子的偏移量
+		if (mRole->getOtherCamp() && !mRole->getEnemy())
+			mRole->setMoveGrid(mRole->getGridIndex());
 		monsterSoleSprite();
 	}
 

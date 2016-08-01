@@ -18,14 +18,10 @@ public:
     void onExit();
     void showHeroInfo(CHero* hero);
 	void updateHeroInfo(const TMessage& tMsg);
-	//CCObject* tableviewDataSource(CCObject* pConvertCell, unsigned int uIdx);
-	//void addTableCell(unsigned int uIdx, CTableViewCell* pCell);
 protected:
 private:
 	CLayout *m_ui;
 	CHero *m_hero;
-	//CLayout *m_cell;
-	//CTableView *m_tableView;
 };
 
 #endif

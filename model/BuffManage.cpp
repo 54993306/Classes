@@ -64,7 +64,7 @@ namespace BattleSpace{
 
 	void BuffManage::AddBuff(BuffData& buf)
 	{
-		if (!m_alive->getBattle() || !m_alive->getRoleObject())
+		if (!m_alive->getBattle()||!m_alive->getRoleObject())
 		{
 			CCLOG("[ TIPS ] BuffManage::AddBuff Add Faild");
 			return;											//统一的做安全性判断处理
@@ -82,7 +82,7 @@ namespace BattleSpace{
 		ExcuteBuff(tBuffinfo);									//执行buff逻辑
 		m_BuffMap[tBuffinfo->getBuffID()] = tBuffinfo;			//map添加信息的方法	
 		if (m_alive->getHp()<=0)
-			m_alive->getRoleObject()->AliveDie();
+			m_alive->roleDie();
 		CCLOG("[ Tips ] BuffManage::AddBuff succeed bufID = %d",buf.getBuffID());
 		NOTIFICATION->postNotification(B_AddBuff,m_alive);
 	}
@@ -163,7 +163,7 @@ namespace BattleSpace{
 		for (auto i:RemoveFirst)					//执行移除操作
 			removeBuf(i);
 		if (m_alive->getHp()<=0)
-			m_alive->getRoleObject()->AliveDie();
+			m_alive->roleDie();
 	}
 
 	//返回true表示不添加新Buf

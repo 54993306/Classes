@@ -1,0 +1,41 @@
+import "common/armor_common.proto";
+import "common/prop_common.proto";
+package protos.common;
+
+option java_package = "dass.server.gameserver.protos.common";
+option java_outer_classname = "ItemCommon";
+option optimize_for = SPEED ;
+
+//道具
+message Item{
+	optional int32 id = 1;			//玩家道具ID
+	optional int32 itemId = 2;		//道具标识ID
+	optional string itemName = 3;		//道具名称
+	optional int32 itemType = 4;		//道具类型(1 常规道具，2 装备，3 消耗类道具，4 宝物)
+	optional int32 useLevel = 5;		//使用等级
+	optional int32 moneyType = 6;		//购买道具花费的货币类型(1元宝，2金币，3友情点，4粮食)
+	optional int32 buyPrice = 7;		//购买价格
+	optional int32 sellPrice = 8;		//出售价格
+	optional int32 quality = 9;		//装备品阶(1 白色， 2 绿色， 3 蓝色，4 紫色， 5 红色)
+	optional int32 itemLevel = 16;		//道具等级(装备强化等级)
+
+	optional fixed64 useTime = 10;		//道具使用时间
+	optional fixed64 loseTime = 11;		//道具过期时间
+	optional int32 itemNum = 12;		//拥有道具的数量(商城中表示可购买的数量)
+	optional int32 gridNum = 13;		//物品背包位置
+
+	optional common.Armor armor = 14;	//装备数据 (itemType 为2时，使用该项)
+	optional common.Prop prop = 15;		//消耗类道具 (itemType 为3时，使用该项)
+
+	optional int32 thumb = 19;		//道具图标ID
+	optional int32 param = 18;		//
+	optional bool canUse = 20;		//道具是否可用
+	repeated DropStage drops = 21;		//道具掉落的关卡列表
+	optional bool stren = 22;		//是否可强化
+	optional int32 star = 23;		//装备星级
+}
+
+message DropStage{
+	required int32 stageId = 1;	//关卡ID
+	required bool open = 2;		//是否开启
+}

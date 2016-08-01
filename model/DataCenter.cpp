@@ -16,7 +16,8 @@ DataCenter::DataCenter()
 	,m_skill(nullptr),m_tollgate(nullptr),m_task(nullptr)
 	,m_heroInfo(nullptr),m_itemDesc(nullptr),m_CombatguideMG(nullptr),m_stageData(nullptr)
 	,m_rewardData(nullptr), m_cityActionType(CA_None),m_RoleData(nullptr),m_shareData(nullptr)
-{}
+{
+}
 DataCenter::~DataCenter()
 {
 	CC_SAFE_RELEASE(m_war);
@@ -215,4 +216,9 @@ ShareGM* DataCenter::getShareData()
 		m_shareData = new ShareGM();
 	}
 	return m_shareData;
+}
+
+VsAnimateData& DataCenter::getVsAnimateData()
+{
+	return m_VsAnimateData;
 }

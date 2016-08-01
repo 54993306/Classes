@@ -1,0 +1,30 @@
+import "common/hero_common.proto";
+
+package protos.common;
+
+option java_package = "dass.server.gameserver.protos.common";
+option java_outer_classname = "CityCommon";
+option optimize_for = SPEED ;
+
+//主城建筑
+message City{
+	required int32 id = 1;		//玩家主城建筑ID
+	required int32 cityId = 2;	//建筑ID
+	optional string cityName = 3;	//名称
+	optional int32 level = 4;	//等级
+	optional int32 lvFood = 5;	//升级需要的粮食数量
+
+	optional int32 strenLv = 6;	//铁匠铺强化上限等级
+	optional int32 basePE = 7;	//金矿、培植区基本产量
+	optional int32 extPE = 8;	//金矿、培植区额外产量
+	optional int32 cap = 9;		//金矿、培植区当前存储量
+	optional int32 maxCap = 10;	//金矿、培植区最大存储量
+
+	optional int32 heroNum = 11;	//可驻守英雄数量
+	optional int32 hero = 15;	//当前已驻守的英雄数量
+	repeated common.Hero heroList = 12;	//驻守英雄列表
+	
+	optional bool  capFull = 14;	//金矿、培植区产量已满
+	optional string note = 16;	//文字说明
+	optional bool  isOpen = 17;	//建筑物是否开启
+}

@@ -92,7 +92,7 @@ public:
 	void sendRoleMove(int xPos, int yPos);
 
 	//登录
-	void sendLogin(string usrName, string usrPass, string access_code="", bool isReconn = false, int roleId = 0, string openId="" );  //isReconn 重连 
+	void sendLogin(string usrName, string usrPass, string access_code="", bool isReconn = false, int roleId = 0, string openId="", int iPlatform = 0);  //isReconn 重连 
 
 	//在线角色列表
 	void sendRoleList(int mapId);

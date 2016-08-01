@@ -52,13 +52,14 @@ void protobuf_AssignDesc_auth_5fprotocol_2eproto() {
       "auth_protocol.proto");
   GOOGLE_CHECK(file != NULL);
   LoginRequest_descriptor_ = file->message_type(0);
-  static const int LoginRequest_offsets_[6] = {
+  static const int LoginRequest_offsets_[7] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LoginRequest, username_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LoginRequest, password_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LoginRequest, reconnect_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LoginRequest, roleid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LoginRequest, openid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LoginRequest, access_code_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LoginRequest, platform_),
   };
   LoginRequest_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -220,19 +221,19 @@ void protobuf_AddDesc_auth_5fprotocol_2eproto() {
   ::protos::common::protobuf_AddDesc_common_2frole_5fcommon_2eproto();
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
     "\n\023auth_protocol.proto\022\006protos\032\030common/ro"
-    "le_common.proto\"z\n\014LoginRequest\022\020\n\010usern"
-    "ame\030\001 \002(\t\022\020\n\010password\030\002 \002(\t\022\021\n\treconnect"
-    "\030\003 \001(\010\022\016\n\006roleId\030\004 \001(\005\022\016\n\006openid\030\005 \001(\t\022\023"
-    "\n\013access_code\030\006 \001(\t\"[\n\rLoginResponse\022\022\n\n"
-    "authRecode\030\001 \002(\005\022\017\n\007hasRole\030\002 \001(\010\022%\n\010rol"
-    "eList\030\003 \003(\0132\023.protos.common.Role\" \n\016Acco"
-    "untBindReq\022\016\n\006openid\030\001 \002(\t\"\037\n\rAcountBind"
-    "Res\022\016\n\006result\030\001 \002(\010\"\037\n\rInGameRequest\022\016\n\006"
-    "roleId\030\001 \002(\005\"5\n\016InGameResponse\022#\n\006myRole"
-    "\030\001 \002(\0132\023.protos.common.Role\"3\n\021Reconnect"
-    "Response\022\016\n\006result\030\001 \002(\010\022\016\n\006reason\030\002 \001(\005"
-    "B0\n\036anvin.server.gameserver.protosB\014Auth"
-    "ProtocolH\001", 530);
+    "le_common.proto\"\214\001\n\014LoginRequest\022\020\n\010user"
+    "name\030\001 \001(\t\022\020\n\010password\030\002 \001(\t\022\021\n\treconnec"
+    "t\030\003 \001(\010\022\016\n\006roleId\030\004 \001(\005\022\016\n\006openid\030\005 \001(\t\022"
+    "\023\n\013access_code\030\006 \001(\t\022\020\n\010platform\030\007 \001(\005\"["
+    "\n\rLoginResponse\022\022\n\nauthRecode\030\001 \002(\005\022\017\n\007h"
+    "asRole\030\002 \001(\010\022%\n\010roleList\030\003 \003(\0132\023.protos."
+    "common.Role\" \n\016AccountBindReq\022\016\n\006openid\030"
+    "\001 \002(\t\"\037\n\rAcountBindRes\022\016\n\006result\030\001 \002(\010\"\037"
+    "\n\rInGameRequest\022\016\n\006roleId\030\001 \002(\005\"5\n\016InGam"
+    "eResponse\022#\n\006myRole\030\001 \002(\0132\023.protos.commo"
+    "n.Role\"3\n\021ReconnectResponse\022\016\n\006result\030\001 "
+    "\002(\010\022\016\n\006reason\030\002 \001(\005B/\n\035dass.server.games"
+    "erver.protosB\014AuthProtocolH\001", 548);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "auth_protocol.proto", &protobuf_RegisterTypes);
   LoginRequest::default_instance_ = new LoginRequest();
@@ -268,6 +269,7 @@ const int LoginRequest::kReconnectFieldNumber;
 const int LoginRequest::kRoleIdFieldNumber;
 const int LoginRequest::kOpenidFieldNumber;
 const int LoginRequest::kAccessCodeFieldNumber;
+const int LoginRequest::kPlatformFieldNumber;
 #endif  // !_MSC_VER
 
 LoginRequest::LoginRequest()
@@ -292,6 +294,7 @@ void LoginRequest::SharedCtor() {
   roleid_ = 0;
   openid_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   access_code_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  platform_ = 0;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -361,6 +364,7 @@ void LoginRequest::Clear() {
         access_code_->clear();
       }
     }
+    platform_ = 0;
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
@@ -372,7 +376,7 @@ bool LoginRequest::MergePartialFromCodedStream(
   ::google::protobuf::uint32 tag;
   while ((tag = input->ReadTag()) != 0) {
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // required string username = 1;
+      // optional string username = 1;
       case 1: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
@@ -388,7 +392,7 @@ bool LoginRequest::MergePartialFromCodedStream(
         break;
       }
 
-      // required string password = 2;
+      // optional string password = 2;
       case 2: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
@@ -467,6 +471,22 @@ bool LoginRequest::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(56)) goto parse_platform;
+        break;
+      }
+
+      // optional int32 platform = 7;
+      case 7: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_platform:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &platform_)));
+          set_has_platform();
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -489,7 +509,7 @@ bool LoginRequest::MergePartialFromCodedStream(
 
 void LoginRequest::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // required string username = 1;
+  // optional string username = 1;
   if (has_username()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8String(
       this->username().data(), this->username().length(),
@@ -498,7 +518,7 @@ void LoginRequest::SerializeWithCachedSizes(
       1, this->username(), output);
   }
 
-  // required string password = 2;
+  // optional string password = 2;
   if (has_password()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8String(
       this->password().data(), this->password().length(),
@@ -535,6 +555,11 @@ void LoginRequest::SerializeWithCachedSizes(
       6, this->access_code(), output);
   }
 
+  // optional int32 platform = 7;
+  if (has_platform()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(7, this->platform(), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -543,7 +568,7 @@ void LoginRequest::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* LoginRequest::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
-  // required string username = 1;
+  // optional string username = 1;
   if (has_username()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8String(
       this->username().data(), this->username().length(),
@@ -553,7 +578,7 @@ void LoginRequest::SerializeWithCachedSizes(
         1, this->username(), target);
   }
 
-  // required string password = 2;
+  // optional string password = 2;
   if (has_password()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8String(
       this->password().data(), this->password().length(),
@@ -593,6 +618,11 @@ void LoginRequest::SerializeWithCachedSizes(
         6, this->access_code(), target);
   }
 
+  // optional int32 platform = 7;
+  if (has_platform()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(7, this->platform(), target);
+  }
+
   if (!unknown_fields().empty()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
@@ -604,14 +634,14 @@ int LoginRequest::ByteSize() const {
   int total_size = 0;
 
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    // required string username = 1;
+    // optional string username = 1;
     if (has_username()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::StringSize(
           this->username());
     }
 
-    // required string password = 2;
+    // optional string password = 2;
     if (has_password()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::StringSize(
@@ -642,6 +672,13 @@ int LoginRequest::ByteSize() const {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::StringSize(
           this->access_code());
+    }
+
+    // optional int32 platform = 7;
+    if (has_platform()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->platform());
     }
 
   }
@@ -689,6 +726,9 @@ void LoginRequest::MergeFrom(const LoginRequest& from) {
     if (from.has_access_code()) {
       set_access_code(from.access_code());
     }
+    if (from.has_platform()) {
+      set_platform(from.platform());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -706,7 +746,6 @@ void LoginRequest::CopyFrom(const LoginRequest& from) {
 }
 
 bool LoginRequest::IsInitialized() const {
-  if ((_has_bits_[0] & 0x00000003) != 0x00000003) return false;
 
   return true;
 }
@@ -719,6 +758,7 @@ void LoginRequest::Swap(LoginRequest* other) {
     std::swap(roleid_, other->roleid_);
     std::swap(openid_, other->openid_);
     std::swap(access_code_, other->access_code_);
+    std::swap(platform_, other->platform_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

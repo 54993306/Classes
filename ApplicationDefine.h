@@ -14,10 +14,10 @@
 //语言类型
 enum struct AppLanguageType
 {
-	AppLangChineseCom= 1,		//中文繁体
+	AppLangChineseCom= 1,			//中文繁体
 	AppLangChineseSim,				//中文简体
 	AppLangEnglish,						//英文
-	AppLangThailand,					//泰文
+	AppLangThailand,						//泰文
 	AppLangMax
 };
 
@@ -57,7 +57,7 @@ const std::string RES_PATH_WITH_LANG[(int)AppLanguageType::AppLangMax] =
 #endif
 
 //更新开启
-#define VERSION_UPDATE 1
+#define VERSION_UPDATE 0
 
 //跳过网关服务器开起,直接连入游戏服务器
 #define DIRECT_CONNECT_GAMESERVER 0

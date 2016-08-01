@@ -1,8 +1,6 @@
 ﻿#include "ShopLayer.h"
-#include "scene/layer/LayerManager.h"
 #include "net/CNetClient.h"
 #include "netcontrol/CPlayerControl.h"
-#include "scene/layer/LayerManager.h"
 #include "model/DataCenter.h"
 #include "GMessage.h"
 #include "common/color.h"
@@ -17,7 +15,10 @@
 #include "common/CheckMoney.h"
 
 #include "common/CGameSound.h"
-#include "Resources.h"
+#include <spine/spine-cocos2dx.h>
+#include "mainCity/CityData.h"
+
+using namespace spine;
 
 
 CShopLayer::CShopLayer():
@@ -40,6 +41,7 @@ bool CShopLayer::init()
 		m_ui = LoadComponent("shop.xaml");  //  SelectSkill
 		m_ui->setPosition(VCENTER);
 		this->addChild(m_ui);
+
 		return true;
 	}
 	return false;
@@ -103,7 +105,6 @@ void CShopLayer::onEnter()
 
 	// 	pageView->removeFromParent();
 
-
 	//退出
 	CButton* pClose = CButton::create("common/back.png", "common/back.png");
 	pClose->getSelectedImage()->setScale(1.1f);
@@ -129,6 +130,14 @@ void CShopLayer::onEnter()
 		m_armature->setScaleX(-1.2f);
 		m_armature->setScaleY(1.2f);
 		m_ui->addChild(m_armature);
+	}
+	else if (m_buyType==1)
+	{
+		//添加动画
+		SkeletonAnimation *pSkeletonAnimation = SkeletonAnimation::createWithFile("shop/5001.json", "shop/5001.atlas", 1);
+		pSkeletonAnimation->setPosition(ccp(140, -100));
+		pSkeletonAnimation->setAnimation(0, "stand", true);
+		m_ui->addChild(pSkeletonAnimation, 3);
 	}
 
 	CSceneManager::sharedSceneManager()->addMsgObserver(UPDATE_HERO, this, GameMsghandler_selector(CShopLayer::roleUpdate));
@@ -467,7 +476,11 @@ void CShopLayer::leaveTime(struct tm &lastTm, struct tm &timem, struct tm &now)
 
 CShopLayer::~CShopLayer()
 {
-	CC_SAFE_RELEASE(m_cell);
+	if (m_cell)
+	{
+		m_cell->release();
+		m_cell = nullptr;
+	}
 }
 
 void CShopLayer::addCell(CGridPageViewCell* pCell, unsigned int uIdx)

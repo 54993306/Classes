@@ -172,7 +172,7 @@ namespace BattleSpace{
 	{
 		if (!musicId)return;
 		char musicAds[60] = {0};
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+#if BATTLE_TEST
 		sprintf(musicAds,"SFX/Test/%d.mp3",musicId);
 #else
 		sprintf(musicAds,"SFX/%d.ogg",musicId);

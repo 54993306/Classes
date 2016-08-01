@@ -1,14 +1,12 @@
 #include "BackLayer.h"
 #include "scene/layer/SetPanel.h"
-#include "scene/layer/SetPanel.h"
 #include "scene/CPopTip.h"
-#include "scene/layer/LayerManager.h"
 #include "net/CNetClient.h"
 #include "guide/GuideManager.h"
-#include "model/DataCenter.h"
 #include "task/TaskControl.h"
 #include "Battle/BattleMessage.h"
-#include "GamePlatfomDefine.h"
+#include "SDK/GamePlatformManager.h"
+#include "model/DataCenter.h"
 
 using namespace cocos2d;
 
@@ -39,11 +37,11 @@ void BackLayer::keyBackClicked()
 		if (LayerManager::instance()->getLayerCount()==0&&name=="CMainScene")
 		{
 
-			//UC-退出
-#if G_PLATFORM_TARGET==G_PLATFORM_UC
-			LoginLayerUC::exit_with_uc();
-			return;
-#endif
+			//平台推出
+			if(GamePlatformMgr->ExitPlatform())
+			{
+				return;
+			}
 
 			m_backTip = CPopTip::create();
 			m_backTip->addContentTip(GETLANGSTR(5));

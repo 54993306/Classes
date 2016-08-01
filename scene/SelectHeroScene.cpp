@@ -469,6 +469,10 @@ bool SelectHeroScene::ProcessMsg(int type, google::protobuf::Message *msg)
 				pop->setTouchPriority(-100);
 				pop->setButtonLisener(this, ccw_click_selector(SelectHeroScene::onClickDownloadPackage));
 				CCDirector::sharedDirector()->getRunningScene()->addChild(pop, 899);
+
+				m_textFieldName->setPriority(6);
+				m_textFieldName->setVisible(false);
+
 				return true;
 			}
 #endif

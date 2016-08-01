@@ -36,6 +36,7 @@ namespace BattleSpace{
 		int getAliveGuard(BaseRole* pAlive);	
 		void initAliveGuard(BaseRole* pAlive,std::vector<int>& pGuards);									//
 	protected:
+		bool hasTarget(BaseRole* pRole,int pGrid);
 		void initAliveCurrGrids(BaseRole* pAlive,std::vector<int>& pVector);
 		void guradUpAndDown(BaseRole* pAlive,std::vector<int>& pGuards);
 		void guardFront(BaseRole* pAlive,std::vector<int>& pGuards);

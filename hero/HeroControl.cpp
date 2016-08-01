@@ -272,7 +272,6 @@ void CHeroControl::processMessage(int type, google::protobuf::Message *msg)
 				{
 					m_heroAttrLayer->showSkillTip(false);
 				}
-
 			}
 		}
 	default:
@@ -631,4 +630,10 @@ void CHeroControl::updateHeroValue(CHero * hero)
 void CHeroControl::setIsHideOperation(bool isHide)
 {
 	m_isShowOpr = isHide;
+}
+
+void CHeroControl::onExit()
+{
+	BaseLayer::onExit();
+	GetTcpNet->unRegisterAllMsgHandler(this);
 }

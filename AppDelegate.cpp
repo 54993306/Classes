@@ -31,8 +31,8 @@
 #include "Battle/BattleScene/LoadBattleResource.h"
 #include "GMessage.h"
 #include "CFileScaner.h"
-
-#include "GamePlatfomDefine.h"
+#include "SDK/GooglePaySDK.h"
+#include "SDK/GamePlatformManager.h"
 
 USING_NS_CC;
 using namespace CocosDenshion;
@@ -60,6 +60,8 @@ AppDelegate::~AppDelegate()
 	GameSound->destroy();
 	CWholeBodyShowData::destroy();
 	CJniHelper::destroy();
+	GooglePaySDK::destroy();
+	GamePlatformManager::destroy();
 }
 
 bool AppDelegate::applicationDidFinishLaunching() 
@@ -143,13 +145,9 @@ bool AppDelegate::applicationDidFinishLaunching()
 	CSceneManager::sharedSceneManager()->runScene(GETSCENE(LogoScene));
 
 
-
-	//UC-初始化
-#if G_PLATFORM_TARGET==G_PLATFORM_UC
-	LoginLayerUC::uc_sdk_init();
-#endif
+	//平台相关初始化
+	GamePlatformMgr->InitPlatForm();
 	
-
     return true;
 }
 
@@ -185,10 +183,7 @@ void AppDelegate::applicationWillEnterForeground() {
 void AppDelegate::initPlatformConfig()
 {
 	//Facebook
-	CCDictionary *fbConfigDict = CCDictionary::create();
-	fbConfigDict -> setObject(CCString::create("802924199830394"), "api_key"); // api_key
-	fbConfigDict -> setObject(CCString::create("9a262839fabeb02f646604b6d6cb0e77"), "app_secret");
-	C2DXShareSDK::setPlatformConfig(C2DXPlatTypeFacebook, fbConfigDict);
+
 
 	//新浪微博
 // 	CCDictionary *sinaConfigDict = CCDictionary::create();

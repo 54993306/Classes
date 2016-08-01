@@ -27,6 +27,7 @@ namespace BattleSpace
 	class CombatLogic;
 	class BuffConfig;
 	class StoryData;
+	class CaptainSkill;
 	using namespace std;
 	typedef map<unsigned int,BaseRole*> RolesMap;	
 	typedef std::pair<spSkeletonData*,spAtlas*> SpData;
@@ -47,7 +48,7 @@ namespace BattleSpace
 		void BattleDataClear();
 		void ReleaseSpineData();
 		void initData();
-		bool checkMonstOver();
+		bool checkBatchOver();
 		void initMonsterByBatch(int batch);
 		void initHeroData();
 		EffectData* getEffData();
@@ -63,6 +64,8 @@ namespace BattleSpace
 		void saveWordBossHurt();
 		vector<int>* getBossHurtVec(){return &m_VecBossHurt;}
 		vector<int>* getMoveVec(){return &mMoveArea;}
+		vector<int>* getEnterVec(){return &mEnterArea;}
+		vector<int>* getOtherEnter(){return &mOtherEnter;}
 		vector<int>* getNndefinedArea(){return &mUndefinedArea;}
 		vector<int>* getAddcostVec(){return &mCostArea;}
 
@@ -77,6 +80,7 @@ namespace BattleSpace
 
 		void initHeros(vector<BaseRole*>& pHeros,bool pAlive = false);
 		void initMonsters(vector<BaseRole*>& pMonsters,bool pAlive = false);
+		void initOtherCamp(vector<BaseRole*>& pOthers,bool pAlive = false);
 		void initRoles(vector<BaseRole*>& pRoles,bool pAlive,bool pEnemy);
 
 		int getCurrRandomGrid(int grid,bool hasAlive = false);
@@ -85,8 +89,11 @@ namespace BattleSpace
 		void initRoleSkillInfo(int pEffectID,BaseRole* pRole);
 		bool inAddCostArea(int pGrid);
 		bool inMoveArea(int pGrid);
+		bool inEnterArea(int pGrid);
+		bool inOtherEnter(int pGrid);
 		bool inUnDefineArea(int pGrid);
 		bool lastBatch();
+		void executeCaptainSkill(bool mOther = false);
 	public:
 		CC_SYNTHESIZE(int, m_iWorldBossRank, WorldBossRank);			//世界BOSS狂暴状态
 		CC_SYNTHESIZE(int,m_LoadImage,LoadImage);						//用于记录加载图片的id
@@ -113,6 +120,8 @@ namespace BattleSpace
 		void costUpdate(float delta);
 		void changeCost(float pCost);
 	protected:
+		vector<int> mEnterArea;									//武将创建时的召唤区域
+		vector<int>	mOtherEnter;								//对方阵营武将进入战场区域
 		vector<int> mUndefinedArea;								//未定义区域,任意对象都不可进入
 		vector<int> mMoveArea;									//可移动格子存储
 		vector<int> mCostArea;									//可增加cost格子存储
@@ -123,6 +132,7 @@ namespace BattleSpace
 		EffectData* m_efdata;
 		BuffConfig* mBuffData;
 		StoryData* mStoryData;
+		CaptainSkill* mCaptainSkill;
 		ArmatureEventDataMgr* m_armatureEventDataMgr;				
 		vector<BaseRole*> mBattleHeros;
 		vector<BaseRole*> mBattleMonsters;

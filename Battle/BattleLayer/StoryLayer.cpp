@@ -65,7 +65,7 @@ namespace BattleSpace{
 		mapAddZero();
 		if(!pStoryData)
 		{
-#if CC_TARGET_PLATFORM != CC_PLATFORM_WIN32
+#if !BATTLE_TEST
 			if (!DataCenter::sharedData()->getWar()->getFirstStage())		//第一次打关卡才出现关卡剧情
 				return false;
 #endif	
@@ -158,7 +158,7 @@ namespace BattleSpace{
 	{
 		PlayEffectSound(SFX_423);	
 		char sfx[60] = {0};
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+#if BATTLE_TEST
 		sprintf(sfx,"SFX/Test/%d.mp3",m_StoryStep->getSFX());
 #else
 		sprintf(sfx,"SFX/%d.ogg",m_StoryStep->getSFX());
@@ -172,7 +172,7 @@ namespace BattleSpace{
 		if (m_LastStep && m_StoryStep->getBGM() == m_LastStep->getBGM())
 			return;
 		char bgm[60] = {0};
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+#if BATTLE_TEST
 		sprintf(bgm,"BGM/Test/%d.mp3",m_StoryStep->getBGM());
 #else
 		sprintf(bgm,"BGM/%d.ogg",m_StoryStep->getBGM());
@@ -348,13 +348,17 @@ namespace BattleSpace{
 		if (m_StoryStep->getright())
 		{
 			Animation = (SkeletonAnimation*)m_ui->getChildByTag(rightImg_tag);
-			Animation->setPosition(ccp(size.width-Animation->boundingBox().getMaxX()+m_StoryStep->getRolex(),65+m_StoryStep->getRoley()));
 		}else{
 			Animation = (SkeletonAnimation*)m_ui->getChildByTag(leftImg_tag);
-			Animation->setPosition(ccp(Animation->boundingBox().getMaxX()+m_StoryStep->getRolex(),65+m_StoryStep->getRoley()));
 		}
 		if (Animation)
 		{
+			if (m_StoryStep->getright())
+			{
+				Animation->setPosition(ccp(size.width-Animation->boundingBox().getMaxX()+m_StoryStep->getRolex(),65+m_StoryStep->getRoley()));
+			}else{
+				Animation->setPosition(ccp(Animation->boundingBox().getMaxX()+m_StoryStep->getRolex(),65+m_StoryStep->getRoley()));
+			}
 			if (m_StoryStep->getTurn())
 				Animation->setScaleX(-1);
 			Animation->setVisible(true);

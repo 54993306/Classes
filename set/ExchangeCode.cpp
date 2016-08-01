@@ -1,9 +1,6 @@
 ﻿#include "ExchangeCode.h"
-#include "scene/layer/LayerManager.h"
 #include "net/CNetClient.h"
 #include "netcontrol/CPlayerControl.h"
-#include "scene/layer/LayerManager.h"
-#include "model/DataCenter.h"
 #include "GMessage.h"
 
 #include "common/color.h"
@@ -16,6 +13,11 @@
 #include "common/CGameSound.h"
 #include "Resources.h"
 #include "SetLayer.h"
+#include "bag/bagData.h"
+#include "model/DataCenter.h"
+#include "common/CursorTextField.h"
+
+#include "model/RoleNameGM.h"
 
 CExchangeCode::CExchangeCode()
 {

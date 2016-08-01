@@ -1,9 +1,6 @@
 ﻿#include "SetLayer.h"
-#include "scene/layer/LayerManager.h"
 #include "net/CNetClient.h"
 #include "netcontrol/CPlayerControl.h"
-#include "scene/layer/LayerManager.h"
-#include "model/DataCenter.h"
 #include "GMessage.h"
 
 #include "common/color.h"
@@ -19,9 +16,8 @@
 #include "common/CGameSound.h"
 #include "common/CommonFunction.h"
 
-#include "common/CGameSound.h"
 #include "Resources.h"
-#include "common/CGameSound.h"
+#include "common/CursorTextField.h"
 
 CSetLayer::CSetLayer():m_bSoundLock(false)
 {

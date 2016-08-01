@@ -858,7 +858,7 @@ namespace BattleSpace
 	{
 		CCInteger* music = (CCInteger*)ob;
 		char musicAds[60] = {0};
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+#if BATTLE_TEST
 		sprintf(musicAds,"BGM/Test/%d.mp3",music->getValue());
 #else
 		sprintf(musicAds,"BGM/%d.ogg",music->getValue());

@@ -26,6 +26,7 @@ struct CStage
 	int star;		   //通关评价(星星)
 	int action;		//挑战关卡需要消耗的行动力
 	int prize;      //关卡奖励道具(0 没有道具，1 有道具、可领取，2 有道具、不可领取)
+	vector<string> friendList;
 	void read(const StageInfo& info);
 };
 

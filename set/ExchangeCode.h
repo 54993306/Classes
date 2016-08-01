@@ -4,17 +4,14 @@
 
 #include "AppUI.h"
 #include "scene/layer/LayerManager.h"
-#include "bag/bagData.h"
-#include "model/DataCenter.h"
-#include "common/CursorTextField.h"
-
-#include "model/RoleNameGM.h"
 
 enum ExchangeType
 {
 	ExCode = 1,
 	CBCode
 };
+
+class CursorTextField;
 
 class CExchangeCode: public BaseLayer
 {

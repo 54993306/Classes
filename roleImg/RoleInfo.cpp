@@ -1,8 +1,6 @@
 ﻿#include "RoleInfo.h"
-#include "scene/layer/LayerManager.h"
 #include "net/CNetClient.h"
 #include "netcontrol/CPlayerControl.h"
-#include "scene/layer/LayerManager.h"
 #include "model/DataCenter.h"
 #include "GMessage.h"
 
@@ -20,6 +18,8 @@
 
 #include "common/CGameSound.h"
 #include "Resources.h"
+#include "bag/bagData.h"
+
 #define  FACEBOOKIMG "http://graph.facebook.com/%s/picture?width=106&height=106"
 
 CRoleInfo::CRoleInfo()

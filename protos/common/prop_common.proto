@@ -1,0 +1,12 @@
+package protos.common;
+
+option java_package = "dass.server.gameserver.protos.common";
+option java_outer_classname = "PropCommon";
+option optimize_for = SPEED ;
+
+//药物、消耗类道具
+message Prop{
+	optional int32 AddType = 1;	 //使用后获得的资源类型 (1强化成功率加成，2英雄增加经验值)
+	optional int32 AddVal  = 2;	 //使用后获得的资源数量
+	optional int32 param = 3;	 //备用
+}

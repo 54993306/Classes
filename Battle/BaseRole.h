@@ -33,6 +33,7 @@ namespace BattleSpace
 	class HurtCount;
 	class BattleRoleLayer;
 	class CombatGuideManage;
+	class BattleModel;
 	class BaseRole:public CCObject			//定义数据的顺序结构是为了方便查看数据
 	{
 	protected:
@@ -42,6 +43,8 @@ namespace BattleSpace
 		SkillRange* mSkillRange;
 		HurtCount* mHurtCount;
 		CombatGuideManage* mGuideManage;
+		BattleModel* mBattleModel;
+		skEffectData* mSkillEffect;			//空对象代替空指针防止程序崩溃
 	public:
 		virtual void excuteLogic(float pTime);
 		bool stateDispose(float pTime);
@@ -70,12 +73,13 @@ namespace BattleSpace
 		bool IsAutoMoveType();
 		/******************* Monster ********************/
 		void monsterCritEffect();
-		void MonsterExcuteAI(float dt); 
+		void MonsterExcuteAI(); 
 		bool monsterFlee();
 		//monster move Logic
 		bool MonstMoveExcute();
 		int getMonsterMove();
 		//hero touch move
+		bool moveToGrid();
 		bool moveToTouchEndGrid();
 		bool unCommonAlive();
 		bool movePrecondition();
@@ -87,6 +91,9 @@ namespace BattleSpace
 		void moveSwappingAlives(vector<BaseRole*>& pVector,int pOffs);
 		bool callAliveJudge(vector<int>& pDestinations);
 		PROPERTY_CONSTREAD(int,mCommandGrid,CommandGrid);				//触	摸结束点
+		bool skillAreaHasTarget();
+		bool currGridHasTarget();
+		bool inMoveObjectArea(int pGrid);
 	public:
 		virtual ~BaseRole();
 		virtual bool init();
@@ -108,7 +115,10 @@ namespace BattleSpace
 		bool critJudge();
 		void initAliveData();
 		void initAliveByFather(BaseRole*pFather);
-		vector<BaseRole*>* getSkillTargets();
+		void updateRole(float dt);
+		vector<BaseRole*>* getCurrSkillTargets();
+		void roleDie();
+		bool hasOtherRole(int pGrid);
 	public:
 		//public
 		CC_SYNTHESIZE(BaseRoleData*,mBaseData,BaseData);
@@ -146,6 +156,7 @@ namespace BattleSpace
 		CC_SYNTHESIZE(bool,m_CritEffect,CritEffect);					//必杀技播放过特效
 		CC_SYNTHESIZE(bool,m_Move,Move);								//是否可以移动
 		CC_SYNTHESIZE(float,m_Zoom,Zoom);								//缩放比
+		CC_SYNTHESIZE(bool,mFirstInit,FirstInit);						//武将初次初始化
 	public:
 		//data
 		CC_SYNTHESIZE(int,m_Model,Model);								//武将模型
@@ -157,6 +168,7 @@ namespace BattleSpace
 		CC_SYNTHESIZE(int,m_Doge,Doge);									//闪避
 		CC_SYNTHESIZE(int,m_Crit,Crit);									//暴击
 		CC_SYNTHESIZE(unsigned int,m_Renew,Renew);						//回复
+		CC_SYNTHESIZE(bool,mOtherCamp,OtherCamp);
 	public:
 		//unused
 		CC_SYNTHESIZE(int,m_Hrt,Hrt);									//伤害减免效果(正加深,负减少)
@@ -172,13 +184,16 @@ namespace BattleSpace
 		CC_SYNTHESIZE(int,m_UILayout,UiLayout);							//对应的UI控制面板ID
 		CC_SYNTHESIZE(float,m_AtkDelay,AtkDelay);						//武将攻击延迟时间(我方武将释放必杀技时使用)
 		CC_SYNTHESIZE(int,m_initCost,InitCost);							//初始 cost
-		CC_SYNTHESIZE(int,m_CostMax,Costmax);							//cost Max
+		CC_SYNTHESIZE(int,mCostMax,CostMax);							//cost Max
 		CC_SYNTHESIZE(float,m_AddCost,AddCost);							//cost 秒变化率
 		CC_SYNTHESIZE(int,m_CallAliveNum,CallAliveNum);					//record can call alive number use int alive is captain
 		CC_SYNTHESIZE(bool,m_Captain,Captain);							//是否为队长
 		CC_SYNTHESIZE(bool,m_ExecuteCap,ExecuteCap);					//队长技执行标记
 		CC_SYNTHESIZE(bool,m_Opposite,Opposite);						//标记是否转向攻击
 		CC_SYNTHESIZE(bool,mAutoState,AutoState);						//自动战斗状态
+		CC_SYNTHESIZE(float,mEnterTime,EnterTime);
+		CC_SYNTHESIZE(float,mSkillTime,SkillTime);
+		CC_SYNTHESIZE(bool,mUpdateSkill,UpdateSkill);
 	public:
 		//monster
 		CC_SYNTHESIZE(sBehavior,mBehavior,Behavior);					//怪物类型

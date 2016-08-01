@@ -13,6 +13,14 @@
 *
 */
 
+#if CC_PLATFORM_WIN32  == CC_TARGET_PLATFORM
+
+#ifndef BATTLE_TEST
+#define BATTLE_TEST 1
+#endif
+
+#endif
+
 #define PROPERTY_CONSTREAD(varType, varName, funName)\
 protected: varType varName;\
 public: virtual varType get##funName(void) const { return varName; }\
@@ -66,5 +74,8 @@ private: \
 #define ROLE_READONLY(varType, varName, funName)\
 protected: varType varName;\
 public: virtual varType get##funName(void) const;
+
+
+
 
 #endif

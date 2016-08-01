@@ -198,7 +198,7 @@ void CGuideLayer::ccTouchEnded(CCTouch* pTouch, CCEvent* pEvent)
 		task->isFinish = true;
 		CGuideManager::getInstance()->nextStep();
 	}
-	else if(m_finger->isVisible()||(CGuideManager::getInstance()->getCurrTask()==1&&CGuideManager::getInstance()->getCurrStep()==7))
+	else if((m_finger&&m_finger->isVisible())||(CGuideManager::getInstance()->getCurrTask()==1&&CGuideManager::getInstance()->getCurrStep()==7))
 	{
 		CCNode* pNode = getClickBoundNode();
 		if(pNode)

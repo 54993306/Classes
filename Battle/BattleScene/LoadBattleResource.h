@@ -1,13 +1,13 @@
 ﻿#ifndef _LOADWAR_SCENE_H_
 #define _LOADWAR_SCENE_H_
 #include "AppUI.h"
-#include "scene/LoadScene.h"
 /************************************************************************/
 /*                           
 						预加载战斗资源//  [10/30/2014 xc_lin]
 */
 /************************************************************************/
-namespace BattleSpace{
+namespace BattleSpace
+{
 	enum WARLoadResType
 	{
 		LOAD_FrameAnimation = 1,		//模型
@@ -32,11 +32,35 @@ namespace BattleSpace{
 		Load_Terrain,
 		Load_Buff,
 	};
+	enum struct sLoadType
+	{
+		eNuLL,
+		eFrameAnimation,
+		eEffect,
+		eCocosBone,
+		eSpine,
+	};
 	enum SceneType
 	{
 		SkipcityScene =	0,		//主城
 		SkipLoginScene,			//登陆界面
 		skipSelectHero,
+	};
+
+	enum LoadResType
+	{
+		LOAD_RES_MODEL			= 1,
+		LOAD_BACKGROUND_SND		= 2,
+		LOAD_EFFECT_SND			= 3,
+		LOAD_FONT				= 4
+	};
+
+	struct LoadResourceInfo
+	{
+		string FileName;
+		string FilePath;
+		sLoadType Loadtype;
+		LoadResourceInfo():Loadtype(sLoadType::eNuLL),FileName(""),FilePath(""){}
 	};
 	class BaseRoleData;
 	class WarManager;
@@ -69,11 +93,13 @@ namespace BattleSpace{
 		void LoadBeingAnimation();
 		void ProgressEnd();
 		void LoadCocosEffect();
+		void updateProgress();
+		void releaseResource();
 	protected:
 		CProgressBar*						m_progress;
 		CCSprite*							m_pZombieSprite;					//小僵尸
 		map<ResourceType,vector<int>>		m_WarResouse;	
-		int									m_currNum;							//当前已加载的行数
+		int									m_CurrIndex;						//当前已加载的行数
 		int									m_publicNum;						//公共资源
 		int									m_totalNum;							//得到总行数
 		CCLabelTTF*							m_tip;

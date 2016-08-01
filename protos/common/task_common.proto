@@ -1,0 +1,28 @@
+import "common/prize_common.proto";
+
+package protos.common;
+
+option java_package = "dass.server.gameserver.protos.common";
+option java_outer_classname = "TaskCommon";
+option optimize_for = SPEED ;
+
+//任务
+message Task{
+	optional int32 taskId	= 1;	//任务ID
+	optional string name	= 2;	//任务名称
+	optional int32 level	= 3;	//任务等级
+	optional int32 process	= 4;	//任务进度
+	optional int32 target	= 5;	//任务目标
+	optional int32 exp	= 6;	//奖励经验
+	optional int32 coin	= 7;	//奖励金币
+	optional int32 food	= 8;	//奖励粮食
+	optional string note	= 9;	//任务描述
+	optional bool isNew	= 10;	//新任务
+	optional bool finish	= 11;	//任务是否完成(可领奖)
+	repeated common.Prize prize = 12;	//奖励道具列表
+	optional int32 tindex	= 13;	//任务索引(读取任务描述)
+	optional int32 action	= 14;	//奖励行动力
+	optional int32 gold	= 15;	//奖励元宝
+	optional fixed64 getTime = 16;	//下次领取奖励的时间
+	optional bool end	= 17;	//已结束(领完奖励后的状态)
+}

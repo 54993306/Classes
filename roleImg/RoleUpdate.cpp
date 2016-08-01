@@ -1,26 +1,9 @@
 ﻿#include "RoleUpdate.h"
-#include "scene/layer/LayerManager.h"
 #include "net/CNetClient.h"
 #include "netcontrol/CPlayerControl.h"
-#include "scene/layer/LayerManager.h"
-#include "model/DataCenter.h"
-#include "GMessage.h"
-
-#include "common/color.h"
-#include "tools/ShowTexttip.h"
-#include "tools/UICloneMgr.h"
-
-#include "mainCity/MainCityControl.h"
-
-#include "ChangeName.h"
-#include "ChangeHeadImg.h"
-
-#include "set/SetLayer.h"
-#include "common/CShowToBuyResource.h"
-
 #include "common/CGameSound.h"
-#include "Resources.h"
 #include "Battle/AnimationManager.h"
+#include "model/DataDefine.h"
 
 CRoleUpdate::CRoleUpdate()
 {
@@ -136,8 +119,28 @@ void CRoleUpdate::showRoleData(UserData * data, const Role * role)
 	nextAction->setString(ToString(role->actionlimit()));
 
 	CImageView *hero = (CImageView *)(m_ui->findWidgetById("hero"));
+	
+	int textId = 0;
+	switch (data->getRoleNation())
+	{
+	case 1:
+		textId = 346;
+		break;
+	case 2:
+		textId = 146;
+		break;
+	case 3:
+		textId = 541;
+		break;
+	default:
+		break;
+	}
+	if (data->getThumb()>0)
+	{
+ 		textId = data->getThumb();
+	}
 	CCTexture2D *texture = CCTextureCache::sharedTextureCache()
-		->addImage(CCString::createWithFormat("selectRole/%d.png", data->getThumb())->getCString());
+		->addImage(CCString::createWithFormat("selectRole/%d.png", textId)->getCString());
 	if (texture)
 	{
 		hero->setTexture(texture);

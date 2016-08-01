@@ -1,0 +1,38 @@
+package protos.common;
+
+option java_package = "dass.server.gameserver.protos.common";
+option java_outer_classname = "RoleCommon";
+option optimize_for = SPEED ;
+
+//玩家游戏角色
+message Role{
+	required int32 roleId = 1;		//角色ID
+	optional string roleName = 2;		//角色名称
+	optional int32 roleLv = 3;		//角色等级
+	optional int32 roleNation = 4;		//角色国家
+	optional int32 vip = 17;		//VIP等级
+	optional int32 combat = 16;		//角色战斗力
+	optional int32 thumb = 20;		//头像编号(头像为0时选用fb头像)
+	optional string fbId = 5;		//FB ID
+
+	optional int32 roleExp = 10;		//角色经验
+	optional int32 nextExp = 12;		//下一等级所需的经验值
+	
+	optional int32 roleMoney = 6;		//充值金币
+	optional int32 roleCoin = 11;		//角色铜钱数量
+	optional int32 roleGold = 14;		//勾玉数量(钻石)
+	optional int32 roleFood = 15;		//粮食数量
+	optional int32 roleFCoin = 18;		//友情点数
+	optional int32 rolePoints = 22;		//PVP勋章
+
+	optional int32 roleAction = 13;		//行动值
+	optional int32 actionLimit = 19;	//行动值上限
+	optional fixed64 actionTime = 21;	//下一次行动值回复时间
+	optional int32 interval = 23;		//行动力回复间隔(分钟)
+
+	optional int32 newerStep = 24;		//新手教程步骤
+	optional bool  mobileShop = 25;		//是否出现流动商店
+	optional int32 inviteFriend = 26;	//邀请好友数量
+	optional bool  firstLogin = 27;		//是否每天第一次登入
+	optional bool  gooleBilling = 28;
+}

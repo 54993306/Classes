@@ -41,6 +41,9 @@
 #include "Battle/WarWinLayer.h"
 #include "Battle/WorldBossEndLayer.h"
 #include "Battle/BattleClose.h"
+#include "Battle/BattleDataCenter.h"
+#include "Battle/BattleModel.h"
+#include "Battle/PvpEndLayer.h"
 
 namespace BattleSpace
 {
@@ -78,6 +81,8 @@ namespace BattleSpace
 		WarMapData* mapData = DataCenter::sharedData()->getMap()->getCurrWarMap();
 		m_MoveLayer = CCNode::create();					//可以移动的节点包含地图和武将
 		addChild(m_MoveLayer);
+		if (BattleData->getBattleModel()->isPvEBattle())
+			m_MoveLayer->setScale(0.85f);
 
 		m_MapLayer = BattleMapLayer::create();
 		m_MoveLayer->addChild(m_MapLayer);
@@ -128,6 +133,7 @@ namespace BattleSpace
 		bNotification->addObserver(this,callfuncO_selector(BattleScene::cReturnLayer),MsgReturnLayer,nullptr);
 		CNetClient::getShareInstance()->registerMsgHandler(ExitStage,this,CMsgHandler_selector(BattleScene::OnBattleFinish));
 		CNetClient::getShareInstance()->registerMsgHandler(BossFinishReqMsg,this,CMsgHandler_selector(BattleScene::onWordBossFinish));
+		CNetClient::getShareInstance()->registerMsgHandler(PvpOverReqMsg, this, CMsgHandler_selector(BattleScene::onPVEBattleFinish));
 	}
 	//移除事件
 	void BattleScene::RemoveEvent()
@@ -153,8 +159,9 @@ namespace BattleSpace
 	//拖动地图
 	void BattleScene::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)
 	{
-#if CC_TARGET_PLATFORM != CC_PLATFORM_WIN32
-		if (!DataCenter::sharedData()->getWar()->getNormal())
+#if !BATTLE_TEST
+		if (!DataCenter::sharedData()->getWar()->getNormal() || 
+			!BattleData->getBattleModel()->layerMove())
 			return;
 #endif
 		if (m_Touch != pTouch || !mMoveState)
@@ -165,7 +172,7 @@ namespace BattleSpace
 		WarMapData* mapData = DataCenter::sharedData()->getMap()->getCurrWarMap();
 		if( newX < MAP_MINX(mapData) )
 			newX = MAP_MINX(mapData);
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+#if BATTLE_TEST
 		if( newX > MAP_MAXX(mapData) )
 			newX = MAP_MAXX(mapData);
 #else
@@ -198,20 +205,9 @@ namespace BattleSpace
 			m_Touch = nullptr;
 	}		
 
-	CCArray* BattleScene::getTaskArray()
-	{
-		if (m_Loginc->getTaskArray())
-		{
-			return m_Loginc->getTaskArray();
-		}else{
-			CCLOG("[ *ERROR ] WarScene::getTaskArray");
-			return nullptr;
-		}
-	}
-
 	void BattleScene::LayerMoveEnd(CCObject* ob)
 	{
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+#if BATTLE_TEST
 		bNotification->postNotification(MsgCreateStory,ob);
 #else
 		if (DataCenter::sharedData()->getWar()->getStageID())
@@ -264,6 +260,17 @@ namespace BattleSpace
 		WorldBossEndLayer * layer = WorldBossEndLayer::create();
 		this->addChild(layer);
 		layer->processBattleFinish(pType, msg);
+	}
+
+	void BattleScene::onPVEBattleFinish( int type, google::protobuf::Message *msg )
+	{
+		if(type != PvpOverReqMsg)
+			return;
+		mBattleClose->setRecvFinish(true);
+		PvpEndLayer *pLayer = PvpEndLayer::create();
+		pLayer->setBattleResult(mBattleClose->getFinishData().res);
+		this->addChild(pLayer);
+		pLayer->processBattleFinish(type, msg);
 	}
 
 };

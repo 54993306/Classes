@@ -12,6 +12,9 @@
 #include "CityData.h"
 #include "bag/bagData.h"
 #include "SmeltArmor.h"
+#include <spine/spine-cocos2dx.h>
+
+using namespace spine;
 
 //强化类
 class CLevelUpItem:public BaseLayer
@@ -96,4 +99,6 @@ private:
 
 	CLayout* m_pCellInfo;
 	CLayout* m_pBaseInfo[4];
+
+	SkeletonAnimation *m_pSpineHero;
 };

@@ -18,7 +18,6 @@
 #include "jni/CJniHelper.h"
 #include "common/CursorTextField.h"
 #include "update/CDownloadPackageDelegate.h"
-#include "ApplicationDefine.h"
 #include "UserDefaultData.h"
 #include "update/CUpdateData.h"
 
@@ -62,6 +61,7 @@ void inline LOGIN_GAME(  string sExtra )
 	CCLOG("CNetClient::getShareInstance()->sendLogin");
 };
 
+const char *LoginDayUC = "2016-05-07-11";
 
 class LoginLayerUC:  public BaseLayer, public MessageHandler, public CJniListener, public DownloadPackageDelegate
 {
@@ -160,9 +160,6 @@ private:
 
 	void showLabelRoll(const char* sInfo);
 	void hideLableRoll();
-
-	bool checkDay();
-
 
 	//。。。。。。。。。。。。。。
 public:

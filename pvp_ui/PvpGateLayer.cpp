@@ -7,10 +7,10 @@
 #include "pvp_ui/SelectChallengeLayer.h"
 #include "netcontrol/CPlayerControl.h"
 #include "mainCity/mainScene.h"
-
+#include "Global.h"
 
 CPvpGateLayer::CPvpGateLayer():
-	m_ui(nullptr), m_pCloudyTranstion(nullptr),m_fogLay(nullptr),m_fogLay1(nullptr),m_fMiddleLayer(nullptr)
+	m_ui(nullptr), m_pCloudyTranstion(nullptr),m_fogLay(nullptr),m_fogLay1(nullptr),m_fMiddleLayer(nullptr),m_iGateLevel(0),m_iRank(0),m_iRoleRank(0)
 {
 }
 
@@ -30,6 +30,7 @@ bool CPvpGateLayer::init()
 		m_ui->setPosition(VCENTER);
 		this->addChild(m_ui);
 
+		setIsShowBlack(false);
 		setVisible(false);
 		setTouchPriority(-2);
 
@@ -69,11 +70,69 @@ bool CPvpGateLayer::init()
 		runCloud();
 
 		m_fMiddleLayer = (CLayout *)m_ui->findWidgetById("middle");
+		
+		//过渡云
+		initCloundyTranstion();
+
+		m_ui->setScale(1.3f);
+
+		//箭头上下
+		CImageView *pArrow = (CImageView *)m_ui->findWidgetById("arrow");
+		pArrow->runAction(CCRepeatForever::create(CCSequence::createWithTwoActions(
+			CCMoveBy::create(0.3f, ccp(0, 10)),
+			CCMoveBy::create(0.3f, ccp(0, -10))
+			)));
 
 		return true;
 	}
 
 	return false;
+}
+
+
+void CPvpGateLayer::setGateLevel( int iRank )
+{
+	m_iRank = iRank;
+	//根据等级划分
+	//僵尸皇
+	if(m_iRank == 1)
+	{
+		m_iGateLevel = 3;
+		m_iRoleRank = 1;
+	}
+	//皇族
+	else if(m_iRank>=2 && m_iRank<= 10)
+	{
+		m_iGateLevel = 3;
+		m_iRoleRank = 2;
+	}
+	//贵族
+	else if(m_iRank>=11 && m_iRank<=50)
+	{
+		m_iGateLevel = 3;
+		m_iRoleRank = 3;
+	}
+	//天师
+	else if(m_iRank>=51 && m_iRank<=100)
+	{
+		m_iGateLevel = 2;
+		m_iRoleRank = 4;
+	}
+	//行者
+	else if(m_iRank>=101 && m_iRank<=1000)
+	{
+		m_iGateLevel = 2;
+		m_iRoleRank = 5;
+	}
+	//平民  1000+
+	else
+	{
+		m_iGateLevel = 1;
+		m_iRoleRank = 6;
+	}
+
+	//建筑
+	initBuilding();
 }
 
 void CPvpGateLayer::runBloodFogAction()
@@ -119,15 +178,10 @@ void CPvpGateLayer::onEnter()
 void CPvpGateLayer::onExit()
 {
 	BaseLayer::onExit();
-
-	//移除无用的资源
-	CCTextureCache::sharedTextureCache()->removeUnusedTextures();
 }
 
 void CPvpGateLayer::onClose( CCObject* pSender )
 {
-	PlayEffectSound(SFX_Ensure);
-
 	//重置锚点
 	ResetAnchorPointAndKeepSamePos(m_ui, ccp(0.5f, 0.4f));
 	//屏蔽触摸
@@ -143,11 +197,14 @@ void CPvpGateLayer::onClose( CCObject* pSender )
 
 void CPvpGateLayer::pvpSynchronization( CCObject* pSender )
 {
+	PlayEffectSound(SFX_413);
 	ShowPopTextTip("open later!");
+	return;
 }
 
 void CPvpGateLayer::pvpAsynchronization( CCObject* pSender )
 {
+	PlayEffectSound(SFX_424);
 	//进入异步PVP，选择队伍
 		/*	CTranstionEffectLayer* pEffect = CTranstionEffectLayer::create();
 	pEffect->onOpen(this, 100);
@@ -208,7 +265,7 @@ void CPvpGateLayer::showEffectOut()
 
 void CPvpGateLayer::initCloundyTranstion()
 {
-	SkeletonAnimation *pSkeletonAnimation = SkeletonAnimation::createWithFile("pvp/yun.json", "pvp/yun.atlas", 1);
+	SkeletonAnimation *pSkeletonAnimation = SkeletonAnimation::createWithFile("pvp/gate/yun.json", "pvp/gate/yun.atlas", 1);
 	pSkeletonAnimation->setPosition(ccp(VCENTER.x, 0));
 	this->addChild(pSkeletonAnimation);
 	pSkeletonAnimation->completeListener = std::bind(&CPvpGateLayer::SpineComplete, this, std::placeholders::_1, std::placeholders::_2);
@@ -223,9 +280,11 @@ void CPvpGateLayer::showCloundyTranstion( bool bFlipY )
 		initCloundyTranstion();
 	}
 
-	m_pCloudyTranstion->setScaleY(bFlipY?-1:1);
+	//m_pCloudyTranstion->setScaleY(bFlipY?-1:1);
 	m_pCloudyTranstion->setVisible(true);
-	m_pCloudyTranstion->setAnimation(0, "stand", false);
+	m_pCloudyTranstion->setAnimation(0,  bFlipY?"stand2":"stand1", false);
+
+	PlayEffectSound(SFX_422);
 }
 
 void CPvpGateLayer::hideCloundyTranstion()
@@ -236,36 +295,49 @@ void CPvpGateLayer::hideCloundyTranstion()
 
 void CPvpGateLayer::initBuilding()
 {
-	//建筑1
+	//塔
 	{
-		SkeletonAnimation *pSkeletonAnimation = SkeletonAnimation::createWithFile("pvp/zuojian.json", "pvp/zuojian.atlas", 1);
+		SkeletonAnimation *pSkeletonAnimation = SkeletonAnimation::createWithFile("pvp/gate/zhongjian.json", "pvp/gate/zhongjian.atlas", 1);
+		pSkeletonAnimation->setPosition(ccp(DESIGN_WIDTH/2, 0));
+		pSkeletonAnimation->setAnimation(0, "stand", true);
+		m_fMiddleLayer->addChild(pSkeletonAnimation, 3);
+	}
+
+
+	//同步PVP
+	{
+		SkeletonAnimation *pSkeletonAnimation = SkeletonAnimation::createWithFile(
+			CCString::createWithFormat("pvp/gate/zuojian_%d.json", m_iGateLevel)->getCString(), 
+			CCString::createWithFormat("pvp/gate/zuojian_%d.atlas", m_iGateLevel)->getCString(), 
+			1);
 		pSkeletonAnimation->setPosition(ccp(180, 0));
 		pSkeletonAnimation->setAnimation(0, "stand", true);
 		m_fMiddleLayer->addChild(pSkeletonAnimation, 1);
 	}
 
-	//建筑2
+	//异步PVP
 	{
-		SkeletonAnimation *pSkeletonAnimation = SkeletonAnimation::createWithFile("pvp/zhongjian.json", "pvp/zhongjian.atlas", 1);
-		pSkeletonAnimation->setPosition(ccp(DESIGN_WIDTH/2, 0));
-		pSkeletonAnimation->setAnimation(0, "stand", true);
-		m_fMiddleLayer->addChild(pSkeletonAnimation, 3);
-	}
-	
-	//建筑3
-	{
-		SkeletonAnimation *pSkeletonAnimation = SkeletonAnimation::createWithFile("pvp/youjian.json", "pvp/youjian.atlas", 1);
+		SkeletonAnimation *pSkeletonAnimation = SkeletonAnimation::createWithFile(
+			CCString::createWithFormat("pvp/gate/youjian_%d.json", m_iGateLevel)->getCString(), 
+			CCString::createWithFormat("pvp/gate/youjian_%d.atlas", m_iGateLevel)->getCString(), 
+			1);
 		pSkeletonAnimation->setPosition(ccp(900, 0));
 		pSkeletonAnimation->setAnimation(0, "stand", true);
 		m_fMiddleLayer->addChild(pSkeletonAnimation, 2);
 	}
+
 }
 
 void CPvpGateLayer::showBuilding()
 {
 	m_ui->setVisible(true);
-
-	initBuilding();
+	m_ui->runAction(
+		CCSequence::create(
+		CCDelayTime::create(0.5f), 
+		CCScaleTo::create(1.2f, 1.0f),
+		CCCallFunc::create(this, callfunc_selector(CPvpGateLayer::showUI)),
+		nullptr
+		));
 }
 
 
@@ -278,14 +350,15 @@ void CPvpGateLayer::postMsgToCleanMainCityRes()
 {
 	//清除主场景资源，其实不清楚也行，没有怎么样，反而搞来搞去会卡顿
 	//TODO
-	NOTIFICATION->postNotification("CMainScene::removeCityBuildLayer");
+	//NOTIFICATION->postNotification("CMainScene::removeCityBuildLayer");
 
 }
 
 void CPvpGateLayer::postMsgToRebuildMainCityRes()
 {
 	//TODO
-	NOTIFICATION->postNotification("CMainScene::addCityBuildLayer");
+	//NOTIFICATION->postNotification("CMainScene::addCityBuildLayer");
+	NOTIFICATION->postNotification("CMainCityBuild::backFromPvp");
 }
 
 
@@ -302,6 +375,7 @@ void CPvpGateLayer::SpineComplete( int trackIndex, int loopCount )
 		{
 			NOTIFICATION->postNotification("CMainScene::removePvpGateLayer");
 		}
+
 	}
 }
 
@@ -321,3 +395,109 @@ void CPvpGateLayer::runCloud()
 			);
 	}
 }
+
+bool CPvpGateLayer::ccTouchBegan( CCTouch *pTouch, CCEvent *pEvent )
+{
+	bool res = CWidgetWindow::ccTouchBegan(pTouch,pEvent);
+	return true;
+}
+
+void CPvpGateLayer::showUI()
+{
+	//底层UI
+	CLayout *pLayout = (CLayout *)m_ui->findWidgetById("down");
+	pLayout->setVisible(true);
+
+	//奖杯
+	CImageView *pCupImage = (CImageView *)m_ui->findWidgetById("cup");
+	CCTexture2D *pCupTexture = CCTextureCache::sharedTextureCache()->addImage(CCString::createWithFormat("pvp/gate/cup_%d.png", m_iRoleRank)->getCString());
+	if (pCupTexture)
+	{
+		pCupImage->setTexture(pCupTexture);
+	}
+	else
+	{
+		pCupImage->setVisible(false);
+	}
+
+	//添加六边形特效
+	SkeletonAnimation *pSkeletonAnimation = SkeletonAnimation::createWithFile("pvp/gate/pian.json", "pvp/gate/pian.atlas", 1);
+	pSkeletonAnimation->setPosition(ccp(789, 26));
+	pLayout->addChild(pSkeletonAnimation, 2);
+	pSkeletonAnimation->completeListener = std::bind(
+		[pSkeletonAnimation]( int iData1, int iData2 ){ 
+			if(iData1 == 0)
+			{
+				pSkeletonAnimation->setAnimation(1, "stand2", true); 
+			}
+		},	
+		std::placeholders::_1, std::placeholders::_2
+		);
+	//pSkeletonAnimation->setVisible(pCupImage->isVisible());
+	
+
+	//称号
+	CImageView *pTitle = (CImageView *)m_ui->findWidgetById("title");
+	CCTexture2D *pTitleTexture = CCTextureCache::sharedTextureCache()->addImage(CCString::createWithFormat("pvp/gate/type_%d.png", m_iRoleRank)->getCString());
+	if (pTitleTexture)
+	{
+		pTitle->setTexture(pTitleTexture);
+		pTitle->runAction(CCMoveBy::create(0.1f, ccp(pCupImage->isVisible()?0:50, 0)));
+	}
+	else
+	{
+		pTitle->setVisible(false);
+	}
+
+	//排名
+	CLabelAtlas *pRank = CLabelAtlas::create(ToString(m_iRank), "pvp/gate/pvp_number2.png", 34, 54, '0');
+	pRank->setPosition(ccp(950, 35));
+	pRank->setAnchorPoint(CCPointCenter);
+	if(m_iRank > 1000)
+	{
+		pRank->setScale(0.7f);
+		pRank->setString("1000:");
+	}
+	pLayout->addChild(pRank);
+
+	//横条
+	CImageView *pBlank = (CImageView *)m_ui->findWidgetById("blank");
+
+	//ranking
+	CLabel *pRanking = (CLabel *)m_ui->findWidgetById("ranking");
+	
+
+	//动画-横条飞出-ranking显示-（六边形显示-奖杯落下）-名字显示
+	pBlank->setPositionX(pBlank->getPositionX()+410);
+	pBlank->runAction(CCMoveBy::create(0.2f, ccp(-410, 0)));
+
+	pRank->setOpacity(0);
+	pRank->runAction(CCSequence::createWithTwoActions(CCDelayTime::create(0.2f), CCFadeIn::create(0.3f)));
+	pRanking->setOpacity(0);
+	pRanking->runAction(CCSequence::createWithTwoActions(CCDelayTime::create(0.2f), CCFadeIn::create(0.3f)));
+
+	pSkeletonAnimation->setOpacity(0);
+	pSkeletonAnimation->runAction(CCSequence::createWithTwoActions(CCDelayTime::create(0.5f), CCCallFuncN::create(this, callfuncN_selector(CPvpGateLayer::callbackForSpineAnimate))));
+
+	pCupImage->setOpacity(0);
+	pCupImage->setPositionY(pCupImage->getPositionY() + 180);
+	pCupImage->runAction(CCSequence::create(
+		CCDelayTime::create(0.5f), 
+		CCSpawn::createWithTwoActions(
+			CCFadeIn::create(0.2f), 
+			CCEaseBackOut::create(CCMoveBy::create(0.3f, ccp(0, -180)))
+		),
+		nullptr
+		));
+
+	pTitle->setOpacity(0);
+	pTitle->runAction(CCSequence::createWithTwoActions(CCDelayTime::create(0.7f), CCFadeIn::create(0.2f)));
+}
+
+void CPvpGateLayer::callbackForSpineAnimate( CCNode *pSender )
+{
+	SkeletonAnimation *pSkeletonAnimation = ( SkeletonAnimation *)pSender;
+	pSkeletonAnimation->setAnimation(0, "stand1", false);
+	pSkeletonAnimation->setOpacity(255);
+}
+

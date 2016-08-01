@@ -52,6 +52,9 @@ public:
 	//获取机器码
 	std::string getDeviceId();
 
+	//获取平台信息
+	int getPlatform();
+
 	//播放视频
 	void showVideo(int iTag);
 
@@ -63,6 +66,9 @@ public:
 
 	//是否为WIFI网络
 	std::string getVersionName();
+
+	//去GooglePlay下载最新版本
+	void downloadNewVersionFromGooglePlay();
 
 	//开始震动
 	void startVibrator(int iMsec);

@@ -30,7 +30,7 @@ namespace BattleSpace
 	int getMonsterNewCol(int originCol ,int aimCol ,int aim_col);
 	void CallAliveByFixRange( BaseRole*father , BaseRole*child );
 
-	void VectorUnique(vector<int>& Vec);
+	void VectorUnique(vector<int>& Vec,bool pReverse = false);
 
 	void VectorUnique(vector<BaseRole*> &pVector);
 
@@ -46,5 +46,8 @@ namespace BattleSpace
 
 	int converCol(int pGrid);
 
+	bool sameRow(int pGrid1 , int pGrid2);
+
+	bool sameCol(int pGrid1 , int pGrid2);
 };
 #endif

@@ -33,35 +33,3 @@ inline long getCurrentTime()
 	CCLOG("getCurrentTime=%ld", msec);
 	return msec;
 }
-
-inline void ChangePicture(CCSprite* pSprite)
-{
-	if(pSprite==nullptr)
-	{
-		return;
-	}
-	CCTexture2D* pTexture = pSprite->getTexture();
-	CCTexture2D* pNewTexture = nullptr;
-
-	int iRand = ((int)(CCRANDOM_0_1()*100))%9+1;//首次随机
-	do
-	{
-		pNewTexture = CCTextureCache::sharedTextureCache()->addImage(CCString::createWithFormat("warScene/LoadImage/%d.png", iRand)->getCString());
-		iRand ++;
-		iRand = iRand%9+1;
-		//第二次做按顺序移动操作，保证两次肯定找到新图片
-	}
-	while(pNewTexture==pTexture || pNewTexture==nullptr);
-
-	pSprite->setTexture(pNewTexture);
-
-	pSprite->setZOrder(-2);
-
-	CCSprite* pTranstionSprite = CCSprite::createWithTexture(pTexture);
-	pTranstionSprite->setPosition(pSprite->getPosition());
-	pTranstionSprite->setAnchorPoint(pSprite->getAnchorPoint());
-	pTranstionSprite->setScale(pSprite->getScale());
-	pSprite->getParent()->addChild(pTranstionSprite, pSprite->getZOrder()+1);
-	pTranstionSprite->runAction(CCSequence::createWithTwoActions(CCFadeOut::create(0.6f), CCRemoveSelf::create()));
-
-}

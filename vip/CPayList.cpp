@@ -47,6 +47,7 @@ void CPayList::onEnter()
 {
 	BaseLayer::onEnter();
 	initUI();
+	NOTIFICATION->postNotification(HIDE_TOP_LAYER);
 }
 
 
@@ -105,11 +106,8 @@ void CPayList::initUI()
 void CPayList::onExit()
 {
 	BaseLayer::onExit();	
-	if (LayerManager::instance()->getLayer("CActivityLayer"))
-	{
-		NOTIFICATION->postNotification(SHOW_TOP_LAYER);
-		NOTIFICATION->postNotification(SHOW_TOP_LAYER);
-	}
+
+	NOTIFICATION->postNotification(SHOW_TOP_LAYER);
 }
 
 CCObject* CPayList::tableviewDataSource(CCObject* pConvertCell, unsigned int uIdx)

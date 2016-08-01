@@ -1,8 +1,6 @@
 ﻿#include "PopItem.h"
-#include "scene/layer/LayerManager.h"
 #include "net/CNetClient.h"
 #include "netcontrol/CPlayerControl.h"
-#include "scene/layer/LayerManager.h"
 #include "model/DataCenter.h"
 #include "GMessage.h"
 
@@ -17,8 +15,8 @@
 #include "mainCity/CNewHero.h"
 
 #include "common/CGameSound.h"
-#include "Resources.h"
 #include "battle/AnimationManager.h"
+
 using namespace BattleSpace;
 CPopItem::CPopItem()
 	:m_pMonsterInfo(nullptr)
@@ -96,6 +94,7 @@ void CPopItem::onExit()
 CPopItem::~CPopItem()
 {
 	clearPrizeSave();
+	CC_SAFE_RELEASE(m_pTargetCallBack);
 }
 
 
@@ -243,7 +242,7 @@ void CPopItem::signPrize(CPrize *prize)
 		HeroLotteryData data;
 		data.heroType = prize->type;
 		data.thumb = prize->thumb;
-		data.quality = prize->quality;
+		data.quality = prize->color;
 		m_pNewHeroEffect->showNewHeroEffect(&data);
 	}
 	else
@@ -533,7 +532,7 @@ void CPopItem::callBackForShowNewHero( )
 			HeroLotteryData data;
 			data.heroType = prize.type;
 			data.thumb = prize.thumb;
-			data.quality = prize.quality;
+			data.quality = prize.color;
 			m_pNewHeroEffect->showNewHeroEffect(&data);
 			m_pNewHeroEffect->runAction(CCSequence::createWithTwoActions(
 				CCDelayTime::create(3.0f), 
@@ -567,6 +566,9 @@ void CPopItem::doCallBack()
 
 void CPopItem::bindTargetCallBack( CCObject* pObj, PopItemCallBack pFun )
 {
+	CC_SAFE_RETAIN(pObj);
+	CC_SAFE_RELEASE(m_pTargetCallBack);
+
 	m_pTargetCallBack = pObj;
 	m_pTargetFun = pFun;
 }

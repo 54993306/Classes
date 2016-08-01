@@ -383,7 +383,7 @@ void CWorldBoss::updateFrame( float dt )
 void CWorldBoss::PlaySound_Event( int sData )
 {
 	char str[60] = {0};
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+#if BATTLE_TEST
 	sprintf(str,"SFX/Test/%d.mp3",sData);											
 #else
 	sprintf(str,"SFX/%d.ogg",sData);												

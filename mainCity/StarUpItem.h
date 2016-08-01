@@ -11,7 +11,9 @@
 #include "scene/layer/LayerManager.h"
 #include "CityData.h"
 #include "bag/bagData.h"
+#include <spine/spine-cocos2dx.h>
 
+using namespace spine;
 
 struct  CRisingResponse
 {
@@ -112,4 +114,6 @@ private:
 
 	CLayout* m_pCellInfo;
 	CLayout* m_pBaseInfo[4];
+
+	SkeletonAnimation *m_pSpineHero;
 };

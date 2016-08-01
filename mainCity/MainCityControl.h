@@ -46,6 +46,9 @@ public:
 	vector<int> getGarrsionHeroId();
 
 	CHero* getGarrsionHeroIdByCityId(int cityId);
+
+	const CCity& getCityDataById( int iId );
+
 protected:
 	void removeTip(CCNode * node);
 private:

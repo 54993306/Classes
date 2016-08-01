@@ -29,30 +29,38 @@ namespace protos{
 }
 using namespace std;
 #define BattleData BattleSpace::BattleDataCenter::ShareBattleDataCenter()
-namespace BattleSpace{
+namespace BattleSpace
+{
 	class HeroData;
 	class MonsterData;
 	class BaseRoleData;
+	class BattleModel;
 	class BattleDataCenter
 	{
 	public:
 		static BattleDataCenter* ShareBattleDataCenter();
 		void releaseRoleData();
 	public:
-		void initBattleData( const google::protobuf::Message *pResponse,bool pWorldBoss = false );
+		void initWordBossStage( const google::protobuf::Message *pResponse );
+		void initNormalStage( const google::protobuf::Message *pResponse );
+		void initPvEData( const google::protobuf::Message *pResponse);
 		const  vector<HeroData*>&  getHeroVector()const	;
 		const vector<MonsterData*>& getMonsterVector()const;
 		const vector<MonsterData*>& getCallRoleDatas()const;
 		const vector<BaseRoleData*>& getRoleDatas()const;
+		const vector<HeroData*>& getPvPHeros() const;
 		BaseRoleData* getCallRoleData(int pRoleID) const;
+	public:
+		BattleModel* getBattleModel();
 	private:
-		void initWordBossStage( const google::protobuf::Message *pResponse );
-		void initNormalStage( const google::protobuf::Message *pResponse );
+		BattleModel* mBattleModel;
+	private:
 		void initBaseRoleDataVector();
 		void initMonsterData(const protos::common::Monster* pData);
-		void initHeroData(const protos::common::Hero* pData);
+		void initHeroData(const protos::common::Hero* pData,bool pPvPHero = false);
 	private:
 		vector<HeroData*> mHeroVec;
+		vector<HeroData*> mPvPHeros;
 		vector<MonsterData*>mMonsterVec;
 		vector<MonsterData*>mCallRoleVec;
 		vector<BaseRoleData*>mBaseRoleData;
@@ -61,7 +69,8 @@ namespace BattleSpace{
 		class SingletonDestroy
 		{
 		public :
-			~SingletonDestroy(){
+			~SingletonDestroy()
+			{
 				if (mDataControl != nullptr )
 				{
 					delete mDataControl;

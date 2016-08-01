@@ -10,6 +10,7 @@
 #include "GMessage.h"
 #include "UserDefaultData.h"
 #include "task/TaskControl.h"
+#include "SDK/GamePlatfomDefine.h"
 
 //根据typeName反射对象
 google::protobuf::Message* createMessage(const std::string& type_name)
@@ -81,7 +82,7 @@ void CNetClient::onConnected()
 		string psw = CCUserDefault::sharedUserDefault()->getStringForKey(PASSWORD);
 		string openId = CCUserDefault::sharedUserDefault()->getStringForKey(FACEBOOK_ID);
 		CCLOG("roleId %d", DataCenter::sharedData()->getUser()->getUserData()->getRoleID());
-		this->sendLogin(userName,psw, "", true, DataCenter::sharedData()->getUser()->getUserData()->getRoleID(),openId);
+		this->sendLogin(userName,psw, "", true, DataCenter::sharedData()->getUser()->getUserData()->getRoleID(),openId, G_PLATFORM_TARGET);
 	}else{
 		m_reConnectType = ReconnNull;
 	}
@@ -245,7 +246,7 @@ void CNetClient::onMessage(STREAM stream)
 					printf("message type=%d doesn't process",protoType);
 				}
 				Role *role = dynamic_cast<Role*>(message);
-				if (CGuideManager::getInstance()->getIsRunGuide()&&!role&&protoType!=TaskNoticeMsg&&protoType!=GameTipMsg&&protoType!=BulletMsg)
+				if (CGuideManager::getInstance()->getIsRunGuide()&&!role&&protoType!=Reconnect&&protoType!=TaskNoticeMsg&&protoType!=GameTipMsg&&protoType!=BulletMsg)
 					CGuideManager::getInstance()->nextStep();
 
 				saveRecvMsg(protoType, message, typeName);
@@ -353,7 +354,7 @@ void CNetClient::closeWait(float delt)
 }                   
 
 //登录
-void CNetClient::sendLogin(string usrName, string usrPass, string access_code/*=""*/,bool isReconn /*= false*/, int roleId /*= 0*/, string openId/*="" */)
+void CNetClient::sendLogin(string usrName, string usrPass, string access_code/*=""*/,bool isReconn /*= false*/, int roleId /*= 0*/, string openId/*="" */, int iPlatform/*=0*/)
 {
 	LoginRequest *msg = new LoginRequest();
 	msg->set_username(usrName);
@@ -371,6 +372,7 @@ void CNetClient::sendLogin(string usrName, string usrPass, string access_code/*=
 	{
 		msg->set_openid(openId);
 	}
+	msg->set_platform(iPlatform);
 	sendData(msg,LoginResponseMsg);
 	delete msg;
 }

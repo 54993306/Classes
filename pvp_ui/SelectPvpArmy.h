@@ -19,6 +19,11 @@ public:
 	void setUnionList(vector<CUnion> unionList);
 	void setStagId(int stageId, int questId=0);
 	CC_SYNTHESIZE(int, m_WorldBoss,WordBoss);					//世界boss
+	CC_SYNTHESIZE(int, m_iRoleId, RoleId);						//角色ID
+	CC_SYNTHESIZE(bool, m_bRobot, IsRobot);				//机器人
+	CC_SYNTHESIZE(std::string , m_sEnemyRoleName, EnemyRoleName);		//敌人名字
+	CC_SYNTHESIZE(int ,				m_iEnemyRoleHead, EnemyRoleHead);			//敌人头像
+	CC_SYNTHESIZE(std::string , m_sEnemyRoleFaceBook, EnemyRoleFacebook);		//敌人facebookId
 protected:
 	void onClose(CCObject* pSender);
 	void onCombat(CCObject* pSender);
@@ -56,6 +61,7 @@ private:
 	bool checkShowCaptain();
 	void willToBatthle(CCObject* pObj);
 	void addOppTeamCell(unsigned int uIdx, CPageViewCell * pCell);
+	CCObject* oppViewDataSource(CCObject* pConvertCell, unsigned int uIdx);
 private:
 	CLayout *m_ui;
 	int  m_selectHero;
@@ -82,7 +88,7 @@ private:
 	map<int,vector<CHero*>> m_friendMap;
 	vector<CHero*> *m_currHeroList;
 	CGridView *m_gridView;
-	CGridView *m_oppTeamView;
+	CPageView *m_oppTeamView;
 
 	int m_frdId;
 	vector<CHero> m_oppTeamList;

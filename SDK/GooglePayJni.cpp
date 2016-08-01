@@ -65,11 +65,14 @@ extern "C"
 		c_handlMsg( iMsg, str, 0, 0);
 	}
 
+
+	void c_start_consume_trouble_purchaes( int iMsg )
+	{
+		c_handlMsg( iMsg, "", 0, 0);
+	}
+
+
 }
-
-
-
-
 
 
 #endif

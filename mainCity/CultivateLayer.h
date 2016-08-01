@@ -5,6 +5,9 @@
 #include "scene/layer/LayerManager.h"
 //培植类
 #include "CityData.h"
+
+USING_NS_CC;
+
 class CCultivateLayer:public BaseLayer
 {
 public:
@@ -35,6 +38,8 @@ public:
 	void updateTime(float dt);
 
 	void updateLabel(float dt);
+
+	void onPress(CCObject* pSender, CTouchPressState iState);
 
 protected:
 	void runFadeAction(const CCity &ct);

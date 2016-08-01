@@ -340,7 +340,7 @@ void protobuf_AssignDesc_stage_5fprotocol_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Chapter));
   StageInfo_descriptor_ = file->message_type(15);
-  static const int StageInfo_offsets_[8] = {
+  static const int StageInfo_offsets_[9] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(StageInfo, id_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(StageInfo, name_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(StageInfo, inlevel_),
@@ -349,6 +349,7 @@ void protobuf_AssignDesc_stage_5fprotocol_2eproto() {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(StageInfo, action_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(StageInfo, ismain_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(StageInfo, prize_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(StageInfo, friends_),
   };
   StageInfo_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -517,16 +518,17 @@ void protobuf_AddDesc_stage_5fprotocol_2eproto() {
     "esult\030\001 \002(\010\022$\n\006prizes\030\002 \003(\0132\024.protos.com"
     "mon.Prize\"c\n\007Chapter\022\n\n\002id\030\001 \002(\005\022\014\n\004name"
     "\030\002 \001(\t\022\016\n\006isOpen\030\003 \001(\010\022\014\n\004star\030\004 \001(\005\022\021\n\t"
-    "totalStar\030\005 \001(\005\022\r\n\005prize\030\006 \001(\005\"\203\001\n\tStage"
+    "totalStar\030\005 \001(\005\022\r\n\005prize\030\006 \001(\005\"\224\001\n\tStage"
     "Info\022\n\n\002id\030\001 \002(\005\022\014\n\004name\030\002 \001(\t\022\017\n\007inLeve"
     "l\030\003 \001(\005\022\016\n\006isOpen\030\004 \001(\010\022\014\n\004star\030\005 \001(\005\022\016\n"
     "\006action\030\006 \001(\005\022\016\n\006isMain\030\007 \001(\010\022\r\n\005prize\030\010"
-    " \001(\005\"\253\001\n\010FieldEff\022\n\n\002id\030\001 \002(\005\022\014\n\004type\030\002 "
-    "\002(\005\022\014\n\004name\030\003 \001(\t\022\020\n\010interval\030\004 \002(\005\022\r\n\005l"
-    "imit\030\005 \002(\005\022\016\n\006param1\030\006 \001(\005\022\016\n\006param2\030\007 \001"
-    "(\005\022\'\n\007monster\030\010 \001(\0132\026.protos.common.Mons"
-    "ter\022\r\n\005batch\030\t \001(\005B0\n\035dass.server.gamese"
-    "rver.protosB\rStageProtocolH\001", 1788);
+    " \001(\005\022\017\n\007friends\030\t \003(\t\"\253\001\n\010FieldEff\022\n\n\002id"
+    "\030\001 \002(\005\022\014\n\004type\030\002 \002(\005\022\014\n\004name\030\003 \001(\t\022\020\n\010in"
+    "terval\030\004 \002(\005\022\r\n\005limit\030\005 \002(\005\022\016\n\006param1\030\006 "
+    "\001(\005\022\016\n\006param2\030\007 \001(\005\022\'\n\007monster\030\010 \001(\0132\026.p"
+    "rotos.common.Monster\022\r\n\005batch\030\t \001(\005B0\n\035d"
+    "ass.server.gameserver.protosB\rStageProto"
+    "colH\001", 1805);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "stage_protocol.proto", &protobuf_RegisterTypes);
   StageInfoReq::default_instance_ = new StageInfoReq();
@@ -5067,6 +5069,7 @@ const int StageInfo::kStarFieldNumber;
 const int StageInfo::kActionFieldNumber;
 const int StageInfo::kIsMainFieldNumber;
 const int StageInfo::kPrizeFieldNumber;
+const int StageInfo::kFriendsFieldNumber;
 #endif  // !_MSC_VER
 
 StageInfo::StageInfo()
@@ -5144,6 +5147,7 @@ void StageInfo::Clear() {
     ismain_ = false;
     prize_ = 0;
   }
+  friends_.Clear();
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
 }
@@ -5278,6 +5282,25 @@ bool StageInfo::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(74)) goto parse_friends;
+        break;
+      }
+
+      // repeated string friends = 9;
+      case 9: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_friends:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->add_friends()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+            this->friends(this->friends_size() - 1).data(),
+            this->friends(this->friends_size() - 1).length(),
+            ::google::protobuf::internal::WireFormat::PARSE);
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(74)) goto parse_friends;
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -5344,6 +5367,15 @@ void StageInfo::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt32(8, this->prize(), output);
   }
 
+  // repeated string friends = 9;
+  for (int i = 0; i < this->friends_size(); i++) {
+  ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+    this->friends(i).data(), this->friends(i).length(),
+    ::google::protobuf::internal::WireFormat::SERIALIZE);
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      9, this->friends(i), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -5395,6 +5427,15 @@ void StageInfo::SerializeWithCachedSizes(
   // optional int32 prize = 8;
   if (has_prize()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(8, this->prize(), target);
+  }
+
+  // repeated string friends = 9;
+  for (int i = 0; i < this->friends_size(); i++) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->friends(i).data(), this->friends(i).length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteStringToArray(9, this->friends(i), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -5461,6 +5502,13 @@ int StageInfo::ByteSize() const {
     }
 
   }
+  // repeated string friends = 9;
+  total_size += 1 * this->friends_size();
+  for (int i = 0; i < this->friends_size(); i++) {
+    total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
+      this->friends(i));
+  }
+
   if (!unknown_fields().empty()) {
     total_size +=
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
@@ -5486,6 +5534,7 @@ void StageInfo::MergeFrom(const ::google::protobuf::Message& from) {
 
 void StageInfo::MergeFrom(const StageInfo& from) {
   GOOGLE_CHECK_NE(&from, this);
+  friends_.MergeFrom(from.friends_);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     if (from.has_id()) {
       set_id(from.id());
@@ -5543,6 +5592,7 @@ void StageInfo::Swap(StageInfo* other) {
     std::swap(action_, other->action_);
     std::swap(ismain_, other->ismain_);
     std::swap(prize_, other->prize_);
+    friends_.Swap(&other->friends_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

@@ -6,7 +6,7 @@
 #include "Battle/BattleTools.h"
 using namespace BattleSpace;
 //解析可移动格子文件
-void ParseMoveGrid( int stageid,vector<int> & pMoveGrids,vector<int>& pUndefinedGrids )
+void ParseBattleGrid( int pStage,vector<int> &pMoveGrids,vector<int> &pUndefinedGrids,vector<int> &pEnterArea,vector<int> &pOtherEnter )
 {
 	pUndefinedGrids.clear();
 	pMoveGrids.clear();
@@ -37,7 +37,7 @@ void ParseMoveGrid( int stageid,vector<int> & pMoveGrids,vector<int>& pUndefined
 		if (json_step.HasMember("id"))
 		{
 			rapidjson::Value & var = json_step["id"];
-			if (var.GetInt() != stageid)				//只存储当前关卡的可移动范围
+			if (var.GetInt() != pStage)								//只存储当前关卡的可移动范围
 				continue;
 			if (json_step.HasMember("grid"))
 			{
@@ -64,7 +64,7 @@ void ParseMoveGrid( int stageid,vector<int> & pMoveGrids,vector<int>& pUndefined
 				rapidjson::Value& pVec = json_step["undefine"];		//得到键对应的数组信息
 				if (!pVec.IsArray())								//判断是否为数组
 				{
-					CCLOG("[ *ERROR ] ParseFileData::ParseMoveGrid Can Not't Find grids Vec");
+					CCLOG("[ *ERROR ] ParseFileData::ParseMoveGrid Can Not't Find undefine Vec");
 					continue;
 				}
 				for (rapidjson::SizeType j = 0;j<pVec.Size();j++)
@@ -73,22 +73,54 @@ void ParseMoveGrid( int stageid,vector<int> & pMoveGrids,vector<int>& pUndefined
 					pUndefinedGrids.push_back(json_step.GetInt());
 				}
 			}
+			if (json_step.HasMember("EnterGrid"))
+			{
+				rapidjson::Value & par = json_step["EnterGrid"];
+				for (int j=par.GetInt();j< C_CAPTAINGRID;j++)
+					pEnterArea.push_back(j);
+			}
+			if (json_step.HasMember("EnterGrids"))
+			{
+				rapidjson::Value& pVec = json_step["EnterGrids"];		//得到键对应的数组信息
+				if (!pVec.IsArray())								//判断是否为数组
+				{
+					CCLOG("[ *ERROR ] ParseFileData::ParseMoveGrid Can Not't Find EnterGrids Vec");
+					continue;
+				}
+				for (rapidjson::SizeType j = 0;j<pVec.Size();j++)
+				{
+					rapidjson::Value& json_step = pVec[j];
+					pEnterArea.push_back(json_step.GetInt());
+				}
+			}
+			if (json_step.HasMember("OtherEnter"))
+			{
+				rapidjson::Value & par = json_step["OtherEnter"];
+				for (int tGrid = C_PVEStopGrid;tGrid <= par.GetInt();tGrid++)
+					pOtherEnter.push_back( tGrid );
+			}
 			break;													//只存储当前关卡的可移动范围
 		}else{
 			CCLOG("[ *ERROR ] ParseFileData::ParseMoveGrid Lost stage id");
 			continue;
 		}
 	}
-	if (!pMoveGrids.size())
+	if (pMoveGrids.empty())
 	{
 		for (int j=C_BEGINGRID;j< C_CAPTAINGRID;j++)				//默认情况处理(都可以移动)
 			pMoveGrids.push_back(j);
 	}
+	if (pEnterArea.empty())
+		pEnterArea.assign(pMoveGrids.begin(),pMoveGrids.end());
+	if (pOtherEnter.empty())
+		pOtherEnter.assign(pMoveGrids.begin(),pMoveGrids.end());
+	VectorUnique(pOtherEnter,true);
+	VectorUnique(pEnterArea);
 	VectorUnique(pMoveGrids);
 	VectorUnique(pUndefinedGrids);
 }
 //解析增加cost格子文件
-void ParseAddCostGrid( int stageid,vector<int> & pAddCostArea )
+void ParseAddCostGrid( int pStage,vector<int> & pAddCostArea )
 {
 	unsigned long size = 0;
 	unsigned char *buff = CCFileUtils::sharedFileUtils()->getFileData("csv/CostGrids.json","r",&size);
@@ -118,7 +150,7 @@ void ParseAddCostGrid( int stageid,vector<int> & pAddCostArea )
 		if (json_step.HasMember("id"))
 		{
 			rapidjson::Value & var = json_step["id"];
-			if (var.GetInt() != stageid)
+			if (var.GetInt() != pStage)
 				continue;
 			if (json_step.HasMember("grid"))
 			{

@@ -26,6 +26,7 @@
 #include <google/protobuf/unknown_field_set.h>
 #include "common/prize_common.pb.h"
 #include "common/hero_common.pb.h"
+#include "common/monster_common.pb.h"
 // @@protoc_insertion_point(includes)
 
 namespace protos {
@@ -41,6 +42,13 @@ class PvpDataRes;
 class PvpPrizeList;
 class OppTeamReq;
 class OppTeamRes;
+class StartPvpReq;
+class StartPvpRes;
+class PvpOverReq;
+class PvpOverRes;
+class PvpRecordRes;
+class Record;
+class RecordData;
 class Member;
 class Opponent;
 class PvpPrize;
@@ -608,18 +616,134 @@ class OppTeamRes : public ::google::protobuf::Message {
   inline ::google::protobuf::RepeatedPtrField< ::protos::common::Hero >*
       mutable_hero_list();
 
+  // optional int32 team_combat = 4;
+  inline bool has_team_combat() const;
+  inline void clear_team_combat();
+  static const int kTeamCombatFieldNumber = 4;
+  inline ::google::protobuf::int32 team_combat() const;
+  inline void set_team_combat(::google::protobuf::int32 value);
+
   // @@protoc_insertion_point(class_scope:protos.OppTeamRes)
  private:
   inline void set_has_result();
   inline void clear_has_result();
   inline void set_has_captin_skill_id();
   inline void clear_has_captin_skill_id();
+  inline void set_has_team_combat();
+  inline void clear_has_team_combat();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
   ::google::protobuf::int32 result_;
   ::google::protobuf::int32 captin_skill_id_;
   ::google::protobuf::RepeatedPtrField< ::protos::common::Hero > hero_list_;
+  ::google::protobuf::int32 team_combat_;
+
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
+
+  friend void  protobuf_AddDesc_pvp_5fprotocol_2eproto();
+  friend void protobuf_AssignDesc_pvp_5fprotocol_2eproto();
+  friend void protobuf_ShutdownFile_pvp_5fprotocol_2eproto();
+
+  void InitAsDefaultInstance();
+  static OppTeamRes* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class StartPvpReq : public ::google::protobuf::Message {
+ public:
+  StartPvpReq();
+  virtual ~StartPvpReq();
+
+  StartPvpReq(const StartPvpReq& from);
+
+  inline StartPvpReq& operator=(const StartPvpReq& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const StartPvpReq& default_instance();
+
+  void Swap(StartPvpReq* other);
+
+  // implements Message ----------------------------------------------
+
+  StartPvpReq* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const StartPvpReq& from);
+  void MergeFrom(const StartPvpReq& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required int32 opp_id = 1;
+  inline bool has_opp_id() const;
+  inline void clear_opp_id();
+  static const int kOppIdFieldNumber = 1;
+  inline ::google::protobuf::int32 opp_id() const;
+  inline void set_opp_id(::google::protobuf::int32 value);
+
+  // required bool is_robot = 2;
+  inline bool has_is_robot() const;
+  inline void clear_is_robot();
+  static const int kIsRobotFieldNumber = 2;
+  inline bool is_robot() const;
+  inline void set_is_robot(bool value);
+
+  // repeated int32 battle_hero = 3 [packed = true];
+  inline int battle_hero_size() const;
+  inline void clear_battle_hero();
+  static const int kBattleHeroFieldNumber = 3;
+  inline ::google::protobuf::int32 battle_hero(int index) const;
+  inline void set_battle_hero(int index, ::google::protobuf::int32 value);
+  inline void add_battle_hero(::google::protobuf::int32 value);
+  inline const ::google::protobuf::RepeatedField< ::google::protobuf::int32 >&
+      battle_hero() const;
+  inline ::google::protobuf::RepeatedField< ::google::protobuf::int32 >*
+      mutable_battle_hero();
+
+  // @@protoc_insertion_point(class_scope:protos.StartPvpReq)
+ private:
+  inline void set_has_opp_id();
+  inline void clear_has_opp_id();
+  inline void set_has_is_robot();
+  inline void clear_has_is_robot();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::int32 opp_id_;
+  bool is_robot_;
+  ::google::protobuf::RepeatedField< ::google::protobuf::int32 > battle_hero_;
+  mutable int _battle_hero_cached_byte_size_;
 
   mutable int _cached_size_;
   ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
@@ -629,7 +753,730 @@ class OppTeamRes : public ::google::protobuf::Message {
   friend void protobuf_ShutdownFile_pvp_5fprotocol_2eproto();
 
   void InitAsDefaultInstance();
-  static OppTeamRes* default_instance_;
+  static StartPvpReq* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class StartPvpRes : public ::google::protobuf::Message {
+ public:
+  StartPvpRes();
+  virtual ~StartPvpRes();
+
+  StartPvpRes(const StartPvpRes& from);
+
+  inline StartPvpRes& operator=(const StartPvpRes& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const StartPvpRes& default_instance();
+
+  void Swap(StartPvpRes* other);
+
+  // implements Message ----------------------------------------------
+
+  StartPvpRes* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const StartPvpRes& from);
+  void MergeFrom(const StartPvpRes& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required bool result = 5;
+  inline bool has_result() const;
+  inline void clear_result();
+  static const int kResultFieldNumber = 5;
+  inline bool result() const;
+  inline void set_result(bool value);
+
+  // optional int32 status = 1;
+  inline bool has_status() const;
+  inline void clear_status();
+  static const int kStatusFieldNumber = 1;
+  inline ::google::protobuf::int32 status() const;
+  inline void set_status(::google::protobuf::int32 value);
+
+  // repeated .protos.common.Hero opponents = 2;
+  inline int opponents_size() const;
+  inline void clear_opponents();
+  static const int kOpponentsFieldNumber = 2;
+  inline const ::protos::common::Hero& opponents(int index) const;
+  inline ::protos::common::Hero* mutable_opponents(int index);
+  inline ::protos::common::Hero* add_opponents();
+  inline const ::google::protobuf::RepeatedPtrField< ::protos::common::Hero >&
+      opponents() const;
+  inline ::google::protobuf::RepeatedPtrField< ::protos::common::Hero >*
+      mutable_opponents();
+
+  // repeated .protos.common.Hero hero_list = 3;
+  inline int hero_list_size() const;
+  inline void clear_hero_list();
+  static const int kHeroListFieldNumber = 3;
+  inline const ::protos::common::Hero& hero_list(int index) const;
+  inline ::protos::common::Hero* mutable_hero_list(int index);
+  inline ::protos::common::Hero* add_hero_list();
+  inline const ::google::protobuf::RepeatedPtrField< ::protos::common::Hero >&
+      hero_list() const;
+  inline ::google::protobuf::RepeatedPtrField< ::protos::common::Hero >*
+      mutable_hero_list();
+
+  // repeated .protos.common.Monster call_monster = 4;
+  inline int call_monster_size() const;
+  inline void clear_call_monster();
+  static const int kCallMonsterFieldNumber = 4;
+  inline const ::protos::common::Monster& call_monster(int index) const;
+  inline ::protos::common::Monster* mutable_call_monster(int index);
+  inline ::protos::common::Monster* add_call_monster();
+  inline const ::google::protobuf::RepeatedPtrField< ::protos::common::Monster >&
+      call_monster() const;
+  inline ::google::protobuf::RepeatedPtrField< ::protos::common::Monster >*
+      mutable_call_monster();
+
+  // @@protoc_insertion_point(class_scope:protos.StartPvpRes)
+ private:
+  inline void set_has_result();
+  inline void clear_has_result();
+  inline void set_has_status();
+  inline void clear_has_status();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  bool result_;
+  ::google::protobuf::int32 status_;
+  ::google::protobuf::RepeatedPtrField< ::protos::common::Hero > opponents_;
+  ::google::protobuf::RepeatedPtrField< ::protos::common::Hero > hero_list_;
+  ::google::protobuf::RepeatedPtrField< ::protos::common::Monster > call_monster_;
+
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(5 + 31) / 32];
+
+  friend void  protobuf_AddDesc_pvp_5fprotocol_2eproto();
+  friend void protobuf_AssignDesc_pvp_5fprotocol_2eproto();
+  friend void protobuf_ShutdownFile_pvp_5fprotocol_2eproto();
+
+  void InitAsDefaultInstance();
+  static StartPvpRes* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class PvpOverReq : public ::google::protobuf::Message {
+ public:
+  PvpOverReq();
+  virtual ~PvpOverReq();
+
+  PvpOverReq(const PvpOverReq& from);
+
+  inline PvpOverReq& operator=(const PvpOverReq& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const PvpOverReq& default_instance();
+
+  void Swap(PvpOverReq* other);
+
+  // implements Message ----------------------------------------------
+
+  PvpOverReq* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const PvpOverReq& from);
+  void MergeFrom(const PvpOverReq& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required bool battle_result = 1;
+  inline bool has_battle_result() const;
+  inline void clear_battle_result();
+  static const int kBattleResultFieldNumber = 1;
+  inline bool battle_result() const;
+  inline void set_battle_result(bool value);
+
+  // optional int32 battle_time = 2;
+  inline bool has_battle_time() const;
+  inline void clear_battle_time();
+  static const int kBattleTimeFieldNumber = 2;
+  inline ::google::protobuf::int32 battle_time() const;
+  inline void set_battle_time(::google::protobuf::int32 value);
+
+  // optional int32 blood_1 = 3;
+  inline bool has_blood_1() const;
+  inline void clear_blood_1();
+  static const int kBlood1FieldNumber = 3;
+  inline ::google::protobuf::int32 blood_1() const;
+  inline void set_blood_1(::google::protobuf::int32 value);
+
+  // optional int32 blood_2 = 4;
+  inline bool has_blood_2() const;
+  inline void clear_blood_2();
+  static const int kBlood2FieldNumber = 4;
+  inline ::google::protobuf::int32 blood_2() const;
+  inline void set_blood_2(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:protos.PvpOverReq)
+ private:
+  inline void set_has_battle_result();
+  inline void clear_has_battle_result();
+  inline void set_has_battle_time();
+  inline void clear_has_battle_time();
+  inline void set_has_blood_1();
+  inline void clear_has_blood_1();
+  inline void set_has_blood_2();
+  inline void clear_has_blood_2();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  bool battle_result_;
+  ::google::protobuf::int32 battle_time_;
+  ::google::protobuf::int32 blood_1_;
+  ::google::protobuf::int32 blood_2_;
+
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
+
+  friend void  protobuf_AddDesc_pvp_5fprotocol_2eproto();
+  friend void protobuf_AssignDesc_pvp_5fprotocol_2eproto();
+  friend void protobuf_ShutdownFile_pvp_5fprotocol_2eproto();
+
+  void InitAsDefaultInstance();
+  static PvpOverReq* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class PvpOverRes : public ::google::protobuf::Message {
+ public:
+  PvpOverRes();
+  virtual ~PvpOverRes();
+
+  PvpOverRes(const PvpOverRes& from);
+
+  inline PvpOverRes& operator=(const PvpOverRes& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const PvpOverRes& default_instance();
+
+  void Swap(PvpOverRes* other);
+
+  // implements Message ----------------------------------------------
+
+  PvpOverRes* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const PvpOverRes& from);
+  void MergeFrom(const PvpOverRes& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required int32 result = 1;
+  inline bool has_result() const;
+  inline void clear_result();
+  static const int kResultFieldNumber = 1;
+  inline ::google::protobuf::int32 result() const;
+  inline void set_result(::google::protobuf::int32 value);
+
+  // optional int32 org_points = 2;
+  inline bool has_org_points() const;
+  inline void clear_org_points();
+  static const int kOrgPointsFieldNumber = 2;
+  inline ::google::protobuf::int32 org_points() const;
+  inline void set_org_points(::google::protobuf::int32 value);
+
+  // optional sint32 add_points = 3;
+  inline bool has_add_points() const;
+  inline void clear_add_points();
+  static const int kAddPointsFieldNumber = 3;
+  inline ::google::protobuf::int32 add_points() const;
+  inline void set_add_points(::google::protobuf::int32 value);
+
+  // optional int32 pvp_coin = 4;
+  inline bool has_pvp_coin() const;
+  inline void clear_pvp_coin();
+  static const int kPvpCoinFieldNumber = 4;
+  inline ::google::protobuf::int32 pvp_coin() const;
+  inline void set_pvp_coin(::google::protobuf::int32 value);
+
+  // optional .protos.Opponent next_rank = 5;
+  inline bool has_next_rank() const;
+  inline void clear_next_rank();
+  static const int kNextRankFieldNumber = 5;
+  inline const ::protos::Opponent& next_rank() const;
+  inline ::protos::Opponent* mutable_next_rank();
+  inline ::protos::Opponent* release_next_rank();
+  inline void set_allocated_next_rank(::protos::Opponent* next_rank);
+
+  // optional int32 my_rank = 6;
+  inline bool has_my_rank() const;
+  inline void clear_my_rank();
+  static const int kMyRankFieldNumber = 6;
+  inline ::google::protobuf::int32 my_rank() const;
+  inline void set_my_rank(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:protos.PvpOverRes)
+ private:
+  inline void set_has_result();
+  inline void clear_has_result();
+  inline void set_has_org_points();
+  inline void clear_has_org_points();
+  inline void set_has_add_points();
+  inline void clear_has_add_points();
+  inline void set_has_pvp_coin();
+  inline void clear_has_pvp_coin();
+  inline void set_has_next_rank();
+  inline void clear_has_next_rank();
+  inline void set_has_my_rank();
+  inline void clear_has_my_rank();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::int32 result_;
+  ::google::protobuf::int32 org_points_;
+  ::google::protobuf::int32 add_points_;
+  ::google::protobuf::int32 pvp_coin_;
+  ::protos::Opponent* next_rank_;
+  ::google::protobuf::int32 my_rank_;
+
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(6 + 31) / 32];
+
+  friend void  protobuf_AddDesc_pvp_5fprotocol_2eproto();
+  friend void protobuf_AssignDesc_pvp_5fprotocol_2eproto();
+  friend void protobuf_ShutdownFile_pvp_5fprotocol_2eproto();
+
+  void InitAsDefaultInstance();
+  static PvpOverRes* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class PvpRecordRes : public ::google::protobuf::Message {
+ public:
+  PvpRecordRes();
+  virtual ~PvpRecordRes();
+
+  PvpRecordRes(const PvpRecordRes& from);
+
+  inline PvpRecordRes& operator=(const PvpRecordRes& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const PvpRecordRes& default_instance();
+
+  void Swap(PvpRecordRes* other);
+
+  // implements Message ----------------------------------------------
+
+  PvpRecordRes* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const PvpRecordRes& from);
+  void MergeFrom(const PvpRecordRes& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // repeated .protos.Record record_list = 1;
+  inline int record_list_size() const;
+  inline void clear_record_list();
+  static const int kRecordListFieldNumber = 1;
+  inline const ::protos::Record& record_list(int index) const;
+  inline ::protos::Record* mutable_record_list(int index);
+  inline ::protos::Record* add_record_list();
+  inline const ::google::protobuf::RepeatedPtrField< ::protos::Record >&
+      record_list() const;
+  inline ::google::protobuf::RepeatedPtrField< ::protos::Record >*
+      mutable_record_list();
+
+  // @@protoc_insertion_point(class_scope:protos.PvpRecordRes)
+ private:
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::RepeatedPtrField< ::protos::Record > record_list_;
+
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+
+  friend void  protobuf_AddDesc_pvp_5fprotocol_2eproto();
+  friend void protobuf_AssignDesc_pvp_5fprotocol_2eproto();
+  friend void protobuf_ShutdownFile_pvp_5fprotocol_2eproto();
+
+  void InitAsDefaultInstance();
+  static PvpRecordRes* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class Record : public ::google::protobuf::Message {
+ public:
+  Record();
+  virtual ~Record();
+
+  Record(const Record& from);
+
+  inline Record& operator=(const Record& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const Record& default_instance();
+
+  void Swap(Record* other);
+
+  // implements Message ----------------------------------------------
+
+  Record* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const Record& from);
+  void MergeFrom(const Record& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // optional int32 record_id = 1;
+  inline bool has_record_id() const;
+  inline void clear_record_id();
+  static const int kRecordIdFieldNumber = 1;
+  inline ::google::protobuf::int32 record_id() const;
+  inline void set_record_id(::google::protobuf::int32 value);
+
+  // optional int32 battle_time = 2;
+  inline bool has_battle_time() const;
+  inline void clear_battle_time();
+  static const int kBattleTimeFieldNumber = 2;
+  inline ::google::protobuf::int32 battle_time() const;
+  inline void set_battle_time(::google::protobuf::int32 value);
+
+  // optional .protos.RecordData player1 = 3;
+  inline bool has_player1() const;
+  inline void clear_player1();
+  static const int kPlayer1FieldNumber = 3;
+  inline const ::protos::RecordData& player1() const;
+  inline ::protos::RecordData* mutable_player1();
+  inline ::protos::RecordData* release_player1();
+  inline void set_allocated_player1(::protos::RecordData* player1);
+
+  // optional .protos.RecordData player2 = 4;
+  inline bool has_player2() const;
+  inline void clear_player2();
+  static const int kPlayer2FieldNumber = 4;
+  inline const ::protos::RecordData& player2() const;
+  inline ::protos::RecordData* mutable_player2();
+  inline ::protos::RecordData* release_player2();
+  inline void set_allocated_player2(::protos::RecordData* player2);
+
+  // @@protoc_insertion_point(class_scope:protos.Record)
+ private:
+  inline void set_has_record_id();
+  inline void clear_has_record_id();
+  inline void set_has_battle_time();
+  inline void clear_has_battle_time();
+  inline void set_has_player1();
+  inline void clear_has_player1();
+  inline void set_has_player2();
+  inline void clear_has_player2();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::int32 record_id_;
+  ::google::protobuf::int32 battle_time_;
+  ::protos::RecordData* player1_;
+  ::protos::RecordData* player2_;
+
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
+
+  friend void  protobuf_AddDesc_pvp_5fprotocol_2eproto();
+  friend void protobuf_AssignDesc_pvp_5fprotocol_2eproto();
+  friend void protobuf_ShutdownFile_pvp_5fprotocol_2eproto();
+
+  void InitAsDefaultInstance();
+  static Record* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class RecordData : public ::google::protobuf::Message {
+ public:
+  RecordData();
+  virtual ~RecordData();
+
+  RecordData(const RecordData& from);
+
+  inline RecordData& operator=(const RecordData& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const RecordData& default_instance();
+
+  void Swap(RecordData* other);
+
+  // implements Message ----------------------------------------------
+
+  RecordData* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const RecordData& from);
+  void MergeFrom(const RecordData& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // optional int32 role_thumb = 1;
+  inline bool has_role_thumb() const;
+  inline void clear_role_thumb();
+  static const int kRoleThumbFieldNumber = 1;
+  inline ::google::protobuf::int32 role_thumb() const;
+  inline void set_role_thumb(::google::protobuf::int32 value);
+
+  // optional string role_name = 2;
+  inline bool has_role_name() const;
+  inline void clear_role_name();
+  static const int kRoleNameFieldNumber = 2;
+  inline const ::std::string& role_name() const;
+  inline void set_role_name(const ::std::string& value);
+  inline void set_role_name(const char* value);
+  inline void set_role_name(const char* value, size_t size);
+  inline ::std::string* mutable_role_name();
+  inline ::std::string* release_role_name();
+  inline void set_allocated_role_name(::std::string* role_name);
+
+  // optional int32 role_level = 3;
+  inline bool has_role_level() const;
+  inline void clear_role_level();
+  static const int kRoleLevelFieldNumber = 3;
+  inline ::google::protobuf::int32 role_level() const;
+  inline void set_role_level(::google::protobuf::int32 value);
+
+  // optional sint32 rank = 4;
+  inline bool has_rank() const;
+  inline void clear_rank();
+  static const int kRankFieldNumber = 4;
+  inline ::google::protobuf::int32 rank() const;
+  inline void set_rank(::google::protobuf::int32 value);
+
+  // repeated .protos.common.Hero teams = 5;
+  inline int teams_size() const;
+  inline void clear_teams();
+  static const int kTeamsFieldNumber = 5;
+  inline const ::protos::common::Hero& teams(int index) const;
+  inline ::protos::common::Hero* mutable_teams(int index);
+  inline ::protos::common::Hero* add_teams();
+  inline const ::google::protobuf::RepeatedPtrField< ::protos::common::Hero >&
+      teams() const;
+  inline ::google::protobuf::RepeatedPtrField< ::protos::common::Hero >*
+      mutable_teams();
+
+  // optional string fb_id = 6;
+  inline bool has_fb_id() const;
+  inline void clear_fb_id();
+  static const int kFbIdFieldNumber = 6;
+  inline const ::std::string& fb_id() const;
+  inline void set_fb_id(const ::std::string& value);
+  inline void set_fb_id(const char* value);
+  inline void set_fb_id(const char* value, size_t size);
+  inline ::std::string* mutable_fb_id();
+  inline ::std::string* release_fb_id();
+  inline void set_allocated_fb_id(::std::string* fb_id);
+
+  // @@protoc_insertion_point(class_scope:protos.RecordData)
+ private:
+  inline void set_has_role_thumb();
+  inline void clear_has_role_thumb();
+  inline void set_has_role_name();
+  inline void clear_has_role_name();
+  inline void set_has_role_level();
+  inline void clear_has_role_level();
+  inline void set_has_rank();
+  inline void clear_has_rank();
+  inline void set_has_fb_id();
+  inline void clear_has_fb_id();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::std::string* role_name_;
+  ::google::protobuf::int32 role_thumb_;
+  ::google::protobuf::int32 role_level_;
+  ::google::protobuf::RepeatedPtrField< ::protos::common::Hero > teams_;
+  ::std::string* fb_id_;
+  ::google::protobuf::int32 rank_;
+
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(6 + 31) / 32];
+
+  friend void  protobuf_AddDesc_pvp_5fprotocol_2eproto();
+  friend void protobuf_AssignDesc_pvp_5fprotocol_2eproto();
+  friend void protobuf_ShutdownFile_pvp_5fprotocol_2eproto();
+
+  void InitAsDefaultInstance();
+  static RecordData* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -882,6 +1729,13 @@ class Opponent : public ::google::protobuf::Message {
   inline ::std::string* release_fb_id();
   inline void set_allocated_fb_id(::std::string* fb_id);
 
+  // optional int32 rank = 10;
+  inline bool has_rank() const;
+  inline void clear_rank();
+  static const int kRankFieldNumber = 10;
+  inline ::google::protobuf::int32 rank() const;
+  inline void set_rank(::google::protobuf::int32 value);
+
   // @@protoc_insertion_point(class_scope:protos.Opponent)
  private:
   inline void set_has_role_id();
@@ -902,6 +1756,8 @@ class Opponent : public ::google::protobuf::Message {
   inline void clear_has_is_robot();
   inline void set_has_fb_id();
   inline void clear_has_fb_id();
+  inline void set_has_rank();
+  inline void clear_has_rank();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
@@ -914,9 +1770,10 @@ class Opponent : public ::google::protobuf::Message {
   ::google::protobuf::int32 hero_thumb_;
   ::std::string* fb_id_;
   bool is_robot_;
+  ::google::protobuf::int32 rank_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(9 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(10 + 31) / 32];
 
   friend void  protobuf_AddDesc_pvp_5fprotocol_2eproto();
   friend void protobuf_AssignDesc_pvp_5fprotocol_2eproto();
@@ -1393,6 +2250,856 @@ OppTeamRes::mutable_hero_list() {
   return &hero_list_;
 }
 
+// optional int32 team_combat = 4;
+inline bool OppTeamRes::has_team_combat() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void OppTeamRes::set_has_team_combat() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void OppTeamRes::clear_has_team_combat() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void OppTeamRes::clear_team_combat() {
+  team_combat_ = 0;
+  clear_has_team_combat();
+}
+inline ::google::protobuf::int32 OppTeamRes::team_combat() const {
+  return team_combat_;
+}
+inline void OppTeamRes::set_team_combat(::google::protobuf::int32 value) {
+  set_has_team_combat();
+  team_combat_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// StartPvpReq
+
+// required int32 opp_id = 1;
+inline bool StartPvpReq::has_opp_id() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void StartPvpReq::set_has_opp_id() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void StartPvpReq::clear_has_opp_id() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void StartPvpReq::clear_opp_id() {
+  opp_id_ = 0;
+  clear_has_opp_id();
+}
+inline ::google::protobuf::int32 StartPvpReq::opp_id() const {
+  return opp_id_;
+}
+inline void StartPvpReq::set_opp_id(::google::protobuf::int32 value) {
+  set_has_opp_id();
+  opp_id_ = value;
+}
+
+// required bool is_robot = 2;
+inline bool StartPvpReq::has_is_robot() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void StartPvpReq::set_has_is_robot() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void StartPvpReq::clear_has_is_robot() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void StartPvpReq::clear_is_robot() {
+  is_robot_ = false;
+  clear_has_is_robot();
+}
+inline bool StartPvpReq::is_robot() const {
+  return is_robot_;
+}
+inline void StartPvpReq::set_is_robot(bool value) {
+  set_has_is_robot();
+  is_robot_ = value;
+}
+
+// repeated int32 battle_hero = 3 [packed = true];
+inline int StartPvpReq::battle_hero_size() const {
+  return battle_hero_.size();
+}
+inline void StartPvpReq::clear_battle_hero() {
+  battle_hero_.Clear();
+}
+inline ::google::protobuf::int32 StartPvpReq::battle_hero(int index) const {
+  return battle_hero_.Get(index);
+}
+inline void StartPvpReq::set_battle_hero(int index, ::google::protobuf::int32 value) {
+  battle_hero_.Set(index, value);
+}
+inline void StartPvpReq::add_battle_hero(::google::protobuf::int32 value) {
+  battle_hero_.Add(value);
+}
+inline const ::google::protobuf::RepeatedField< ::google::protobuf::int32 >&
+StartPvpReq::battle_hero() const {
+  return battle_hero_;
+}
+inline ::google::protobuf::RepeatedField< ::google::protobuf::int32 >*
+StartPvpReq::mutable_battle_hero() {
+  return &battle_hero_;
+}
+
+// -------------------------------------------------------------------
+
+// StartPvpRes
+
+// required bool result = 5;
+inline bool StartPvpRes::has_result() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void StartPvpRes::set_has_result() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void StartPvpRes::clear_has_result() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void StartPvpRes::clear_result() {
+  result_ = false;
+  clear_has_result();
+}
+inline bool StartPvpRes::result() const {
+  return result_;
+}
+inline void StartPvpRes::set_result(bool value) {
+  set_has_result();
+  result_ = value;
+}
+
+// optional int32 status = 1;
+inline bool StartPvpRes::has_status() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void StartPvpRes::set_has_status() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void StartPvpRes::clear_has_status() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void StartPvpRes::clear_status() {
+  status_ = 0;
+  clear_has_status();
+}
+inline ::google::protobuf::int32 StartPvpRes::status() const {
+  return status_;
+}
+inline void StartPvpRes::set_status(::google::protobuf::int32 value) {
+  set_has_status();
+  status_ = value;
+}
+
+// repeated .protos.common.Hero opponents = 2;
+inline int StartPvpRes::opponents_size() const {
+  return opponents_.size();
+}
+inline void StartPvpRes::clear_opponents() {
+  opponents_.Clear();
+}
+inline const ::protos::common::Hero& StartPvpRes::opponents(int index) const {
+  return opponents_.Get(index);
+}
+inline ::protos::common::Hero* StartPvpRes::mutable_opponents(int index) {
+  return opponents_.Mutable(index);
+}
+inline ::protos::common::Hero* StartPvpRes::add_opponents() {
+  return opponents_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::protos::common::Hero >&
+StartPvpRes::opponents() const {
+  return opponents_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::protos::common::Hero >*
+StartPvpRes::mutable_opponents() {
+  return &opponents_;
+}
+
+// repeated .protos.common.Hero hero_list = 3;
+inline int StartPvpRes::hero_list_size() const {
+  return hero_list_.size();
+}
+inline void StartPvpRes::clear_hero_list() {
+  hero_list_.Clear();
+}
+inline const ::protos::common::Hero& StartPvpRes::hero_list(int index) const {
+  return hero_list_.Get(index);
+}
+inline ::protos::common::Hero* StartPvpRes::mutable_hero_list(int index) {
+  return hero_list_.Mutable(index);
+}
+inline ::protos::common::Hero* StartPvpRes::add_hero_list() {
+  return hero_list_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::protos::common::Hero >&
+StartPvpRes::hero_list() const {
+  return hero_list_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::protos::common::Hero >*
+StartPvpRes::mutable_hero_list() {
+  return &hero_list_;
+}
+
+// repeated .protos.common.Monster call_monster = 4;
+inline int StartPvpRes::call_monster_size() const {
+  return call_monster_.size();
+}
+inline void StartPvpRes::clear_call_monster() {
+  call_monster_.Clear();
+}
+inline const ::protos::common::Monster& StartPvpRes::call_monster(int index) const {
+  return call_monster_.Get(index);
+}
+inline ::protos::common::Monster* StartPvpRes::mutable_call_monster(int index) {
+  return call_monster_.Mutable(index);
+}
+inline ::protos::common::Monster* StartPvpRes::add_call_monster() {
+  return call_monster_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::protos::common::Monster >&
+StartPvpRes::call_monster() const {
+  return call_monster_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::protos::common::Monster >*
+StartPvpRes::mutable_call_monster() {
+  return &call_monster_;
+}
+
+// -------------------------------------------------------------------
+
+// PvpOverReq
+
+// required bool battle_result = 1;
+inline bool PvpOverReq::has_battle_result() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void PvpOverReq::set_has_battle_result() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void PvpOverReq::clear_has_battle_result() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void PvpOverReq::clear_battle_result() {
+  battle_result_ = false;
+  clear_has_battle_result();
+}
+inline bool PvpOverReq::battle_result() const {
+  return battle_result_;
+}
+inline void PvpOverReq::set_battle_result(bool value) {
+  set_has_battle_result();
+  battle_result_ = value;
+}
+
+// optional int32 battle_time = 2;
+inline bool PvpOverReq::has_battle_time() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void PvpOverReq::set_has_battle_time() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void PvpOverReq::clear_has_battle_time() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void PvpOverReq::clear_battle_time() {
+  battle_time_ = 0;
+  clear_has_battle_time();
+}
+inline ::google::protobuf::int32 PvpOverReq::battle_time() const {
+  return battle_time_;
+}
+inline void PvpOverReq::set_battle_time(::google::protobuf::int32 value) {
+  set_has_battle_time();
+  battle_time_ = value;
+}
+
+// optional int32 blood_1 = 3;
+inline bool PvpOverReq::has_blood_1() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void PvpOverReq::set_has_blood_1() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void PvpOverReq::clear_has_blood_1() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void PvpOverReq::clear_blood_1() {
+  blood_1_ = 0;
+  clear_has_blood_1();
+}
+inline ::google::protobuf::int32 PvpOverReq::blood_1() const {
+  return blood_1_;
+}
+inline void PvpOverReq::set_blood_1(::google::protobuf::int32 value) {
+  set_has_blood_1();
+  blood_1_ = value;
+}
+
+// optional int32 blood_2 = 4;
+inline bool PvpOverReq::has_blood_2() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void PvpOverReq::set_has_blood_2() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void PvpOverReq::clear_has_blood_2() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void PvpOverReq::clear_blood_2() {
+  blood_2_ = 0;
+  clear_has_blood_2();
+}
+inline ::google::protobuf::int32 PvpOverReq::blood_2() const {
+  return blood_2_;
+}
+inline void PvpOverReq::set_blood_2(::google::protobuf::int32 value) {
+  set_has_blood_2();
+  blood_2_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// PvpOverRes
+
+// required int32 result = 1;
+inline bool PvpOverRes::has_result() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void PvpOverRes::set_has_result() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void PvpOverRes::clear_has_result() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void PvpOverRes::clear_result() {
+  result_ = 0;
+  clear_has_result();
+}
+inline ::google::protobuf::int32 PvpOverRes::result() const {
+  return result_;
+}
+inline void PvpOverRes::set_result(::google::protobuf::int32 value) {
+  set_has_result();
+  result_ = value;
+}
+
+// optional int32 org_points = 2;
+inline bool PvpOverRes::has_org_points() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void PvpOverRes::set_has_org_points() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void PvpOverRes::clear_has_org_points() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void PvpOverRes::clear_org_points() {
+  org_points_ = 0;
+  clear_has_org_points();
+}
+inline ::google::protobuf::int32 PvpOverRes::org_points() const {
+  return org_points_;
+}
+inline void PvpOverRes::set_org_points(::google::protobuf::int32 value) {
+  set_has_org_points();
+  org_points_ = value;
+}
+
+// optional sint32 add_points = 3;
+inline bool PvpOverRes::has_add_points() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void PvpOverRes::set_has_add_points() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void PvpOverRes::clear_has_add_points() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void PvpOverRes::clear_add_points() {
+  add_points_ = 0;
+  clear_has_add_points();
+}
+inline ::google::protobuf::int32 PvpOverRes::add_points() const {
+  return add_points_;
+}
+inline void PvpOverRes::set_add_points(::google::protobuf::int32 value) {
+  set_has_add_points();
+  add_points_ = value;
+}
+
+// optional int32 pvp_coin = 4;
+inline bool PvpOverRes::has_pvp_coin() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void PvpOverRes::set_has_pvp_coin() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void PvpOverRes::clear_has_pvp_coin() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void PvpOverRes::clear_pvp_coin() {
+  pvp_coin_ = 0;
+  clear_has_pvp_coin();
+}
+inline ::google::protobuf::int32 PvpOverRes::pvp_coin() const {
+  return pvp_coin_;
+}
+inline void PvpOverRes::set_pvp_coin(::google::protobuf::int32 value) {
+  set_has_pvp_coin();
+  pvp_coin_ = value;
+}
+
+// optional .protos.Opponent next_rank = 5;
+inline bool PvpOverRes::has_next_rank() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void PvpOverRes::set_has_next_rank() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void PvpOverRes::clear_has_next_rank() {
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline void PvpOverRes::clear_next_rank() {
+  if (next_rank_ != NULL) next_rank_->::protos::Opponent::Clear();
+  clear_has_next_rank();
+}
+inline const ::protos::Opponent& PvpOverRes::next_rank() const {
+  return next_rank_ != NULL ? *next_rank_ : *default_instance_->next_rank_;
+}
+inline ::protos::Opponent* PvpOverRes::mutable_next_rank() {
+  set_has_next_rank();
+  if (next_rank_ == NULL) next_rank_ = new ::protos::Opponent;
+  return next_rank_;
+}
+inline ::protos::Opponent* PvpOverRes::release_next_rank() {
+  clear_has_next_rank();
+  ::protos::Opponent* temp = next_rank_;
+  next_rank_ = NULL;
+  return temp;
+}
+inline void PvpOverRes::set_allocated_next_rank(::protos::Opponent* next_rank) {
+  delete next_rank_;
+  next_rank_ = next_rank;
+  if (next_rank) {
+    set_has_next_rank();
+  } else {
+    clear_has_next_rank();
+  }
+}
+
+// optional int32 my_rank = 6;
+inline bool PvpOverRes::has_my_rank() const {
+  return (_has_bits_[0] & 0x00000020u) != 0;
+}
+inline void PvpOverRes::set_has_my_rank() {
+  _has_bits_[0] |= 0x00000020u;
+}
+inline void PvpOverRes::clear_has_my_rank() {
+  _has_bits_[0] &= ~0x00000020u;
+}
+inline void PvpOverRes::clear_my_rank() {
+  my_rank_ = 0;
+  clear_has_my_rank();
+}
+inline ::google::protobuf::int32 PvpOverRes::my_rank() const {
+  return my_rank_;
+}
+inline void PvpOverRes::set_my_rank(::google::protobuf::int32 value) {
+  set_has_my_rank();
+  my_rank_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// PvpRecordRes
+
+// repeated .protos.Record record_list = 1;
+inline int PvpRecordRes::record_list_size() const {
+  return record_list_.size();
+}
+inline void PvpRecordRes::clear_record_list() {
+  record_list_.Clear();
+}
+inline const ::protos::Record& PvpRecordRes::record_list(int index) const {
+  return record_list_.Get(index);
+}
+inline ::protos::Record* PvpRecordRes::mutable_record_list(int index) {
+  return record_list_.Mutable(index);
+}
+inline ::protos::Record* PvpRecordRes::add_record_list() {
+  return record_list_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::protos::Record >&
+PvpRecordRes::record_list() const {
+  return record_list_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::protos::Record >*
+PvpRecordRes::mutable_record_list() {
+  return &record_list_;
+}
+
+// -------------------------------------------------------------------
+
+// Record
+
+// optional int32 record_id = 1;
+inline bool Record::has_record_id() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void Record::set_has_record_id() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void Record::clear_has_record_id() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void Record::clear_record_id() {
+  record_id_ = 0;
+  clear_has_record_id();
+}
+inline ::google::protobuf::int32 Record::record_id() const {
+  return record_id_;
+}
+inline void Record::set_record_id(::google::protobuf::int32 value) {
+  set_has_record_id();
+  record_id_ = value;
+}
+
+// optional int32 battle_time = 2;
+inline bool Record::has_battle_time() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void Record::set_has_battle_time() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void Record::clear_has_battle_time() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void Record::clear_battle_time() {
+  battle_time_ = 0;
+  clear_has_battle_time();
+}
+inline ::google::protobuf::int32 Record::battle_time() const {
+  return battle_time_;
+}
+inline void Record::set_battle_time(::google::protobuf::int32 value) {
+  set_has_battle_time();
+  battle_time_ = value;
+}
+
+// optional .protos.RecordData player1 = 3;
+inline bool Record::has_player1() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void Record::set_has_player1() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void Record::clear_has_player1() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void Record::clear_player1() {
+  if (player1_ != NULL) player1_->::protos::RecordData::Clear();
+  clear_has_player1();
+}
+inline const ::protos::RecordData& Record::player1() const {
+  return player1_ != NULL ? *player1_ : *default_instance_->player1_;
+}
+inline ::protos::RecordData* Record::mutable_player1() {
+  set_has_player1();
+  if (player1_ == NULL) player1_ = new ::protos::RecordData;
+  return player1_;
+}
+inline ::protos::RecordData* Record::release_player1() {
+  clear_has_player1();
+  ::protos::RecordData* temp = player1_;
+  player1_ = NULL;
+  return temp;
+}
+inline void Record::set_allocated_player1(::protos::RecordData* player1) {
+  delete player1_;
+  player1_ = player1;
+  if (player1) {
+    set_has_player1();
+  } else {
+    clear_has_player1();
+  }
+}
+
+// optional .protos.RecordData player2 = 4;
+inline bool Record::has_player2() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void Record::set_has_player2() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void Record::clear_has_player2() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void Record::clear_player2() {
+  if (player2_ != NULL) player2_->::protos::RecordData::Clear();
+  clear_has_player2();
+}
+inline const ::protos::RecordData& Record::player2() const {
+  return player2_ != NULL ? *player2_ : *default_instance_->player2_;
+}
+inline ::protos::RecordData* Record::mutable_player2() {
+  set_has_player2();
+  if (player2_ == NULL) player2_ = new ::protos::RecordData;
+  return player2_;
+}
+inline ::protos::RecordData* Record::release_player2() {
+  clear_has_player2();
+  ::protos::RecordData* temp = player2_;
+  player2_ = NULL;
+  return temp;
+}
+inline void Record::set_allocated_player2(::protos::RecordData* player2) {
+  delete player2_;
+  player2_ = player2;
+  if (player2) {
+    set_has_player2();
+  } else {
+    clear_has_player2();
+  }
+}
+
+// -------------------------------------------------------------------
+
+// RecordData
+
+// optional int32 role_thumb = 1;
+inline bool RecordData::has_role_thumb() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void RecordData::set_has_role_thumb() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void RecordData::clear_has_role_thumb() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void RecordData::clear_role_thumb() {
+  role_thumb_ = 0;
+  clear_has_role_thumb();
+}
+inline ::google::protobuf::int32 RecordData::role_thumb() const {
+  return role_thumb_;
+}
+inline void RecordData::set_role_thumb(::google::protobuf::int32 value) {
+  set_has_role_thumb();
+  role_thumb_ = value;
+}
+
+// optional string role_name = 2;
+inline bool RecordData::has_role_name() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void RecordData::set_has_role_name() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void RecordData::clear_has_role_name() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void RecordData::clear_role_name() {
+  if (role_name_ != &::google::protobuf::internal::kEmptyString) {
+    role_name_->clear();
+  }
+  clear_has_role_name();
+}
+inline const ::std::string& RecordData::role_name() const {
+  return *role_name_;
+}
+inline void RecordData::set_role_name(const ::std::string& value) {
+  set_has_role_name();
+  if (role_name_ == &::google::protobuf::internal::kEmptyString) {
+    role_name_ = new ::std::string;
+  }
+  role_name_->assign(value);
+}
+inline void RecordData::set_role_name(const char* value) {
+  set_has_role_name();
+  if (role_name_ == &::google::protobuf::internal::kEmptyString) {
+    role_name_ = new ::std::string;
+  }
+  role_name_->assign(value);
+}
+inline void RecordData::set_role_name(const char* value, size_t size) {
+  set_has_role_name();
+  if (role_name_ == &::google::protobuf::internal::kEmptyString) {
+    role_name_ = new ::std::string;
+  }
+  role_name_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* RecordData::mutable_role_name() {
+  set_has_role_name();
+  if (role_name_ == &::google::protobuf::internal::kEmptyString) {
+    role_name_ = new ::std::string;
+  }
+  return role_name_;
+}
+inline ::std::string* RecordData::release_role_name() {
+  clear_has_role_name();
+  if (role_name_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = role_name_;
+    role_name_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+inline void RecordData::set_allocated_role_name(::std::string* role_name) {
+  if (role_name_ != &::google::protobuf::internal::kEmptyString) {
+    delete role_name_;
+  }
+  if (role_name) {
+    set_has_role_name();
+    role_name_ = role_name;
+  } else {
+    clear_has_role_name();
+    role_name_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  }
+}
+
+// optional int32 role_level = 3;
+inline bool RecordData::has_role_level() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void RecordData::set_has_role_level() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void RecordData::clear_has_role_level() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void RecordData::clear_role_level() {
+  role_level_ = 0;
+  clear_has_role_level();
+}
+inline ::google::protobuf::int32 RecordData::role_level() const {
+  return role_level_;
+}
+inline void RecordData::set_role_level(::google::protobuf::int32 value) {
+  set_has_role_level();
+  role_level_ = value;
+}
+
+// optional sint32 rank = 4;
+inline bool RecordData::has_rank() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void RecordData::set_has_rank() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void RecordData::clear_has_rank() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void RecordData::clear_rank() {
+  rank_ = 0;
+  clear_has_rank();
+}
+inline ::google::protobuf::int32 RecordData::rank() const {
+  return rank_;
+}
+inline void RecordData::set_rank(::google::protobuf::int32 value) {
+  set_has_rank();
+  rank_ = value;
+}
+
+// repeated .protos.common.Hero teams = 5;
+inline int RecordData::teams_size() const {
+  return teams_.size();
+}
+inline void RecordData::clear_teams() {
+  teams_.Clear();
+}
+inline const ::protos::common::Hero& RecordData::teams(int index) const {
+  return teams_.Get(index);
+}
+inline ::protos::common::Hero* RecordData::mutable_teams(int index) {
+  return teams_.Mutable(index);
+}
+inline ::protos::common::Hero* RecordData::add_teams() {
+  return teams_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::protos::common::Hero >&
+RecordData::teams() const {
+  return teams_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::protos::common::Hero >*
+RecordData::mutable_teams() {
+  return &teams_;
+}
+
+// optional string fb_id = 6;
+inline bool RecordData::has_fb_id() const {
+  return (_has_bits_[0] & 0x00000020u) != 0;
+}
+inline void RecordData::set_has_fb_id() {
+  _has_bits_[0] |= 0x00000020u;
+}
+inline void RecordData::clear_has_fb_id() {
+  _has_bits_[0] &= ~0x00000020u;
+}
+inline void RecordData::clear_fb_id() {
+  if (fb_id_ != &::google::protobuf::internal::kEmptyString) {
+    fb_id_->clear();
+  }
+  clear_has_fb_id();
+}
+inline const ::std::string& RecordData::fb_id() const {
+  return *fb_id_;
+}
+inline void RecordData::set_fb_id(const ::std::string& value) {
+  set_has_fb_id();
+  if (fb_id_ == &::google::protobuf::internal::kEmptyString) {
+    fb_id_ = new ::std::string;
+  }
+  fb_id_->assign(value);
+}
+inline void RecordData::set_fb_id(const char* value) {
+  set_has_fb_id();
+  if (fb_id_ == &::google::protobuf::internal::kEmptyString) {
+    fb_id_ = new ::std::string;
+  }
+  fb_id_->assign(value);
+}
+inline void RecordData::set_fb_id(const char* value, size_t size) {
+  set_has_fb_id();
+  if (fb_id_ == &::google::protobuf::internal::kEmptyString) {
+    fb_id_ = new ::std::string;
+  }
+  fb_id_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* RecordData::mutable_fb_id() {
+  set_has_fb_id();
+  if (fb_id_ == &::google::protobuf::internal::kEmptyString) {
+    fb_id_ = new ::std::string;
+  }
+  return fb_id_;
+}
+inline ::std::string* RecordData::release_fb_id() {
+  clear_has_fb_id();
+  if (fb_id_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = fb_id_;
+    fb_id_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+inline void RecordData::set_allocated_fb_id(::std::string* fb_id) {
+  if (fb_id_ != &::google::protobuf::internal::kEmptyString) {
+    delete fb_id_;
+  }
+  if (fb_id) {
+    set_has_fb_id();
+    fb_id_ = fb_id;
+  } else {
+    clear_has_fb_id();
+    fb_id_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  }
+}
+
 // -------------------------------------------------------------------
 
 // Member
@@ -1803,6 +3510,28 @@ inline void Opponent::set_allocated_fb_id(::std::string* fb_id) {
     clear_has_fb_id();
     fb_id_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   }
+}
+
+// optional int32 rank = 10;
+inline bool Opponent::has_rank() const {
+  return (_has_bits_[0] & 0x00000200u) != 0;
+}
+inline void Opponent::set_has_rank() {
+  _has_bits_[0] |= 0x00000200u;
+}
+inline void Opponent::clear_has_rank() {
+  _has_bits_[0] &= ~0x00000200u;
+}
+inline void Opponent::clear_rank() {
+  rank_ = 0;
+  clear_has_rank();
+}
+inline ::google::protobuf::int32 Opponent::rank() const {
+  return rank_;
+}
+inline void Opponent::set_rank(::google::protobuf::int32 value) {
+  set_has_rank();
+  rank_ = value;
 }
 
 // -------------------------------------------------------------------

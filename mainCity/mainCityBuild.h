@@ -33,7 +33,8 @@ class CTopLayer;
 class CMainCityBuild:public BaseLayer
 {
 public:
-	CMainCityBuild():m_isLoadFinish(false),m_isInterTouch(false),m_isTouchShop(false),m_armature(nullptr),m_iIndexForShow(0), m_bTouchLock(false),m_pTopLay(nullptr){}
+	CMainCityBuild():m_isLoadFinish(false),m_isInterTouch(false),m_isTouchShop(false),m_armature(nullptr),m_iIndexForShow(0), m_bTouchLock(false),m_iBgLayerMaxLeftBasePos(1822)
+	{}
 // 	virtual ~CMainCityBuild();
 	CREATE_FUNC(CMainCityBuild);
 	virtual bool init();
@@ -72,6 +73,8 @@ public:
 	void show(CCObject* pObj);
 	void hide(CCObject* pObj);
 
+	void resetPosToTower( CCObject *pSender );
+
 public:
 	void onTimeWaitCityAction(CCNode* pSender);
 	void moveFrontByPos(CCPoint pos);
@@ -107,9 +110,18 @@ protected:
 	void unGarrisonAndFindNew();
 
 private:
+	//点击塔上天
 	void showPvp();
 	void showPvpCallbackForResetAnchorPoint();
 	void showPvpCallBack();
+
+	//从天上返回
+	void backFromPvp( CCObject *pSender );
+	void backFromPvpForResetAnchorPoint();
+	void backFormPvpCallBack();
+
+	//自动上天
+	void autoToPvp();
 
 private:
 	float m_fmoveTime;
@@ -157,5 +169,5 @@ private:
 	bool m_isTouchShop;
 	int m_iIndexForShow;
 	bool m_bTouchLock;
-	CTopLayer *m_pTopLay;
+	int m_iBgLayerMaxLeftBasePos;
 };

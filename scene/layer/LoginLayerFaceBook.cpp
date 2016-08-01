@@ -33,6 +33,9 @@
 #include "common/RollLabel.h"
 #include "tools/ShowTexttip.h"
 #include "../LoginScene.h"
+#include "SDK/GamePlatformManager.h"
+#include "SDK/GamePlatfomDefine.h"
+#include "ApplicationDefine.h"
 
 using namespace BattleSpace;
 
@@ -227,14 +230,24 @@ void LoginLayeFaceBook::initLogin()
 	pLabel->removeFromParentAndCleanup(true);
 	this->addChild(pLabel);
 	CC_SAFE_RELEASE(pLabel);
-	pLabel->setString(CCString::createWithFormat("Version:%s", m_serverInfo.game_version().c_str())->getCString());
-
+	
+//#if VERSION_UPDATE
+//	pLabel->setString(CCString::createWithFormat("Version:%s", m_serverInfo.game_version().c_str())->getCString());
+//#else
+	//显示本地的版本号。全部都是这样
+	std::string sDefalutVersion = CJniHelper::getInstance()->getVersionName();
+	std::string sCurrentVersion = CCUserDefault::sharedUserDefault()->getStringForKey(VERSION, sDefalutVersion);
+	pLabel->setString(CCString::createWithFormat("Version:%s", sCurrentVersion.c_str())->getCString());
+//#endif	
+	
 
 	//隐藏服务器列表
 	showServerList();
 	hideServerList();
 
-	if(userName != "")
+
+	string fbId = CCUserDefault::sharedUserDefault()->getStringForKey(FACEBOOK_ID);
+	if(fbId != "")
 	{
 		pQuickLogin->setVisible(true);
 		m_logLay->setVisible(false);
@@ -288,6 +301,9 @@ void LoginLayeFaceBook::onFacebookLogin(CCObject* obj)
 		}
 	}
 	
+	//GetTcpNet->sendLogin("","","",false,0,"118595065242260", G_PLATFORM_TARGET);
+	//return;
+
 #if (CC_TARGET_PLATFORM==CC_PLATFORM_ANDROID)
 	FaceBookSDK::sharedInstance()->openAuthor();
 #else
@@ -386,8 +402,8 @@ void LoginLayeFaceBook::onLogin(CCObject* obj)
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 			if(deviceId.compare("")==0)
 			{
-				deviceId = CJniHelper::getInstance()->getDeviceId();
-				CCUserDefault::sharedUserDefault()->setStringForKey(USER_NAME, deviceId.c_str());
+// 				deviceId = CJniHelper::getInstance()->getDeviceId();
+// 				CCUserDefault::sharedUserDefault()->setStringForKey(USER_NAME, deviceId.c_str());
 // 				CNetClient::getShareInstance()->sendLogin(deviceId,"123456","");
 			}
 #else (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
@@ -420,7 +436,7 @@ void LoginLayeFaceBook::doFacebookLogin(float delt)
 	}
 	else
 	{			
-		GetTcpNet->sendLogin("","","",false,0,m_FaceBookUserID);
+		GetTcpNet->sendLogin("","","",false,0,m_FaceBookUserID, G_PLATFORM_TARGET);
 	}
 }
 
@@ -453,8 +469,8 @@ void LoginLayeFaceBook::doLogin(float delt)
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 		if(deviceId.compare("")==0)
 		{
-			deviceId = CJniHelper::getInstance()->getDeviceId();
-			CCUserDefault::sharedUserDefault()->setStringForKey(USER_NAME, deviceId.c_str());
+			//deviceId = CJniHelper::getInstance()->getDeviceId();
+			//CCUserDefault::sharedUserDefault()->setStringForKey(USER_NAME, deviceId.c_str());
 // 			CNetClient::getShareInstance()->sendLogin(deviceId,"123456","");
 		}
 #endif
@@ -495,12 +511,6 @@ void LoginLayeFaceBook::onQuickLogin(CCObject* obj)
 {
 	PlayEffectSound(SFX_LoginClick);
 
-	//如果输入框显示状态，不快速login
-	if(m_logLay->isVisible())
-	{
-		return;
-	}
-
 	//点击按钮才连接服务器
 	const Server& gameServer = m_serverInfo.server_list().Get(m_iSelectServerIndex);
 	
@@ -510,36 +520,21 @@ void LoginLayeFaceBook::onQuickLogin(CCObject* obj)
 		return;
 	}
 
-// 	LinkedGameServer(gameServer);
+	CCLOG("[ AAA  checkServerStatus]");
 
-// 	string userName = CCUserDefault::sharedUserDefault()->getStringForKey(USER_NAME);
-// 	string psw = CCUserDefault::sharedUserDefault()->getStringForKey(PASSWORD);
-// 	if (!CNetClient::getShareInstance()->isConnected())
-// 	{
-// 		CNetClient::getShareInstance()->connect();
-// 		this->scheduleOnce(schedule_selector(LoginLayeFaceBook::reConnectLogin),0.5);
-// 	}
-// 	else if (userName!=""&&psw!="")
-// 	{
-// 		CNetClient::getShareInstance()->sendLogin(userName,psw);
-// 	}
+
 	m_FaceBookUserID = CCUserDefault::sharedUserDefault()->getStringForKey(FACEBOOK_ID);
+	CCLOG("[ AAA  %s", m_FaceBookUserID.c_str());
 	if (m_FaceBookUserID!="")
 	{
+		CCLOG("[ AAA  if (m_FaceBookUserID!="")]");
 		facebookUserLogin();
 	}
 	else
 	{
+		CCLOG("[ AAA  else");
 		onFacebookLogin(nullptr);
 	}
-}
-
-void LoginLayeFaceBook::reConnectLogin(float dt)
-{
-	string userName = CCUserDefault::sharedUserDefault()->getStringForKey(USER_NAME);
-	string psw = CCUserDefault::sharedUserDefault()->getStringForKey(PASSWORD);
-	CNetClient::getShareInstance()->sendLogin(userName,psw);
-	this->unschedule(schedule_selector(LoginLayeFaceBook::reConnectLogin));
 }
 
 bool LoginLayeFaceBook::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
@@ -561,11 +556,11 @@ bool LoginLayeFaceBook::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
 		return true;
 	}
 
-	//登录按钮
-	if (CCUserDefault::sharedUserDefault()->getStringForKey(USER_NAME)=="")
-	{
-		return false;
-	}
+// 	//登录按钮
+// 	if (CCUserDefault::sharedUserDefault()->getStringForKey(USER_NAME)=="")
+// 	{
+// 		return false;
+// 	}
 
 	CCNode *login = m_ui->getChildByTag(1);
 	CButton *btn = (CButton*)m_ui->getChildByTag(11);
@@ -593,6 +588,7 @@ bool LoginLayeFaceBook::ProcessMsg(int type, google::protobuf::Message *msg)
 			m_serverInfo = *serverInfo;
 			m_pLoading->setVisible(false);
 
+
 			//没有服务器列表弹框提示
 			if(m_serverInfo.server_list().size()<=0)
 			{
@@ -613,19 +609,13 @@ bool LoginLayeFaceBook::ProcessMsg(int type, google::protobuf::Message *msg)
 				CCUserDefault::sharedUserDefault()->flush();
 			}
 
-			//检查版本号，是否要更新
-			bool isNeedUpdate = CUpdateLayer::checkUpdate(serverInfo->game_version().c_str());
-			//创建更新
-			if(isNeedUpdate)
-			{				
-				CUpdateLayer* pLayer = CUpdateLayer::create();
-				pLayer->setVersion(m_serverInfo.game_version().c_str());
-				this->addChild(pLayer, 999);
-			}
-			else
+			//版本更新
+			bool bUpdate = GamePlatformMgr->VersionUpdateWithPlatform( serverInfo->game_version() );
+			if(!bUpdate)
 			{
 				initLogin();
 			}
+
 		}
 		break;
 	case LoginResponseMsg:
@@ -1183,7 +1173,7 @@ void LoginLayeFaceBook::directConnectGameServer()
 
 void LoginLayeFaceBook::showLabelRoll( const char* sInfo )
 {
-	if(checkDay())
+	if(CheckDay(LoginDayFaceBook))
 	{
 		return;
 	}
@@ -1208,36 +1198,10 @@ void LoginLayeFaceBook::hideLableRoll()
 	this->removeChildByTag(88888);
 }
 
-bool LoginLayeFaceBook::checkDay()
-{
-	struct   tm  * tm ;  
-	time_t  timep;  
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)   
-	time(&timep);  
-#else   
-	struct  cc_timeval now;   
-	CCTime::gettimeofdayCocos2d(&now, NULL);   
-	timep = now.tv_sec;  
-#endif   
-
-	tm  = localtime(&timep);  
-	int  year =  tm ->tm_year + 1900;  
-	int  month =  tm ->tm_mon + 1;  
-	int  day =  tm ->tm_mday;  
-	int  hour= tm ->tm_hour;  
-
-	CCString* sDay = CCString::createWithFormat("%d-%s%d-%s%d-%s%d", year, month>9?"":"0", month, day>9?"":"0", day, hour>9?"":"0", hour);
-	if(sDay->compare("2016-05-07-11")>0)
-	{
-		return true;
-	}
-
-	return false;
-}
 
 void LoginLayeFaceBook::updateForCheckDay( float dt )
 {
-	if(checkDay())
+	if(CheckDay(LoginDayFaceBook))
 	{
 		hideLableRoll();
 		unschedule(schedule_selector(LoginLayeFaceBook::updateForCheckDay));
@@ -1335,9 +1299,7 @@ void LoginLayeFaceBook::facebookUserLogin()
 		}
 		else
 		{			
-			GetTcpNet->sendLogin("","","",false,0,m_FaceBookUserID);
+			GetTcpNet->sendLogin("","","",false,0,m_FaceBookUserID, G_PLATFORM_TARGET);
 		}
 	}
 }
-
-

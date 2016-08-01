@@ -360,9 +360,9 @@ namespace BattleSpace{
 			if (tRole->getMoveObject())
 				tRole->getMoveObject()->setPosition(p);										//可重构点,这些操作都应该封装在武将的内部执行的
 			tRole->getRoleObject()->setPosition(p);											//在视野外进行死亡处理
-			if (!tRole->getEnemy()&&tRole->getCriAtk())
+			if (!tRole->getEnemy()&&tRole->getCritEffect())
 				NOTIFICATION->postNotification(B_CritEnd,tRole);
-			tRole->getRoleObject()->AliveDie();
+			tRole->roleDie();
 			tRole->getRoleObject()->setReset(true);
 			tRole->setRoleObject(nullptr);
 		}

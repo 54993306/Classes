@@ -4,8 +4,6 @@
 
 #include "AppUI.h"
 #include "scene/layer/LayerManager.h"
-#include "mainCity/CityData.h"
-#include "net/CNetClient.h"
 #include "bag/bagData.h"
 
 class CShopLayer: public BaseLayer

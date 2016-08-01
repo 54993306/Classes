@@ -18,9 +18,10 @@
 #include "jni/CJniHelper.h"
 #include "common/CursorTextField.h"
 #include "update/CDownloadPackageDelegate.h"
-#include "ApplicationDefine.h"
 
 using namespace cn::sharesdk;
+
+const static char *LoginDayFaceBook = "2016-05-07-11";
 
 class LoginLayeFaceBook: public BaseLayer, public MessageHandler, public CJniListener, public DownloadPackageDelegate
 {
@@ -108,8 +109,6 @@ private:
 
 	//快速登录按钮回调
 	void onQuickLogin(CCObject* obj);
-	//游戏服务器没连接上则请求连接，然后延时再次快速登录
-	void reConnectLogin(float dt);
 
 	//进入游戏
 	void callBackInGame();
@@ -119,6 +118,9 @@ private:
 
 	//点击下载更新包按钮回调
 	void onClickDownloadPackage(CCObject* pSender);
+
+	//从google下载最新包
+	void downloadFromGoogle( CCObject* pSender );
 
 	//facebook登录相关
 	void onFaceBookAuthor(CCObject *object);
@@ -141,8 +143,6 @@ private:
 
 	void showLabelRoll(const char* sInfo);
 	void hideLableRoll();
-
-	bool checkDay();
 
 	
 private:

@@ -98,7 +98,7 @@ class LoginRequest : public ::google::protobuf::Message {
 
   // accessors -------------------------------------------------------
 
-  // required string username = 1;
+  // optional string username = 1;
   inline bool has_username() const;
   inline void clear_username();
   static const int kUsernameFieldNumber = 1;
@@ -110,7 +110,7 @@ class LoginRequest : public ::google::protobuf::Message {
   inline ::std::string* release_username();
   inline void set_allocated_username(::std::string* username);
 
-  // required string password = 2;
+  // optional string password = 2;
   inline bool has_password() const;
   inline void clear_password();
   static const int kPasswordFieldNumber = 2;
@@ -160,6 +160,13 @@ class LoginRequest : public ::google::protobuf::Message {
   inline ::std::string* release_access_code();
   inline void set_allocated_access_code(::std::string* access_code);
 
+  // optional int32 platform = 7;
+  inline bool has_platform() const;
+  inline void clear_platform();
+  static const int kPlatformFieldNumber = 7;
+  inline ::google::protobuf::int32 platform() const;
+  inline void set_platform(::google::protobuf::int32 value);
+
   // @@protoc_insertion_point(class_scope:protos.LoginRequest)
  private:
   inline void set_has_username();
@@ -174,6 +181,8 @@ class LoginRequest : public ::google::protobuf::Message {
   inline void clear_has_openid();
   inline void set_has_access_code();
   inline void clear_has_access_code();
+  inline void set_has_platform();
+  inline void clear_has_platform();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
@@ -183,9 +192,10 @@ class LoginRequest : public ::google::protobuf::Message {
   ::google::protobuf::int32 roleid_;
   ::std::string* openid_;
   ::std::string* access_code_;
+  ::google::protobuf::int32 platform_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(6 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(7 + 31) / 32];
 
   friend void  protobuf_AddDesc_auth_5fprotocol_2eproto();
   friend void protobuf_AssignDesc_auth_5fprotocol_2eproto();
@@ -733,7 +743,7 @@ class ReconnectResponse : public ::google::protobuf::Message {
 
 // LoginRequest
 
-// required string username = 1;
+// optional string username = 1;
 inline bool LoginRequest::has_username() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
@@ -803,7 +813,7 @@ inline void LoginRequest::set_allocated_username(::std::string* username) {
   }
 }
 
-// required string password = 2;
+// optional string password = 2;
 inline bool LoginRequest::has_password() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
@@ -1055,6 +1065,28 @@ inline void LoginRequest::set_allocated_access_code(::std::string* access_code) 
     clear_has_access_code();
     access_code_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   }
+}
+
+// optional int32 platform = 7;
+inline bool LoginRequest::has_platform() const {
+  return (_has_bits_[0] & 0x00000040u) != 0;
+}
+inline void LoginRequest::set_has_platform() {
+  _has_bits_[0] |= 0x00000040u;
+}
+inline void LoginRequest::clear_has_platform() {
+  _has_bits_[0] &= ~0x00000040u;
+}
+inline void LoginRequest::clear_platform() {
+  platform_ = 0;
+  clear_has_platform();
+}
+inline ::google::protobuf::int32 LoginRequest::platform() const {
+  return platform_;
+}
+inline void LoginRequest::set_platform(::google::protobuf::int32 value) {
+  set_has_platform();
+  platform_ = value;
 }
 
 // -------------------------------------------------------------------

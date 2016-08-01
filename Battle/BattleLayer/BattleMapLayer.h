@@ -58,8 +58,10 @@ namespace BattleSpace{
 		void addEvent();	
 		void removeEvent();
 		void touchAreaCancel(CCObject* ob);
-		void DrawAtkArea(BaseRole* alive);
-		void DrawMoveArea(BaseRole* alive);
+		void DrawAtkArea(BaseRole* pRole);
+		void DrawMoveArea();
+		void drawEnterArea();
+		void showFloor(int pGrid);
 		void DrawMoveAtkArea(CCObject* ob);
 		void DrawAtkEffect(CCObject* ob);
 		void setBlackBg(CCObject* ob);

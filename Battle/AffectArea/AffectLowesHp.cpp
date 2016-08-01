@@ -25,7 +25,7 @@ namespace BattleSpace
 
 	void AffectLowesHp::initArea(AreaCountInfo& pInfo)
 	{
-		vector<BaseRole*>* tAlives = pInfo.getAlive()->getSkillTargets();
+		vector<BaseRole*>* tAlives = pInfo.getAlive()->getCurrSkillTargets();
 		SortRoleHp(*tAlives);
 		if (pInfo.getAreaRange() >= tAlives->size())
 		{

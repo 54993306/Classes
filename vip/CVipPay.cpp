@@ -74,6 +74,7 @@ void CVipPay::onEnter()
 
 	//获取验证码
 	CButton* pGetSercurityCode = (CButton*)m_ui->findWidgetById("get_code");
+	pGetSercurityCode->setTextColor(ccBLACK);
 	pGetSercurityCode->setOnClickListener(this, ccw_click_selector(CVipPay::onGetSecurityCode));
 
 	//读取上一次的机器ID
@@ -103,7 +104,7 @@ void CVipPay::onEnter()
 	m_pTelInput->setTextInput(sTel);
 	m_pTelInput->setLimitNum(17);
 	m_pTelInput->setAnchorPoint(ccp(0, 0.5f));
-	m_pTelInput->setPosition( ccp(pRect1->getPositionX()-370, pRect1->getPositionY()));
+	m_pTelInput->setPosition( ccp(pRect1->getPositionX()-332, pRect1->getPositionY()));
 	m_ui->addChild(m_pTelInput);
 
 	//验证码
@@ -111,7 +112,7 @@ void CVipPay::onEnter()
 	m_pCodeInput = CursorTextField::textFieldWithPlaceHolder("", FONT_NAME, 22, CCSize(470, 50), ccBLACK);
 	m_pCodeInput->setPriority(this->getTouchPriority());
 	m_pCodeInput->setTextInput("");
-	m_pCodeInput->setPosition(ccp(pRect2->getPositionX()-370, pRect2->getPositionY()));
+	m_pCodeInput->setPosition(ccp(pRect2->getPositionX()-332, pRect2->getPositionY()));
 	m_pCodeInput->setLimitNum(10);
 	m_pCodeInput->setAnchorPoint(ccp(0, 0.5f));
 	m_ui->addChild(m_pCodeInput);
@@ -237,6 +238,8 @@ void CVipPay::showTimeClock()
 	pBtn->setVisible(false);
 	CCNode* pLabel = (CCNode*)m_ui->findWidgetById("time_delay");
 	pLabel->setVisible(true);
+	CCNode* time_tip = (CCNode*)m_ui->findWidgetById("time_tip");
+	time_tip->setVisible(true);
 	m_iTimeRemain = 60;
 	schedule(schedule_selector(CVipPay::updateClock), 1.0f);
 }
@@ -269,6 +272,8 @@ void CVipPay::hideTimeClock()
 	pBtn->setVisible(true);
 	CCNode* pLabel = (CCNode*)m_ui->findWidgetById("time_delay");
 	pLabel->setVisible(false);
+	CCNode* time_tip = (CCNode*)m_ui->findWidgetById("time_tip");
+	time_tip->setVisible(false);
 	unschedule(schedule_selector(CVipPay::updateClock));
 }
 
@@ -305,6 +310,8 @@ void CVipPay::showVerifyCode(const char* str)
 	pGetSercurityCode->setVisible(false);
 	CCNode* pLabel = (CCNode*)m_ui->findWidgetById("time_delay");
 	pLabel->setVisible(false);
+	CCNode* time_tip = (CCNode*)m_ui->findWidgetById("time_tip");
+	time_tip->setVisible(false);
 	setConfirmState(true);
 	//隐藏手机输入框
 	{
@@ -315,6 +322,14 @@ void CVipPay::showVerifyCode(const char* str)
 		cancel->setVisible(false);
 	}
 	HttpLoadImage::getInstance()->requestUrlImage(str,"code");
+    CCNode *text1 = m_ui->findWidgetById("text1");
+	CCNode *text2 = m_ui->findWidgetById("text2");
+	CCNode *text3 = m_ui->findWidgetById("text3");
+	text1->setVisible(false);
+	text2->setVisible(false);
+	text3->setVisible(true);
+	CCNode *rect_2 = m_ui->findWidgetById("rect_2");
+	rect_2->setPositionX(rect_2->getPositionX()-60);
 }
 
 void CVipPay::imageLoadSuccessCallBack(string sTag, vector<char>* pBuffer)
@@ -328,7 +343,7 @@ void CVipPay::imageLoadSuccessCallBack(string sTag, vector<char>* pBuffer)
 		CCSprite *spr = CCSprite::createWithTexture(texture);
 		CButton* pGetSercurityCode = (CButton*)m_ui->findWidgetById("error_code");
 		spr->setPositionX(pGetSercurityCode->getPositionX());
-		spr->setPositionY(pGetSercurityCode->getPositionY()+20);
+		spr->setPositionY(pGetSercurityCode->getPositionY()+55);
 		m_ui->addChild(spr);
 	}
 }

@@ -1,0 +1,24 @@
+import "common/skill_common.proto";
+
+package protos.common;
+
+option java_package = "dass.server.gameserver.protos.common";
+option java_outer_classname = "TrapCommon";
+option optimize_for = SPEED ;
+
+//地形
+message Trap{
+	optional int32  id = 1;			//关卡地形ID
+	optional int32  trapId = 2;		//地形标识ID
+	optional string name = 3;		//地形名称
+	optional int32  type = 4;		//地形类型
+	optional int32  damage = 5;		//地形造成的伤害
+	optional int32  round = 6;		//地形存大的最大回合数
+	optional int32  posX = 7;		//在地图上的位置X
+	optional int32  posY = 8;		//在地图上的位置Y
+	optional int32  pro_type = 9;		//属性影响类型
+	optional sint32  pro_rate = 10;		//属性影响数量
+	optional int32  touch = 11;		//最大触发次数
+	optional Buff   buff = 12;		//关联BUFF
+	optional int32  batch = 13;		//批次
+}

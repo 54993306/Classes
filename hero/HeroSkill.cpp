@@ -37,9 +37,13 @@ bool CHeroSkill::init()
 
 void CHeroSkill::onClickSkill(CCObject* pSender)
 {
-	PlayEffectSound(SFX_Button);
-
 	CCNode *node = (CCNode*)pSender;
+
+	if(node->isVisible())
+	{
+		PlayEffectSound(SFX_Button);
+	}
+	
 	CSkill *skill= (CSkill*)node->getUserData();
 	CCNode *cost = m_ui->findWidgetById("cost");
 
@@ -61,6 +65,10 @@ void CHeroSkill::onClickSkill(CCObject* pSender)
 	{
 		m_skillIndex = 5;
 	}
+	else if (skill->skillId==m_hero->skill6.skillId)
+	{
+		m_skillIndex = 6;
+	}
 	cost->setVisible(m_skillIndex==3||m_skillIndex==4);
 
 	CLayout *item = (CLayout*)(m_ui->findWidgetById("item"));
@@ -75,12 +83,8 @@ void CHeroSkill::onClickSkill(CCObject* pSender)
 	CLabel *desc2 = (CLabel*)m_ui->findWidgetById("desc2");
 	CLabel *name2 = (CLabel*)m_ui->findWidgetById("name2");
 	CLabel *level = (CLabel*)m_ui->findWidgetById("level");
-	CLabel *type = (CLabel*)m_ui->findWidgetById("type");
-	if (m_skillIndex==3||m_skillIndex==4)
-	{
-		type->setString(GETLANGSTR(1090));
-	}
-	else type->setString(GETLANGSTR(274));
+	showSkillType();
+
 
 	if (m_skillIndex==3||m_skillIndex==4)
 	{
@@ -91,7 +95,7 @@ void CHeroSkill::onClickSkill(CCObject* pSender)
 		level->setString("");
 	}
 
-	const SkillCfg *cfg1 = DataCenter::sharedData()->getSkill()->getCfg(skill->skillId+skill->level);
+	const SkillCfg *cfg1 = DataCenter::sharedData()->getSkill()->getCfg(skill->skillId/*+skill->level*/);
 	if(cfg1)
 	{
 		name2->setString(cfg1->name.c_str());
@@ -119,15 +123,6 @@ void CHeroSkill::onClickSkill(CCObject* pSender)
 	{
 		desc2->setString(CCString::createWithFormat(GETLANGSTR(2012),4)->getCString());
 	}
-
-	
-	//bool isPasssive = ((CCBool*)node->getUserObject())->getValue();	
-	//int idx = ((CTableViewCell*)node->getParent())->getIdx();
-
-	//CSkillDesc *skillDesc= CSkillDesc::create();
-	//LayerManager::instance()->push(skillDesc);
-	//skillDesc->updateSkillInfo(skill,isPasssive, idx);
-
 // 	CSkillUpdate *su = CSkillUpdate::create();
 // 	LayerManager::instance()->push(su);
 // 	su->heroSkill(m_hero,&m_hero->skill3);
@@ -136,9 +131,6 @@ void CHeroSkill::onClickSkill(CCObject* pSender)
 void CHeroSkill::showSkill(CHero* hero, int type)
 {
  	m_hero = hero;
-// 	m_type = type;
-// 	m_tableView->setCountOfCell(2);
-// 	m_tableView->reloadData();
 	if (this->isVisible())
 	{
 		GetTcpNet->registerMsgHandler(RoleBag,this,CMsgHandler_selector(CHeroSkill::processMsg));
@@ -164,12 +156,7 @@ void CHeroSkill::showSkill(CHero* hero, int type)
 	{
 	case 1:
 		{
-			//star1->setPositionX(star1->getPositionX()+135);
-// 			CCNode *parent;
-// 			float offset;
-// 			nodeOffset(parent, offset);
-			
-			m_offsetX1 = 140;
+			m_offsetX1 = 120;
 			m_offsetX2 = 0;
 			nodeOffset(star1,m_offsetX1);
 			nodeOffset(levtip,m_offsetX1);
@@ -315,144 +302,6 @@ void CHeroSkill::addTableCell(unsigned int uIdx, CTableViewCell * pCell)
 			break;
 		}
 	}
-
-// 	CCNode *cost1 = (CCNode*)pCell->findWidgetById("cost");
-// 	CLabel *desc1 = (CLabel*)pCell->findWidgetById("desc1");
-// 	CLabel *name1 = (CLabel*)pCell->findWidgetById("name1");
-// 	CLabel *level1 = (CLabel*)pCell->findWidgetById("level1");
-// 
-// 	CImageViewScale9 *bg1 = (CImageViewScale9*)pCell->findWidgetById("bg1");
-// 	CImageViewScale9 *bg2 = (CImageViewScale9*)pCell->findWidgetById("bg2");
-// 	bg1->setTouchEnabled(true);
-// 	bg1->setOnClickListener(this,ccw_click_selector(CHeroSkill::onClickSkill));	
-// 	bg2->setTouchEnabled(true);
-// 	bg2->setOnClickListener(this,ccw_click_selector(CHeroSkill::onClickSkill));
-// 
-// 	CLabel *name2 = (CLabel*)pCell->findWidgetById("name2");
-// 
-// 	CCSprite *mask1= (CCSprite*)pCell->findWidgetById("mask1");
-// 	CCSprite *mask2= (CCSprite*)pCell->findWidgetById("mask2");
-// 	CLabel *desc2 = (CLabel*)pCell->findWidgetById("desc2");
-// 	CImageView *lock = (CImageView*)pCell->findWidgetById("_lock");
-// 
-// 
-// 	if (uIdx==1)
-// 	{
-// 		level1->setString(CCString::createWithFormat("%d/%d",m_hero->skill3.level,m_hero->skill3.maxLevel)->getCString());
-// 		bg1->setUserData(&m_hero->skill3);
-// 		bg1->setUserObject(CCBool::create(true));
-// 		const SkillCfg *cfg1 = DataCenter::sharedData()->getSkill()->getCfg(m_hero->skill3.skillId);
-// 		if(cfg1)
-// 			name1->setString(cfg1->name.c_str());
-// 		//cost
-// 		addFireAndNum(cost1, m_hero->skill3.cost);
-// 
-// 		//描述
-// 		if(cfg1)
-// 			desc1->setString(cfg1->desc.c_str());
-// 
-// 		bg2->setUserData(&m_hero->skill2);
-// 		bg2->setUserObject(CCBool::create(false));
-// 
-// 		CSkill &skill = m_hero->skill2;
-// 		const SkillCfg *cfg2 = DataCenter::sharedData()->getSkill()->getCfg(skill.skillId);
-// 		CImageView *spr = CImageView::create(CCString::createWithFormat("skillIcon/%d.png",cfg1->icon)->getCString());
-// 		if(!spr)
-// 		{
-// 			CCLOG("ERROR  CHeroSkill::addTableCell");
-// 			spr  = CImageView::create("skillIcon/100000.png");
-// 		}
-// 		spr->setPosition(ccp(mask1->getContentSize().width/2,mask1->getContentSize().height/2));
-// 		spr->setScale(0.9f);
-// 		mask1->addChild(spr);
-// 
-// 
-// 		if(cfg2)
-// 			name2->setString(cfg2->name.c_str());
-// 
-// 		spr = CImageView::create(CCString::createWithFormat("skillIcon/%d.png",cfg2->icon)->getCString());
-// 		if(!spr)
-// 		{
-// 			CCLOG("ERROR  CHeroSkill::addTableCell");
-// 			spr  = CImageView::create("skillIcon/100000.png");
-// 		}
-// 		spr->setPosition(ccp(mask2->getContentSize().width/2,mask2->getContentSize().height/2));
-// 		spr->setScale(0.9f);
-// 		mask2->addChild(spr);
-// 
-// 		//描述
-// 		if(cfg2)
-// 			desc2->setString(cfg2->desc.c_str());
-// 
-// 		//是否加锁
-// 		if(m_hero->quality < 3)
-// 		{
-// 			lock->setVisible(true);
-// 			desc2->setString(GETLANGSTR(1157));
-// 		}
-// 	}
-// 	else if (uIdx==0)
-// 	{
-// 		CLabel *skillType = (CLabel*)(pCell->findWidgetById("type"));
-// 		skillType->setString(GETLANGSTR(273));
-// 		
-// 		level1->setString(CCString::createWithFormat("%d/%d",m_hero->skill4.level,m_hero->skill4.maxLevel)->getCString());
-// 		bg1->setUserData(&m_hero->skill4);
-// 		bg1->setUserObject(CCBool::create(true));
-// 		const SkillCfg *cfg1 = DataCenter::sharedData()->getSkill()->getCfg(m_hero->skill4.skillId);
-// 		if (cfg1)
-// 		{
-// // 			desc1->setString(cfg1->desc.c_str());
-// 			CImageView *spr = CImageView::create(CCString::createWithFormat("skillIcon/%d.png",cfg1->icon)->getCString());
-// 			if(!spr)
-// 			{
-// 				CCLOG("ERROR  CHeroSkill::addTableCell");
-// 				spr  = CImageView::create("skillIcon/100000.png");
-// 			}	
-// 			spr->setScale(0.9f);
-// 			spr->setPosition(ccp(mask1->getContentSize().width/2,mask1->getContentSize().height/2));
-// 			mask1->addChild(spr);
-// 			name1->setString(cfg1->name.c_str());
-// 		}
-// 		else
-// 		{
-// // 			desc1->setString(GETLANGSTR(202));
-// 		}
-// 
-// 		//cost
-// 		addFireAndNum(cost1, m_hero->skill4.cost);
-// 
-// 		//描述
-// 		if(cfg1)
-// 			desc1->setString(cfg1->desc.c_str());
-// 		
-// 		bg2->setUserData(&m_hero->skill5);
-// 		bg2->setUserObject(CCBool::create(false));
-// 
-// 		const SkillCfg *cfg2 = DataCenter::sharedData()->getSkill()->getCfg(m_hero->skill5.skillId);
-// 		if (cfg2)
-// 		{
-// // 			desc2->setString(cfg2->desc.c_str());
-// 			CCSprite* spr = CImageView::create(CCString::createWithFormat("skillIcon/%d.png",cfg2->icon)->getCString());
-// 			if(!spr)
-// 			{
-// 				CCLOG("ERROR  CHeroSkill::addTableCell");
-// 				spr  = CImageView::create("skillIcon/100000.png");
-// 			}	
-// 			spr->setPosition(ccp(mask2->getContentSize().width/2,mask2->getContentSize().height/2));
-// 			spr->setScale(0.9f);
-// 			mask2->addChild(spr);
-// 			name2->setString(cfg2->name.c_str());
-// 
-// 			//描述
-// 			if(cfg2)
-// 				desc2->setString(cfg2->desc.c_str());
-// 		}
-// 		else
-// 		{
-// // 			desc2->setString(GETLANGSTR(202));
-// 		}
-
 }
 
 void CHeroSkill::updateHeroInfo(const TMessage& tMsg)
@@ -527,7 +376,7 @@ void CHeroSkill::levelUp(bool isSuccess)
 				CLabel *level = (CLabel*)m_ui->findWidgetById("level");
 				level->setString(CCString::createWithFormat("Lv.%d",m_hero->skill3.level)->getCString());
 				CLabel *desc = (CLabel*)m_ui->findWidgetById("desc2");
-				const SkillCfg *cfg1 = DataCenter::sharedData()->getSkill()->getCfg(m_hero->skill3.skillId+m_hero->skill3.level);
+				const SkillCfg *cfg1 = DataCenter::sharedData()->getSkill()->getCfg(m_hero->skill3.skillId/*+m_hero->skill3.level*/);
 				if(cfg1)
 				{
 					desc->setString(cfg1->desc.c_str());
@@ -543,7 +392,7 @@ void CHeroSkill::levelUp(bool isSuccess)
 				CLabel *level = (CLabel*)m_ui->findWidgetById("level");
 				level->setString(CCString::createWithFormat("Lv.%d",m_hero->skill4.level)->getCString());
 				CLabel *desc = (CLabel*)m_ui->findWidgetById("desc2");
-				const SkillCfg *cfg1 = DataCenter::sharedData()->getSkill()->getCfg(m_hero->skill4.skillId+m_hero->skill4.level);
+				const SkillCfg *cfg1 = DataCenter::sharedData()->getSkill()->getCfg(m_hero->skill4.skillId/*+m_hero->skill4.level*/);
 				if(cfg1)
 				{
 					desc->setString(cfg1->desc.c_str());
@@ -594,7 +443,9 @@ void CHeroSkill::showSkillIcon(CSkill *skill, CImageView * mask1)
 
 	if (skill->skillId==m_hero->skill3.skillId)
 	{
+		spr->setVisible(false);
 		onClickSkill(spr);
+		spr->setVisible(true);
 	}
 	if (skill->skillId == m_hero->skill2.skillId&&m_hero->quality<2)
 	{
@@ -739,5 +590,30 @@ void CHeroSkill::onPress( CCObject* pSender, CTouchPressState iState )
 		break;
 	}
 	
+}
+
+void CHeroSkill::showSkillType()
+{
+	CLabel *type = (CLabel*)m_ui->findWidgetById("type");
+	switch (m_skillIndex)
+	{
+	case 3:
+		type->setString(GETLANGSTR(2019));
+		break;
+	case 4:
+		type->setString(GETLANGSTR(2020));
+		break;
+	case 5:
+		type->setString(GETLANGSTR(2021));
+		break;
+	case 2:
+		type->setString(GETLANGSTR(2022));
+		break;
+	case 6:
+		type->setString(GETLANGSTR(2023));
+		break;
+	default:
+		break;
+	}
 }
 

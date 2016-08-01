@@ -21,11 +21,11 @@ public:
 	void onExit();
 
 	void updateHero(const TMessage& tMsg);
-	void friendListRes(int type, google::protobuf::Message *msg);
+	void friendListRes(int type, google::protobuf::Message *msg);//好友列表消息
 
 protected:
 	void onClose(CCObject* pSender);
-	void onAddFriend(CCObject* pSender);
+	void onAddFriend(CCObject* pSender); //增加好友
 	CCObject* friendDataSource(CCObject* pConvertCell, unsigned int uIdx);
 	void addTableCell(unsigned int uIdx, CTableViewCell * pCell);
 	void showSelectRadioImg(int selIndex);
@@ -37,14 +37,15 @@ protected:
 
 	void onAcceptFriend(CCObject* pSender);
 	CCObject* recomFriendDataSource(CCObject* pConvertCell, unsigned int uIdx);
-	void onComfirmDeleteFriend(CCObject* pSender);
+	
+	void onComfirmDeleteFriend(CCObject* pSender);//删除好友
 	void onSearch(CCObject* pSender);
 	void onUpdateSearch(float dt);
 	void onInviteFriend(CCObject* pSender);
 	void onFaceBookUserInfo(CCObject *object);
 	void accountBinRes(int type, google::protobuf::Message *msg);
-	void imageLoadSuccessCallBack(string sTag, vector<char>* pBuffer);
-	std::string getStoragePath(const char* downDir, const char* fileName);
+	void imageLoadSuccessCallBack(string sTag, vector<char>* pBuffer);//好友头像下载回调
+	std::string getStoragePath(const char* downDir, const char* fileName);//获取好友图片存储位置
 
 private:
 	void showFriendTip(bool bShow, const char* sInfo);

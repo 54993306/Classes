@@ -38,10 +38,13 @@ public:
     void onEnter();
     void onExit();
 
-private:
-
 	//信息读取特效
 	void showOpenEffect();
+
+	//隐藏
+	void hide();
+
+private:
 
 	void showOpenEffectCallback();
 

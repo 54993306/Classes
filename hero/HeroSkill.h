@@ -15,6 +15,9 @@ public:
     virtual bool init();
     void onEnter();
     void onClickSkill(CCObject* pSender);
+
+	void showSkillType();
+
 	void onSkillItem(CCObject* pSender);
 	
 	void onLvUp(CCObject* pSender);

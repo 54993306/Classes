@@ -137,7 +137,8 @@ void CCultivateLayer::updateHero(const TMessage& tMsg)
 		head->setTag(1);
 		btn->addChild(head);
 		NodeFillParent(head);
-		btn->setEnabled(false);
+		btn->setOnClickListener(nullptr, nullptr);
+		btn->setOnPressListener(this, ccw_press_selector(CCultivateLayer::onPress));
 		head->setColor(RGB_GRAY_COLOR);
 
 		if (m_selectHero>m_city.heroList.size())
@@ -305,8 +306,14 @@ void CCultivateLayer::showBuildInfo(const CCity& ct)
 			//如果英雄还没有开采完
 			if (!hero.remove)
 			{
-				btn->setEnabled(false);
+				btn->setOnPressListener(this, ccw_press_selector(CCultivateLayer::onPress));
+				btn->setOnClickListener(nullptr, nullptr);
 				head->setColor(RGB_GRAY_COLOR);
+			}
+			else
+			{
+				btn->setOnClickListener(this, ccw_click_selector(CCultivateLayer::onClickButton));
+				btn->setOnPressListener(nullptr, nullptr);
 			}
 		}
 	}
@@ -608,6 +615,28 @@ void CCultivateLayer::updateGetMoneyButtonStatus()
 		//按钮不可按, 变灰
 		pBtn->setEnabled(false);
 		pBtn->getDisabledImage()->setShaderProgram(ShaderDataMgr->getShaderByType(ShaderStone));
+	}
+}
+
+void CCultivateLayer::onPress( CCObject* pSender, CTouchPressState iState )
+{
+	switch (iState)
+	{
+	case CTouchPressOn:
+		{
+
+			ShowPopTextTip(GETLANGSTR(109));
+
+			CCLOG("show");
+		}
+		break;
+	case CTouchPressOff:
+		{
+			CCLOG("hide");
+		}
+		break;
+	default:
+		break;
 	}
 }
 

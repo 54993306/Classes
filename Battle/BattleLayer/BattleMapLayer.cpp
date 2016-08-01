@@ -21,6 +21,8 @@
 #include "Battle/GuardArea.h"
 #include "Battle/BaseRoleData.h"
 #include "Battle/skEffectData.h"
+#include "Battle/BattleDataCenter.h"
+#include "Battle/BattleModel.h"
 namespace BattleSpace{
 
 #define AddMoveImg		"lv.png"
@@ -111,14 +113,14 @@ namespace BattleSpace{
 	{
 		WarMapData* map = DataCenter::sharedData()->getMap()->getCurrWarMap();
 		if (!map) return;
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+#if BATTLE_TEST
 		for(int i = 0; i < C_GRID_ROW * C_GRID_COL;++i)
 #else
 		for(int i = C_BEGINGRID; i < C_GRID_ROW * C_GRID_COL;++i)
 #endif
 		{
 			const CCPoint p = map->getPoint(i);		//画战场格子
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32	
+#if BATTLE_TEST	
 			CCLabelTTF* floorID = CCLabelTTF::create(ToString(i),"SimHei",50);
 			floorID->setPosition(ccp(p.x,p.y));
 			m_GridIndex->addChild(floorID);
@@ -165,16 +167,17 @@ namespace BattleSpace{
 
 	void BattleMapLayer::CancelGuide() { m_DisPlayArea->getChildByTag(map_guide)->setVisible(false); }
 
-	void BattleMapLayer::DrawAtkArea(BaseRole* alive)
+	void BattleMapLayer::DrawAtkArea(BaseRole* pRole)
 	{
-		alive->setTouchState(true);
+		pRole->setTouchState(true);
 		vector<int>VecGrid;
-		if (alive->getBaseData()->getAlertType() && !alive->getCriAtk())
+		if (pRole->getBaseData()->getAlertType() && !pRole->getCriAtk())
 		{
-			mGuardArea->initAliveGuard(alive,VecGrid);
+			mGuardArea->initAliveGuard(pRole,VecGrid);
 		}else{
-			m_SkillRange->initSkillArea(alive,VecGrid);
+			m_SkillRange->initSkillArea(pRole,VecGrid);
 		}
+		
 		for (int grid:VecGrid) 
 		{
 			CCSprite* sp = (CCSprite*)m_DisPlayArea->getChildByTag(grid+map_Bg);
@@ -182,16 +185,16 @@ namespace BattleSpace{
 			sp->setDisplayFrame(CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(AtksImg));
 			sp->setVisible(true);
 			m_VecGridIndex.push_back(grid+map_Bg);
-			BaseRole* t_alive = mManage->getAliveByGrid(grid);
-			if (t_alive&&t_alive->getEnemy() != alive->getEnemy())
+			BaseRole* tRole = mManage->getAliveByGrid(grid);
+			if (tRole&&tRole->getOtherCamp() != pRole->getOtherCamp())
 			{
-				if (alive->getOpposite())
+				if (pRole->getOpposite())
 					m_BackArea = true;
 				else
 					m_FrontArea = true;
 			}
 		}
-		for (auto i : alive->mTouchGrids)
+		for (auto i : pRole->mTouchGrids)
 		{
 			CCSprite* sp = (CCSprite*)m_DisPlayArea->getChildByTag(i+map_Bg);
 			if (!sp)continue;
@@ -199,59 +202,78 @@ namespace BattleSpace{
 			sp->setVisible(true);
 			m_VecGridIndex.push_back(i+map_Bg);
 		}
-		alive->setTouchState(false);
+		pRole->setTouchState(false);
 	}
 
-	void BattleMapLayer::DrawMoveArea(BaseRole* tRole)
+	void BattleMapLayer::DrawMoveArea()
 	{
 		for (auto tGrid : *mManage->getMoveVec())
 		{
-			if (mManage->inUnDefineArea(tGrid))
+			if (BattleData->getBattleModel()->isPvEBattle() && tGrid < C_PVPMINGRID)
 				continue;
-			if (tGrid < C_GRID_ROW+C_BEGINGRID)
-				continue;
-			CCSprite* sp = (CCSprite*)m_DisPlayArea->getChildByTag(tGrid+map_Bg);
-			if (!sp)continue;
-			if (mManage->inAddCostArea(tGrid))
-			{
-				sp->setDisplayFrame(CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(AddMoveImg));
-			}else{
-				sp->setDisplayFrame(CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(CutMoveImg));
-			}
-			sp->setVisible(true);
-			m_VecGridIndex.push_back(tGrid+map_Bg); 
+			showFloor(tGrid);
 		}
 	}
 
+	void BattleMapLayer::drawEnterArea()
+	{
+		for (auto tGrid : *mManage->getEnterVec())
+			showFloor(tGrid);
+	}
+
+	void BattleMapLayer::showFloor( int tGrid )
+	{
+		if (tGrid < C_GRID_ROW+C_BEGINGRID || mManage->inUnDefineArea(tGrid))
+			return;
+		CCSprite* tFloor = (CCSprite*)m_DisPlayArea->getChildByTag(tGrid+map_Bg);
+		if (!tFloor)return;
+		if (mManage->inAddCostArea(tGrid))
+		{
+			tFloor->setDisplayFrame(CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(AddMoveImg));
+		}else{
+			tFloor->setDisplayFrame(CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(CutMoveImg));
+		}
+		tFloor->setVisible(true);
+		m_VecGridIndex.push_back(tGrid+map_Bg); 
+	}
+
+
 	void BattleMapLayer::DrawMoveAtkArea(CCObject* ob)
 	{
-		BaseRole* alive = dynamic_cast<BaseRole*>(ob);
-		if (!alive)
+		BaseRole* pRole = dynamic_cast<BaseRole*>(ob);
+		if (!pRole)
 		{
 			CCLOG("[ *ERROR ] WarMapLayer::DrawMoveAtkArea");
 			return ;
 		}
 		touchAreaCancel(nullptr);
-		DrawMoveArea(alive);
-		DrawAtkArea(alive);
+		if (pRole->getBattle())
+		{
+			DrawMoveArea();
+		}else{
+			drawEnterArea();
+		}
+		//如果PVP的模式确实是要做成不能往后走的情况，在显示部分要做相应的处理效果
+
+		DrawAtkArea(pRole);
 		if (!m_BackArea)
 		{
 			m_BackArea = true;
-			alive->setOpposite(true);
+			pRole->setOpposite(true);
 			bool ReverseArea = false;
-			alive->setTouchState(true);
+			pRole->setTouchState(true);
 			vector<int> tVector;
-			m_SkillRange->initSkillArea(alive,tVector);
+			m_SkillRange->initSkillArea(pRole,tVector);
 			for (auto tGrid:tVector)
 			{
-				BaseRole* pAlive = mManage->getAliveByGrid(tGrid);
-				if (pAlive&&pAlive->getEnemy() != alive->getEnemy())
+				BaseRole* tRole = mManage->getAliveByGrid(tGrid);
+				if (tRole&&tRole->getOtherCamp() != pRole->getOtherCamp())
 					ReverseArea = true;
 			}
 			if (ReverseArea)
-				DrawMoveAtkArea(alive);	
-			alive->setOpposite(false);
-			alive->setTouchState(false);
+				DrawMoveAtkArea(pRole);	
+			pRole->setOpposite(false);
+			pRole->setTouchState(false);
 		}
 		m_BackArea = false;
 	}

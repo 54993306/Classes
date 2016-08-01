@@ -21,8 +21,7 @@
 #include "common/CGameSound.h"
 #include "Resources.h"
 #include "mainCity/PanelTips.h"
-
-#define  FACEBOOKIMG "http://graph.facebook.com/%s/picture?width=92&height=92"
+#include "Global.h"
 
 CFriendLayer::~CFriendLayer()
 {

@@ -71,6 +71,8 @@ public:
 	CC_SYNTHESIZE(int,m_roleMoney, RoleMoney);   //充值金币
 	CC_SYNTHESIZE(int,m_rolePoints,RolePoints);  //PVP勋章
 	CC_SYNTHESIZE(bool, m_bGoogleBilling, GoogleBilling);  //GooglePay
+	CC_SYNTHESIZE(int, m_roleNation, RoleNation);  //GooglePay
+
 	void read(const protos::common::Role& role);
 };
 //武将的信息最后由服务器发送过来，定义好一个结构体去接收服务器发送的信息

@@ -76,7 +76,12 @@ void WorldBossEndLayer::onEnter()
 
 	CButton* fbBtn = (CButton*)m_ui->findWidgetById("fbBtn");
 	fbBtn->setOnClickListener(this,ccw_click_selector(WorldBossEndLayer::shareFb));
-
+#ifdef FACEBOOKSHARE
+	fbBtn->setVisible(true);
+#else
+	fbBtn->setVisible(false);
+#endif // FACEBOOKSHARE
+	
 }
 
 void WorldBossEndLayer::onExit()

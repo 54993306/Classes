@@ -21,6 +21,7 @@ public:
 	void onClose( CCObject * pSender );
 	bool getStep1Success();
 	void enableSmsCodeBtn();
+	void setPayEnable(bool isEnable );
 
 private:
 	void hideErrorCode();

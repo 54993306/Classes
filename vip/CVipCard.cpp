@@ -103,6 +103,7 @@ void CVipCard::onConfirm( CCObject * pSender )
 		return;
 	}
 	CPlayerControl::getInstance().sendBuyMoneyCard(*m_cardText->getTextInput());
+    setPayEnable(false);
 }
 
 void CVipCard::onCancel( CCObject * pSender )
@@ -207,6 +208,12 @@ void CVipCard::addTableCell(unsigned int uIdx, CTableViewCell * pCell)
 		}
 	}
 	cell->setVisible(false);
+}
+
+void CVipCard::setPayEnable(bool isEnable)
+{
+	CButton* pConfirm = (CButton*)m_ui->findWidgetById("confirm");
+	pConfirm->setEnabled(isEnable);
 }
 
 

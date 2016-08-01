@@ -619,7 +619,7 @@ void CHeroList::showNewHeroEffect(CHero *hero)
 	HeroLotteryData data;
 	data.heroType = hero->roletype;
 	data.thumb = hero->thumb;
-	data.quality = hero->quality;
+	data.quality = hero->iColor;
 	m_pNewHeroEffect->showNewHeroEffect(&data);
 }
 

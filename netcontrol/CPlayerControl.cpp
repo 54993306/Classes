@@ -19,6 +19,11 @@
 #include "mainCity/mainScene.h"
 #include "roleImg/RoleUpdate.h"
 #include "Battle/BattleDataCenter.h"
+#include "common/CGameSound.h"
+#include "vip/CPaySelect.h"
+#include "tools/ShowTexttip.h"
+#include "vip/CVipCard.h"
+#include "vip/CVipPay.h"
 
 using namespace protos;
 using namespace protos::common;
@@ -42,17 +47,6 @@ bool CPlayerControl::init()
 		CCDirector::sharedDirector()->getScheduler()->scheduleUpdateForTarget(this,0,false);
 	}
 	return true;
-}
-
-
-void CPlayerControl::sendChangeHero(int nionId, int pos, int heroId)
-{
-//     ChangeHeroRequest *req = new ChangeHeroRequest;
-// 	req->set_unionid(nionId);
-// 	req->set_pos(pos);
-// 	req->set_heroid(heroId);
-// 	GetTcpNet->sendData(req,ChangeHeroMsg);
-// 	delete req;
 }
 
 void CPlayerControl::sendGetStagePrize(int prizeType, int stageId)
@@ -132,24 +126,6 @@ void CPlayerControl::SendLotteryType(int type)
 	delete req;
 }
 
-// void CPlayerControl::sendSkillList(int heroId)//请求英雄所有可用技能列表
-// {
-// 	HeroSkillRequest *req = new HeroSkillRequest;
-// 	req->set_heroid(heroId);
-// 	GetTcpNet->sendData(req,HeroSkillMsg);
-// 	delete req;
-// }
-// 
-// void CPlayerControl::sendChangeSkill(int type, int skillId,int heroId)//请求更换技能
-// {
-// 	ChangeSkillRequest *req = new ChangeSkillRequest;
-// 	req->set_type(type);
-// 	req->set_skillid(skillId);
-// 	req->set_heroid(heroId);
-// 	GetTcpNet->sendData(req,ChangeSkillMsg);
-// 	delete req;
-// }
-
 void CPlayerControl::sendChangeArmor(int heroId, int pos,int armorId)
 {
 	ChangeArmorRequest *req = new ChangeArmorRequest;
@@ -159,58 +135,26 @@ void CPlayerControl::sendChangeArmor(int heroId, int pos,int armorId)
 	GetTcpNet->sendData(req,ChangeArmor);
 	delete req;
 }
-
+//一直存在一直监听,先进行逐个判断后再判断监听列表
 bool CPlayerControl::ProcessMsg(int type, google::protobuf::Message *msg)
 {
 	switch (type)
 	{
-		//角色列表
-	case RoleListMsg:
-		{
-			roleOnlineList(msg);
-		}
-		return true;
-		//角色上线
-	case RoleOnlineMsg:
-		{
-// 		    Role *role = (Role*)msg;
-// 			DataCenter::sharedData()->getUser()->addRoleAlive(role);
-// 			if (CSceneManager::sharedSceneManager()->getRunningScene()->getClassName()=="CityScene")
-// 			{
-// 				CityScene *ctScene = (CityScene*)CSceneManager::sharedSceneManager()->getRunningScene();
-// 				ctScene->addAlive(role->roleid());
-// 			}
-		}
-		return true;
-		//角色移动
-	case RoleMoveMsg:
-		{
-			roleMove(msg);
-		}
-		return true;
-
-	case RoleLeaveMsg:
-		{
-			roleExit(msg);
-		}
-		return true;
-// 	case StageList:
-// 		{
-// 			stageListResponse(msg);
-// 		}
-// 		return true;
-	//战斗信息
 	case EnterStage:
 		{
 			NOTIFICATION->postNotification(RECEIVE_BATTLE_INFO);
-			battleInfo(msg);
-		}
-		return true;
+			BattleData->initNormalStage(msg);
+		}break;
 	case WarRequestMsg:
 		{
 			NOTIFICATION->postNotification(RECEIVE_BATTLE_INFO);
-			BossBattleInfo(msg);
-		}return true;
+			BattleData->initWordBossStage(msg);
+		}break;
+	case PvpAsyncBattle:
+		{
+			NOTIFICATION->postNotification(RECEIVE_BATTLE_INFO);
+			BattleData->initPvEData(msg);
+		}break;
 	case UpdateRoleMsg:
 		{
 			Role *role = (Role *)msg;
@@ -224,50 +168,34 @@ bool CPlayerControl::ProcessMsg(int type, google::protobuf::Message *msg)
 				CGuideManager::getInstance()->setTaskStep(user->getNewStep(),1);
 				CGuideManager::getInstance()->enterGuide();
 			}
-		}
-		return true;
-
+		}break;
 	case BulletMsg:
 		{
 			Bulletin *bullet = (Bulletin*)msg;
 			printf("bullet %s",bullet->text().c_str());
-			
-			m_bulletText = bullet->text();
-		//	this->scheduleOnce(schedule_selector(CPlayerControl::showBullet),2.0f);
-		//	if (CSceneManager::sharedSceneManager()->getRunningScene()->getClassName()!="LoginScene")
-			{
- 				CCScene* scene =  GETCURRSCENE();//CCDirector::sharedDirector()->getRunningScene();
+			CCScene* scene =  GETCURRSCENE();
 
-				scene->removeChildByTag(88888);
-				CCNode *rollNode = CCNode::create();
-				scene->addChild(rollNode,0,88888);
-				CCSprite *rollBg = CCSprite::create("mainCity/bulletin-board.png");
-				rollBg->setPosition(ccp(VCENTER.x,VCENTER.y+200));
-				rollBg->setTag(1200);
-				rollNode->addChild(rollBg);
-				CRollLabel *rollLab = CRollLabel::create(bullet->text().c_str(),"Arial",20,
+			scene->removeChildByTag(88888);
+			CCNode *rollNode = CCNode::create();
+			scene->addChild(rollNode,0,88888);
+			CCSprite *rollBg = CCSprite::create("mainCity/bulletin-board.png");
+			rollBg->setPosition(ccp(VCENTER.x,VCENTER.y+200));
+			rollBg->setTag(1200);
+			rollNode->addChild(rollBg);
+			CRollLabel *rollLab = CRollLabel::create(bullet->text().c_str(),"Arial",20,
 				CCRectMake(rollBg->getPositionX()-rollBg->getContentSize().width/2,rollBg->getPositionY()-rollBg->getContentSize().height/2+8,rollBg->getContentSize().width,rollBg->getContentSize().height));
-				rollLab->setRollTime(1);
-				rollNode->addChild(rollLab);
-			}     
-		}
-		return true;
-	default:
-		break;
-	}
-	return false;
-}
+			rollLab->setRollTime(1);
+			rollNode->addChild(rollLab);  
+		}break;
 
-void CPlayerControl::roleMove(google::protobuf::Message *msg)
-{
-	//MoveResponse *response = (MoveResponse *)msg;
-	//int roleId = response->roleid();
-	//if (CSceneManager::sharedSceneManager()->getRunningScene()->getClassName()=="CityScene")
-	//{
-	//	CityScene *scene = (CityScene *)CSceneManager::sharedSceneManager()->getRunningScene();
-	//	scene->roleMoveToPos(roleId,response->movex(),response->movey());
-	//	printf("move x:%d, y:%d\n",response->movex(), response->movey());
-	//}
+	case RechargeMsg:
+		{
+			rechargeRes(RechargeMsg,msg);
+		}
+		break;
+	default: return false;
+	}
+	return true;
 }
 
 void CPlayerControl::showBullet(float delt)
@@ -278,62 +206,6 @@ void CPlayerControl::showBullet(float delt)
 	tip->showTip(m_bulletText.c_str(),VCENTER,CCSizeMake(400,200));
 	LayerManager::instance()->push(tip);
 }
-
-//角色列表
-void CPlayerControl::roleOnlineList(google::protobuf::Message *msg)
-{
-//	RoleListResponse *roleList = (RoleListResponse*)msg;
-//	CityScene *ctScene = (CityScene*)CSceneManager::sharedSceneManager()->getRunningScene();
-//	for (int i=0; i<roleList->rolelist_size(); i++)
-//	{
-//		Role role = roleList->rolelist(i);
-//		DataCenter::sharedData()->getUser()->addRoleAlive(&role);
-//		ctScene->addAlive(role.roleid());
-//	}
-//	//ctScene->onAddAliveData();
-//// 	LayerManager::instance()->setPriority(-1);
-//// 	GameTip *tip = GameTip::create();
-//// 	tip->setPosition(VCENTER);
-//// 	tip->showTip(m_bulletText.c_str(),VCENTER,CCSizeMake(400,200));
-//// 	LayerManager::instance()->push(tip);
-}
-
-//角色退出
-void CPlayerControl::roleExit(google::protobuf::Message *msg)
-{
-	//Role *role = (Role*)msg;
-	//DataCenter::sharedData()->getUser()->removeRoleAlive(role->roleid());
-	//if (CSceneManager::sharedSceneManager()->getRunningScene()->getClassName()=="CityScene")
-	//{
-	//	CityScene *ctScene = (CityScene*)CSceneManager::sharedSceneManager()->getRunningScene();
-	//	ctScene->removeAlive(role->roleid());
-	//}
-}
-
-//关卡列表
-void CPlayerControl::stageListResponse(Message *msg)
-{
-	//StageListResponse *stList = (StageListResponse *)msg;
-	//TollgateScene *scene = (TollgateScene *)CSceneManager::sharedSceneManager()->getRunningScene();
-	//
-	//DataCenter::sharedData()->tollgate()->clearTollgate();
-	//for (int i =0; i<stList->stagelist_size(); i++)
-	//{
-	//	StageInfo stage = stList->stagelist(i);
-	//	TollgateCfg *cfg = new TollgateCfg;
-	//	cfg->id = stage.id();
-	//	cfg->name = stage.name();
-	//	cfg->level = stage.inlevel();
-	//	cfg->isOpen= stage.isopen();
-	//	cfg->star = stage.star();
-	//	DataCenter::sharedData()->tollgate()->addTollgate(cfg);
-	//}
-	//if (CSceneManager::sharedSceneManager()->getRunningScene()->getClassName()=="TollgateScene")
-	//{
-	//	scene->showList();
-	//}
-}
-
 
 //进入关卡
 void CPlayerControl::sendEnterStage(int stageId,int hero1,int hero2, int hero3, int hero4, int hero5/*=0*/, int fid/*=0*/, int questId/*=0*/)
@@ -346,12 +218,21 @@ void CPlayerControl::sendEnterStage(int stageId,int hero1,int hero2, int hero3, 
 	batReq->set_hero4(hero4);
 	batReq->set_hero5(hero5);
 	batReq->set_fid(fid);
-	if (questId>0)
-	{	
-	//	batReq->set_questid(questId);
-	}
 	GetTcpNet->sendData(batReq,EnterStage);
 	delete batReq;
+}
+
+void CPlayerControl::sendPvEBattleInfo( int pRoleID,bool pAiState,vector<int>& pHeroID )
+{
+	StartPvpReq *tPvEInfo = new StartPvpReq;
+	for (auto tRoleID : pHeroID)
+	{
+		tPvEInfo->add_battle_hero(tRoleID);
+	}
+	tPvEInfo->set_opp_id(pRoleID);
+	tPvEInfo->set_is_robot(pAiState);
+	GetTcpNet->sendData(tPvEInfo, PvpAsyncBattle);
+	delete tPvEInfo;
 }
 
 void CPlayerControl::sendEnterStageForBoss( int hero1,int hero2, int hero3, int hero4, int hero5 )
@@ -364,17 +245,6 @@ void CPlayerControl::sendEnterStageForBoss( int hero1,int hero2, int hero3, int 
 	batReq->set_hero5(hero5);
 	GetTcpNet->sendData(batReq, WarRequestMsg);
 	delete batReq;
-}
-
-void CPlayerControl::BossBattleInfo( Message * msg )
-{
-	BattleData->initBattleData(msg,true);
-}
-
-//进入关卡战斗信息
-void CPlayerControl::battleInfo(Message * msg)
-{
-	BattleData->initBattleData(msg);
 }
 
 void CPlayerControl::sendChapterList(int type)
@@ -440,36 +310,19 @@ void CPlayerControl::sendItemInfo(int itemId)
 	delete req;
 }
 
-void CPlayerControl::sendSkillList(int heroId)
-{
-
-}
-
-void CPlayerControl::sendChangeSkill(int type, int skillId,int heroId)
-{
-
-}
-
 void CPlayerControl::sendGetHeroInfo(int roleHeroId,int heroId,int roleId,int quality)
 {
 	RequestHeroInfo *req = new RequestHeroInfo;
 	if (roleHeroId!=0)
 	{
 		req->set_roleheroid(roleHeroId);
-	}
-	else
-	{
+	}else{
 		req->set_heroid(heroId);
 	}
-
 	if (roleId!=0)
-	{
 		req->set_roleid(roleId);
-	}
 	if (quality!=0)
-	{
 		req->set_quality(quality);
-	}
 	GetTcpNet->sendData(req,HeroInfoMsg,true);
 	delete req;
 }
@@ -481,14 +334,7 @@ void CPlayerControl::sendUnion(int stageId/*=0*/, int questId/*=0*/, bool bBoss/
 	{
 		req->set_stageid(stageId);
 	}
- 	
-	if (questId>0)
-	{
-		//req->set_questid(questId);
-	}
-
 	req->set_boss(bBoss);
-
 	GetTcpNet->sendData(req,UnionRes,true);
 	delete req;
 }
@@ -510,9 +356,7 @@ void CPlayerControl::sendSmeltArmor(int armorId, const vector<int> &attrVec)
 	if (attrVec.size()>0)
 	{
 		for (int i = 0; i < attrVec.size(); i++)
-		{
 			req->add_attr(attrVec.at(i));
-		}
 	}
 	GetTcpNet->sendData(req, SmeltArmorMsg);
 	delete req;
@@ -730,7 +574,7 @@ void CPlayerControl::sendPvpTeamData( int iStatus, const vector<Member*> vec )
 	for(auto pMember : vec)
 	{
 		Member* pNewMember = pReq->add_team();
-		pNewMember->CopyFrom(*pNewMember);
+		pNewMember->CopyFrom(*pMember);
 	}
 
 	GetTcpNet->sendData(pReq, SendPvpTeamDataMsg);
@@ -753,4 +597,145 @@ void CPlayerControl::sendSkillLvUp(int id, int skillId, int itemId)
 	req->set_itemid(itemId);
 	GetTcpNet->sendData(req,SkillLvUpMsg);
 	delete req;
+}
+
+
+void CPlayerControl::rechargeRes(int type, google::protobuf::Message *msg)
+{
+	RechargeRes *res = (RechargeRes*)msg;
+
+	//获取购买弹框
+	CVipPay* pPay = dynamic_cast<CVipPay*>(LayerManager::instance()->getLayer("CVipPay"));
+
+	if(pPay)
+	{
+		pPay->enableSmsCodeBtn();
+	}
+
+	//成功
+	if (res->result() == 1)
+	{
+		PlayEffectSound(SFX_415);
+
+		int iSetp = res->rolemoney()==0?1:2;
+
+		//当前步骤
+		if(pPay)
+		{
+			//第一步验证
+			if(iSetp ==1)
+			{
+				pPay->setStep1Success(true);
+				pPay->showTimeClock();
+				return;
+			}
+		}
+
+		if(iSetp == 2)
+		{
+			pPay->onClose(nullptr);
+		}
+		if (res->rolemoney()>0)
+		{
+			UserData *data = DataCenter::sharedData()->getUser()->getUserData();	
+			int money = res->rolemoney() - data->getRoleMoney();	
+			data->setRoleMoney(res->rolemoney());
+			paySuccess(money, res);
+			CSceneManager::sharedSceneManager()->PostMessageA(UPDATE_HERO,0,nullptr,nullptr);
+		}
+	}
+	else if(res->result() == 2)
+	{
+		string str = GETLANGSTR(1172) + res->errorcode();
+
+		ShowPopTextTip(str.c_str(),ccWHITE,false);
+	}
+	else if(res->result() == 3)
+	{
+		string str = GETLANGSTR(1173) +res->errorcode();
+
+		if(pPay)
+		{	
+			ShowPopTextTip(str.c_str(),ccWHITE,false);
+			pPay->showErrorCode(res->errorcode());
+		}
+		else 
+		{
+			CPaySelect *paySel = dynamic_cast<CPaySelect*>(LayerManager::instance()->getLayer("CPaySelect"));
+			if (paySel&&paySel->getPayType()==CardPay)
+			{
+				string  str = res->desc();
+				ShowPopTextTip(str.c_str(),ccWHITE,false);
+				CVipCard *vipCard = dynamic_cast<CVipCard*>(LayerManager::instance()->getLayer("CVipCard"));
+				if (vipCard)vipCard->setPayEnable(true);
+			}
+		}
+	}
+	else if(res->result() == 4)
+	{
+		string str = GETLANGSTR(170) + res->errorcode();	
+		ShowPopTextTip(str.c_str(),ccWHITE,false);
+		if(pPay)
+		{
+			pPay->showErrorCode(res->errorcode());
+		}
+		else
+		{
+			CPaySelect *paySel = dynamic_cast<CPaySelect*>(LayerManager::instance()->getLayer("CPaySelect"));
+			if (paySel&&paySel->getPayType()==CardPay)
+			{
+				string  str = res->desc();
+				CVipCard *vipCard = dynamic_cast<CVipCard*>(LayerManager::instance()->getLayer("CVipCard"));
+				if (vipCard)
+				{
+					vipCard->setPayEnable(true);
+				}
+			}
+		}
+
+	}
+	else if(res->result() == 5)
+	{
+		if (pPay)
+		{
+			pPay->showVerifyCode(res->errorcode().c_str());
+		}
+	}
+}
+
+void CPlayerControl::paySuccess(int money, RechargeRes *res)
+{
+	CPaySelect *paySel = dynamic_cast<CPaySelect*>(LayerManager::instance()->getLayer("CPaySelect"));
+	if (paySel)
+	{
+		string tip = "";
+		switch (paySel->getPayType())
+		{
+		case GooglePay:
+		case PhonePay:
+			{
+				tip ="ทำรายการสำเร็จแล้ว";
+			}
+			break;
+		case CardPay:
+			{
+				tip = res->desc();
+			}
+			break;
+		default:
+			break;
+		}
+		ShowPopTextTip(tip.c_str(),ccWHITE,false);
+	}
+}
+
+void CPlayerControl::sendPveBattleFinish(  bool bBattleResult, int iBattleTime, int iEnemyLeaderHp, int iSelfLeaderHp )
+{
+	PvpOverReq *pReq = new PvpOverReq;
+	pReq->set_battle_result(bBattleResult);
+	pReq->set_battle_time(iBattleTime);
+	pReq->set_blood_1(iEnemyLeaderHp);
+	pReq->set_blood_2(iSelfLeaderHp);
+	GetTcpNet->sendData(pReq, PvpOverReqMsg);
+	delete pReq;
 }

@@ -23,6 +23,11 @@ void CStage::read(const StageInfo& info)
 	this->star = info.star();
 	this->action = info.action();
 	this->prize = info.prize();
+	for (int i = 0; i < info.friends_size(); i++)
+	{
+		const string &frd = info.friends(i);
+		this->friendList.push_back(frd);
+	}
 }
 
 void CStageInfoRes::read(const StageInfoRes& info)

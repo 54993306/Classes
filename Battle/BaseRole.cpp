@@ -8,6 +8,7 @@
 #include "Battle/GuardArea.h"
 #include "Battle/MonsterData.h"
 #include "Battle/BattleDataCenter.h"
+#include "Battle/BattleModel.h"
 #include "Battle/StateManage/StateManager.h"
 
 #include "model/DataCenter.h"
@@ -24,18 +25,19 @@
 namespace BattleSpace
 {
 	BaseRole::BaseRole()
-		:m_Enemy(false),m_Hp(0),m_MaxHp(0),mGridIndex(INVALID_GRID),m_MoveGrid(0),m_AtkDelay(0)
-		,m_AtkNum(0),m_Move(true),m_CritSkill(false),m_Hrt(0),m_HrtPe(0),m_AIState(false)
-		,m_initCost(0),m_Batch(0),m_CostMax(0),m_AddCost(0),m_Atk(0),m_Def(0),m_Hit(0),m_NorAtk(true)
+		:m_Enemy(false),m_Hp(0),m_MaxHp(0),mGridIndex(INVALID_GRID),m_MoveGrid(0),m_AtkDelay(0),mFirstInit(true)
+		,m_AtkNum(0),m_Move(true),m_CritSkill(false),m_Hrt(0),m_HrtPe(0),m_AIState(false),mUpdateSkill(false)
+		,m_initCost(0),m_Batch(0),mCostMax(0),m_AddCost(0),m_Atk(0),m_Def(0),m_Hit(0),m_NorAtk(true)
 		,m_Doge(0),m_Crit(0),m_Zoom(0),m_Renew(0),m_GroupIndex(0),m_EffectIndex(0),m_LastAlive(false)
-		,m_Opposite(false),m_ExecuteCap(false),m_TerType(0),m_TerTypeNum(0),m_cloaking(false)
-		,m_SortieNum(0),mRoleObject(nullptr),mBuffManage(nullptr),m_UILayout(0),m_Atktime(0)
-		,m_AtkInterval(0),m_SpecialAtk(false),mBattle(false),m_MoveSpeed(0),mSkillRange(nullptr)
-		,m_CritTime(0),m_FatherID(0),m_Captain(false),m_CritEffect(false),mAliveState(true)
+		,m_Opposite(false),m_ExecuteCap(false),m_TerType(0),m_TerTypeNum(0),m_cloaking(false),mSkillTime(0)
+		,m_SortieNum(0),mRoleObject(nullptr),mBuffManage(nullptr),m_UILayout(0),m_Atktime(0),mOtherCamp(false)
+		,m_AtkInterval(0),m_SpecialAtk(false),mBattle(false),m_MoveSpeed(0),mSkillRange(nullptr),m_Model(0)
+		,m_CritTime(0),m_FatherID(0),m_Captain(false),m_CritEffect(false),mAliveState(true),mBattleModel(nullptr)
 		,m_TouchGrid(0),m_TouchState(false),mMoveObject(nullptr),mCallType(sCallType::eCommon),m_CallAliveNum(0)
 		,mDelaytime(0),mLogicState(sLogicState::eNormal),mMonsterSpecies(sMonsterSpecies::eCommon),mHurtCount(nullptr)
-		,m_Model(0),m_AliveID(0),mBehavior(sBehavior::eNormal),mBaseData(nullptr),mLogicData(nullptr),mGuideManage(nullptr)
-		,mCommandGrid(0),mRoleLayer(nullptr),mAutoState(false),mMaxGrid(INVALID_GRID),mHasTarget(false)
+		,m_AliveID(0),mBehavior(sBehavior::eNormal),mBaseData(nullptr),mLogicData(nullptr),mGuideManage(nullptr)
+		,mCommandGrid(0),mRoleLayer(nullptr),mAutoState(false),mMaxGrid(INVALID_GRID),mHasTarget(false),mEnterTime(0)
+		,mSkillEffect(nullptr)
 	{}
 	//AliveDefine
 	BaseRole::~BaseRole()
@@ -46,6 +48,8 @@ namespace BattleSpace
 		mSkillRange = nullptr;
 		CC_SAFE_RELEASE(mGuardArea);
 		mGuardArea = nullptr;
+		CC_SAFE_RELEASE(mSkillEffect);
+		mSkillEffect = nullptr;
 		mRoleObject = nullptr;
 		mMoveObject = nullptr;
 		mStandGrids.clear();
@@ -56,6 +60,7 @@ namespace BattleSpace
 	bool BaseRole::init()
 	{
 		mManage = DataCenter::sharedData()->getWar();
+		mBattleModel = BattleData->getBattleModel();
 		mGuideManage = DataCenter::sharedData()->getCombatGuideMg();
 
 		mBuffManage = BuffManage::create();
@@ -70,6 +75,9 @@ namespace BattleSpace
 
 		mHurtCount = HurtCount::create();
 		mHurtCount->retain();
+
+		mSkillEffect = skEffectData::create();			//做容错性处理
+		mSkillEffect->retain();
 		return true;
 	}
 
@@ -111,9 +119,39 @@ namespace BattleSpace
 		mStandGrids.clear();
 		setDelaytime(getBaseData()->getDelayTime());
 		setModel(getBaseData()->getRoleModel());
-		if (getEnemy())															//把指针转化成相应的类型对特殊的敌方进行相应的初始化
+		setOtherCamp(getBaseData()->getOtherCamp());
+		if (getOtherCamp())									//把指针转化成相应的类型对特殊的敌方进行相应的初始化
 		{
-			setGridIndex(getBaseData()->getInitGrid());
+			if (getEnemy())
+			{
+				setGridIndex(getBaseData()->getInitGrid());
+			}else{
+				if (!getBaseData()->getInitGrid())
+				{
+					setGridIndex(C_OtherCaptain);
+					setCaptain(true);
+				}else{
+					if (getFirstInit())
+					{
+						setFirstInit(false);
+						if (getBaseData()->getInitGrid() < C_PVEStopGrid)
+						{
+							for (int tGrid = C_PVEStopGrid; tGrid < C_PVEOtherArea ; tGrid++) 
+							{
+								if (mManage->getAliveByGrid(tGrid))
+									continue;
+								setGridIndex(tGrid);								//(数据错误容错处理)
+								CCLOG("[ *ERROR ] BaseRole::initAliveData");
+								break;
+							}
+						}else{
+							setGridIndex(getBaseData()->getInitGrid());
+						}
+					}else{
+						setGridIndex(INVALID_GRID);
+					}
+				}
+			}
 		}else{
 			if (getBaseData()->getCaptain())									//队长进来则为上阵状态(服务器用于区分队长的标志)
 			{
@@ -127,6 +165,7 @@ namespace BattleSpace
 			}
 		}
 		setHasTarget(false);
+		ResetAttackState();
 		setNorAtk(true);
 		setExecuteCap(false);
 		setAliveState(true);
@@ -140,7 +179,14 @@ namespace BattleSpace
 			setMaxHp(getBaseData()->getRoleHp());
 		}
 		setHp(getBaseData()->getRoleHp());									//第一次进来是满血状态
-		setCostmax(getBaseData()->getMaxCost());
+#if BATTLE_TEST
+		if (getOtherCamp() && !getBaseData()->getInitGrid())
+		{
+			setMaxHp(10000000);
+			setHp(10000000);	
+		}
+#endif
+		setCostMax(getBaseData()->getMaxCost());
 		setInitCost(getBaseData()->getInitCost());			
 		setAddCost(getBaseData()->getCostSpeed());
 		setAtk(getBaseData()->getRoleAttack());
@@ -149,6 +195,7 @@ namespace BattleSpace
 		setHit(getBaseData()->getRoleHit());
 		setRenew(getBaseData()->getRoleRegain());
 		setDoge(getBaseData()->getRoleDodge());
+
 		setZoom(getBaseData()->getRoleZoom()*0.01f);
 	}
 
@@ -227,10 +274,7 @@ namespace BattleSpace
 	void BaseRole::setBattle(bool pBattle)
 	{
 		if (pBattle != mBattle)
-		{
 			mBattle = pBattle;
-			bNotification->postNotification(MsgBattleStateChange,this);
-		}
 		if (!pBattle)
 			setGridIndex(INVALID_GRID);
 	}
@@ -280,7 +324,7 @@ namespace BattleSpace
 		setBattle(true);
 		if (getCaptain())
 		{
-			mStandGrids.clear();
+			mStandGrids.clear();		//做攻击范围需要用
 			for (int tRow=0;tRow<getBaseData()->getRoleRow();tRow++)
 			{
 				if (pGrid + tRow>C_ENDGRID)
@@ -290,7 +334,7 @@ namespace BattleSpace
 			sort(mStandGrids.begin(),mStandGrids.end());
 		}else{
 			initContainGrid(mGridIndex,mStandGrids);
-			bNotification->postNotification(MsgRoleGridChange,this);
+			bNotification->postNotification(MsgRoleGridChange,this);			//这句代码的效率很低（频率高，遍历全部消息数组）
 		}
 	}
 
@@ -313,7 +357,7 @@ namespace BattleSpace
 	void BaseRole::setCallType(sCallType var)
 	{
 		if (var == sCallType::eAutoSkill)							//进入战场就释放技能(陨石类)
-			setCriAtk( true );							//只有必杀技是没有怪物也会释放的
+			setCriAtk( true );										//只有必杀技是没有怪物也会释放的
 		mCallType = var;
 	}
 
@@ -360,14 +404,14 @@ namespace BattleSpace
 			if (tRole == this)
 				continue;
 			if (tRole->getAliveState()&&tRole->getHp()<=0 && tRole->getRoleObject())
-				tRole->getRoleObject()->AliveDie();
+				tRole->roleDie();
 		}
 		HittingAlive.clear();
 	}
 
 	RoleSkill* BaseRole::getCurrSkill()
 	{
-		if (getCriAtk())
+		if (this->getCriAtk())
 		{
 			if (getBaseData()->hasActiveSkill())
 			{
@@ -392,16 +436,16 @@ namespace BattleSpace
 
 	skEffectData* BaseRole::getCurrEffect()
 	{
-		if (this->getGroupIndex() < this->getCurrSkill()->getListSize())
-			if ( this->getCurrSkill()->getEffectSize(getGroupIndex())>getEffIndex())
-				return this->getCurrSkill()->getIndexEffect(getGroupIndex(),getEffIndex());
+		if (getGroupIndex() < getCurrSkill()->getListSize())
+			if ( getCurrSkill()->getEffectSize(getGroupIndex())>getEffIndex())
+				return getCurrSkill()->getIndexEffect(getGroupIndex(),getEffIndex());
 			else
 				CCLOG("[ *ERROR ] BaseRole::getCurrEffect EffIndex > EffectListSize  AliveID=%d mode=%d",getAliveID(),getBaseData()->getRoleModel());
 		else{
-			CCLOG("[ *ERROR ]BaseRole::getCurrEffect NULL  AliveID=%d mode=%d EffectGroup=%d",getAliveID(),getBaseData()->getRoleModel(),getGroupIndex());
+			CCLOG("[ *ERROR ]BaseRole::getCurrEffect NULL Role=%d,Mode=%d,Index=%d,Skill=%d",getAliveID(),getBaseData()->getRoleModel(),getGroupIndex(),getCurrSkill()->getSkillID());
 			this->setGroupIndex(0);
 		}	
-		return nullptr;
+		return mSkillEffect;
 		CCTextureCache::sharedTextureCache()->dumpCachedTextureInfo();
 	}
 
@@ -467,11 +511,20 @@ namespace BattleSpace
 			mAreaTargets.clear();										//非主动技能状态无法攻击全部潜行怪物		
 		}
 	}
-
+	//从PVP中的敌方boss可以知道，武将的受击区域和攻击判定区域是不一样的
 	bool BaseRole::inStandGrid( int pGrid )
 	{
-		if (pGrid >= C_CAPTAINGRID && getCaptain() )
-			return true;
+		if (getCaptain())
+		{
+			if (getOtherCamp())
+			{
+				if (mBattleModel->isPvEBattle() && pGrid < C_PVEStopGrid)
+					return true;
+			}else{
+				if ( pGrid >= C_CAPTAINGRID )
+					return true;
+			}	
+		}
 		for (auto tGrid : mStandGrids)
 		{
 			if (tGrid == pGrid)
@@ -507,27 +560,28 @@ namespace BattleSpace
 		return false;
 	}
 
-	vector<BaseRole*>* BaseRole::getSkillTargets()
+	vector<BaseRole*>* BaseRole::getCurrSkillTargets()
 	{
 		int tTarget = getCurrEffect()->getTargetType();
-		if ((getEnemy()&&tTarget == eUsType)	|| 
-			(!getEnemy()&&tTarget == eEnemyType) )			/*敌方自己，我方敌人*/
+		if ((getOtherCamp()&&tTarget == eUsType)	|| 
+			(!getOtherCamp()&&tTarget == eEnemyType) )			/*敌方自己，我方敌人*/
 			return mManage->inBattleMonsters(true);
-		if ((getEnemy()&&tTarget == eEnemyType) ||
-			(!getEnemy()&&tTarget == eUsType))				/*敌方敌人，我方自己*/
+		if ((getOtherCamp()&&tTarget == eEnemyType) ||
+			(!getOtherCamp()&&tTarget == eUsType))				/*敌方敌人，我方自己*/
 			return mManage->inBattleHeros(true);
 		return mManage->inBattleRoles(true); 
 	}
 
 	void BaseRole::excuteLogic(float pTime)
 	{
+		updateRole(pTime);
 		if (!getRoleObject())return;
 		this->getRoleObject()->updateFrameEvent(pTime);									//刷新武将帧事件
 		if (stateDispose(pTime) || !AttackJudge())
 			return;										
 		if (getEnemy())
 		{
-			this->MonsterExcuteAI(pTime);
+			this->MonsterExcuteAI();
 		}else{
 			this->HeroExcuteAI();			
 		}
@@ -659,7 +713,7 @@ namespace BattleSpace
 		}
 	}
 
-	void BaseRole::MonsterExcuteAI( float dt )
+	void BaseRole::MonsterExcuteAI()
 	{
 		if (monsterFlee())												//骸兽逃跑处理,将AI执行的都放在这个地方后面好整理
 			return;
@@ -711,7 +765,7 @@ namespace BattleSpace
 			}
 			if (getGridIndex()<= C_BEGINGRID-C_GRID_ROW*4)
 			{		
-				getRoleObject()->AliveDie();
+				roleDie();
 				getRoleObject()->setVisible(false);
 			}		
 			return true;
@@ -735,7 +789,7 @@ namespace BattleSpace
 
 	int BaseRole::getMonsterMove()//怪物的移动处理是，哪个最先返回值不是INVALID_GRID就以哪个为标准，后面的不做处理了
 	{
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+#if BATTLE_TEST
 		if (getRoleLayer()->gettestState())
 			return INVALID_GRID;
 #endif
@@ -778,6 +832,9 @@ namespace BattleSpace
 
 	void BaseRole::heroCritEffect()
 	{
+		bNotification->postNotification(B_RoleSkill,this);
+		if ( !mBattleModel->battlePause() )
+			return;
 		RoleObject* pActObject = getRoleObject();
 		pActObject->setUserObject(CCBool::create(true));
 		pActObject->setZOrder(0);
@@ -790,7 +847,6 @@ namespace BattleSpace
 			tAlive->getRoleObject()->TurnStateTo(sStateCode::eStandState);
 		}
 		bNotification->postNotification(MsgChangeLayerLight,CCBool::create(true));
-		bNotification->postNotification(B_RoleSkill,this);
 		mRoleLayer->removeEvent();
 	}
 
@@ -805,7 +861,7 @@ namespace BattleSpace
 		if (getOpposite())									//反向攻击处理(怪物取消反向处理了)
 		{
 			RoleObject* pActObject = getRoleObject();
-			if (getEnemy())
+			if (pActObject->getEnemy())
 			{
 				pActObject->setRoleDirection(Ditection_Left);
 			}else{
@@ -830,12 +886,12 @@ namespace BattleSpace
 		}else{		
 			if (IsAutoMoveType()						||
 				ActionCode == sStateCode::eWalkState	||
-				getCallType() != sCallType::eCommon	)			//只有可收控制的武将才有后续的处理(其他类型武将没有MoveObject))								//自动移动类,或已经开始执行AI状态
+				getCallType() != sCallType::eCommon		)	//只有可收控制的武将才有后续的处理(其他类型武将没有MoveObject))								//自动移动类,或已经开始执行AI状态		
 				return;
-			if ( !getCaptain() && getGridIndex() != getMoveObject()->getgrid())					//武将当前是否在固定位置,如果不在则移动回固定位置(执行AI完毕状态)
+			if (!getCaptain() && getMoveObject() && 
+				getGridIndex() != getMoveObject()->getgrid())					//武将当前是否在固定位置,如果不在则移动回固定位置(执行AI完毕状态)
 			{			
-				setAIState(false);
-				setMoveGrid(getMoveObject()->getgrid());							//@@武将有一个回到初始位置的方法
+				setMoveGrid(getMoveObject()->getgrid());											//@@武将有一个回到初始位置的方法
 				getRoleObject()->setMoveState(sStateCode::eWalkState);
 			}else{
 				heroGuard();
@@ -848,17 +904,38 @@ namespace BattleSpace
 		int tGrid = INVALID_GRID;
 		if ( getCaptain() )
 		{
-			tGrid = mSkillRange->CaptainGuard(this);
+			tGrid = mSkillRange->CaptainGuard(this);				//在一列上一直不停的巡逻
 		}else{
 			tGrid = mGuardArea->getAliveGuard(this);
 		}
 		setAIState(true);
 		if(tGrid)
 		{
+			setHasTarget(true);									//这个标记并没有起到作用，因为当开始移动时攻击范围内会再设置为false
 			setMoveGrid(tGrid);
 			getRoleObject()->setMoveState(sStateCode::eWalkState);
 		}else{
-			setAIState(false);
+#if BATTLE_TEST
+			if (getOtherCamp())
+			{
+				//对方阵营执行AI的位置
+				setAIState(false);
+			}else{
+				if (!getRoleLayer()->gettestState())
+				{
+					if (!mBattleModel->heroMove(this))				//武将这个状态是表示保持空闲，判断战斗模式对武将AI产生的影响应该从这里加上去
+						setAIState(false);
+				}
+			}
+			return;
+#endif
+			if (getOtherCamp()||getCaptain())
+			{
+				setAIState(false);
+			}else{
+				if (!mBattleModel->heroMove(this))					//武将这个状态是表示保持空闲，判断战斗模式对武将AI产生的影响应该从这里加上去
+					setAIState(false);
+			}
 		}
 	}
 
@@ -870,14 +947,19 @@ namespace BattleSpace
 			return true;
 		if (getGridIndex() <= C_BEGINGRID-C_GRID_ROW*3)			
 		{
-			getRoleObject()->AliveDie();							//超出预定范围执行死亡操作
+			roleDie();							//超出预定范围执行死亡操作
 			return true;
 		}			
 		if (mManage->inUnDefineArea(getGridIndex()-C_GRID_ROW))
 		{
 			getRoleObject()->setMoveState(sStateCode::eStandState);
 		}else{
-			setMoveGrid(getGridIndex()-C_GRID_ROW);					//这里的移动范围是写死了的
+			if (getOtherCamp())
+			{
+				setMoveGrid(getGridIndex()+C_GRID_ROW);					//这里的移动范围是写死了的
+			}else{
+				setMoveGrid(getGridIndex()-C_GRID_ROW);					//这里的移动范围是写死了的
+			}
 			getRoleObject()->setMoveState(sStateCode::eWalkState);
 		}
 		return true;
@@ -891,7 +973,10 @@ namespace BattleSpace
 			getRoleObject()->setUpdateState(true);
 			setHasTarget(false);
 			if (getBaseData()->getAlertType())
-				setAIState(true);		
+				setAIState(true);	
+			const RoleSkill* skill = getBaseData()->getActiveSkill();
+			float tDirectorTime = CCDirector::sharedDirector()->getScheduler()->getTimeScale();
+			setSkillTime(skill->getCooldown()/tDirectorTime);
 		}
 		mRoleLayer->addEvent();
 	}
@@ -939,6 +1024,7 @@ namespace BattleSpace
 		tChild->setBaseData(tBaseData);
 		tChild->setCallType(tBaseData->getCallType());
 		tChild->setEnemy(getEnemy());
+		tChild->setOtherCamp(getOtherCamp());
 		if ( getEnemy() )
 		{
 			tChild->setAliveID(C_CallMonst);
@@ -949,9 +1035,15 @@ namespace BattleSpace
 			{
 				CallAliveByFixRange(this,tChild);
 			}else{
-				int ran = CCRANDOM_0_1()*(mStandGrids.size()-1);
-				int grid = mManage->getCurrRandomGrid(mStandGrids.at(ran));	//得到当前武将格子的附近范围格子
-				tChild->setGridIndex(grid);
+				if (mStandGrids.empty())
+				{
+					CCLOG("[ *ERROR ] BaseRole::createCallRole ");
+					tChild->setGridIndex(getGridIndex());
+				}else{
+					int ran = CCRANDOM_0_1()*(mStandGrids.size()-1);
+					int grid = mManage->getCurrRandomGrid(mStandGrids.at(ran));	//得到当前武将格子的附近范围格子
+					tChild->setGridIndex(grid);
+				}
 			}
 			tChild->setBehavior(tChild->getBaseData()->getBehavior());
 			tChild->setMove(tBaseData->getMoveState());
@@ -1015,7 +1107,7 @@ namespace BattleSpace
 		if (unCommonAlive() || movePrecondition())
 			return false;
 		getRoleObject()->showThis();
-		if (!mManage->inMoveArea(mCommandGrid)			||
+		if (!moveToGrid()								||
 			!mGuideManage->moveGuideJudge(mCommandGrid)	||
 			!moveJudge())		//当前位置是否可以放置英雄
 			return false;
@@ -1025,11 +1117,32 @@ namespace BattleSpace
 		return true;
 	}
 
+	bool BaseRole::moveToGrid()
+	{
+		if (getBattle())
+		{
+			if (mBattleModel->isPvEBattle() && mCommandGrid < C_PVEStopGrid)
+				return false;
+			if (!getOtherCamp() && !mBattleModel->moveJudge(this,mCommandGrid))
+				return false;
+			return mManage->inMoveArea(mCommandGrid);
+		}else{
+			if (getOtherCamp())
+			{
+				return mManage->inOtherEnter(mCommandGrid);
+			}else{
+				return mManage->inEnterArea(mCommandGrid);		//对方的入场区域实现
+			}
+		}
+	}
+
 	bool BaseRole::unCommonAlive()
 	{
+		if (!getRoleObject())
+			return true;
 		if ( getCallType() != sCallType::eCommon		&& 
 			mGuideManage->moveGuideJudge(mCommandGrid)	&&
-			mManage->inMoveArea(mCommandGrid)			)
+			moveToGrid()			)
 		{
 			mGuideManage->moveGuideJudge(mCommandGrid,true);
 			setMoveGrid(mCommandGrid);
@@ -1041,10 +1154,10 @@ namespace BattleSpace
 
 	bool BaseRole::movePrecondition()
 	{
-		if (!getMove()			|| 
-			!getRoleObject()	|| 
+		if (!getMove()			||
 			!getMoveObject()	||
 			getLogicState() == sLogicState::eInvincible||
+			!getAliveState()	||
 			mCommandGrid == getMoveObject()->getgrid() )
 			return true;
 		return false;
@@ -1054,8 +1167,10 @@ namespace BattleSpace
 	{
 		vector<int> tDestinations;
 		initContainGrid(getCommandGrid(),tDestinations);
-		if (!tDestinations.size())
+		if (tDestinations.empty())
 			return false;				//没有目标位置(超出边界)
+		//if (!haveOtherRole(tDestinations))
+		//	return true;
 		if (getBattle())
 		{
 			if (!swappingRule(tDestinations))
@@ -1067,8 +1182,37 @@ namespace BattleSpace
 		return true;
 	}
 
+	bool BaseRole::currGridHasTarget( )
+	{
+		vector<int> tArea;							//做模拟技能状态的判断。
+		int tGroupIndex = getGroupIndex();
+		int tEffectIndex = getEffIndex();
+		setGroupIndex(0);
+		setEffIndex(0);
+		mSkillRange->initSkillArea(this,tArea);
+		vector<BaseRole*>* tVec = getCurrSkillTargets();
+		for (auto tGrid : tArea)
+		{
+			BaseRole* tRole = mManage->getAliveByGrid(tGrid);
+			if (!tRole) continue;
+			for (auto t2Role : * tVec)
+			{
+				if (t2Role == tRole)		//在攻击范围内有技能对应目标
+				{
+					setGroupIndex(tGroupIndex);
+					setEffIndex(tEffectIndex);
+					return true;
+				}
+			}
+		}
+		setGroupIndex(tGroupIndex);
+		setEffIndex(tEffectIndex);
+		return false;
+	}
+
 	bool BaseRole::borderJudge( vector<int>& pVector )
 	{
+		if (pVector.empty())return true;
 		for (auto pGrid : pVector)									//主帅位置不可替换
 		{
 			if ( pGrid >= C_CAPTAINGRID )							//我方武将边缘处理
@@ -1091,6 +1235,8 @@ namespace BattleSpace
 		{
 			if (tSwappingAlive == this)
 				continue;
+			if (tSwappingAlive->getOtherCamp() != this->getOtherCamp())
+				return false;
 			int tSwappingGrid = tSwappingAlive->getMoveObject()->getgrid()+tOffs;
 			vector<int> tAliveDes;
 			tSwappingAlive->initContainGrid(tSwappingGrid,tAliveDes);
@@ -1115,20 +1261,20 @@ namespace BattleSpace
 		vector<BaseRole*> tAreaAlives;
 		for (auto tGrid:pAreas)
 		{
-			BaseRole* tAlive = mRoleLayer->getAliveByMoveGrid(tGrid);
-			if (tAlive)
+			BaseRole* tRole = mRoleLayer->getAliveByMoveGrid(tGrid);
+			if (tRole && !tRole->getOtherCamp())
 			{
 				bool tAddAlive = true;
 				for (auto atAlive:tAreaAlives)
 				{
-					if (atAlive == tAlive)
+					if (atAlive == tRole)
 					{
 						tAddAlive = false;
 						break;
 					}
 				}
 				if (tAddAlive)
-					tAreaAlives.push_back(tAlive);
+					tAreaAlives.push_back(tRole);
 			}
 		}
 		return tAreaAlives;
@@ -1160,14 +1306,14 @@ namespace BattleSpace
 	{
 		for (auto tGrid:pDestinations)
 		{
-			BaseRole* tDestinationAlive = mRoleLayer->getAliveByMoveGrid(tGrid);
-			if (!tDestinationAlive)
+			BaseRole* tRole = mRoleLayer->getAliveByMoveGrid(tGrid);
+			if (!tRole || tRole->getOtherCamp() != getOtherCamp())
 				continue;
 			if (mGuideManage->isRest())		//重置状态下我方未上阵武将可以重叠
 			{
 				return true;
 			}else{
-				if (tDestinationAlive->getCallType() == sCallType::eCommon)
+				if (tRole->getCallType() == sCallType::eCommon)
 					return false;
 			}
 		}
@@ -1180,4 +1326,112 @@ namespace BattleSpace
 			return false;
 		return true;
 	}
+
+	bool BaseRole::skillAreaHasTarget()
+	{
+		vector<int> tArea;							//做模拟技能状态的判断。
+		this->setCriAtk(true);
+		int tGroupIndex = getGroupIndex();
+		int tEffectIndex = getEffIndex();
+		setGroupIndex(0);
+		setEffIndex(0);
+		mSkillRange->initSkillArea(this,tArea);
+		vector<BaseRole*>* tVec = getCurrSkillTargets();
+		for (auto tGrid : tArea)
+		{
+			BaseRole* tRole = mManage->getAliveByGrid(tGrid);
+			if (!tRole)continue;
+			for (auto t2Role : * tVec)
+			{
+				if (t2Role == tRole)		//在攻击范围内有技能对应目标
+				{
+					setGroupIndex(tGroupIndex);
+					setEffIndex(tEffectIndex);
+					setCriAtk(false);
+					return true;
+				}
+			}
+		}
+		setGroupIndex(tGroupIndex);
+		setEffIndex(tEffectIndex);
+		setCriAtk(false);
+		return false;
+	}
+
+	void BaseRole::updateRole( float dt )
+	{
+		if (getEnemy() || !getOtherCamp())
+			return ;
+		if (mEnterTime > 0)
+		{
+			mEnterTime -= dt;
+			if (mEnterTime < 0)
+			{
+				mEnterTime = 0;
+				bNotification->postNotification(MsgButtonStateUpdate);
+			}
+		}
+		if (!getCriAtk() && mSkillTime > 0)
+		{
+			mSkillTime -= dt;
+			if (mSkillTime < 0)
+			{
+				mSkillTime = 0;
+				bNotification->postNotification(MsgButtonStateUpdate);
+			}
+		}
+	}
+
+	void BaseRole::roleDie()
+	{
+		if (this->getAliveState())
+		{
+			setAliveState(false);
+			setFirstInit(false);
+			mRoleObject->AliveDie();
+			clearHitAlive();//bug 点，在自动战斗状态下，当敌方被击杀时，会马上更新战场态势，而后产生新的AI指引去 引导武将移动，然后会再次刷新武将的打击列表，导致打击列表在循环时被改变，程序崩溃
+			setHp(0);
+			setGridIndex(INVALID_GRID);
+			if (getMoveObject())getMoveObject()->removeFromParentAndCleanup(true);
+			setMoveObject(nullptr);
+			getBuffManage()->Buffclear();
+			float tDirectorTime = CCDirector::sharedDirector()->getScheduler()->getTimeScale();
+			setEnterTime(getBaseData()->getColdDown()/tDirectorTime);
+			setSkillTime(0);
+			setBattle(false);
+			NOTIFICATION->postNotification(MsgRoleDie,this);
+		}
+	}
+	//最好做成一个公用的方法，常用到,做是否可移动判断必须判断的
+	bool BaseRole::hasOtherRole( int pGrid )
+	{
+		BaseRole* tRole = mRoleLayer->getAliveByMoveGrid(pGrid);
+		if (!tRole || tRole->getOtherCamp() != getOtherCamp())
+			return false;
+		return true;
+	}
+
+	bool BaseRole::inMoveObjectArea( int pGrid )
+	{
+		if ( !mMoveObject )
+			return false;
+		if (getCaptain())
+		{
+			if (getOtherCamp())
+			{
+				if (mBattleModel->isPvEBattle() && pGrid < C_PVEStopGrid)
+					return true;
+			}else{
+				if ( pGrid >= C_CAPTAINGRID )
+					return true;
+			}	
+		}
+		for (auto tGrid : mMoveObject->grids)
+		{
+			if (tGrid == pGrid)
+				return true;
+		}
+		return false;
+	}
+
 };

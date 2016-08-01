@@ -10,6 +10,9 @@
 #include "AppUI.h"
 #include "scene/layer/LayerManager.h"
 #include "bag/bagData.h"
+#include <spine/spine-cocos2dx.h>
+
+using namespace spine;
 
 class CSmeltArmor: public BaseLayer
 {
@@ -70,4 +73,6 @@ private:
 	CLayout* m_pBaseInfo[4];
 
 	int m_iCount;
+
+	SkeletonAnimation *m_pSpineHero;
 };

@@ -9,7 +9,7 @@
 #include "rank/RankLayer.h"
 #include "netcontrol/CPlayerControl.h"
 
-bool WRuleSortPvpPrize(const BossPrize& data1, const BossPrize& data2)
+bool WRuleSortPvpPrize(const PvpPrize& data1, const PvpPrize& data2)
 {
 	return data1.rank()<data2.rank();
 }
@@ -78,7 +78,7 @@ void CPvpRuleLayer::onEnter()
 	BaseLayer::onEnter();
 
 	//绑定活动列表回调
-	GetTcpNet->registerMsgHandler(BossPrizesMsg, this, CMsgHandler_selector(CPvpRuleLayer::processNetMsg));
+	GetTcpNet->registerMsgHandler(PvpPrizeListMsg, this, CMsgHandler_selector(CPvpRuleLayer::processNetMsg));
 }
 
 void CPvpRuleLayer::onExit()
@@ -108,14 +108,11 @@ void CPvpRuleLayer::processNetMsg( int type, google::protobuf::Message *msg )
 	
 	switch (type)
 	{
-	case BossPrizesMsg:
+	case PvpPrizeListMsg:
 		{
-			BossPrizes* pBossPrizes = (BossPrizes*)msg;
-			if(pBossPrizes->result() == 1)
-			{
-				//initRank
-				initRank(pBossPrizes);
-			}
+			PvpPrizeList* pPrizes = (PvpPrizeList*)msg;
+			//initRank
+			initRank(pPrizes);
 		}
 		break;
 	default:
@@ -131,32 +128,32 @@ void CPvpRuleLayer::updateShowInfoScroll(CCSize size)
 	m_pScroll->setContentOffsetToTop();
 }
 
-void CPvpRuleLayer::initRank(BossPrizes* pPrizes)
+void CPvpRuleLayer::initRank(PvpPrizeList* pPrizes)
 {
 	CCNode* pNode = (CCNode*)m_pLayer->findWidgetById("title_tip2");
 
 	CCPoint pPos = pNode->getPosition()+ccp(215, 167);
 
-	vector<BossPrize> vecBossPrize;
-	for(unsigned int b=0; b<pPrizes->prizelist().size(); b++)
+	vector<PvpPrize> vecPvpPrize;
+	for(unsigned int b=0; b<pPrizes->prize_list().size(); b++)
 	{
-		vecBossPrize.push_back(pPrizes->prizelist().Get(b));
+		vecPvpPrize.push_back(pPrizes->prize_list().Get(b));
 	}
-	std::sort(vecBossPrize.begin(), vecBossPrize.end(), WRuleSortPvpPrize);
+	std::sort(vecPvpPrize.begin(), vecPvpPrize.end(), WRuleSortPvpPrize);
 
-	for(int i=0; i<vecBossPrize.size(); i++)
+	for(int i=0; i<vecPvpPrize.size(); i++)
 	{
 		//最多10个
 		if(i==10) break;
 
-		const BossPrize& bossPrize = vecBossPrize[i];
+		const PvpPrize& pvpPrize = vecPvpPrize[i];
 
 		CLayout* pCell = UICloneMgr::cloneLayout(m_pCell);
 		pCell->setPosition(pPos+ccp(0, -87*i));
 		pNode->getParent()->addChild(pCell);
 
 		//排名
-		int iRank = bossPrize.rank();
+		int iRank = pvpPrize.rank();
 		CCSprite* pRankIcon = (CCSprite*)(pCell->findWidgetById("rank_icon"));
 		if(iRank<=3)
 		{
@@ -185,13 +182,13 @@ void CPvpRuleLayer::initRank(BossPrizes* pPrizes)
 		//奖励
 		
 		vector<Prize> vecWarPrize;
-		for(unsigned int b=0; b<bossPrize.prizes().size();b++)
+		for(unsigned int b=0; b<pvpPrize.prizes().size();b++)
 		{
-			vecWarPrize.push_back(bossPrize.prizes().Get(b));
+			vecWarPrize.push_back(pvpPrize.prizes().Get(b));
 		}
 		std::sort(vecWarPrize.begin(), vecWarPrize.end(), WRuleSortPrize);
 
-		for(unsigned int j=0; j<bossPrize.prizes().size(); j++)
+		for(unsigned int j=0; j<pvpPrize.prizes().size(); j++)
 		{
 	//		if(i==2)break;
 

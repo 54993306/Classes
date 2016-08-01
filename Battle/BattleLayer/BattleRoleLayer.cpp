@@ -28,7 +28,8 @@
 #include "Battle/MoveObject.h"
 #include "Battle/BaseRole.h"
 #include "Battle/BaseRoleData.h"
-namespace BattleSpace{
+namespace BattleSpace
+{
 	BattleRoleLayer::BattleRoleLayer()
 		:m_TouchAlive(nullptr),m_grid(0),m_AliveNode(0),mtestState(true)
 		,m_MoveActObject(nullptr),m_TouchAliveBtn(false),mManage(nullptr)
@@ -111,6 +112,10 @@ namespace BattleSpace{
 		mManage->initMonsters(tMonsters,true);
 		for (auto tMonster : tMonsters)
 			initActobject(tMonster);
+		vector<BaseRole*>tOthers;
+		mManage->initOtherCamp(tOthers,true);
+		for (auto tRole:tOthers)
+			initActobject(tRole);
 		initActobject(mManage->getAliveByGrid(C_CAPTAINSTAND));
 	}
 
@@ -118,12 +123,14 @@ namespace BattleSpace{
 	{
 		BaseRole* tRole = pRoleObject->getBaseRole();
 		if (tRole->getDelaytime()>0)pGrid = 0;
-		if (pGrid == INVALID_GRID&&pRoleObject->getEnemy())
+		if (pGrid == INVALID_GRID&&tRole->getEnemy())
 		{
 			pGrid = CCRANDOM_0_1()*3+1;
 			tRole->setGridIndex(pGrid);
 		}
 		pRoleObject->countOffs(m_map->getPoint(pGrid));
+		if (tRole->getOtherCamp() && !tRole->getEnemy())
+			pRoleObject->setMoveState(sStateCode::eWalkState);
 		if(pRoleObject->getParent() == nullptr)
 		{
 			m_AliveNode->addChild(pRoleObject);
@@ -190,23 +197,23 @@ namespace BattleSpace{
 		m_TouchAliveBtn = true;
 	}
 
-	void BattleRoleLayer::initMoveActObject( RoleObject* aliveOb )
+	void BattleRoleLayer::initMoveActObject( RoleObject* pRoleObject )
 	{
-		if (m_MoveActObject->getModel() != aliveOb->getModel())
+		if (m_MoveActObject->getModel() != pRoleObject->getModel())
 		{
 			if (m_MoveActObject->getArmature())
 			{
 				m_MoveActObject->getArmature()->removeFromParentAndCleanup(true);
 				m_MoveActObject->setArmature(nullptr);
 			}
-			m_MoveActObject->setModel(aliveOb->getModel());	//移动的目标是模型是被点击的目标模型'
-			m_MoveActObject->setoffs(aliveOb->getoffs());		//武将原来相对于格子的偏移量
-			m_MoveActObject->getBody()->setScale(aliveOb->getBody()->getScale());
+			m_MoveActObject->setModel(pRoleObject->getModel());	//移动的目标是模型是被点击的目标模型'
+			m_MoveActObject->setoffs(pRoleObject->getoffs());		//武将原来相对于格子的偏移量
+			m_MoveActObject->getBody()->setScale(pRoleObject->getBody()->getScale());
 		}
-		if (aliveOb->getBaseRole()->getGridIndex())
+		if (pRoleObject->getBaseRole()->getGridIndex())
 		{
-			if(aliveOb->getMoveObject())
-				m_MoveActObject->setPosition(aliveOb->getMoveObject()->getPosition());
+			if(pRoleObject->getMoveObject())
+				m_MoveActObject->setPosition(pRoleObject->getMoveObject()->getPosition());
 		}else{
 			m_MoveActObject->setPosition(ccp(-500,100));
 		}
@@ -242,11 +249,12 @@ namespace BattleSpace{
 
 	bool BattleRoleLayer::touchInAlive( int grid, const CCPoint& p )
 	{
-		vector<BaseRole*>* Vec = mManage->inBattleHeros();
-		for (auto i : *Vec)
+		vector<BaseRole*>* tHeros = mManage->inBattleHeros();
+		for (auto tHero : *tHeros)
 		{
-			if (i->getCallType()!=sCallType::eCommon)continue;
-			MoveObject* mo = i->getMoveObject();
+			if (tHero->getCallType()!=sCallType::eCommon || tHero->getCriAtk())
+				continue;
+			MoveObject* mo = tHero->getMoveObject();
 			if (!mo)continue;
 			for (auto j :mo->grids)
 			{
@@ -254,7 +262,7 @@ namespace BattleSpace{
 					continue;
 				CCPoint upoint = mo->getParent()->convertToWorldSpace(mo->getPosition());	//转化为世界坐标进行偏移量处理
 				m_TouchOffs = upoint - p;													//加减号被重载了,出触摸偏移量
-				initTouchAlive(i);
+				initTouchAlive(tHero);
 				return true;
 			}
 		}

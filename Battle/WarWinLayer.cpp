@@ -189,8 +189,8 @@ void WarWinLayer::processBattleFinish(int type, google::protobuf::Message *msg)
 		DataCenter::sharedData()->getUser()->getUserData()->setFirstMobileShop(true);
 	}
 
-	 //大关卡才有重来按钮
-	/*if(DataCenter::sharedData()->getWar()->getStageType()==1)*/
+	 //非悬赏府才有重来按钮
+	if(DataCenter::sharedData()->getWar()->getLastStageId()!=-1)
 	{
 		CButton *btnTry = (CButton*)m_ui->findWidgetById("retry");
 		btnTry->runAction(CCSequence::create(CCDelayTime::create(fDelayTime), CCShow::create(), CCScaleTo::create(0.2f, 1.2f), CCScaleTo::create(0.1f, 1), NULL));
@@ -557,7 +557,9 @@ void WarWinLayer::genStar(int numOfStar)
 	}
 	else
 	{
-		grade2->setTexture(CCTextureCache::sharedTextureCache()->addImage("tollgate/star.png"));
+		CCTexture2D *texture = CCTextureCache::sharedTextureCache()->addImage("tollgate/star.png");
+		grade2->setTexture(texture);
+		grade2->setTextureRect(CCRectMake(0,0,texture->getContentSize().width,texture->getContentSize().height));
 	}
 	CCPoint basePos2 = grade2->getPosition();
 	grade2->setPositionY(size.height*1.05f);
@@ -574,7 +576,9 @@ void WarWinLayer::genStar(int numOfStar)
 	}
 	else
 	{
-		grade1->setTexture(CCTextureCache::sharedTextureCache()->addImage("tollgate/star.png"));
+		CCTexture2D *texture = CCTextureCache::sharedTextureCache()->addImage("tollgate/star.png");
+		grade1->setTexture(texture);
+		grade1->setTextureRect(CCRectMake(0,0,texture->getContentSize().width,texture->getContentSize().height));
 	}
 	CCPoint basePos1 = grade1->getPosition();
 	grade1->setPositionY(size.height*1.05f);
@@ -590,7 +594,9 @@ void WarWinLayer::genStar(int numOfStar)
 	}
 	else
 	{
-		grade3->setTexture(CCTextureCache::sharedTextureCache()->addImage("tollgate/star.png"));
+		CCTexture2D *texture = CCTextureCache::sharedTextureCache()->addImage("tollgate/star.png");
+		grade3->setTexture(texture);
+		grade3->setTextureRect(CCRectMake(0,0,texture->getContentSize().width,texture->getContentSize().height));
 	}
 	CCPoint basePos3 = grade3->getPosition();
 	grade3->setPositionY(size.height*1.05f);
@@ -916,7 +922,7 @@ void WarWinLayer::callBackForShowNewHero()
 			HeroLotteryData data;
 			data.heroType = prize.type;
 			data.thumb = prize.thumb;
-			data.quality = prize.quality;
+			data.quality = prize.color;
 			m_pNewHeroEffect->showNewHeroEffect(&data);
 			m_pNewHeroEffect->runAction(CCSequence::createWithTwoActions(
 				CCDelayTime::create(3.0f), 

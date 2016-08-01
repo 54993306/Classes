@@ -1,0 +1,16 @@
+package protos.common;
+
+option java_package = "dass.server.gameserver.protos.common";
+option java_outer_classname = "PrizeCommon";
+option optimize_for = SPEED ;
+
+message Prize{
+	optional int32 type = 1;	//奖励类型(1 道具，2 英雄，3 铜钱，4 元宝，5 粮食, 6体力, 7 角色经验)
+	optional int32 id = 2;		//奖励物品ID
+	optional int32 num = 3;		//数量
+	optional int32 quality = 4;	//品质(星星)
+	optional int32 thumb = 5;	//关联图标
+	optional int32 color = 6;	//颜色
+
+	optional int32 param = 7;
+}

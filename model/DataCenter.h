@@ -25,7 +25,8 @@ enum CityActionType{
 	CA_GoToChapater,
 	CA_GoToStage,
 	CA_GoToReward,
-	CA_GoToWorldBoss
+	CA_GoToWorldBoss,
+	CA_PVP
 };
 
 
@@ -33,6 +34,21 @@ enum Task_Type
 {
 	Evole_Task,
 	Normal_Task,
+};
+
+struct VsAnimateData
+{
+	std::string sEnemyRoleName;
+	std::string sSelfRoleName;
+	int			iEnemyLeader;
+	int			iSelfLeader;
+	int			iEnemyHead;
+	int			iSelfHead;
+	std::string	sEnemyFacebookId;
+	std::string	sSelfFacebookId;
+public:
+	VsAnimateData():sEnemyRoleName(""),sSelfRoleName(""),iEnemyLeader(0),iSelfLeader(0),iEnemyHead(0),iSelfHead(0),sEnemyFacebookId(""),sSelfFacebookId("")
+	{}
 };
 
 namespace BattleSpace{
@@ -70,6 +86,7 @@ public:
 
 	CC_SYNTHESIZE(CityActionType, m_cityActionType, CityActionType);
 	CC_SYNTHESIZE(CRroleData*, m_RoleData, RoleData);
+	VsAnimateData& getVsAnimateData();
 protected:
 	virtual bool init();	
 protected:
@@ -87,6 +104,7 @@ protected:
 	RewardDataGM *m_rewardData;
 	CDataPool *m_dataPool;
 	ShareGM *m_shareData;
+	VsAnimateData m_VsAnimateData;
 private:
 	static DataCenter* m_dataCenter;
 };

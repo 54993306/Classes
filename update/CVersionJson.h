@@ -31,6 +31,7 @@ public:
 	void reloadFile(std::string sFile);
 	const CVersionData& getDataById(std::string sVersion);
 	vector<CVersionData> getUpdateList(std::string sCurrentVersion, std::string sAimVersion);
+	bool isThereAForceApkUpdateVersion( std::string sCurrentVersion, std::string sAimVersion );
 private:
 	VersionDataList _data;
 };

@@ -23,10 +23,13 @@
 #include "common/CSpecialProgress.h"
 #include "SharpTollgate.h"
 #include "Global.h"
+#include "GamePlatfomDefine.h"
+#include "Global.h"
 
 CTollgateLayer::CTollgateLayer():m_selectChapterIndex(0),m_isStory(true),m_iCurrentTouchDir(TollgateTouchDirNull)
 	,m_iLastNormlChapter(-1), m_iLastSpecialChapter(-1),m_bTouchLock(false),m_iPreChapterIndex(1),m_iCurrentPrizeType(1)
-	,m_bExitWithNoHardChapter(false),m_currChapter(0), m_currChapterIndex(0), m_pSpeciallPrizeBtn(nullptr)
+	,m_bExitWithNoHardChapter(false),m_currChapter(0), m_currChapterIndex(0), m_pSpeciallPrizeBtn(nullptr),m_fbImgLayer(nullptr),m_iFirstLockedStage(0)
+	,m_pTips(nullptr)
 {
 	m_nowChapter[0] = 0;
 	m_nowChapter[1] = 0;
@@ -37,6 +40,7 @@ using namespace BattleSpace	;
 
 CTollgateLayer::~CTollgateLayer()
 {
+	CC_SAFE_RELEASE(m_pTips);
 }
 
 
@@ -51,6 +55,15 @@ bool CTollgateLayer::init()
 		m_ui = LoadComponent("Stage.xaml");  
 		m_ui->setPosition(VCENTER);
 		this->addChild(m_ui);
+
+		CLayout *pTips = (CLayout *)m_ui->findWidgetById("tips");
+		pTips->setAnchorPoint(ccp(0, 1));
+		pTips->setCascadeOpacityEnabled(true);
+		pTips->setVisible(false);
+		m_pTips = pTips;
+		CC_SAFE_RETAIN(m_pTips);
+		m_pTips->removeFromParentAndCleanup(true);
+
 		return true;
 	}
 	return false;
@@ -128,7 +141,7 @@ void CTollgateLayer::onEnter()
 
 	UserData *user = DataCenter::sharedData()->getUser()->getUserData();
 // 	 	user->setNewStep(5);
-	if (user->getNewStep()>0)
+	if (user->getNewStep()>0 && user->getNewStep()!=100)
 	{
 #if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
 		this->scheduleOnce(schedule_selector(CTollgateLayer::runGuideStep),0.4f);
@@ -137,6 +150,7 @@ void CTollgateLayer::onEnter()
 #endif
 	}
 	NOTIFICATION->postNotification(HIDE_TOP_LAYER);
+	HttpLoadImage::getInstance()->bindUiTarget(this);
 }
 
 
@@ -149,7 +163,7 @@ void CTollgateLayer::onExit()
 		CSceneManager::sharedSceneManager()->PostMessageA(SHOW_HEAD,0,nullptr,nullptr);
 	}
 	NOTIFICATION->postNotification(SHOW_TOP_LAYER);
-
+	HttpLoadImage::getInstance()->bindUiTarget(nullptr);
 	//NOTIFICATION->postNotification(SHOW_MAIN_SCENE);
 }
 
@@ -273,6 +287,7 @@ void CTollgateLayer::addCell(unsigned int uIdx, CPageViewCell * pCell)
 			->getStageWidgets(m_chapterList[m_isStory][m_selectChapterIndex-1].id);
 
 		if (!data) return;
+		m_pTips->setVisible(false);
 		for (int i = 0; i < data->size(); i++)
 		{
 			CImageView *sprite = nullptr;
@@ -295,15 +310,51 @@ void CTollgateLayer::addCell(unsigned int uIdx, CPageViewCell * pCell)
 			{
 				pNode = CButton::create(widget.normalImage.c_str());
 				btn = (CButton*)pNode;
+
+
+				//等级开放
+				if((widget.normalImage=="tollgate/xingxing_1.png" || widget.widgetId.find("hero")!=string::npos) )
+				{
+					CStage &stage = m_stageMap[m_chapterList[m_isStory][m_selectChapterIndex-1].id].at(widget.stageId-1);
+
+					if(m_iFirstLockedStage == -1)
+					{
+						if(stage.isOpen)
+						{
+							m_iFirstLockedStage = 0;
+						}
+					}
+					//关卡没有开，而且是第一个发现的未开关卡,
+					else if(m_iFirstLockedStage==0 && DataCenter::sharedData()->getUser()->getUserData()->getLevel() < stage.level)
+					{
+						if(!stage.isOpen)
+						{
+							m_iFirstLockedStage = stage.id;
+							showTips(pNode, CCString::createWithFormat(GETLANGSTR(225), stage.level)->m_sString);
+							stage.isOpen = true;
+						}
+					}
+					else if( m_iFirstLockedStage > 0)
+					{
+						if(stage.id == m_iFirstLockedStage)
+						{
+							showTips(pNode, CCString::createWithFormat(GETLANGSTR(225), stage.level)->m_sString);
+							stage.isOpen = true;
+						}
+					}
+				}
+
 			}
 
 			btn = dynamic_cast<CButton*>(pNode);
 			if (btn)
 			{
-				//	btn->setUserData(&m_stageMap[m_chapterList[m_selectChapterIndex-1].id].at(widget.stageId-1));
 				btn->setOnClickListener(this,ccw_click_selector(CTollgateLayer::onBattle));
 				btn->setZOrder(widget.stageType);
-				btn->setEnabled(m_stageMap[m_chapterList[m_isStory][m_selectChapterIndex-1].id].at(widget.stageId-1).isOpen);
+				//if (m_stageMap[m_chapterList[m_isStory][m_selectChapterIndex-1].id].size()>widget.stageId)
+				//{
+				//	btn->setEnabled(m_stageMap[m_chapterList[m_isStory][m_selectChapterIndex-1].id].at(widget.stageId-1).isOpen);
+				//}
 			}
 
 			if (pNode)
@@ -418,6 +469,42 @@ void CTollgateLayer::addCell(unsigned int uIdx, CPageViewCell * pCell)
 								pNode->setVisible(false);
 							}
 						}
+
+						if (widget.normalImage=="tollgate/xingxing_1.png")
+						{
+#ifdef FACEBOOKSHARE
+							if (stage.friendList.size()>0&&stage.friendList.at(0)!="0")
+							{
+								CImageView *cellImg = CImageView::create("common/cell.png");
+								pCell->addChild(cellImg, 998);
+
+								CImageView *fbBg = CImageView::create("common/box_yellow.png");
+								if (widget.stageId==1)
+								{
+									fbBg->setPositionX(btn->getPositionX());
+									fbBg->setPositionY(btn->getPositionY()-50);
+								}
+								else
+								{
+									fbBg->setPositionX(btn->getPositionX()-60);
+									fbBg->setPositionY(btn->getPositionY()-15);
+								}
+							
+								fbBg->setScale(0.5f);
+								fbBg->setUserData(&m_stageMap[m_chapterList[m_isStory][m_selectChapterIndex-1].id].at(widget.stageId-1));
+								fbBg->setTouchEnabled(true);
+								fbBg->setOnClickListener(this,ccw_click_selector(CTollgateLayer::onFaceImg));
+								// fbBg->setId(stage.friendList.at(0).c_str());
+								pCell->addChild(fbBg, 999);
+								cellImg->setScale(fbBg->getScale());
+								cellImg->setPosition(fbBg->getPosition());
+
+								addFaceBookImg(stage, fbBg);
+							}
+#endif 
+						}
+
+
 						//隐藏闯关通过关卡
 						if (widget.stageType==0&&stage.isOpen&&stage.star>0&&i>0)
 						{
@@ -454,7 +541,7 @@ void CTollgateLayer::addCell(unsigned int uIdx, CPageViewCell * pCell)
 						}
 						if (widget.normalImage=="tollgate/star_1.png"&&stage.star==0)
 						{
-							pNode->setVisible(false);
+ 							pNode->setVisible(false);
 						}
 					}
 				}
@@ -855,6 +942,11 @@ void CTollgateLayer::ProcessMsg(int type, google::protobuf::Message *msg)
 			stage.read(info);
 			m_currStageList.push_back(stage);
 		}
+		if (m_currStageList.size()==0&&m_isStory)
+		{
+			ShowPopTextTip("data error");
+			return;
+		}
 		m_stageMap[m_nowChapter[m_isStory]] = m_currStageList;
 
 		//更新章节信息
@@ -999,7 +1091,7 @@ void CTollgateLayer::onBattle(CCObject* pSender)
 		CButton *btn = (CButton*)pSender;
 		CStage *stage = (CStage*)btn->getUserData();
 		int zorder = btn->getZOrder();
-		if (stage&&stage->isOpen)
+		if (stage&&stage->isOpen && stage->id!=m_iFirstLockedStage)
 		{
 			//DataCenter::sharedData()->getWar()->setChapter(m_chapterList[m_isStory][m_selectChapterIndex-1]);
 			DataCenter::sharedData()->getWar()->setLastStageId(stage->id); 
@@ -1025,7 +1117,7 @@ void CTollgateLayer::onBattle(CCObject* pSender)
 			{
 				CPlayerControl::getInstance().sendStageInfo(stage->id);
 			}
-		} 
+		}
 	}
 	else
 	{
@@ -1096,7 +1188,8 @@ void CTollgateLayer::checkLeftAndRightButton()
 		CButton* leftbtn = (CButton*)(m_ui->findWidgetById("left"));
 		leftbtn->setVisible(m_currChapterIndex>=1);
 		CButton* rightbtn = (CButton*)(m_ui->findWidgetById("right"));
-		rightbtn->setVisible(m_currChapterIndex<1&&m_chapterList[m_isStory].at(4).isOpen);
+		int page = m_chapterList[m_isStory].size()%4==0?m_chapterList[m_isStory].size()/4:m_chapterList[m_isStory].size()/4+1;
+		rightbtn->setVisible(m_currChapterIndex<page-1);
 	}
 }
 
@@ -1149,4 +1242,125 @@ bool CTollgateLayer::isLasStageInChapter( const CStage& stage )
 void CTollgateLayer::setLastChapter(int chapter)
 {
 	m_currChapter = chapter;
+}
+
+void CTollgateLayer::imageLoadSuccessCallBack(string sTag, vector<char>* pBuffer)
+{
+	CCImage* img = new CCImage;
+	img->initWithImageData((unsigned char*)pBuffer->data(), pBuffer->size());
+	CCTexture2D* texture = new CCTexture2D();
+	texture->initWithImage(img);
+
+	CCSprite *headImg = CCSprite::createWithTexture(texture);
+// 	if (pCell) pCell->getChildByTag(2)->addChild(headImg);
+	int stageId = atoi(sTag.c_str());
+	int size = m_stageMap[m_chapterList[m_isStory][m_selectChapterIndex-1].id].size();
+	//找到下载对应的关卡
+	{
+		CStage *cstage = nullptr;
+		for (int i = 0; i < size; i++)
+		{
+			CStage *stage = &m_stageMap[m_chapterList[m_isStory][m_selectChapterIndex-1].id].at(i);
+			if (stage->id == stageId)
+			{
+				cstage = stage; 
+				break;
+			}
+		}
+		if (cstage)
+		{
+
+			string fbName = cstage->friendList.at(0)+".jpg";
+			string fullName = CCFileUtils::sharedFileUtils()->fullPathForFilename(fbName.c_str());
+			bool isFileExist = CCFileUtils::sharedFileUtils()->isFileExist(fullName);
+			if (!isFileExist)
+			{
+				string path = HttpLoadImage::getInstance()->getStoragePath("download/fbImg",cstage->friendList.at(0).c_str())+".jpg";
+				string buff(pBuffer->begin(), pBuffer->end());
+				CCLOG("path: %s", path.c_str());
+				FILE *fp = fopen(path.c_str(), "wb+");
+				fwrite(buff.c_str(), 1, pBuffer->size(),  fp);
+				fclose(fp);
+			}
+			string id = cstage->friendList.at(0)+ToString(cstage->id);
+			m_pageView->cellAtIndex(0)->findWidgetById(id.c_str())->addChild(headImg, -1);
+			NodeFillParent(headImg);
+			headImg->setScale(headImg->getScale()*0.85f);
+		}
+	}
+	img->release();
+}
+
+void CTollgateLayer::addFaceBookImg(CStage &stage, CImageView * fbBg)
+{
+	string fbName = stage.friendList.at(0)+".jpg";
+	string fullName = CCFileUtils::sharedFileUtils()->fullPathForFilename(fbName.c_str());
+	bool isFileExist = CCFileUtils::sharedFileUtils()->isFileExist(fullName);
+	if(isFileExist)
+	{
+		CCSprite* spr = CCSprite::create(fullName.c_str());
+		if (spr)
+		{
+			fbBg->addChild(spr, -1);
+			NodeFillParent(spr);
+			spr->setScale(spr->getScale()*0.85f);
+		}
+	}
+	else
+ 	{
+// 		CCSprite* spr = CCSprite::create("headImg/119.png");
+// 		if (spr)
+// 		{
+// 			fbBg->addChild(spr);
+// 			NodeFillParent(spr);
+// 			spr->setScale(0.8*spr->getScale());
+// 		}
+		CCString *imgUrl = CCString::createWithFormat(FACEBOOKIMG,stage.friendList.at(0).c_str());
+		HttpLoadImage::getInstance()->requestUrlImage(imgUrl->getCString(),ToString(stage.id));
+	}
+	string strId = stage.friendList.at(0) + ToString(stage.id);
+	fbBg->setId(strId.c_str());
+}
+
+void CTollgateLayer::onFaceImg(CCObject* pSender)
+{
+	CImageView *imgView = (CImageView*)pSender;
+	CStage *stage = (CStage*)imgView->getUserData();
+
+	m_fbImgLayer = CFacebookImg::create();
+	m_fbImgLayer->setVisible(true);
+	LayerManager::instance()->push(m_fbImgLayer);
+	m_fbImgLayer->setStage(*stage);
+}
+
+void CTollgateLayer::showTips( CCNode *pNode, const std::string sInfo )
+{
+	if( m_pTips->isVisible())
+	{
+		return;
+	}
+
+	CLayout *pTips = UICloneMgr::cloneLayout(m_pTips);
+	m_pTips->setVisible(true);
+
+	//计算位置
+	CCPoint pPos = ccp(pNode->getContentSize().width*pNode->getScaleX()*pNode->getAnchorPoint().x, -1);
+
+	pTips->setVisible(true);
+	pTips->setOpacity(0);
+	pTips->stopAllActions();
+
+	CLabel *pDesc = (CLabel *)pTips->findWidgetById("tips_info");
+	pDesc->setString(sInfo.c_str());
+
+	pTips->runAction(CCSequence::create(
+		CCFadeIn::create(0.2f),
+		//CCDelayTime::create(1.0f),
+		//CCFadeOut::create(0.3f),
+		//CCHide::create(),
+		nullptr));
+
+	pTips->setPosition(pPos);
+	pTips->setScale(0.95f/pNode->getScale());
+	pNode->addChild(pTips, 999);
 }

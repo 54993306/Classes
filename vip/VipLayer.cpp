@@ -18,7 +18,7 @@
 #include "CVipPay.h"
 #include "CPaySelect.h"
 
-#include "GamePlatfomDefine.h"
+#include "SDK/GamePlatformManager.h"
 #include "vip/CPayList.h"
 
 
@@ -57,38 +57,8 @@ void CVipLayer::onClose(CCObject* pSender)
 }
 
 void CVipLayer::onPay(CCObject* pSender)
-{
-//#if CC_TARGET_PLATFORM != CC_PLATFORM_WIN32
-//	ShowPopTextTip(GETLANGSTR(191));
-//	return;
-//#endif
-
-#if G_PLATFORM_TARGET == G_PLATFORM_UC
-	//LoginLayerUC::click_pay(nullptr);
-	ShowPopTextTip(GETLANGSTR(2015));
-	return;
-#endif
-
-	//win32平台默认显示
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
-	CPaySelect *paySel = CPaySelect::create();
-	LayerManager::instance()->push(paySel);
-	return;
-#endif
-
-	////只显示Google
-	//if(!DataCenter::sharedData()->getUser()->getUserData()->getGoogleBilling())
-	//{
-	//	CPayList *pGoogleList = CPayList::create();
-	//	pGoogleList->setPayType(PayListTypeGoogle);
-	//	LayerManager::instance()->push(pGoogleList);
-	//}
-	//else
-	{
-		CPaySelect *paySel = CPaySelect::create();
-		LayerManager::instance()->push(paySel);
-	}
-	
+{	
+	GamePlatformMgr->ShowPayUI();
 }
 
 void CVipLayer::onToggle(CCObject* pSender)
@@ -154,11 +124,11 @@ void CVipLayer::onEnter()
 	GetTcpNet->registerMsgHandler(VipInfoMsg,this, CMsgHandler_selector(CVipLayer::ProcessMsg));
 	GetTcpNet->registerMsgHandler(VipShopMsg,this, CMsgHandler_selector(CVipLayer::resVipShop));
 	GetTcpNet->registerMsgHandler(BuyCardMsg,this, CMsgHandler_selector(CVipLayer::buyCardRes));
-	GetTcpNet->registerMsgHandler(RechargeMsg,this, CMsgHandler_selector(CVipLayer::rechargeRes));
+	//GetTcpNet->registerMsgHandler(RechargeMsg,this, CMsgHandler_selector(CVipLayer::rechargeRes));
 
 	CSceneManager::sharedSceneManager()->addMsgObserver(UPDATE_VIPINFO,this,GameMsghandler_selector(CVipLayer::updateBuyInfo));
 	NOTIFICATION->postNotification(HIDE_TOP_LAYER);
-	NOTIFICATION->postNotification(HIDE_TOP_LAYER);
+	//NOTIFICATION->postNotification(HIDE_TOP_LAYER);
 
 	UserData *data = DataCenter::sharedData()->getUser()->getUserData();
 	CLabel *roleGold = (CLabel*)m_ui->findWidgetById("roleGold");
@@ -341,7 +311,7 @@ void CVipLayer::ProcessMsg(int type, google::protobuf::Message *msg)
 		//隐藏被遮盖的层，不渲染
 		LayerManager::instance()->hideLayerBeCovered(this);
 		NOTIFICATION->postNotification(HIDE_MAIN_SCENE);
-		NOTIFICATION->postNotification(SHOW_TOP_LAYER);
+		//NOTIFICATION->postNotification(SHOW_TOP_LAYER);
 	}
 
 

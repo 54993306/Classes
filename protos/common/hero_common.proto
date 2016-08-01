@@ -1,0 +1,89 @@
+import "common/skill_common.proto";
+import "common/item_common.proto";
+
+package protos.common;
+
+option java_package = "dass.server.gameserver.protos.common";
+option java_outer_classname = "HeroCommon";
+option optimize_for = SPEED ;
+
+//英雄
+message Hero{
+	optional int32	id = 1;			//玩家英雄ID(全服唯一)
+	optional int32  heroId = 2;		//英雄ID
+	optional string name = 3;		//名称
+	optional int32	level = 4;		//英雄等级
+	optional int32  maxLevel = 5;		//最大等级
+	optional int32  coldDown = 6;		//死亡后重新上阵CD
+	optional float	atkInterval = 7;	//攻击速度(次/秒)
+	
+	optional int32	hp = 8;			//血量
+	optional int32	atk = 9;		//攻击力
+	optional int32	def = 10;		//防御
+	optional int32	crit = 11;		//暴击几率
+	optional int32  hit = 12;		//命中
+	optional int32  dodge = 13;		//闪避、回避
+	optional int32  renew = 14;		//回复值
+	optional int32  dex = 62;		//敏捷
+
+	optional int32	addHp = 15;		//血量加成
+	optional int32	addAtk = 16;		//攻击加成
+	optional int32	addDef = 17;		//防御加成
+	optional int32  addHit = 18;		//命中加成
+	optional int32  addCrit = 19;		//暴击加成
+	optional int32  addDodge = 20;		//闪避加成
+	optional int32	addRenew = 21;		//回复加成
+	optional int32  addDex = 63;		//敏捷成长
+
+	optional int32	initCost = 22;		//初始cost
+	optional int32	useCost = 23;		//上阵消耗
+	optional float	addCost = 24;		//cost恢复速度(1/s)
+	optional int32	moveCost = 25;		//每次移动消耗
+	optional int32  maxCost = 26;		//cost上限
+
+	optional int32	exp = 27;		//经验值
+	optional int32	nextExp = 28;		//下一级经验
+	optional int32  heroType = 29;		//英雄类型(1 僵尸， 2 道士， 3 神将)
+	optional int32  thumb = 30;		//英雄模型ID
+	optional int32  zoom = 31;		//模型缩放比例
+	optional int32  quality = 32;		//英雄品阶 1~5星
+	optional int32  maxQuality = 33;	//最大品阶
+	
+	optional int32  itemId = 37;		//进阶或招募所用到的道具ID
+	optional int32  itemNum1 = 34;		//需求碎片数量1
+	optional int32  itemNum2 = 35;		//需求碎片数量2
+	optional bool	own = 36;		//是否已拥有该英雄
+
+	optional int32  alert = 38;		//警戒区域类型
+	optional int32  alertRange = 39;	//警戒范围
+	optional int32  posX = 40;		//X轴格子数
+	optional int32  posY = 41;		//Y轴格子数
+
+	optional float  moveSpeed = 64;		//移动速度
+	optional common.Skill skill1 = 42;	//普通攻击
+	optional common.Skill skill2 = 43;	//特殊攻击
+	optional common.Skill skill3 = 44;	//必杀技能
+	optional common.Skill skill4 = 45;	//召唤技能(队长必杀技)
+	optional common.Skill skill5 = 65;	//队长技
+	optional int32  combat = 46;		//英雄战斗力
+	optional int32	coin = 49;		//选用好友英雄挑战关卡可获得的友情点
+
+	optional common.Item armor1 = 51;	//武器	
+	optional common.Item armor2 = 52;	//衣服
+	optional common.Item armor3 = 48;	//帽子
+	optional common.Item armor4 = 50;	//鞋子
+	optional common.Item armor5 = 53;	//宝物
+
+	optional int32  prate = 54;		//英雄生产效率
+	optional bool	battle = 55;		//是否已上阵
+	optional bool   remove = 56;		//若英雄已驻守，是否可撤离(进阶任务时表示是否可移走该英雄)
+	
+	optional int32  color = 47;		//边框颜色
+	optional bool	evol = 57;		//英雄是否可进阶
+	optional HPos	heroPos = 66;		//位置
+}
+
+message HPos{
+	required int32 x = 1;
+	required int32 y = 2;
+}

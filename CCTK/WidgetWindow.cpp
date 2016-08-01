@@ -49,6 +49,7 @@ CWidgetWindow::CWidgetWindow()
 , m_pLongClickedWidgetObject(NULL)
 , m_bMultiTouchEnabled(false)
 , m_isTouchSwallow(true)
+, m_pTouch(NULL)
 #if USING_LUA
 , m_nTouchMovedAfterLongClickScriptHandler(0)
 , m_nTouchEndedAfterLongClickScriptHandler(0)
@@ -408,6 +409,8 @@ void CWidgetWindow::onExit()
 
 bool CWidgetWindow::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
 {
+	if( m_pTouch != NULL ) return true;
+
 	if (m_bModalable) return true;
 	if( m_bTouchEnabled && m_bVisible && m_pChildren && m_pChildren->count() > 0 )
 	{
@@ -428,6 +431,7 @@ bool CWidgetWindow::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
 							m_pSelectedWidget = pWidget;
 							m_bIsTouched = true;
 							m_fTouchedDuration = 0.0f;
+							m_pTouch = pTouch;
 							return true;
 						}
 					}
@@ -441,6 +445,8 @@ bool CWidgetWindow::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
 
 void CWidgetWindow::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)
 {
+	if( m_pTouch != pTouch )  return;
+
 	if( m_pSelectedWidget )
 	{
 		if( m_pSelectedWidget->isTouchInterrupted() )
@@ -459,6 +465,8 @@ void CWidgetWindow::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)
 
 void CWidgetWindow::ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent)
 {
+	if( m_pTouch != pTouch )  return;
+
 	if( m_pSelectedWidget )
 	{
 		if( m_pSelectedWidget->isTouchInterrupted() )
@@ -477,10 +485,13 @@ void CWidgetWindow::ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent)
     m_fTouchedDuration = 0.0f;
 	m_pSelectedWidget = NULL;
 	m_pLongClickedWidgetObject = NULL;
+	m_pTouch = NULL;
 }
 
 void CWidgetWindow::ccTouchCancelled(CCTouch *pTouch, CCEvent *pEvent)
 {
+	if( m_pTouch != pTouch )  return;
+
 	if( m_pSelectedWidget )
 	{
 		if( m_pSelectedWidget->isTouchInterrupted() )
@@ -499,6 +510,7 @@ void CWidgetWindow::ccTouchCancelled(CCTouch *pTouch, CCEvent *pEvent)
     m_fTouchedDuration = 0.0f;
 	m_pSelectedWidget = NULL;
 	m_pLongClickedWidgetObject = NULL;
+	m_pTouch = NULL;
 }
 
 void CWidgetWindow::ccTouchesBegan(CCSet *pTouches, CCEvent *pEvent)

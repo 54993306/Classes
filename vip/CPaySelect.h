@@ -10,6 +10,8 @@ enum PayType
 	GooglePay
 };
 
+const static char *PaySelectDay = "2016-07-13-00";
+
 class CPaySelect:public BaseLayer
 {
 public:
@@ -22,7 +24,8 @@ public:
 	void onClose( CCObject * pSender );
 	int getPayType();
 private:
-
+	void updateForCheckDay(float dt);
+	void updatePayUiShow( bool bShowAll );
 	
 private:
 	void onPhonePay( CCObject * pSender );

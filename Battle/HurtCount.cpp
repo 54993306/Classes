@@ -24,6 +24,7 @@
 #include "Battle/RoleObject/HPObject.h"
 #include "Battle/BuffData.h"
 #include "Battle/skEffectData.h"
+#include "Battle/BattleTools.h"
 namespace BattleSpace
 {
 	HurtCount::HurtCount():m_Manage(nullptr){}
@@ -58,14 +59,20 @@ namespace BattleSpace
 		const skEffectData* effect = AtcAlive->getCurrEffect();
 		if (effect->getBatter() != AtcAlive->getSortieNum() || !effect->getRepel())
 			return HitAlive->getGridIndex();									//连击的最后一次才做击退
-		bool enemy = AtcAlive->getEnemy();
+		bool tEnemy = AtcAlive->getOtherCamp();
 		if (AtcAlive->getOpposite())
-			enemy = !enemy;
-		int grid = MoveRule::create()->FrontBack(HitAlive,effect->getRepel(),enemy);
+			tEnemy = !tEnemy;
+		int grid = MoveRule::create()->FrontBack(HitAlive,effect->getRepel(),tEnemy);
 		if (grid != INVALID_GRID)
 		{
-			if ( grid>=C_BEGINGRID && grid<C_CAPTAINGRID )						//击退范围做一个边界处理
-				return grid;
+			if (!DataCenter::sharedData()->getWar()->getNormal())
+			{
+				if (grid >= C_PVEStopGrid)
+					return grid;
+			}else{
+				if ( grid >= C_BEGINGRID )						//击退范围做一个边界处理
+					return grid;								//精英关卡的击退距离要做一个处理，因为精英关卡是不能够移动。
+			}
 		}		
 		return HitAlive->getGridIndex();
 	}
@@ -116,6 +123,7 @@ namespace BattleSpace
 		}else{
 			AtcTarget->HittingAlive.push_back(HitTarget);
 		}
+		VectorUnique(AtcTarget->HittingAlive);
 	}
 
 	void HurtCount::woldBossHurt( BaseRole* pAlive,float pHurt )
@@ -162,6 +170,7 @@ namespace BattleSpace
 		float hurt   = effect->getRealHurt();									//真实伤害
 		//注意百分比和正负值运算问题
 		float addhp = attributeHurt(AtcTarget);							//属性伤害的值
+		addhp += HitTarget->getRenew();
 		if (!erange)erange = 0.05f;
 		float hp_max = addhp*(1 + erange);			  
 		float hp_min = addhp*(1 - erange);			  
@@ -305,6 +314,9 @@ namespace BattleSpace
 	//只能计算最后一个效果添加在武将身上的buff
 	void HurtCount::BuffHandleLogic(BaseRole* pAlive)
 	{
+#if BATTLE_TEST
+		return ;
+#endif
 		const skEffectData* tKillEffect = pAlive->getCurrEffect();
 		BuffManage* AtcbufManege = pAlive->getBuffManage();
 		for (auto tAlive : pAlive->HittingAlive)

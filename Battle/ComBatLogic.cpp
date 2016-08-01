@@ -34,11 +34,13 @@
 #include "Battle/BaseRoleData.h"
 #include "Battle/MonsterData.h"
 #include "Battle/Strategy/TotalStrategy.h"
+#include "Battle/BattleDataCenter.h"
+#include "Battle/BattleModel.h"
 namespace BattleSpace
 {
 	CombatLogic::CombatLogic()
-		:mTime(0),mAssist(nullptr),mTask(nullptr),mCombatEffect(nullptr),m_FiratBatch(true)
-		,mMapLayer(nullptr),mControlLayer(nullptr),mBattleScene(nullptr)
+		:mTime(0),mAssist(nullptr),mTask(nullptr),mCombatEffect(nullptr),mFirstBatch(true)
+		,mMapLayer(nullptr),mControlLayer(nullptr),mBattleScene(nullptr),mInterval(0)
 		,mManage(nullptr),mTotalStrategy(nullptr),mGuideManage(nullptr)
 		,mCritRole(nullptr),mRecvFinish(false),m_PlayerNum(0),mbufExp(nullptr)
 		,m_Record(true),m_RecordNum(0)
@@ -116,10 +118,10 @@ namespace BattleSpace
 
 	void CombatLogic::showRound()
 	{
-		if (mTime >= 0.8f && m_FiratBatch && !mGuideManage->IsGuide())
+		if (mTime >= 0.8f && mFirstBatch && !mGuideManage->IsGuide())
 		{
 			mManage->setLogicState(true);
-			m_FiratBatch = false;
+			mFirstBatch = false;
 			bNotification->postNotification(MsgMonsterTips);
 		}
 	}
@@ -149,6 +151,7 @@ namespace BattleSpace
 	void CombatLogic::update(float delta)
 	{
 		mTime += delta;
+		mInterval += delta;
 		showRound();
 		updateTask();
 		mbufExp->ResetInterval(delta);
@@ -167,16 +170,21 @@ namespace BattleSpace
 		ExcuteAI(delta);
 		if ( !mCritRole )
 		{
+			if (mInterval > 1.0f)						//每 1.0f 秒强行刷新一次策略
+			{
+				mInterval = 0;
+				mTotalStrategy->updateStrategy();
+			}
 			mManage->costUpdate(delta);
-			mTotalStrategy->excuteStrategy(delta);		//我方释放必杀技是不做AI处理
+			mTotalStrategy->excuteStrategy(delta);
 		}
 	}
 	//cost 计算(帧)或以秒为单位进行计算、位置实时更新
 	void CombatLogic::CostCount(BaseRole* tRole,float dt)
 	{
-		if ( tRole->getEnemy() || tRole->getFatherID() || mCritRole)			
+		if ( tRole->getOtherCamp() || tRole->getFatherID() || mCritRole)			
 			return;
-		if (mManage->inAddCostArea(tRole->getGridIndex()))
+		if (mManage->inAddCostArea(tRole->getGridIndex()) || tRole->getCaptain())
 		{
 			float tSpeed = mManage->getCostSpeed() + (tRole->getAddCost()* dt);
 			mManage->setCostSpeed(tSpeed);
@@ -209,12 +217,15 @@ namespace BattleSpace
 		mCombatEffect->setPlayerNum(m_PlayerNum);
 		if (m_PlayerNum >= m_RecordNum)
 		{
-			mManage->setLogicState(false);
-			mCombatEffect->BatterSpine(m_RecordNum);
+			if (!BattleData->getBattleModel()->isPvEBattle())
+			{
+				mManage->setLogicState(false);
+				mCombatEffect->BatterSpine(m_RecordNum);
+			}
 			m_PlayerNum = 0; 
 			m_RecordNum = 0;
-			mCombatEffect->setPlayerNum(m_PlayerNum);
 			m_Record = true;
+			mCombatEffect->setPlayerNum(0);
 		}
 	}
 
@@ -222,7 +233,10 @@ namespace BattleSpace
 	{
 		BaseRole* tRole = dynamic_cast<BaseRole*>(ob);
 		tRole->AliveCritEnd();
-		mControlLayer->ResetButtonState(mCritRole);
+		if (tRole->getOtherCamp())
+			return;
+		tRole->AliveCritEnd();
+		mControlLayer->ResetButtonState(tRole);
 		bNotification->postNotification(MsgChangeLayerLight,CCBool::create(false));
 		mCritRole = nullptr;
 		critComboEffect();
@@ -231,13 +245,18 @@ namespace BattleSpace
 	void CombatLogic::rolePlyaSkill( CCObject* ob )
 	{
 		BaseRole* tRole = (BaseRole*)ob;
-		mCombatEffect->PlayerSkill(tRole);
-		if (!tRole->getEnemy())
+		if (BattleData->getBattleModel()->battlePause())
 		{
-			mManage->setLogicState(false);
-			mCritRole = tRole;
+			mCombatEffect->PlayerSkill(tRole);
+			if (!tRole->getEnemy())
+			{
+				mManage->setLogicState(false);
+				mCritRole = tRole;
+			}
+			mMapLayer->DrawWarningEffect(tRole->mSkillArea);						//格子预警
+		}else{
+			mMapLayer->DrawWarningEffect(tRole->mSkillArea);						//格子预警
 		}
-		mMapLayer->DrawWarningEffect(tRole->mSkillArea);						//格子预警
 	}
 	void CombatLogic::beginStageFloorEffect()								//可以搬到maplayer
 	{
@@ -263,16 +282,25 @@ namespace BattleSpace
 	void CombatLogic::beginStoryEnd()
 	{
 		beginStageFloorEffect();
-		PlayEffectSound(SFX_413);	
-		CCDelayTime* delay = CCDelayTime::create(0.5f);
-		CCDelayTime* delay2 = CCDelayTime::create(0.3f);
-		CCMoveTo* mt = CCMoveTo::create(1.2f,ccp( MAP_MINX(m_MapData) , mBattleScene->getMoveLayer()->getPositionY()));
-		CCCallFuncO* cfo = CCCallFuncO::create(this,callfuncO_selector(BattleScene::LayerMoveEnd),CCInteger::create((int)StoryType::eMoveEndStory));
-		CCSequence* sqe = CCSequence::create(delay,mt,delay2,cfo,nullptr);
-		mBattleScene->getMoveLayer()->runAction(sqe);
+		PlayEffectSound(SFX_413);
+		if (BattleData->getBattleModel()->layerMove())
+		{
+			CCDelayTime* delay = CCDelayTime::create(0.5f);
+			CCDelayTime* delay2 = CCDelayTime::create(0.3f);
+			CCMoveTo* mt = CCMoveTo::create(1.2f,ccp( MAP_MINX(m_MapData) , mBattleScene->getMoveLayer()->getPositionY()));
+			CCCallFuncO* cfo = CCCallFuncO::create(this,callfuncO_selector(BattleScene::LayerMoveEnd),CCInteger::create((int)StoryType::eMoveEndStory));
+			CCSequence* sqe = CCSequence::create(delay,mt,delay2,cfo,nullptr);
+			mBattleScene->getMoveLayer()->runAction(sqe);
+		}else{
+			CCDelayTime* delay = CCDelayTime::create(0.5f);
+			CCPlace* place = CCPlace::create(ccp( MAP_MINX(m_MapData)+280, mBattleScene->getMoveLayer()->getPositionY()));
+			CCCallFuncO* cfo = CCCallFuncO::create(this,callfuncO_selector(BattleScene::LayerMoveEnd),CCInteger::create((int)StoryType::eMoveEndStory));
+			CCSequence* sqe = CCSequence::create(delay,place,cfo,nullptr);
+			mBattleScene->getMoveLayer()->runAction(sqe);
+		}
 	}
 
-	void CombatLogic::moveStoryEnd()
+	void CombatLogic::moveStoryEnd(CCObject* ob)
 	{
 		mControlLayer->battleBegin();
 		mBattleScene->AddEvent();																//场景移动动画结束，添加事件响应
@@ -293,7 +321,12 @@ namespace BattleSpace
 			}break;
 		case StoryType::eMoveEndStory:
 			{
-				moveStoryEnd();		
+				if (BattleData->getBattleModel()->isPvEBattle()){
+					mCombatEffect->showVsAnimate( this );
+				}
+				else{
+					moveStoryEnd(nullptr);	
+				}
 			}break;
 		case StoryType::eOverStory:
 			{

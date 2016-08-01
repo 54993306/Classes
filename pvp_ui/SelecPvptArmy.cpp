@@ -32,7 +32,8 @@ CSelectPvpArmy::~CSelectPvpArmy()
 CSelectPvpArmy::CSelectPvpArmy()
 	:m_selectType(0),m_currPage(0),m_selectFriend(NULL),m_frdId(0),
 	m_friendId(0), m_stageId(0), m_questId(0), m_pActiveLay(nullptr),
-	m_bCaptainShowAction(false),m_WorldBoss(false){}
+	m_bCaptainShowAction(false),m_WorldBoss(false),m_iRoleId(0),m_bRobot(false),m_sEnemyRoleName(""),m_iEnemyRoleHead(0),m_sEnemyRoleFaceBook("")
+{}
 
 bool CSelectPvpArmy::init()
 {
@@ -41,7 +42,7 @@ bool CSelectPvpArmy::init()
 		MaskLayer* lay = MaskLayer::create("SelectArmymask");
 		lay->setContentSize(CCSizeMake(2824,640));
 		LayerManager::instance()->push(lay);
-		
+
 		m_ui = LoadComponent("selectPvpHero.xaml");
 		m_ui->setPosition(VCENTER);
 		this->addChild(m_ui);
@@ -132,16 +133,17 @@ void CSelectPvpArmy::onEnter()
 	m_gridView->reloadData();
 	m_gridView->setContentOffsetToTop();
 
-	m_oppTeamView = (CGridView*)m_ui->findWidgetById("scroll2");
-	m_oppTeamView->setDirection(eScrollViewDirectionVertical);	
+	m_oppTeamView = (CPageView*)m_ui->findWidgetById("scroll2");
+	m_oppTeamView->setZOrder(2);
+	m_oppTeamView->setDirection(eScrollViewDirectionHorizontal);	
 	m_oppTeamView->setCountOfCell(0);
-	m_oppTeamView->setSizeOfCell(m_cell1->getContentSize());
+	m_oppTeamView->setSizeOfCell(CCSizeMake(80,m_cell1->getContentSize().height));
 	m_oppTeamView->setAnchorPoint(ccp(0,0));
-	m_oppTeamView->setColumns(5);
 	m_oppTeamView->setAutoRelocate(true);
 	m_oppTeamView->setDeaccelerateable(false);
-	m_oppTeamView->setDataSourceAdapter(this,ccw_datasource_adapter_selector(CSelectPvpArmy::gridviewDataSource));
-	m_oppTeamView->reloadData();
+	m_oppTeamView->setDataSourceAdapter(this,ccw_datasource_adapter_selector(CSelectPvpArmy::oppViewDataSource));
+	//m_oppTeamView->reloadData();
+	m_oppTeamView->setDragable(false);
 	m_oppTeamView->setContentOffsetToTop();
 
 	CRadioBtnGroup *radioGroup = (CRadioBtnGroup *)m_ui->getChildByTag(10);
@@ -151,25 +153,25 @@ void CSelectPvpArmy::onEnter()
 		radioBtn->setOnCheckListener(this,ccw_check_selector(CSelectPvpArmy::onSwitchBtn));
 	}
 
-//     CRadioButton *myBat = (CRadioButton *)m_ui->findWidgetById("myBat");
-// 	myBat->setOnCheckListener(this,ccw_check_selector(CSelectPvpArmy::onMyBat));
-// 	CRadioButton *friendBat = (CRadioButton *)m_ui->findWidgetById("friendBat");
-// 	
-// 	//有世界BOSS
-// 	if(m_WorldBoss)
-// 	{
-// 		CCSprite* pIcon1 = (CCSprite*)m_ui->findWidgetById("switch9");
-// 		pIcon1->setVisible(false);
-// 		CCSprite* pIcon2 = (CCSprite*)m_ui->findWidgetById("switch11");
-// 		pIcon2->setVisible(false);
-// 
-// 		myBat->setVisible(false);
-// 		friendBat->setVisible(false);
-// 	}
-// 	else
-// 	{
-// 		friendBat->setOnCheckListener(this, ccw_check_selector(CSelectPvpArmy::onFriendBat));
-// 	}
+	//     CRadioButton *myBat = (CRadioButton *)m_ui->findWidgetById("myBat");
+	// 	myBat->setOnCheckListener(this,ccw_check_selector(CSelectPvpArmy::onMyBat));
+	// 	CRadioButton *friendBat = (CRadioButton *)m_ui->findWidgetById("friendBat");
+	// 	
+	// 	//有世界BOSS
+	// 	if(m_WorldBoss)
+	// 	{
+	// 		CCSprite* pIcon1 = (CCSprite*)m_ui->findWidgetById("switch9");
+	// 		pIcon1->setVisible(false);
+	// 		CCSprite* pIcon2 = (CCSprite*)m_ui->findWidgetById("switch11");
+	// 		pIcon2->setVisible(false);
+	// 
+	// 		myBat->setVisible(false);
+	// 		friendBat->setVisible(false);
+	// 	}
+	// 	else
+	// 	{
+	// 		friendBat->setOnCheckListener(this, ccw_check_selector(CSelectPvpArmy::onFriendBat));
+	// 	}
 	GetTcpNet->registerMsgHandler(HeroListMsg,this,CMsgHandler_selector(CSelectPvpArmy::processMessage));
 	GetTcpNet->registerMsgHandler(UnionRes,this,CMsgHandler_selector(CSelectPvpArmy::processMessage));
 	GetTcpNet->registerMsgHandler(PvpOppTeamMsg,this,CMsgHandler_selector(CSelectPvpArmy::processMessage));
@@ -249,7 +251,7 @@ void CSelectPvpArmy::onClearHero(CCObject* pSender)
 		m_frdId = 0;
 		m_friendId =0;
 	}
-    m_union.heroList.at(((CCInteger*)(heromask->getUserObject()))->getValue()) = hero;
+	m_union.heroList.at(((CCInteger*)(heromask->getUserObject()))->getValue()) = hero;
 	m_armyView->reloadData();
 	updateCost();
 
@@ -300,7 +302,7 @@ void CSelectPvpArmy::processNetMsg(int type, google::protobuf::Message *msg)
 void CSelectPvpArmy::setUnionList(vector<CUnion> unionList)
 {
 	m_unionList = unionList;
-	
+
 }
 
 void CSelectPvpArmy::addHeroCell(unsigned int uIdx, CPageViewCell * pCell)
@@ -349,7 +351,7 @@ void CSelectPvpArmy::addHeroCell(unsigned int uIdx, CPageViewCell * pCell)
 							head = CCSprite::create("headImg/101.png");
 							CCLOG("[ ERROR ] CSelectPvpArmy::addHeroCell Lost Image = %d",hero.thumb);
 						}
-					//	head->setScale(0.92f);
+						//	head->setScale(0.92f);
 						head->setPosition(ccp(child->getContentSize().width/2, child->getContentSize().height/2));
 						child->addChild(head);
 					}
@@ -382,7 +384,7 @@ void CSelectPvpArmy::addHeroCell(unsigned int uIdx, CPageViewCell * pCell)
 						CCSprite *heroType = (CCSprite*)child;
 						heroType->setTexture(CCTextureCache::sharedTextureCache()->addImage(CCString::createWithFormat("common/type_%d_%d.png", hero.roletype, data->iType2)->getCString()));
 					}
-					
+
 				}break;
 			default:break;
 			}
@@ -436,33 +438,41 @@ void CSelectPvpArmy::onCombat(CCObject* pSender)
 		ShowPopTextTip(GETLANGSTR(253));
 		return;
 	}
+	PlayEffectSound(SFX_430);
+
+	CButton *combat= (CButton *)pSender;
+	combat->setEnabled(false);
+
+	vector<int> tMondels;
+	for (auto tHero :m_union.heroList)
 	{
-		PlayEffectSound(SFX_430);
-
-		CButton *combat= (CButton *)pSender;
-		combat->setEnabled(false);
-
-		//有世界BOSS
-		if(m_WorldBoss)
-		{
-			CPlayerControl::getInstance().sendEnterStageForBoss(
-				m_union.heroList.at(0).id,
-				m_union.heroList.at(1).id,
-				m_union.heroList.at(2).id,
-				m_union.heroList.at(3).id,
-				m_union.heroList.at(4).id);
-			DataCenter::sharedData()->getWar()->setWorldBoss(true);
-		}else{
-			CPlayerControl::getInstance().sendEnterStage(
-				m_stageId,
-				m_union.heroList.at(0).id,
-				m_union.heroList.at(1).id,
-				m_union.heroList.at(2).id,
-				m_union.heroList.at(3).id,
-				m_union.heroList.at(4).id,
-				m_frdId,m_questId);
-		}
+		tMondels.push_back(tHero.id);
 	}
+	CPlayerControl::getInstance().sendPvEBattleInfo(m_iRoleId,m_bRobot,tMondels);
+
+	//存储vs动画数据
+	UserData *pUserData = DataCenter::sharedData()->getUser()->getUserData();
+	std::string sSelfRoleName = pUserData->getRoleName();
+	int iEnemyLeader = 0;
+	if (m_oppTeamList.size()>0)
+	{
+		iEnemyLeader = m_oppTeamList.at(0).thumb;
+	}
+	int iSelfLeader = 0;
+	if(m_union.heroList.size()>0)
+	{
+		iSelfLeader = m_union.heroList.at(0).thumb;
+	}
+	VsAnimateData &vsAniamteData = DataCenter::sharedData()->getVsAnimateData();
+
+	vsAniamteData.sEnemyRoleName = m_sEnemyRoleName;
+	vsAniamteData.sSelfRoleName = sSelfRoleName;
+	vsAniamteData.iEnemyLeader = iEnemyLeader;
+	vsAniamteData.iSelfLeader = iSelfLeader;
+	vsAniamteData.iEnemyHead = m_iEnemyRoleHead;
+	vsAniamteData.iSelfHead  = pUserData->getThumb();
+	vsAniamteData.sEnemyFacebookId = m_sEnemyRoleFaceBook;
+	vsAniamteData.sSelfFacebookId = pUserData->getFbId();
 
 }
 
@@ -527,6 +537,19 @@ CCObject* CSelectPvpArmy::gridviewDataSource(CCObject* pConvertCell, unsigned in
 		pCell->autorelease();
 		pCell->setTag(uIdx);
 		addHeroSelectCell(uIdx,pCell);
+	}
+	return pCell;
+}
+
+CCObject* CSelectPvpArmy::oppViewDataSource(CCObject* pConvertCell, unsigned int uIdx)
+{ 
+	CPageViewCell* pCell = (CPageViewCell*)pConvertCell;
+	/*if (!pCell&&uIdx>=0&&uIdx<m_itemList.size())*/
+	{
+		pCell = new CPageViewCell();
+		pCell->autorelease();
+		pCell->setTag(uIdx);
+		addOppTeamCell(uIdx,pCell);
 	}
 	return pCell;
 }
@@ -797,7 +820,7 @@ void CSelectPvpArmy::addHeroSelectCell(unsigned int uIdx, CGridViewCell* pCell)
 
 void CSelectPvpArmy::showSelectRadioImg(int selIndex)
 {
-	
+
 }
 
 void CSelectPvpArmy::onSelectHero(CCObject *pSender)
@@ -851,7 +874,7 @@ void CSelectPvpArmy::onSelectHero(CCObject *pSender)
 			m_union.heroList.at(i) = *hero;
 			m_armyView->reloadData();
 			updateCost();
-			
+
 			ReloadGridViewWithSameOffset(m_gridView);
 
 			updateMainSkillDesc();
@@ -911,7 +934,7 @@ void CSelectPvpArmy::processMessage(int type, google::protobuf::Message *msg)
 		{
 			HeroListResponse *res = (HeroListResponse*)msg;
 			m_heroList.clear();
-			
+
 			if (CGuideManager::getInstance()->getIsRunGuide())
 			{
 				CHero hr;
@@ -951,7 +974,7 @@ void CSelectPvpArmy::processMessage(int type, google::protobuf::Message *msg)
 	case UnionRes:
 		{
 			UnionResponse *res = (UnionResponse*)msg;
-		    m_union.read(*res);
+			m_union.read(*res);
 
 			if(CGuideManager::getInstance()->getIsRunGuide()&&CGuideManager::getInstance()->getCurrTask()==2)
 			{
@@ -969,7 +992,7 @@ void CSelectPvpArmy::processMessage(int type, google::protobuf::Message *msg)
 			}
 
 			m_armyView->setCountOfCell(1);
-		    m_armyView->reloadData();
+			m_armyView->reloadData();
 			//Mr.yan
 			if(!CGuideManager::getInstance()->getIsRunGuide())
 			{
@@ -978,7 +1001,7 @@ void CSelectPvpArmy::processMessage(int type, google::protobuf::Message *msg)
 			}
 			updateCost();
 			updateMainSkillDesc();
-// 			selArmy->setStageFriendId(m_stagId,m_selectFriend->friendId);
+			// 			selArmy->setStageFriendId(m_stagId,m_selectFriend->friendId);
 
 			//动作初始化
 			initAction();
@@ -987,8 +1010,31 @@ void CSelectPvpArmy::processMessage(int type, google::protobuf::Message *msg)
 		break;
 	case PvpOppTeamMsg:
 		{
-			OppTeamRes *res = (OppTeamRes*)msg;
 
+			OppTeamRes *res = (OppTeamRes*)msg;
+			if (res->result()==1)
+			{
+				for (int i = 0; i < res->hero_list_size(); i++)
+				{
+					CHero he;
+					he.readData(res->hero_list(i));
+					m_oppTeamList.push_back(he);
+				}
+				if (m_oppTeamList.size()>0)
+				{
+					m_oppTeamView->setCountOfCell(m_oppTeamList.size());
+					m_oppTeamView->reloadData();
+				}
+
+				const SkillCfg *cfg= DataCenter::sharedData()->getSkill()->getCfg(res->captin_skill_id());
+				if (cfg)
+				{
+					CLabel *skillName = (CLabel*)m_ui->findWidgetById("skillname");
+					skillName->setString(cfg->desc.c_str());
+				}
+				CLabel *combatNum = (CLabel*)m_ui->findWidgetById("combatNum");
+				combatNum->setString(ToString(res->team_combat()));
+			}
 		}
 	}
 
@@ -1013,7 +1059,7 @@ void CSelectPvpArmy::updateCurrHeroList()
 				m_gridView->setCountOfCell(m_currHeroList->size());
 			}
 
-// 			ReloadGridViewWithSameOffset(m_gridView);
+			// 			ReloadGridViewWithSameOffset(m_gridView);
 			m_gridView->reloadData();
 			break;
 		}
@@ -1074,14 +1120,14 @@ void CSelectPvpArmy::showActionForArmy(float dt)
 {
 	m_pActiveLay->runAction(CCSequence::createWithTwoActions(CCMoveBy::create(0.25f, ccp(0, 150)), CCCallFunc::create(this, callfunc_selector(CSelectPvpArmy::showActionForArmyCallBack))));
 	//链条1.链条2
-// 	{
-// 		CCNode* pLink = (CCNode*)m_ui->findWidgetById("link_1");
-// 		pLink->runAction(CCMoveBy::create(0.25f, ccp(0, 30)));
-// 	}
-// 	{
-// 		CCNode* pLink = (CCNode*)m_ui->findWidgetById("link_2");
-// 		pLink->runAction(CCMoveBy::create(0.25f, ccp(0, 30)));
-// 	}
+	// 	{
+	// 		CCNode* pLink = (CCNode*)m_ui->findWidgetById("link_1");
+	// 		pLink->runAction(CCMoveBy::create(0.25f, ccp(0, 30)));
+	// 	}
+	// 	{
+	// 		CCNode* pLink = (CCNode*)m_ui->findWidgetById("link_2");
+	// 		pLink->runAction(CCMoveBy::create(0.25f, ccp(0, 30)));
+	// 	}
 }
 
 
@@ -1124,10 +1170,10 @@ bool CSelectPvpArmy::showAddCaptain()
 		pTJ1->runAction(CCSequence::createWithTwoActions(CCRotateBy::create(0.15f, 360), CCMoveBy::create(0.2f, ccp(35, 35))));
 		CCNode* pTJ2 = m_pTaiJi2;
 		pTJ2->runAction(CCSequence::createWithTwoActions(CCRotateBy::create(0.15f, 360), CCMoveBy::create(0.2f, ccp(-35, -35))));
-		
+
 		CCSprite* pFire = (CCSprite*)((CCSprite*)m_ui->findWidgetById("circle_3"))->getChildByTag(1);
 		pFire->runAction(CCFadeIn::create(0.3f));
-		
+
 		//数字
 		CCSprite* pText = (CCSprite*)m_ui->findWidgetById("cost");
 		pText->setVisible(true);
@@ -1135,12 +1181,12 @@ bool CSelectPvpArmy::showAddCaptain()
 		pText->runAction(CCSequence::create(CCDelayTime::create(0.2f), CCSpawn::createWithTwoActions(CCFadeIn::create(0.15f), CCEaseBackOut::create(CCMoveBy::create(0.2f, ccp(90, 0)))),nullptr));
 		//木板
 		{
-			CCNode* pPanel = (CCNode*)m_ui->findWidgetById("bank_2");
-			pPanel->runAction(CCMoveBy::create(0.2f, ccp(0, 102)));
+			//CCNode* pPanel = (CCNode*)m_ui->findWidgetById("bank_2");
+			//pPanel->runAction(CCMoveBy::create(0.2f, ccp(0, 102)));
 			CCNode* pTitle = (CCNode*)m_ui->findWidgetById("desc_title");
-			pTitle->runAction(CCMoveBy::create(0.2f, ccp(0, 102)));
+			pTitle->runAction(CCFadeIn::create(0.2f));
 			CCNode* pDesc = (CCNode*)m_ui->findWidgetById("desc");
-			pDesc->runAction(CCMoveBy::create(0.2f, ccp(0, 102)));
+			pDesc->runAction(CCFadeIn::create(0.2f));
 		}
 	}
 	this->runAction(CCSequence::createWithTwoActions(CCDelayTime::create(0.4f), CCCallFunc::create(this, callfunc_selector(CSelectPvpArmy::showCaptainActionCallBack))));
@@ -1174,12 +1220,12 @@ bool CSelectPvpArmy::showRemoveCaptain()
 
 		//木板
 		{
-			CCNode* pPanel = (CCNode*)m_ui->findWidgetById("bank_2");
-			pPanel->runAction(CCMoveBy::create(0.2f, ccp(0, -102)));
+			//CCNode* pPanel = (CCNode*)m_ui->findWidgetById("bank_2");
+			//pPanel->runAction(CCMoveBy::create(0.2f, ccp(0, -102)));
 			CCNode* pTitle = (CCNode*)m_ui->findWidgetById("desc_title");
-			pTitle->runAction(CCMoveBy::create(0.2f, ccp(0, -102)));
+			pTitle->runAction(CCFadeOut::create(0.2f));
 			CCNode* pDesc = (CCNode*)m_ui->findWidgetById("desc");
-			pDesc->runAction(CCMoveBy::create(0.2f, ccp(0, -102)));
+			pDesc->runAction(CCFadeOut::create(0.2f));
 		}
 	}
 	this->runAction(CCSequence::createWithTwoActions(CCDelayTime::create(0.4f), CCCallFunc::create(this, callfunc_selector(CSelectPvpArmy::showCaptainActionCallBack))));
@@ -1207,51 +1253,52 @@ void CSelectPvpArmy::willToBatthle( CCObject* pObj )
 	CButton *combat= (CButton *)m_ui->findWidgetById("combat");
 	combat->stopAllActions();
 	//停止所有触摸事件
-	CCDirector::sharedDirector()->getTouchDispatcher()->removeAllDelegates();
+ 	CCDirector::sharedDirector()->getTouchDispatcher()->removeAllDelegates();
 }
 
 void CSelectPvpArmy::addOppTeamCell(unsigned int uIdx, CPageViewCell * pCell)
 {
-	    CLayout *lay = UICloneMgr::cloneLayout(m_cell1);
-		CHero &hero = m_oppTeamList.at(uIdx);
-		for (int i=1;i<=4;++i)
+	CLayout *lay = UICloneMgr::cloneLayout(m_cell1);
+	CHero &hero = m_oppTeamList.at(uIdx);
+	for (int i=1;i<=4;++i)
+	{
+		CCNode *child = lay->getChildByTag(i);
+		if (!child)continue;
+		lay->removeChild(child);
+		pCell->addChild(child);
+		switch (i)
 		{
-			CCNode *child = lay->getChildByTag(i);
-			if (!child)continue;
-			lay->removeChild(child);
-			pCell->addChild(child);
-			switch (i)
+		case 1:
 			{
-			case 1:
+				if (hero.thumb>0)
 				{
-					if (hero.thumb>0)
+					CCSprite *head = CCSprite::create(CCString::createWithFormat("headImg/%d.png", hero.thumb)->getCString());
+					if (!head)
 					{
-						CCSprite *head = CCSprite::create(CCString::createWithFormat("headImg/%d.png", hero.thumb)->getCString());
-						if (!head)
-						{
-							head = CCSprite::create("headImg/101.png");
-							CCLOG("[ ERROR ] CSelectPvpArmy::addHeroCell Lost Image = %d",hero.thumb);
-						}
-						//	head->setScale(0.92f);
-						head->setPosition(ccp(child->getContentSize().width/2, child->getContentSize().height/2));
-						child->addChild(head);
+						head = CCSprite::create("headImg/101.png");
+						CCLOG("[ ERROR ] CSelectPvpArmy::addHeroCell Lost Image = %d",hero.thumb);
 					}
-				}break;
-			case 2:
-				{
-					CImageView *mask =(CImageView*)child;
-					mask->setTexture(setItemQualityTexture(hero.iColor));
-				
-					//添加星级
-					CLayout* pStarLayout = getStarLayout(hero.iColor);
-					mask->addChild(pStarLayout);
-				}break;
-			case 3:
-			case 4:
-				{
-					child->setVisible(false);
-				}break;
-			default:break;
-			}
+					//	head->setScale(0.92f);
+					head->setPosition(ccp(child->getContentSize().width/2, child->getContentSize().height/2));
+					child->addChild(head);
+				}
+			}break;
+		case 2:
+			{
+				CImageView *mask =(CImageView*)child;
+				mask->setTexture(setItemQualityTexture(hero.iColor));
+
+				//添加星级
+				CLayout* pStarLayout = getStarLayout(hero.iColor);
+				mask->addChild(pStarLayout);
+			}break;
+		case 3:
+		case 4:
+			{
+				child->setVisible(false);
+			}break;
+		default:break;
 		}
+	}
+	pCell->setScale(0.75f);
 }

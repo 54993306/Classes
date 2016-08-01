@@ -10,8 +10,8 @@
 #ifndef _CAPTAINSKILL_
 #define _CAPTAINSKILL_
 #include "AppUI.h"
-namespace BattleSpace{
-
+namespace BattleSpace
+{
 	class BaseRole;
 	class RoleSkill;
 	class skEffectData;
@@ -21,7 +21,7 @@ namespace BattleSpace{
 		CaptainSkill(){};
 		virtual bool init(){return true;}
 		CREATE_FUNC(CaptainSkill);
-		void ExecuteSkill();
+		void ExecuteSkill(bool pOther = false);
 		CCArray* RaceJudgeCap(CCArray* arr,int type);
 		CCArray* RaceJudge(CCArray* arr,int type,bool exclude = false,bool And = false);
 		CCArray* AttributeJudgeArrCap(RoleSkill& skill,CCArray* arr);

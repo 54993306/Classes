@@ -1,16 +1,16 @@
 /************************************************************* 
- *
- *
- *		Data : 2016.7.6
- *	
- *		Name : 
- *
- *		Author : Lin_Xiancheng
- *
- *		Description : 
- *
- *
- *************************************************************/
+*
+*
+*		Data : 2016.7.6
+*	
+*		Name : 
+*
+*		Author : Lin_Xiancheng
+*
+*		Description : 
+*
+*
+*************************************************************/
 
 #include "Battle/BattleClose.h"
 #include "Battle/BattleMessage.h"
@@ -24,6 +24,7 @@
 #include "common/CommonFunction.h"
 #include "Battle/BattleConfigMacro.h"
 #include "Battle/CombatGuideManage.h"
+#include "Battle/BattleModel.h"
 
 #include "tools/ShowTexttip.h"
 #include "model/DataCenter.h"
@@ -83,10 +84,10 @@ namespace BattleSpace
 
 	void BattleClose::roleObjectRemove( CCObject* ob )
 	{
-		BaseRole* alive = (BaseRole*)ob;
-		if (alive->getEnemy() && alive->getLastAlive())
+		BaseRole* tRole = (BaseRole*)ob;
+		if (tRole->getOtherCamp() && tRole->getLastAlive())
 		{
-			if (!mManage->lastBatch())										//可能会出现的一个bug，两个人同时死亡的间隔太近，会多次调用这个方法。应该从逻辑处进行最后一个死亡武将的判定而不应该从这里进行处理
+			if (!mManage->lastBatch())
 			{
 				this->scheduleOnce(schedule_selector(BattleClose::NextBatch),1);				//打下一批次延时时间
 			}else{
@@ -101,9 +102,9 @@ namespace BattleSpace
 	void BattleClose::roleDieMsg( CCObject* ob )
 	{
 		BaseRole* tRole = (BaseRole*)ob;
-		if (tRole->getEnemy())
+		if (tRole->getOtherCamp())
 		{
-			monsterDie(tRole);
+			otherCampDie(tRole);
 		}else{
 			if ( tRole->getFatherID() )								//喽啰死亡不进行初始化处理
 				return;
@@ -118,11 +119,11 @@ namespace BattleSpace
 		}
 	}
 
-	void BattleClose::monsterDie( BaseRole* pRole )
+	void BattleClose::otherCampDie( BaseRole* pRole )
 	{
-		if (mManage->checkMonstOver())
+		if (mManage->checkBatchOver() || pRole->getCaptain())
 		{
-			pRole->setLastAlive(true);
+			pRole->setLastAlive(true);				//逻辑判定为最后一个死亡怪物
 			if (!mManage->lastBatch())				//判断最后一回合
 				return;
 			mManage->setLogicState(false);
@@ -222,7 +223,17 @@ namespace BattleSpace
 	{
 		if(mRecvFinish)
 			return;
-		CPlayerControl::getInstance().sendBattleFinish(1, m_finishData.res, m_finishData.roundNum);
+		if (BattleData->getBattleModel()->isPvEBattle())
+		{
+			if (m_finishData.res)
+			{
+				CPlayerControl::getInstance().sendPveBattleFinish(m_finishData.res, 60, 0, 100);
+			}else{
+				CPlayerControl::getInstance().sendPveBattleFinish(m_finishData.res, 60, 100, 0);
+			}
+		}else{
+			CPlayerControl::getInstance().sendBattleFinish(1, m_finishData.res, m_finishData.roundNum);
+		}
 	}
-	
+
 }

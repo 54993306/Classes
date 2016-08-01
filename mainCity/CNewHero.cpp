@@ -8,6 +8,7 @@
 #include "SDK/FaceBookSDK.h"
 #include "RecruitResult.h"
 #include "guide/GuideManager.h"
+
 CNewHero::CNewHero():m_ui(nullptr),m_pEffect(nullptr),m_bEvolve(false),m_bShowing(false),m_isFinish(false),m_isShare(false),m_pTarget(nullptr),m_pNewHeroEffectCallback(nullptr)
 {
 
@@ -294,6 +295,10 @@ void CNewHero::hideOrShow( bool bShow )
 				{
 					pNode->setVisible(true);
 				}
+				else if (strcmp(pWidget->getId(), "fbBtn")==0&&bShow)
+				{
+					pNode->setVisible(m_isShare);
+				}
 				else
 				{
 					pNode->setVisible(bShow);
@@ -350,10 +355,16 @@ void CNewHero::setIsShare(bool isShare)
 {
 	m_isShare = isShare;
 	CButton* fbBtn = (CButton*)m_ui->findWidgetById("fbBtn");
-    fbBtn->setVisible(isShare);
+#ifdef FACEBOOKSHARE
+	fbBtn->setVisible(isShare);
+#else
+	fbBtn->setVisible(false);
+	m_isShare = false;
+#endif // FACEBOOKSHARE
 	if (CGuideManager::getInstance()->getIsRunGuide())
 	{
 		fbBtn->setVisible(false);
+		m_isShare = false;
 	}
 }
 

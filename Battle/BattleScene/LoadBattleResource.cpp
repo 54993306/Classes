@@ -27,7 +27,7 @@
 using namespace CocosDenshion;
 //using namespace Battle;
 namespace BattleSpace{
-	LoadBattleResource::LoadBattleResource():m_tip(nullptr),m_currNum(0),m_publicNum(0), m_totalNum(0)
+	LoadBattleResource::LoadBattleResource():m_tip(nullptr),m_CurrIndex(0),m_publicNum(0), m_totalNum(0)
 		,m_progress(nullptr),m_Release(false),m_SceneType(-1),m_loadResNum(0),m_Layer(nullptr)
 	{}
 
@@ -201,9 +201,8 @@ namespace BattleSpace{
 	//公共资源、地图特效技能特效一起加载、骨骼动画和骨骼动画效果一起加载
 	void LoadBattleResource::ResourceDispose(float delta)
 	{
-		++m_currNum;
 		CCObject* resouseID = nullptr;
-		switch(m_currNum)
+		switch(m_CurrIndex)
 		{
 		case LOAD_PUBLIC_EFFECT:
 			{
@@ -227,12 +226,25 @@ namespace BattleSpace{
 			}break;
 		default:break;
 		}
-		float fPercent = float(m_currNum)/float(m_totalNum) * 100;
+		++m_CurrIndex;
+		updateProgress();
+	}
+
+	void LoadBattleResource::updateProgress()
+	{
+		float fPercent = float(m_CurrIndex)/float(m_totalNum) * 100;
 		fPercent = fPercent>100?100:fPercent;
 		m_progress->setValue(fPercent);
 		m_pZombieSprite->setPositionX(m_progress->getPositionX()+m_progress->getContentSize().width*fPercent/100-5);
-		if(m_currNum>=m_totalNum)
+		if(m_CurrIndex < m_totalNum)
+			return ;
+		if (m_Release)
+		{
+			releaseResource();
+		}else{
 			ProgressEnd();
+
+		}
 	}
 	//应该是抽象出一个类来对这个进行处理
 	void LoadBattleResource::LoadCocosEffect()
@@ -505,49 +517,48 @@ namespace BattleSpace{
 		}
 	}
 
+	void LoadBattleResource::releaseResource()
+	{
+		if ( !m_Manage->getStageID())	//统一释放了spine动画,是否可以统一的去释放骨骼动画资源
+			CCArmatureDataManager::sharedArmatureDataManager()->removeArmatureFileInfo("warpublic/open.ExportJson");
+		this->unscheduleAllSelectors();
+		DataCenter::sharedData()->getCombatGuideMg()->clearGuideData(true);
+		m_Manage->BattleDataClear();
+		DataCenter::sharedData()->getWar()->setWorldBoss(false);
+		DataCenter::sharedData()->getWar()->setWorldBossRank(0);
+		DataCenter::sharedData()->getTer()->clear();
+		DataCenter::sharedData()->getMap()->clearMap();
+		CCTextureCache::sharedTextureCache()->removeUnusedTextures();				//清理掉所有的不使用的图片
+		FileUtils::sharedFileUtils()->releaseFile(CSV_ROOT("loadWar.csv"));
+		LayerManager::instance()->closeAll();
+		switch (m_SceneType)
+		{
+		case SkipcityScene:
+			{
+				CSceneManager::sharedSceneManager()->replaceScene(GETSCENE(CMainScene), 1.0f);
+			}break;
+		case SkipLoginScene:
+			{
+				CSceneManager::sharedSceneManager()->replaceScene(GETSCENE(LoginScene), 0.5f);		
+			}break;
+		case skipSelectHero:
+			{
+				CSceneManager::sharedSceneManager()->replaceScene(GETSCENE(SelectHeroScene), 0.5f);	
+			}break;
+		default:	
+			{
+				CCLOG("[ ERROR ]: LoadBattleResource::loadWarResourse()  Skip Scene Fail ");	
+			}break;
+		}
+	}
+
 	void LoadBattleResource::ProgressEnd()
 	{
-		if (m_Release)
+		if ((m_loadResNum>=m_resVec.size() && m_LoadSpine->getLoadSucceed()) || 
+			 (m_CurrIndex >= m_totalNum + 1000) )
 		{
-			CCLOG("m_Release true");
-			if ( !m_Manage->getStageID())	//统一释放了spine动画,是否可以统一的去释放骨骼动画资源
-				CCArmatureDataManager::sharedArmatureDataManager()->removeArmatureFileInfo("warpublic/open.ExportJson");
-			this->unscheduleAllSelectors();
-			DataCenter::sharedData()->getCombatGuideMg()->clearGuideData(true);
-			m_Manage->BattleDataClear();
-			DataCenter::sharedData()->getWar()->setWorldBoss(false);
-			DataCenter::sharedData()->getWar()->setWorldBossRank(0);
-			DataCenter::sharedData()->getTer()->clear();
-			DataCenter::sharedData()->getMap()->clearMap();
-			CCTextureCache::sharedTextureCache()->removeUnusedTextures();				//清理掉所有的不使用的图片
-			FileUtils::sharedFileUtils()->releaseFile(CSV_ROOT("loadWar.csv"));
-			LayerManager::instance()->closeAll();
-			switch (m_SceneType)
-			{
-			case SkipcityScene:
-				{
-					CSceneManager::sharedSceneManager()->replaceScene(GETSCENE(CMainScene), 1.0f);
-				}break;
-			case SkipLoginScene:
-				{
-					CSceneManager::sharedSceneManager()->replaceScene(GETSCENE(LoginScene), 0.5f);		
-				}break;
-			case skipSelectHero:
-				{
-					CSceneManager::sharedSceneManager()->replaceScene(GETSCENE(SelectHeroScene), 0.5f);	
-// 					LoginScene *scene =  (LoginScene*)GETSCENE(LoginScene);
-// 					scene->setIsCreateRole(true);
-// 					CSceneManager::sharedSceneManager()->replaceScene(scene, 0.5f);		
-				}break;
-			default:	
-				{
-					CCLOG("[ ERROR ]: LoadBattleResource::loadWarResourse()  Skip Scene Fail ");	
-				}break;
-			}
-		}else if ( m_loadResNum>=m_resVec.size())
-		{
-			if ( !m_LoadSpine->getLoadSucceed())
-				return;
+			if (m_CurrIndex >= m_totalNum + 1000)
+				CCLOG("[ *ERROR ] LoadBattleResource::ProgressEnd");
 			for (int i=0; i<m_resVec.size();++i)
 			{
 				LoadResourceInfo &res = m_resVec.at(i);
@@ -564,6 +575,4 @@ namespace BattleSpace{
 			CSceneManager::sharedSceneManager()->replaceScene(GETSCENE(BattleScene), 0.5f);
 		}
 	}
-
-
 }

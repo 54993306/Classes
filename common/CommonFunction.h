@@ -122,3 +122,6 @@ CCTexture2D* SetRectColor(int iType);
 
 //只处理英雄跟物品一起的情况
 void SmartSetRectPrizeColor(CCSprite* pSprite, const CPrize* pPrize, const Prize* pProPrize=nullptr, HeroInfoData* pHeroData=nullptr);
+
+//核对日期是否到来
+bool CheckDay( const char *str );

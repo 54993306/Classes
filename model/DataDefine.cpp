@@ -15,7 +15,6 @@ void UserData::read(const protos::common::Role& role)
 		LayerManager::instance()->push(roleUpdate);
 		roleUpdate->updateRole(this,&role);
 	}
-
 	if (role.has_rolename())
 	{
 		this->m_roleName = role.rolename();
@@ -31,6 +30,10 @@ void UserData::read(const protos::common::Role& role)
 	if (role.has_rolecoin())
 	{
 		this->m_coin = role.rolecoin();
+	}
+	if (role.has_rolenation())
+	{
+		this->m_roleNation = role.rolenation();
 	}
 	if (role.has_rolegold())
 	{
@@ -131,5 +134,5 @@ UserData::UserData()
 	:m_raceType(0),m_level(0),m_roleFood(0),m_Friends(0),m_newStep(0),m_roleId(0)
 	,m_coin(0),m_exp(0),m_nextExp(0),m_roleAction(0),m_mapId(0),m_roleGold(0),m_roleName("")
 	,m_actionLimit(0),m_interval(0),m_vip(0),m_combat(0),m_thumb(0),m_inviteFriend(0)
-	,m_isFBLogin(false),m_mobileShop(false),m_bFirstLogin(false),m_roleMoney(0),m_rolePoints(0),m_bGoogleBilling(false)
+	,m_isFBLogin(false),m_mobileShop(false),m_bFirstLogin(false),m_roleMoney(0),m_rolePoints(0),m_bGoogleBilling(false),m_roleNation(0)
 {}

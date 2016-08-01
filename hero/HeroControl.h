@@ -39,7 +39,7 @@ public:
 	CREATE_LAYER(CHeroControl);
 	virtual bool init();
 	void processMessage(int type, google::protobuf::Message *msg);
-
+	void onExit();
 	void updateHeroValue(CHero * hero);
 
 	void onHeroInfo(CHero *hero,int showType);

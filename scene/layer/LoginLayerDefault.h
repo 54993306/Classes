@@ -11,7 +11,8 @@
 #include "jni/CJniHelper.h"
 #include "common/CursorTextField.h"
 #include "update/CDownloadPackageDelegate.h"
-#include "ApplicationDefine.h"
+
+const static char *LoginDayDefault = "2016-05-07-11";
 
 class LoginLayerDefault:  public BaseLayer, public MessageHandler, public CJniListener, public DownloadPackageDelegate
 {
@@ -119,8 +120,6 @@ private:
 
 	void showLabelRoll(const char* sInfo);
 	void hideLableRoll();
-
-	bool checkDay();
 
 	
 private:

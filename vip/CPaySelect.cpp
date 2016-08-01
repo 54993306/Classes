@@ -14,6 +14,9 @@
 #include "CVipCard.h"
 #include "CPayList.h"
 #include "model/DataCenter.h"
+#include "common/CommonFunction.h"
+#include "SDK/GamePlatfomDefine.h"
+
 
 CPaySelect::CPaySelect():m_ui(nullptr),m_payType(PhonePay)
 {
@@ -36,7 +39,13 @@ bool CPaySelect::init()
 		pMaskLayer->setContentSize(winSize);
 		LayerManager::instance()->push(pMaskLayer, true);
 
-		m_ui = LoadComponent("PaySelect.xaml");
+		std::string sXaml = "PaySelectGoogle.xaml";
+		if(CJniHelper::getInstance()->getPlatform() == G_PLATFORM_AIS)
+		{
+			sXaml = "PaySelectAis.xaml";
+		}
+
+		m_ui = LoadComponent(sXaml.c_str());
 		m_ui->setTag(1);
 		m_ui->setPosition(VCENTER);
 		this->addChild(m_ui, 2);
@@ -52,6 +61,9 @@ bool CPaySelect::init()
 		m_ui->addChild(view,-1);
 
 		this->setVisible(true);
+
+		//updatePayUiShow( /*CheckDay(PaySelectDay)*/true );
+		////schedule(schedule_selector(CPaySelect::updateForCheckDay), 1.0f);
 
 		return true;
 	}
@@ -92,16 +104,15 @@ void CPaySelect::onEnter()
 	pClose->setPosition(VLEFT+50, VTOP-50);
 	pClose->setOnClickListener(this,ccw_click_selector(CPaySelect::onClose));
 	this->addChild(pClose, 999);
+
+	NOTIFICATION->postNotification(HIDE_TOP_LAYER);
 }
 
 void CPaySelect::onExit()
 {
 	BaseLayer::onExit();	
-	if (LayerManager::instance()->getLayer("CActivityLayer"))
-	{
-		NOTIFICATION->postNotification(SHOW_TOP_LAYER);
-		NOTIFICATION->postNotification(SHOW_TOP_LAYER);
-	}
+
+	NOTIFICATION->postNotification(SHOW_TOP_LAYER);
 }
 
 
@@ -141,3 +152,27 @@ int CPaySelect::getPayType()
 {
 	return m_payType;
 }
+
+void CPaySelect::updateForCheckDay( float dt )
+{
+	if(CheckDay(PaySelectDay))
+	{
+		//重新刷新按钮状态
+		updatePayUiShow( true );
+
+		unschedule(schedule_selector(CPaySelect::updateForCheckDay));
+	}
+}
+
+void CPaySelect::updatePayUiShow( bool bShowAll )
+{
+	const char *str[6] = { "google", "bg3", "desc_Copy10",  "card", "cardid", "bg2"};
+
+	for(int i=0; i<6; i++)
+	{
+		CCNode *pNode =  m_ui->findWidgetById(str[i]);
+		pNode->setVisible(bShowAll);
+	}
+
+}
+

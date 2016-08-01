@@ -44,12 +44,23 @@ public:
 	void requestVersionInfoCallBack(cocos2d::extension::CCHttpClient *sender, cocos2d::extension::CCHttpResponse *response);
 
 	void callBackForSuccess();
-private:
+
+public:
 	void initDownloadDir();
 	void startDownload();
 	void downloadVersion();
 	void updateForChangePicture(float dt);
 	void update(float dt);
+
+	//更新中断，弹窗口提示重启还是下载新的apk
+	void  showHelpTips( const char *str , bool bShowOkOnly);
+	void showHelpTipsClick( CCObject *pSender );
+
+	//检查是否低于一个强制更新版本（从最大版本向下找）( 注意: 比较的是apk写入版本 )
+	bool isThereAForceApkVersion( std::string &strApkVersion );
+
+	//随机换图片
+	void changeRandPicture( CCSprite* pSprite );
 
 private:
 	CProgressBar*							m_progress;
@@ -66,6 +77,7 @@ private:
 	int												m_iCurrentIPixelndex;
 	int												m_iMaxPixel;
 	int												m_iPercent;
+	int												m_iErrorTimes;
 };
 
 

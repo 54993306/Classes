@@ -59,10 +59,11 @@ namespace BattleSpace
 		void critComboEffect();
 		void beginStageFloorEffect();
 		void beginStoryEnd();
-		void moveStoryEnd();
+		void moveStoryEnd(CCObject* ob);
 		void rolePlyaSkill(CCObject* ob);
 	private:	
-		bool m_FiratBatch;				//第一批怪物提示
+		float mInterval;
+		bool mFirstBatch;				//第一批怪物提示
 		bool m_Record;					//是否记录连击
 		int m_RecordNum;				//点击次数
 		int m_PlayerNum;				//播放次数

@@ -415,11 +415,12 @@ void CRankLayer::addBossRank(CLayout* pCell, CRankData * data)
 	{
 		CLayout *teamLay  = UICloneMgr::cloneLayout(m_heroLay);
 		CTeams *team = &data->teamList.at(i);
-		for (int j = 0; j < team->quality; j++)
-		{
-			CCNode *star = (CCNode*)(teamLay->findWidgetById(CCString::createWithFormat("star%d",j+1)->getCString()));
-			star->setVisible(true);
-		}
+
+		//for (int j = 0; j < team->color; j++)
+		//{
+		//	CCNode *star = (CCNode*)(teamLay->findWidgetById(CCString::createWithFormat("star%d",j+1)->getCString()));
+		//	star->setVisible(true);
+		//}
 		CCSprite *bg = (CCSprite*)teamLay->findWidgetById("bg");
 		CCSprite *head = CCSprite::create(CCString::createWithFormat("headImg/%d.png", team->thumb)->getCString());
 		if (head)
@@ -428,14 +429,19 @@ void CRankLayer::addBossRank(CLayout* pCell, CRankData * data)
 			bg->addChild(head);
 		}
 		CCSprite *mask = (CCSprite*)teamLay->findWidgetById("mask");
-		mask->setTexture(setItemQualityTexture(team->color));
+		const HeroInfoData *heroData = DataCenter::sharedData()->getHeroInfo()->getCfg(team->thumb);
+		mask->setTexture(SetRectColor(heroData->iType1));
 		while (teamLay->getChildrenCount()>0)
 		{
 			CCNode *node = (CCNode *) teamLay->getChildren()->objectAtIndex(0);
 			node->removeFromParent();
 			pCell->addChild(node);
-			node->setPositionX(node->getPositionX()-55*i);
+			node->setPositionX(node->getPositionX()-55*(data->teamList.size()-1-i));
 		}
+
+		//添加星星
+		CLayout* pStarLayout = getStarLayout(team->color);
+		mask->addChild(pStarLayout);
 	}
 }
 
@@ -591,8 +597,10 @@ void CRankLayer::addCombatRank(CLayout* pCell, CRankData * data)
 		{
 			continue;
 		}
+		child->retain();
 		lay->removeChild(child);
 		pCell->addChild(child);
+		child->release();
 
 		switch (i)
 		{
@@ -630,8 +638,11 @@ void CRankLayer::addCombatRank(CLayout* pCell, CRankData * data)
 					if(isFileExist)
 					{
 						CCSprite* spr =CCSprite::create(fullName.c_str());
-						child->addChild(spr);
-						NodeFillParent(spr);
+						if (spr)
+						{
+							child->addChild(spr);
+							NodeFillParent(spr);
+						}
 					}
 					else
 					{
@@ -726,11 +737,11 @@ void CRankLayer::imageLoadSuccessCallBack(string sTag, vector<char>* pBuffer)
 		pCell = m_tableView->cellAtIndex(nIdx);
 	}
 	CCSprite *headImg = CCSprite::createWithTexture(texture);
-	if (pCell)
+	if (pCell&&headImg)
 	{
 		CCNode *node = pCell->getChildByTag(2);
-		headImg->setPosition(ccp(node->getContentSize().width/2,node->getContentSize().height/2));
-		pCell->addChild(headImg);
+		node->addChild(headImg);
+		NodeFillParent(headImg);
 	}	
 	img->release();
 }

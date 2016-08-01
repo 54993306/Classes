@@ -420,15 +420,6 @@ CCObject* CBagLayer::gridviewDataSource(CCObject* pConvertCell, unsigned int uId
 					pLabel->setVisible(true);
 
 					pLabel->setString(CCString::createWithFormat("+%d",item->itemLevel)->getCString());
-
-					//if (item->itemLevel<item->armor.strenLv)
-					//{				
-					//	pLabel->setString(CCString::createWithFormat("Lv.%d",item->itemLevel)->getCString());
-					//}
-					//else
-					//{
-					//	pLabel->setString(CCString::createWithFormat("Lv.%s", GETLANGSTR(229))->getCString());
-					//}
 				}
 				else
 				{
@@ -451,7 +442,6 @@ void CBagLayer::onSelectBagItem(CCObject *pSender)
 	CButton *btn = (CButton*)pSender;	
 	const CItem *item = findItemByGrid(btn->getTag());
 	m_iSelectIndex = btn->getTag();
-	//showBookAnimate(m_ui);
 
 	if (m_selectType == Equipment_Type)
 	{
@@ -546,10 +536,6 @@ void CBagLayer::bagItemData(int type, Message *msg)
 // 		NOTIFICATION->postNotification(HIDE_MAIN_SCENE);
 		//showBookAnimate(m_ui);
 	}
-
-	//CRadioBtnGroup *radioGroup = (CRadioBtnGroup *)m_ui->getChildByTag(10);
-	//radioGroup->setTouchEnabled(true);
-	//radioGroup->stopAllActions();
 
 	if (m_bagData)
 	{

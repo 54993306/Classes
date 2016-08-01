@@ -7,7 +7,7 @@
 *
 *		Author : Lin_Xiancheng
 *
-*		Description : 可分为AutoData初始化部分，触发防御条件的情况是一种，不触发防御条件的情况是另一种
+*		Description : 可分为AutoData初始化部分，触发防御条件的情况是一种，不触发防御条件的情况是另一种,我方的策略是稳守策略。
 *
 *
 *************************************************************/
@@ -18,6 +18,8 @@
 #include "Battle/BaseRoleData.h"
 #include "Battle/BattleTools.h"
 #include "Battle/CaptainSkill.h"
+#include "Battle/Strategy/PvEStrategy.h"
+#include "Battle/MoveObject.h"
 
 #include "model/DataCenter.h"
 #include "model/WarManager.h"
@@ -29,7 +31,7 @@ namespace BattleSpace
 	{}
 
 	TotalStrategy::TotalStrategy():mAutoState(false),mButtonState(false),mSkillRole(nullptr)
-		,mSkillState(true)
+		,mSkillState(true),mExcute(true)
 	{}
 
 	TotalStrategy::~TotalStrategy()
@@ -42,7 +44,7 @@ namespace BattleSpace
 	void TotalStrategy::addEvent()
 	{
 		bNotification->addObserver(this,callfuncO_selector(TotalStrategy::changeAutoState),MsgAutoBattle,nullptr);
-		bNotification->addObserver(this,callfuncO_selector(TotalStrategy::roleStateChange),MsgBattleStateChange,nullptr);
+		bNotification->addObserver(this,callfuncO_selector(TotalStrategy::roleStateChange),MsgRoleDie,nullptr);
 		bNotification->addObserver(this,callfuncO_selector(TotalStrategy::acceptButtonState),MsgSendButtonState,nullptr);
 		bNotification->addObserver(this,callfuncO_selector(TotalStrategy::buttonUpdate),MsgButtonStateUpdate,nullptr);
 		bNotification->addObserver(this,callfuncO_selector(TotalStrategy::roleGridChange),MsgRoleGridChange,nullptr);
@@ -61,6 +63,9 @@ namespace BattleSpace
 		mAutoData->retain();
 		mManage = DataCenter::sharedData()->getWar();
 		initCrossArea();
+		mPveStrategy = PvEStrategy::create();
+		mPveStrategy->retain();
+		mPveStrategy->setTotalStrategy(this);
 		return true;
 	}
 
@@ -105,13 +110,21 @@ namespace BattleSpace
 		BaseRole* tRole = (BaseRole*)ob;
 		if (tRole->getEnemy() && tRole->getGridIndex() > eGuardGrid)
 			updateStrategy();
+		else if (!tRole->getOtherCamp())
+		{
+			mPveStrategy->updatePvEStrategy();
+		}
 	}
-	//刷新判断当前策略
+	//刷新策略的入口
 	void TotalStrategy::updateStrategy()
 	{
-		if (!mAutoState)return;
-		interceptInfo();
-		initCallHero();
+		mPveStrategy->updatePvEStrategy();
+		if (mAutoState)
+		{
+			interceptInfo();
+			initCallHero();
+			setExcute(true);
+		}
 	}
 
 	void TotalStrategy::acceptButtonState( CCObject* ob )
@@ -124,7 +137,7 @@ namespace BattleSpace
 		for (auto tPair : *mManage->getRolesMap())
 		{
 			BaseRole* tRole = tPair.second;
-			if (!tRole->getEnemy() && 
+			if (!tRole->getOtherCamp() && 
 				!tRole->getBattle()&&
 				!tRole->getCaptain()&&
 				!tRole->getFatherID()&&
@@ -158,10 +171,12 @@ namespace BattleSpace
 		mAutoData->setInterceptGrid(INVALID_GRID);
 	}
 	//持续判断条件达成的情况执行AI
-	void TotalStrategy::excuteStrategy( float dt )
+	void TotalStrategy::excuteStrategy(float dt)
 	{
-		if ( !mAutoState )//将该武将召唤到可挡住怪物的位置，优先召唤再我方cost区域内，等怪物过来
+		mPveStrategy->loopPvEBattle(dt);
+		if ( !mAutoState || !getExcute())//将该武将召唤到可挡住怪物的位置，优先召唤再我方cost区域内，等怪物过来
 			return;
+		setExcute(false);
 		if ( mAutoData->getInterceptRole())					//需要马上被拦截的武将,围堵策略有两种，召唤和移位
 		{
 			if (mAutoData->getCallHero())
@@ -186,17 +201,18 @@ namespace BattleSpace
 	void TotalStrategy::excuteCallRole()					//在可最快拦截且增加cost的可移动区域召唤武将
 	{
 		mAutoData->setInterceptRole(nullptr);
-		summonHero(mAutoData->getCallHero(),mAutoData->getInterceptGrid());
+		BaseRole* tRole = mAutoData->getCallHero();
 		mAutoData->setCallHero(nullptr);
+		summonHero(tRole,mAutoData->getInterceptGrid());
 		mAutoData->setInterceptGrid(INVALID_GRID);
 	}
 
 	void TotalStrategy::summonHero( BaseRole* pRole,int pGrid )
 	{
-		if (pRole->getHp()<=0)
+		if (!pRole->getAliveState())
 		{
 			pRole->initAliveData();
-			CaptainSkill::create()->ExecuteSkill();
+			mManage->executeCaptainSkill();
 		}
 		bNotification->postNotification(MsgCreateRoleObject,pRole);		//创建武将显示对象
 		pRole->setCommandGrid( pGrid );
@@ -347,7 +363,7 @@ namespace BattleSpace
 			return false;
 		vector<int> tMoveEnds;
 		pHero->initContainGrid(pHero->getMoveGrid(),tMoveEnds);
-		if (tMoveEnds.at(tMoveEnds.size()-1) < pMonster->getGridIndex())
+		if (tMoveEnds.empty()||tMoveEnds.at(tMoveEnds.size()-1) < pMonster->getGridIndex())
 			return false;
 		for (auto tGrid : tMoveEnds)
 		{
@@ -411,10 +427,12 @@ namespace BattleSpace
 		vector<BaseRole*>* tHeros = mManage->inBattleHeros(true);
 		for (auto tHero : *tHeros)
 		{
-			if (tHero->getHasTarget()	|| 
-				tHero->getCommandGrid()	|| 
-				tHero->getCaptain()		||
-				tHero->getFatherID()		)
+			if (tHero->getHasTarget()		|| 
+				tHero->getAIState()			||
+				tHero->getCommandGrid()		|| 
+				tHero->getCaptain()			||
+				tHero->getFatherID()			||
+				tHero->currGridHasTarget()	)
 				continue;
 			return tHero;
 		}
@@ -430,7 +448,7 @@ namespace BattleSpace
 				tHero == mSkillRole || 
 				tHero->getFatherID())
 				continue;
-			if (tHero->getHasTarget())
+			if (tHero->skillAreaHasTarget())
 			{
 				mSkillRole = tHero;
 				return tHero;
@@ -441,10 +459,30 @@ namespace BattleSpace
 	//全部堵住和尽量靠近(武将进入AI状态)
 	void TotalStrategy::moveUnTargetRole()
 	{
-		BaseRole* tHero = unTargetHero();				//包括了前方没有怪物的武将
-		if ( !tHero )return;
 		//找到没有目标的可移动对象,若在减cost区域则移动回非减区域，且当前行有怪物的最小格子格子可站立
 		//武将当前行存在怪物，判断武将是否是在距离怪物最近的非减cost区域，若不是，则求出能够相遇的非减cost区域的点(武将设置为AI状态)，而后移动过去
+		//找到一个离我最近的敌人跑过去攻击它。
+		BaseRole* tHero = unTargetHero();											//包括了前方没有怪物的武将
+		if ( !tHero ) return;
+		vector<BaseRole*>* tMonsterVec = mManage->inBattleMonsters(true);
+		vector<BaseRole*>::reverse_iterator iter = tMonsterVec->rbegin();			//反向遍历,从位置最大的开始
+		for(;iter != tMonsterVec->rend();iter++)
+		{
+			if ((*iter)->getGridIndex() < eGuardGrid)
+				continue;
+			if (sameRow(tHero->mStandGrids,(*iter)->mStandGrids) && 
+				tHero->getMaxGrid() > (*iter)->getGridIndex()  )
+			{
+				if ( tHero->hasOtherRole(tHero->getGridIndex() + C_GRID_ROW) )
+					return;
+				tHero->setCommandGrid( tHero->getGridIndex() + C_GRID_ROW );			//往前走策略
+			}
+		}
+		//for (;iter != tMonsterVec->rend();iter++)									//若前方没有敌人则是上下走的策略
+		//{
+		//	if ((*iter)->getGridIndex() < eGuardGrid)								//这个策略考虑打得到且多格子怪物的情况比较复杂
+		//		continue;
+		//}
 	}
 	//判断武将是否可以移动到某个格子的方法
 	//是否召唤完武将，是否可以召唤武将，可以召唤的情况下召唤武将
@@ -483,7 +521,7 @@ namespace BattleSpace
 		if (pGrid)return pGrid;
 		return INVALID_GRID;
 	}
-
+	//应该是判断武将的MoveObject的区域，而不是武将的逻辑区域
 	bool TotalStrategy::unCrossHeros( vector<int>& pGrids,BaseRole* pSelf /*=nullptr*/ )
 	{
 		if (pGrids.empty())return false;

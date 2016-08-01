@@ -277,3 +277,8 @@ bool CMainCityControl::isJustOpen(CCity * cb)
 	return justOpen;
 }
 
+const CCity& CMainCityControl::getCityDataById( int iId )
+{
+	return m_cityMap[iId];
+}
+

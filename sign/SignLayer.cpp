@@ -226,6 +226,12 @@ void CSignLayer::onExit()
 	NOTIFICATION->postNotification("CheckShowActivity");
 	CSceneManager::sharedSceneManager()->PostMessageA(SHOW_HEAD,0,nullptr,nullptr);
 
+	CPopItem *popItem = dynamic_cast<CPopItem*>(LayerManager::instance()->getLayer("CPopItem"));
+	if (popItem)
+	{
+		popItem->bindTargetCallBack(nullptr,nullptr);
+	}
+
 	CCSpriteFrameCache::sharedSpriteFrameCache()->removeSpriteFramesFromFile("skill/9065.plist");
 	CCTextureCache::sharedTextureCache()->removeTextureForKey("skill/9065.png");
 	CCSpriteFrameCache::sharedSpriteFrameCache()->removeSpriteFramesFromFile("skill/9066.plist");

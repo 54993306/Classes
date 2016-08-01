@@ -4,9 +4,10 @@
 
 #include "AppUI.h"
 #include "scene/layer/LayerManager.h"
-#include "bag/bagData.h"
-#include "model/DataCenter.h"
 #include "activity/HttpLoadImage.h"
+#include "protos/protocol.h"
+
+class UserData;
 
 class CRoleInfo: public BaseLayer, public HttpLoadImageDelegate
 {

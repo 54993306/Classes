@@ -28,7 +28,7 @@ namespace BattleSpace{
 		this->setServerID(monster->id());
 		this->setMonsterID(monster->monsterid());
 		this->setBatchNumber(monster->batch());
-
+		this->setOtherCamp(true);
 		this->setRoleModel(monster->thumb());
 		this->setCallRole(monster->iscall());				//召唤类的武将都放在怪物列表中传输过来
 		this->setProperty(monster->monstertype());

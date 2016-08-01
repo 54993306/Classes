@@ -19,9 +19,10 @@
 #include "Strengthen.h"
 #include "common/CCRollLabelAction.h"
 
+
 CSmeltArmor::CSmeltArmor():m_noEquip(true),m_yesEquip(true)
 	,m_coin(0),m_diamond(0),m_pFire1(nullptr),m_pFire2(nullptr),m_iStrengthType(0),m_pCellInfo(nullptr)
-	,m_iCount(0)
+	,m_iCount(0),m_pSpineHero(nullptr)
 {
 	for(unsigned int i=0; i<4; i++)
 	{
@@ -55,6 +56,13 @@ bool CSmeltArmor::init()
 		CCPoint pBasePos = ccp(1281, 160);
 		//初始化基础属性四条
 		initItemInfo(pBasePos, m_pBaseInfo, 4);
+
+		//添加动画
+		SkeletonAnimation *pSkeletonAnimation = SkeletonAnimation::createWithFile("strengthen/5002.json", "strengthen/5002.atlas", 1);
+		pSkeletonAnimation->setPosition(ccp(887, -2));
+		pSkeletonAnimation->setAnimation(0, "stand", true);
+		m_ui->addChild(pSkeletonAnimation, 3);
+		m_pSpineHero = pSkeletonAnimation;
 
 		return true;
 	}
@@ -742,8 +750,8 @@ void CSmeltArmor::showSmeltDataToUI()
 	//显示背景框等等
 	CCNode* pNode4 = (CCNode*)m_ui->findWidgetById("tip");
 	pNode4->setVisible(false);
-	CCNode *hero = dynamic_cast<CCNode*>(m_ui->findWidgetById("hero"));
-	hero->setVisible(false);
+
+	m_pSpineHero->setVisible(false);
 
 
 	initSpandAndCheckBox();

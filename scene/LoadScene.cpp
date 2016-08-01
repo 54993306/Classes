@@ -10,204 +10,139 @@
 #include "model/WarManager.h"
 
 using namespace CocosDenshion;
-
-LoadScene::LoadScene()
-:m_tip(nullptr)
-,m_currNum(0)
-, m_totalNum(0)
-, m_currTip(0)
-, m_currTipNum(0)
-, m_time(0)
-,m_asynLoadNum(0)
-,m_fPercent(0)
-,m_iPlistIndex(0)
-{}
-using namespace BattleSpace;
-void LoadScene::onCreate()
+namespace BattleSpace
 {
-	CWidgetWindow* layout = CWidgetWindow::create();
-	layout->setTag(1);
-	addChild(layout);
+	LoadScene::LoadScene()
+		:mCurrIndex(0)
+		,mAsynLoadNum(0)
+	{}
 
-	CColorView *clorView = CColorView::create(ccc4(0,0,0,255));
-	clorView->setContentSize(CCDirector::sharedDirector()->getWinSize());
-	clorView->setPosition(VCENTER);
-	this->addChild(clorView);
-
-	m_ui = LoadComponent("loading.xaml");
-	m_ui->setPosition(VCENTER);
-	this->addChild(m_ui);
-
-	CCSpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile("skill/9049.plist");
-	AnimationManager::sharedAction()->ParseAnimation("9049");
-
-	schedule(schedule_selector(LoadScene::updatePercent));
-
-}
-void LoadScene::onEnter()
-{
-	CScene::onEnter();
-	CSVFile* file = (CSVFile*)FileUtils::sharedFileUtils()->loadCSVFile(CSV_ROOT("preloadRes.csv"));
-	m_totalNum = file->getRowNum();
-	--m_totalNum;
-	m_currNum = 0;
-	file = (CSVFile*)FileUtils::sharedFileUtils()->loadCSVFile(CSV_ROOT("loadTips.csv"));
-	m_currTip = 0;
-	m_time = 0;
-	this->schedule(schedule_selector(LoadScene::load));
-	this->schedule(schedule_selector(LoadScene::load2), 0.025f);
-
-	//进度条
-	m_progress = (CProgressBar*)m_ui->findWidgetById("progress");
-	m_progress->setMaxValue(100);
-
-	//僵尸跳
-	CCAnimation *pZombieEffect = AnimationManager::sharedAction()->getAnimation("9049");
-	pZombieEffect->setDelayPerUnit(0.05f);
-	CCAnimate* pAnimate = CCAnimate::create(pZombieEffect);
-	CCSprite* pZombieSprite = CCSprite::create();
-	pZombieSprite->setScale(0.9f);
-	pZombieSprite->setAnchorPoint(ccp(0.5f, 0.0f));
-	pZombieSprite->setPositionY(m_progress->getPositionY()+5);
-	m_ui->addChild(pZombieSprite);
-	pZombieSprite->runAction(CCRepeatForever::create(pAnimate));
-	m_pZombieSprite = pZombieSprite;
-
-	updatePercent(0);
-
-	CCSprite* backgroundImage = (CCSprite*)m_ui->findWidgetById("bg");
-	int newID = 0;			
-	int stage = DataCenter::sharedData()->getWar()->getStageID();
-	if (!stage||stage==101)								//（关卡0和关卡101特殊处理）
+	void LoadScene::onCreate()
 	{
-		newID = stage;
-	}else{
-		int oldID = DataCenter::sharedData()->getWar()->getLoadImage();
-		do{
-			newID = CCRANDOM_0_1()*9;					//图片总数
-			CCLOG("----------%d",newID);
-			if (newID != oldID)
-				break;
-		} while (true);
+		CWidgetWindow* layout = CWidgetWindow::create();
+		layout->setTag(1);
+		addChild(layout);
+
+		m_ui = LoadComponent("loading.xaml");
+		m_ui->setPosition(VCENTER);
+		this->addChild(m_ui);
+
+		CCSpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile("skill/9049.plist");
+		AnimationManager::sharedAction()->ParseAnimation("9049");
+
 	}
 
-	DataCenter::sharedData()->getWar()->setLoadImage(newID);
-	char path [60] = {0};
-	sprintf(path,"warScene/LoadImage/%d.png",newID);
-	if (!backgroundImage->initWithFile(path))
+	void LoadScene::onEnter()
 	{
-		CCLOG("[ *ERROR ] LoadBattleResource::BackImage BMG initWithFile Fail");
-		backgroundImage->initWithFile("warScene/LoadImage/0.jpg");			//容错性处理
+		CScene::onEnter();
+		CSVFile* file = (CSVFile*)FileUtils::sharedFileUtils()->loadCSVFile(CSV_ROOT("preloadRes.csv"));
+		schedule(schedule_selector(LoadScene::loadResource));
+
+		//进度条
+		mProgress = (CProgressBar*)m_ui->findWidgetById("progress");
+		mProgress->setMaxValue(100);
+
+		//僵尸跳
+		CCAnimation *pZombieEffect = AnimationManager::sharedAction()->getAnimation("9049");
+		pZombieEffect->setDelayPerUnit(0.05f);
+		CCAnimate* pAnimate = CCAnimate::create(pZombieEffect);
+		CCSprite* pZombieSprite = CCSprite::create();
+		pZombieSprite->setScale(0.9f);
+		pZombieSprite->setAnchorPoint(ccp(0.5f, 0.0f));
+		pZombieSprite->setPositionY(mProgress->getPositionY()+5);
+		m_ui->addChild(pZombieSprite);
+		pZombieSprite->runAction(CCRepeatForever::create(pAnimate));
+		m_pZombieSprite = pZombieSprite;
+
+		CCSprite* tBackround = (CCSprite*)m_ui->findWidgetById("bg");
+		tBackround->initWithFile("warScene/LoadImage/1.png");			//容错性处理
 	}
-}
 
-void LoadScene::onExit()
-{
-	CScene::onExit();
-	FileUtils::sharedFileUtils()->releaseFile(CSV_ROOT("loadTips.csv"));
-	FileUtils::sharedFileUtils()->releaseFile(CSV_ROOT("preloadRes.csv"));
-}
-
-void LoadScene::load(float fdetal)
-{
-	CSVFile* file = (CSVFile*)FileUtils::sharedFileUtils()->getFile(CSV_ROOT("preloadRes.csv"));
-	int resType = atoi(file->get(m_currNum+1,0));
-	const char* url = file->get(m_currNum+1,1);
-	switch(resType)
+	void LoadScene::onExit()
 	{
-	case LOAD_RES_MODEL:
+		CScene::onExit();
+		FileUtils::sharedFileUtils()->releaseFile(CSV_ROOT("preloadRes.csv"));
+	}
+
+	void LoadScene::loadResource(float fdetal)
+	{
+		CSVFile* tFile = (CSVFile*)FileUtils::sharedFileUtils()->getFile(CSV_ROOT("preloadRes.csv"));
+		switch( atoi(tFile->get(mCurrIndex+1,0)) )
 		{
-			//先判断是角色还是特效然后判断是否需要加载plist文件进缓存
-			const char* model = file->get(m_currNum+1,2);
-			int type = atoi(file->get(m_currNum+1,3));
-			string str = url;
-			int pos = str.find("plist");
-			if (pos!=string::npos)
+		case LOAD_RES_MODEL:
 			{
-				string pngStr = str.substr(0,pos);
-				pngStr = pngStr.append("png");
-				CCTextureCache::sharedTextureCache()->addImageAsync(pngStr.c_str(),this,callfuncO_selector(LoadScene::loadAsyncImg));
-				LoadResourceInfo res;
-				res.FileName = model;
-				res.FilePath = url;
-				res.Loadtype = sLoadType::eEffect;
-				m_resVec.push_back(res);
-			}
-			++m_currNum;
-		}break;
-	case LOAD_BACKGROUND_SND:
-		{
-			char str[30]={0};
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
-			sprintf(str,"BGM/Test/%d.mp3",atoi(file->get(m_currNum+1,1)));
+				//先判断是角色还是特效然后判断是否需要加载plist文件进缓存
+				string str = tFile->get(mCurrIndex+1,1);
+				int pos = str.find("plist");
+				if (pos != string::npos)
+				{
+					string pngStr = str.substr(0,pos);
+					pngStr = pngStr.append("png");
+					CCTextureCache::sharedTextureCache()->addImageAsync(pngStr.c_str(),this,callfuncO_selector(LoadScene::loadAsyncImg));
+					LoadResourceInfo tRes;
+					tRes.FilePath = tFile->get(mCurrIndex+1,1);
+					tRes.FileName = tFile->get(mCurrIndex+1,2);
+					tRes.Loadtype = sLoadType::eEffect;
+					mResourceVec.push_back(tRes);
+				}
+			}break;
+		case LOAD_BACKGROUND_SND:
+			{
+				char str[30]={0};
+#if BATTLE_TEST
+				sprintf(str,"BGM/Test/%d.mp3",atoi(tFile->get(mCurrIndex+1,1)));
 #else
-			sprintf(str,"BGM/%d.ogg",atoi(file->get(m_currNum+1,1)));
+				sprintf(str,"BGM/%d.ogg",atoi(tFile->get(mCurrIndex+1,1)));
 #endif
-			CCLOG("Load BGM %s",file->get(m_currNum+1,1));
-			SimpleAudioEngine::sharedEngine()->preloadBackgroundMusic(url);
-			++m_currNum;
-		}break;
-	case LOAD_EFFECT_SND:
-		{
-			char str[30]={0};
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
-			sprintf(str,"SFX/Test/%d.mp3",atoi(file->get(m_currNum+1,1)));
+				CCLOG("Load BGM %s",tFile->get(mCurrIndex+1,1));
+				SimpleAudioEngine::sharedEngine()->preloadBackgroundMusic(tFile->get(mCurrIndex+1,1));
+			}break;
+		case LOAD_EFFECT_SND:
+			{
+				char str[30]={0};
+#if BATTLE_TEST
+				sprintf(str,"SFX/Test/%d.mp3",atoi(tFile->get(mCurrIndex+1,1)));
 #else
-			sprintf(str,"SFX/%d.ogg",atoi(file->get(m_currNum+1,1)));
+				sprintf(str,"SFX/%d.ogg",atoi(tFile->get(mCurrIndex+1,1)));
 #endif
-			CCLOG("Load SFX %s",file->get(m_currNum+1,1));
-			SimpleAudioEngine::sharedEngine()->preloadEffect(url);
-			++m_currNum;
-		}break;
-	case LOAD_FONT:{   ++m_currNum;    }
-		break;
-	default:
-		break;
+				CCLOG("Load SFX %s",tFile->get(mCurrIndex+1,1));
+				SimpleAudioEngine::sharedEngine()->preloadEffect(tFile->get(mCurrIndex+1,1));
+			}break;
+		}
+		++mCurrIndex;
+		float tPercent = mCurrIndex*100.0f/(tFile->getRowNum() + 20);			//20是跑空帧
+		mProgress->setValue(tPercent);		//进度条
+		m_pZombieSprite->setPositionX(mProgress->getPositionX()+mProgress->getContentSize().width*tPercent/100-5);		//僵尸位置
+		if (tPercent >= 100)
+			loadResouceEnd();
 	}
 
-	m_fPercent = (m_currNum+m_iPlistIndex+1)*100.0f/(m_totalNum+m_resVec.size());
-}
-
-
-void LoadScene::load2( float fdetal )
-{
-	//加载plist
-	if(m_iPlistIndex < m_resVec.size())
+	void LoadScene::loadAsyncImg(CCObject* pSender)
 	{
-		LoadResourceInfo &res = m_resVec.at(m_iPlistIndex);
-
-		CCSpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile(res.FilePath.c_str());//将plist文件加载进入缓存
-		CCLOG("load mode %s ,\n",res.FileName.c_str());
-		if(res.Loadtype == sLoadType::eFrameAnimation)
-		{
-			AnimationManager::sharedAction()->ParseAnimation(res.FileName.c_str(),eFrameRole);
-		}
-		else if(res.Loadtype == sLoadType::eEffect)
-		{
-			AnimationManager::sharedAction()->ParseAnimation(res.FileName.c_str());
-		}
-		m_iPlistIndex++;
+		CCTexture2D *texture = (CCTexture2D*)pSender;
+		mAsynLoadNum++;
 	}
-}
 
-
-void LoadScene::loadAsyncImg(CCObject* pSender)
-{
-	CCTexture2D *texture = (CCTexture2D*)pSender;
-	m_asynLoadNum++;
-}
-
-void LoadScene::updatePercent(float dt)
-{
-	//进度条
-	m_progress->setValue(m_fPercent);
-	//僵尸位置
-	m_pZombieSprite->setPositionX(m_progress->getPositionX()+m_progress->getContentSize().width*m_fPercent/100-5);
-	if(m_fPercent>=100)
+	void LoadScene::loadResouceEnd()
 	{
-		this->unschedule(schedule_selector(LoadScene::updatePercent));
-		this->unschedule(schedule_selector(LoadScene::load));
-		this->unschedule(schedule_selector(LoadScene::load2));
+		CSVFile* tFine = (CSVFile*)FileUtils::sharedFileUtils()->getFile(CSV_ROOT("preloadRes.csv"));
+		if (mAsynLoadNum < mResourceVec.size() && mCurrIndex < (tFine->getRowNum() + 600))		//当预加载10秒后还没跳转界面则执行强制跳转处理
+			return ;
+		if (mCurrIndex >= (tFine->getRowNum() + 600))
+			CCLOG("[ *ERROR ] LoadScene::loadResouceEnd");
+		for (int i=0; i<mResourceVec.size();++i)
+		{
+			LoadResourceInfo &res = mResourceVec.at(i);
+			if (res.Loadtype>sLoadType::eEffect)
+				continue;
+			CCSpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile(res.FilePath.c_str());//将plist文件加载进入缓存
+			CCLOG("ProgressEnd addSpriteFramesWithFile mode1 %s ",res.FileName.c_str());
+			if(res.Loadtype == sLoadType::eFrameAnimation)
+				AnimationManager::sharedAction()->ParseAnimation(res.FileName.c_str(),eFrameRole);
+			else if(res.Loadtype == sLoadType::eEffect)
+				AnimationManager::sharedAction()->ParseAnimation(res.FileName.c_str());
+		}
+		this->unscheduleAllSelectors();
 		CSceneManager::sharedSceneManager()->replaceScene(GETSCENE(CMainScene), 1.0f);
 	}
 }

@@ -90,3 +90,31 @@ vector<CVersionData> CVersionJson::getUpdateList( std::string sCurrentVersion, s
 
 	return dataBack;
 }
+
+bool CVersionJson::isThereAForceApkUpdateVersion( std::string sCurrentVersion, std::string sAimVersion )
+{
+	bool bAnswer = false;
+
+	int iSize = _data.size();
+	for( int i=iSize-1; i>=0; i--)
+	{
+		const CVersionData& indexData = _data.at(i);
+		if(sCurrentVersion.compare(indexData.sVersion)>=0)
+		{
+			continue;
+		}
+		if(sAimVersion.compare(indexData.sVersion)>=0)
+		{
+			if(indexData.sFile.size()<=1)
+			{
+				return true;
+			}
+		}
+		else
+		{
+			break;
+		}
+	}
+
+	return bAnswer;
+}

@@ -10,10 +10,25 @@
 #include "AppUI.h"
 #include "scene/layer/LayerManager.h"
 #include "net/CNetClient.h"
+#include <spine/spine-cocos2dx.h>
+#include "activity/HttpLoadImage.h"
+
+using namespace spine;
 
 const float fChallengePanelScale[3] = {1.0f, 0.9f, 0.8f};
 
-class CSelectChallengeLayer: public BaseLayer
+void inline AskForGoToSelectPvpArmy( int iRoleId, bool isRobot)
+{
+	OppTeamReq *pReq = new OppTeamReq;
+	pReq->set_role_id(iRoleId);
+	pReq->set_is_robot(isRobot);
+	GetTcpNet->sendData(pReq, PvpOppTeamMsg);
+	delete pReq;
+}
+
+class CPvpMenuLayer;
+
+class CSelectChallengeLayer: public BaseLayer,public  HttpLoadImageDelegate
 {
 public:
 	CSelectChallengeLayer();
@@ -49,9 +64,20 @@ private:
 
 	bool isUILock();
 
+
+	void showOpenEffect();
+	void callBackForShowOpenEffect();
+
+	void showChallenge( CCObject *pSender );
+	void hideChanllenge( CCObject *pSender );
+	void imageLoadSuccessCallBack(string sTag, vector<char>* pBuffer);
+	CImageView * maskedSprite(CCSprite *textureSprite);
 private:
 	CLayout* m_ui;
 	CLayout* m_pPanel[3];
+	SkeletonAnimation* m_pMoveLight[3];
+	SkeletonAnimation* m_pBaseLight[3];
+
 	CLayout* m_pCell;
 
 	//pvp数据备份
@@ -61,4 +87,8 @@ private:
 	bool m_bGetNewData;
 
 	int m_iLockIndex;
+
+	SkeletonAnimation			*m_pRobot;
+	int m_iTimesCombat;
+	std::map<std::string, CImageView *> m_pMapHeadBg;
 };

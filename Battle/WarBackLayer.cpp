@@ -11,6 +11,9 @@
 #include "Battle/ComBatLogic.h"
 #include "Battle/BattleMessage.h"
 #include "common/CGameSound.h"
+#include "Battle/BattleDataCenter.h"
+#include "Battle/BattleModel.h"
+
 namespace BattleSpace
 {
 
@@ -80,7 +83,6 @@ namespace BattleSpace
 
 	void WarBackLayer::touchExit()
 	{
-		CCDirector::sharedDirector()->getScheduler()->setTimeScale(1);
 		if (!this->getChildByTag(0))
 		{
 			CPopTip *tip = CPopTip::create();
@@ -108,10 +110,11 @@ namespace BattleSpace
 
 		CButton* btn = (CButton*)ob;
 		int tag = btn->getTag();
-		if (tag == PopTipCancel)
+		this->removeChildByTag(0);
+
+		if (tag != PopTipCancel)
 		{
-			this->removeChildByTag(0);
-		}else{
+			this->setVisible(false);
 
 			//如果是在引导,重启游戏
 			if( !DataCenter::sharedData()->getWar()->getStageID())
@@ -131,7 +134,14 @@ namespace BattleSpace
 				return;
 			}
 
+			//如果是pvp结算
+			if( BattleData->getBattleModel()->isPvEBattle() )
+			{
+				NOTIFICATION->postNotification(MsgBattleOver);
+				return;
+			}
 
+			//其他类型结算
 			BattleScene* Wscene = (BattleScene*)this->getParent();
 			CScene* scene = GETSCENE(LoadBattleResource);
 			if (DataCenter::sharedData()->getWar()->getStageID())

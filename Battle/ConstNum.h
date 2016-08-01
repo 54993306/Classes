@@ -34,4 +34,11 @@ const int		C_BatchMonst		= 2000;				//伏兵ID
 const int		C_CallHero			= 4000;				//我方英雄召唤武将
 const int		C_CallMonst			= 5000;				//敌方召唤怪物
 
+const int		C_PVEStage			= 10;
+const int		C_PVEStopGrid		= 92;			
+const int		C_OtherCaptain		= 89;
+const int		C_PVPCol			= 23;
+const int		C_PVPMINGRID		= 88;
+const int		C_PVEOtherArea		= 107;
+
 #endif

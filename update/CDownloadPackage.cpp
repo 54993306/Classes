@@ -21,6 +21,9 @@ CDownloadPackage::CDownloadPackage()
 	,m_iCurrentIPixelndex(0)
 	,m_iMaxPixel(0)
 	,m_iPercent(0)
+	,m_iErrorTimes(0)
+	,m_iStoryIndex(0)
+	,m_iStoryMax(9)
 {
 
 }
@@ -39,7 +42,7 @@ bool CDownloadPackage::init()
 		LayerManager::instance()->push(lay);
 		lay->setVisible(false);
 
-		m_ui = LoadComponent("updateLayer.xaml");
+		m_ui = LoadComponent("downloadPackage.xaml");
 		m_ui->setPosition(VCENTER);
 		this->addChild(m_ui, 2);
 		this->setVisible(true);
@@ -51,7 +54,8 @@ bool CDownloadPackage::init()
 
 		m_VersionJson = new CPackageVersionJson;
 
-		schedule(schedule_selector(CDownloadPackage::updateForChangePic), 30);
+		updateForChangePic(0);
+		schedule(schedule_selector(CDownloadPackage::updateForChangePic), 3);
 		scheduleUpdate();
 
 		return true;
@@ -184,10 +188,23 @@ void CDownloadPackage::startDownload()
 	//获取需要更新的目标版本
 	std::string sApkVersion = CJniHelper::getInstance()->getVersionName();
 	m_versionNeedData = m_VersionJson->getAimPackageVersion(sApkVersion);
-	//检测目标package信息是否有误
-	if(m_versionNeedData.sVersion.compare("")==0 || m_versionNeedData.iZipNum==0)
+
+	//如果没有拿到版本信息,重新拿几次，几次后还是拿不到，显示version-error, 2s钟后重启游戏
+	if( m_versionNeedData.sVersion.compare("")==0 || m_versionNeedData.iZipNum==0 )
 	{
-		m_pLabel->setString("Package Version Error !");
+		if (m_iErrorTimes > 0)
+		{
+			m_iErrorTimes--;
+			//重新请求数据
+			requestVersionInfo();
+		}
+		else
+		{
+			m_pInfoLabel->setString("Package version error , the game will restart !");
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+			showHelpTips("Download error, the game will restart !", true);
+#endif
+		}
 		return;
 	}
 
@@ -248,21 +265,30 @@ void CDownloadPackage::onError( AssetsManagerErrorCode errorCode )
 	default:
 		break;
 	}
+
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+	showHelpTips("Download error, the game will restart !", true);
+#endif
 }
 
 void CDownloadPackage::onProgress( int percent )
 {
-	if (percent < 0)
+	//小于0大于100,数据异常
+	if ( percent < 0 || percent > 100)
 	{
 		return;
 	}
+
 	CCLOG("%d", percent);	
 
 	m_iPercent = percent;
 	//显示百分比
 	char progress[20];
 	snprintf(progress, 20, "%d%%", m_iPercent);
-	m_pLabel->setString(progress);
+	if(m_pLabel != nullptr)
+	{
+		m_pLabel->setString(progress);
+	}
 
 	//转换为像素百分比
 	m_iCurrentIPixelndex = (m_iMaxPixel*m_iPercent)/100;
@@ -308,7 +334,7 @@ void CDownloadPackage::updateTextShow()
 void CDownloadPackage::updateForChangePic( float dt )
 {
 	CCSprite* pSprite = dynamic_cast<CCSprite*>(m_ui->findWidgetById("bg"));
-	ChangePicture(pSprite);
+	changeStoryPicture(pSprite);
 }
 
 
@@ -334,5 +360,82 @@ void CDownloadPackage::update( float dt )
 
 	//僵尸位置
 	//m_pZombieSprite->setPositionX(m_progress->getPositionX()+m_progress->getContentSize().width*percent/100-5);
+}
+
+void CDownloadPackage::callbackForRestart()
+{
+#if (CC_TARGET_PLATFORM != CC_PLATFORM_ANDROID)
+	CSceneManager::sharedSceneManager()->replaceScene(GETSCENE(LogoScene));
+#else
+	CJniHelper::getInstance()->restartGame();
+	CCDirector::sharedDirector()->end();
+#endif
+}
+
+void CDownloadPackage::showHelpTips( const char *str , bool bShowOkOnly )
+{
+	if( CCDirector::sharedDirector()->getRunningScene()->getChildByTag(4562) != nullptr )
+	{
+		return;
+	}
+	CPopTip *pop = CPopTip::create();
+	LayerManager::instance()->pop();
+	pop->setVisible(true);
+	pop->addContentTip(str);
+	pop->setTouchEnabled(true);
+	pop->setTouchPriority(-100);
+	if(bShowOkOnly)
+	{
+		pop->showConfirmOnly();
+	}
+	pop->setButtonLisener(this, ccw_click_selector(CDownloadPackage::showHelpTipsClick));
+	CCDirector::sharedDirector()->getRunningScene()->addChild(pop, 4562);
+}
+
+void CDownloadPackage::showHelpTipsClick( CCObject *pSender )
+{
+	//点击取消重启，点击确定下载新的apk
+	CButton *btn = (CButton*)pSender;
+	if (btn->getTag()==PopTipConfirm)
+	{
+		//确定
+		runAction(CCCallFunc::create(this, callfunc_selector(CDownloadPackage::callbackForRestart)));
+	}
+}
+
+void CDownloadPackage::changeStoryPicture( CCSprite* pSprite )
+{
+	if(pSprite==nullptr)
+	{
+		return;
+	}
+
+	CCTexture2D* pTexture = pSprite->getTexture();
+	CCTexture2D* pNewTexture = nullptr;
+	
+	pNewTexture = CCTextureCache::sharedTextureCache()->addImage(CCString::createWithFormat("warScene/LoadImage/story/%d.jpg", m_iStoryIndex)->getCString());
+	m_iStoryIndex++;
+
+	if(m_iStoryIndex >= m_iStoryMax)
+	{
+		m_iStoryIndex = 0;
+	}
+
+	//没有找到图片，返回不操作
+	if(pNewTexture==nullptr)
+	{
+		return;
+	}
+
+	pSprite->setTexture(pNewTexture);
+
+	pSprite->setZOrder(-2);
+
+	CCSprite* pTranstionSprite = CCSprite::createWithTexture(pTexture);
+	pTranstionSprite->setPosition(pSprite->getPosition());
+	pTranstionSprite->setAnchorPoint(pSprite->getAnchorPoint());
+	pTranstionSprite->setScale(pSprite->getScale());
+	pSprite->getParent()->addChild(pTranstionSprite, pSprite->getZOrder()+1);
+	pTranstionSprite->runAction(CCSequence::createWithTwoActions(CCFadeOut::create(0.6f), CCRemoveSelf::create()));
 }
 

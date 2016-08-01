@@ -10,6 +10,9 @@
 #include "netcontrol/CPlayerControl.h"
 #include "mainCity/MainCityControl.h"
 #include "pvp_ui//TranstionEffectLayer.h"
+#include <spine/spine-cocos2dx.h>
+
+using namespace spine;
 
 CPvpMenuLayer::CPvpMenuLayer():
 m_ui(nullptr),m_pSelectDefenseLayer(nullptr), m_pPvpRuleLayer(nullptr), m_pShopLayer(nullptr),m_pPvpRecordLayer(nullptr),
@@ -28,16 +31,33 @@ bool CPvpMenuLayer::init()
 	if(BaseLayer::init())
 	{
 		CCSize winSize = CCDirector::sharedDirector()->getWinSize();
-		
+
 		//黑底
-		MaskLayer* pMaskLayer = MaskLayer::create("PvpMenuLayerMaskLayer");
+		MaskLayer* pMaskLayer = MaskLayer::create("CPvpMenuLayerMaskLayer");
 		pMaskLayer->setContentSize(winSize);
 		LayerManager::instance()->push(pMaskLayer);
+		pMaskLayer->setOpacity(0);
+
 
 		//内容
 		m_ui = LoadComponent("pvp_menu_layer.xaml");
 		m_ui->setPosition(VCENTER);
 		this->addChild(m_ui);
+
+		setIsShowBlack(false);
+
+		////背景
+		//SkeletonAnimation *pSkeletonAnimation = SkeletonAnimation::createWithFile("pvp/pve_beijing.json", "pvp/pve_beijing.atlas", 1);
+		//pSkeletonAnimation->setPosition(CCPointZero);
+		//pSkeletonAnimation->setAnimation(0, "stand", true);
+		//m_ui->addChild(pSkeletonAnimation, -1);
+
+		//退出
+		CButton* pClose = CButton::create("common/back.png", "common/back.png");
+		pClose->getSelectedImage()->setScale(1.1f);
+		pClose->setPosition(VLEFT+50, VTOP-50);
+		pClose->setOnClickListener(this,ccw_click_selector(CPvpMenuLayer::onClose));
+		this->addChild(pClose, 99);
 
 		return true;
 	}
@@ -57,17 +77,10 @@ void CPvpMenuLayer::onEnter()
 		radioBtn->setOnCheckListener(this,ccw_check_selector(CPvpMenuLayer::onSwitchBtn));
 	}
 
-	//退出
-	CButton* pClose = CButton::create("common/back.png", "common/back.png");
-	pClose->getSelectedImage()->setScale(1.1f);
-	pClose->setPosition(VLEFT+50, VTOP-50);
-	pClose->setOnClickListener(this,ccw_click_selector(CPvpMenuLayer::onClose));
-	this->addChild(pClose, 999);
-
 	//默认选择一个
 	selectTabPanel(PvpMenuLayerTabDefense);
 
-	showOpenEffect();
+	NOTIFICATION->postNotification("CSelectChallengeLayer::hideChanllenge");
 }
 
 void CPvpMenuLayer::onExit()
@@ -79,6 +92,7 @@ void CPvpMenuLayer::onExit()
 	//解绑场景事件监听
 	CSceneManager::sharedSceneManager()->removeMsgObserver("NULL", this);
 
+	NOTIFICATION->postNotification("CSelectChallengeLayer::showChallenge");
 
 	//移除无用的资源
 	CCTextureCache::sharedTextureCache()->removeUnusedTextures();
@@ -183,7 +197,7 @@ void CPvpMenuLayer::updateShowArea()
 				pLayer->addChild(m_pShopLayer);
 				m_pShopLayer->setPosition(pLayer->convertToNodeSpace(m_pShopLayer->getPosition()));
 			}			
-			CMainCityControl::getInstance()->sendShopRequest(3);
+			CMainCityControl::getInstance()->sendShopRequest(4);
 			m_pShopLayer->setVisible(true);
 			m_pCurrentLayer = m_pShopLayer;
 		}
@@ -196,7 +210,8 @@ void CPvpMenuLayer::updateShowArea()
 				m_pPvpRecordLayer->setTouchPriority(LayerManager::instance()->getLayerManagerMinPriority()-1);
 				pLayer->addChild(m_pPvpRecordLayer);
 				m_pPvpRecordLayer->setPosition(pLayer->convertToNodeSpace(m_pPvpRecordLayer->getPosition()));
-			}			
+				AskForPvpRecord();
+			}
 			m_pPvpRecordLayer->setVisible(true);
 			m_pCurrentLayer = m_pPvpRecordLayer;
 		}
@@ -210,11 +225,15 @@ void CPvpMenuLayer::updateShowArea()
 
 void CPvpMenuLayer::showOpenEffect()
 {
+	setVisible(true);
+
 	//layout
 	CLayout* pLayout = (CLayout*)m_ui->findWidgetById("panel");
 
 	//拿到背景框
 	CCSprite* pRect = (CCSprite*)m_ui->findWidgetById("bg_rect");
+	pRect->setOpacity(0);
+	pRect->removeAllChildrenWithCleanup(true);
 
 	//拿到位置标记
 	CCSprite* pBoxLight = (CCSprite*)pLayout->findWidgetById("box");
@@ -224,9 +243,9 @@ void CPvpMenuLayer::showOpenEffect()
 	CTranstionEffectLayer* pEffect = CTranstionEffectLayer::create();
 	pEffect->setStartPos(pPos);
 	pEffect->setLineDir(TranstionEffectLineDirectionVertical);
-	pEffect->setGrowDir(TranstionEffectGrowDirectionMinus);
-	pEffect->setLineCount(11);
-	pEffect->setLineMax(15);
+	pEffect->setGrowDir(TranstionEffectGrowDirectionAdd);
+	pEffect->setLineCount(12);
+	pEffect->setLineMax(14);
 	pEffect->setTimeMove(0.03f);
 	pEffect->setTimeFade(0.45f);
 	pEffect->setCellRotation(-90);
@@ -245,4 +264,12 @@ void CPvpMenuLayer::showOpenEffectCallback()
 	//layout
 	CLayout* pLayout = (CLayout*)m_ui->findWidgetById("panel");
 	pLayout->setVisible(true);
+
+	CCSprite* pRect = (CCSprite*)m_ui->findWidgetById("bg_rect");
+	pRect->setOpacity(255);
+}
+
+void CPvpMenuLayer::hide()
+{
+	setVisible(false);
 }

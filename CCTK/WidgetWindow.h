@@ -133,6 +133,8 @@ protected:
 	
 	bool m_isTouchSwallow;
 
+	CCTouch *m_pTouch;
+
 	CCObject* m_pLongClickedWidgetObject;
 	CWidget* m_pSelectedWidget;
 

@@ -435,14 +435,17 @@ void CMainCityUI::onClickBtn(CCObject *pSender)
 
 	case Shop_Btn:
 		{
-			CShopLayer *shpLayer = CShopLayer::create();
-			shpLayer->setShopType(1);
-			LayerManager::instance()->push(shpLayer);
-			CMainCityControl::getInstance()->sendShopRequest(1);
+			if( LayerManager::instance()->getLayer("CShopLayer") == nullptr )
+			{
+				CShopLayer *shpLayer = CShopLayer::create();
+				shpLayer->setShopType(1);
+				LayerManager::instance()->push(shpLayer);
+				CMainCityControl::getInstance()->sendShopRequest(1);
 
-			CCSprite *red = (CCSprite*)(m_ui->findWidgetById("shopPoint"));
-			red->setVisible(false);
-			CTaskControl::getInstance()->getGameTips()->shopTips = false;
+				CCSprite *red = (CCSprite*)(m_ui->findWidgetById("shopPoint"));
+				red->setVisible(false);
+				CTaskControl::getInstance()->getGameTips()->shopTips = false;
+			}
 		}
 		break;
 
@@ -757,11 +760,12 @@ void CMainCityUI::showNoticeTip(CGameTips * ct)
 void CMainCityUI::runTollgatepreviewCallBack()
 {
 	int stage = DataCenter::sharedData()->getWar()->getStageID(); 
-	 
-	CPlayerControl::getInstance().sendStageInfo(stage);
+
 	CTollgatePreview *preview = CTollgatePreview::create();
 	LayerManager::instance()->push(preview);
-	preview->setStage(stage,"");
+	CPlayerControl::getInstance().sendStageInfo(stage);
+	preview->setStage(stage, "");
+	preview->setNormal(DataCenter::sharedData()->getWar()->getNormal());
 }
 
 void CMainCityUI::setShowHeadPart(bool isSHow)

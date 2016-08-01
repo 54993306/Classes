@@ -10,15 +10,23 @@
 #include "Battle/skEffectData.h"
 namespace BattleSpace
 {
-
-	void CaptainSkill::ExecuteSkill()
+	void CaptainSkill::ExecuteSkill(bool pOther /*=false*/)
 	{
-		BaseRole* alive  = DataCenter::sharedData()->getWar()->getAliveByGrid(C_CAPTAINGRID);
-		CCArray* arr = DataCenter::sharedData()->getWar()->getHeros(true);
-		if (!alive||!arr|| !alive->getBaseData()->hasCaptainSkill())
+		BaseRole* tRole  = nullptr;
+		CCArray* tArray = nullptr;
+		if (pOther)
+		{
+			tRole  = DataCenter::sharedData()->getWar()->getAliveByGrid(C_OtherCaptain);
+			tArray = DataCenter::sharedData()->getWar()->getMonsters(true);
+		}else{
+			tRole  = DataCenter::sharedData()->getWar()->getAliveByGrid(C_CAPTAINGRID);
+			tArray = DataCenter::sharedData()->getWar()->getHeros(true);
+		}
+		if (!tRole||!tArray|| !tArray->count()||
+			!tRole->getBaseData()->hasCaptainSkill())
 			return;
-		const RoleSkill* skill = alive->getBaseData()->getCaptainSkill();							//需同时满足种族限制且满足属性限制
-		CCArray* RaceArr = RaceJudgeCap(arr,skill->getTargetType());			//种族限制判定
+		const RoleSkill* skill = tRole->getBaseData()->getCaptainSkill();							//需同时满足种族限制且满足属性限制
+		CCArray* RaceArr = RaceJudgeCap(tArray,skill->getTargetType());			//种族限制判定
 		if (!RaceArr||!RaceArr->count())
 			return;																//不满足种族限制条件
 		//CCArray* AttributeArr=AttributeJudgeArrCap(_CaptainSkill,RaceArr);	//属性限制判定(暂时取消)
@@ -30,7 +38,7 @@ namespace BattleSpace
 		{
 			if (!skill->getIndexEffect(0,i)->getEffectID())
 				continue;
-			CCArray* _arr = getTargetArrCap(skill->getIndexEffect(0,i),AttributeArr,arr);			
+			CCArray* _arr = getTargetArrCap(skill->getIndexEffect(0,i),AttributeArr,tArray);			
 			AddArr(executeArr,_arr);
 		}
 		CCObject* ob = nullptr;

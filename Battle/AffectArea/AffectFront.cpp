@@ -52,7 +52,7 @@ namespace BattleSpace
 	{
 		AffectFront::initArea(pInfo);
 		pInfo.excludeInvalid();
-		vector<BaseRole*>* VecAlive = pInfo.getAlive()->getSkillTargets();
+		vector<BaseRole*>* VecAlive = pInfo.getAlive()->getCurrSkillTargets();
 		for (auto tRole: *VecAlive)
 		{
 			for (int tIndex=0;tIndex < pInfo.getVector().size();tIndex++)

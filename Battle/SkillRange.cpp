@@ -33,20 +33,19 @@ namespace BattleSpace{
 		}
 	}
 	//返回受击区域(可以使用先获取敌方目标的方式然后判断敌方目标格子是否在攻击范围内)
-	void SkillRange::initSkillArea( BaseRole* pAlive,vector<int>& pVector )	
+	void SkillRange::initSkillArea( BaseRole* pRole,vector<int>& pVector )	
 	{
-		pAlive->mSkillArea.clear();
 		pVector.clear();
-		if ( !pAlive->getCurrEffect() )				//在此处判断是因为该方法被多处调用
+		if ( !pRole->getCurrEffect() )				//在此处判断是因为该方法被多处调用
 			return;
-		AreaCountInfo CountInfo(pVector,pAlive);
-		pAlive->getCurrEffect()->initArea(CountInfo);
+		AreaCountInfo CountInfo(pVector,pRole);
+		pRole->getCurrEffect()->initArea(CountInfo);
 		CountInfo.excludeInvalid();
 	}
 	//返回受击范围内受击武将
 	void SkillRange::initAreaTargets(BaseRole* pAlive)
 	{
-		vector<BaseRole*>* VecAlive = pAlive->getSkillTargets();				//不直接使用格子去寻找是为了减少遍历的次数																
+		vector<BaseRole*>* VecAlive = pAlive->getCurrSkillTargets();				//不直接使用格子去寻找是为了减少遍历的次数																
 		for (auto tGrid : pAlive->mSkillArea)								//格子是排序好的,要使用格子来进行遍历(必须,不同阵营获取目标顺序不同)
 		{
 			for (BaseRole* tAlive: *VecAlive)
@@ -95,32 +94,33 @@ namespace BattleSpace{
 		pRole->setGroupIndex(0);					//都没有打中目标,默认显示第一个效果组
 	}
 	//主帅警戒区域处理,先判断所有位置效果组1，再判断所有位置效果组2
-	int SkillRange::CaptainGuard( BaseRole* pAlive )
+	int SkillRange::CaptainGuard( BaseRole* pRole )
 	{
-		int currgrid = pAlive->getGridIndex();
+		int tCurrGrid = pRole->getGridIndex();
+		int tCol = tCurrGrid/C_GRID_ROW;
 		int tGroupIndex = 0;
-		for (;tGroupIndex < pAlive->getCurrSkill()->getListSize(); tGroupIndex++)	//效果优先而不是位置优先,先判断一个效果的所有位置再判断下一个效果
+		for (;tGroupIndex < pRole->getCurrSkill()->getListSize(); tGroupIndex++)	//效果优先而不是位置优先,先判断一个效果的所有位置再判断下一个效果
 		{
-			pAlive->setGroupIndex(tGroupIndex);
-			for (int tGrid=C_CAPTAINGRID; tGrid<=C_ENDGRID; tGrid++)
+			pRole->setGroupIndex(tGroupIndex);
+			for ( int tRow = 0;tRow < C_GRID_ROW;tRow++ )
 			{
-				int tStandRow = tGrid%C_GRID_ROW + pAlive->getBaseData()->getRoleRow();		
-				if (tStandRow > C_GRID_ROW)												//武将所占格子,不能超出地图外
+				int tStandRow = tRow + pRole->getBaseData()->getRoleRow();		
+				if (tStandRow > C_GRID_ROW)										//武将所占格子,不能超出地图外
 					continue;														
-				pAlive->setGridIndex(tGrid);
-				initSkillArea(pAlive,pAlive->mSkillArea);
-				if ( !pAlive->mSkillArea.size() )
+				pRole->setGridIndex(tCol*C_GRID_ROW + tRow);
+				initSkillArea(pRole,pRole->mSkillArea);
+				if ( !pRole->mSkillArea.size() )
 					continue;
-				initAreaTargets(pAlive);	
-				if (pAlive->mAreaTargets.size())
+				initAreaTargets(pRole);	
+				if (pRole->mAreaTargets.size())
 				{
-					pAlive->setGridIndex(currgrid);
-					return tGrid;
+					pRole->setGridIndex(tCurrGrid);
+					return tCol * C_GRID_ROW + tRow;
 				}
 			}
 		}
-		pAlive->setGroupIndex(0);
-		pAlive->setGridIndex(currgrid);
+		pRole->setGroupIndex(0);
+		pRole->setGridIndex(tCurrGrid);
 		return INVALID_GRID;
 	}
 }

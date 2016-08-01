@@ -24,6 +24,9 @@ namespace {
 const ::google::protobuf::Descriptor* Hero_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   Hero_reflection_ = NULL;
+const ::google::protobuf::Descriptor* HPos_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  HPos_reflection_ = NULL;
 
 }  // namespace
 
@@ -35,7 +38,7 @@ void protobuf_AssignDesc_common_2fhero_5fcommon_2eproto() {
       "common/hero_common.proto");
   GOOGLE_CHECK(file != NULL);
   Hero_descriptor_ = file->message_type(0);
-  static const int Hero_offsets_[61] = {
+  static const int Hero_offsets_[62] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Hero, id_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Hero, heroid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Hero, name_),
@@ -97,6 +100,7 @@ void protobuf_AssignDesc_common_2fhero_5fcommon_2eproto() {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Hero, remove_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Hero, color_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Hero, evol_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Hero, heropos_),
   };
   Hero_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -109,6 +113,22 @@ void protobuf_AssignDesc_common_2fhero_5fcommon_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Hero));
+  HPos_descriptor_ = file->message_type(1);
+  static const int HPos_offsets_[2] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(HPos, x_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(HPos, y_),
+  };
+  HPos_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      HPos_descriptor_,
+      HPos::default_instance_,
+      HPos_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(HPos, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(HPos, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(HPos));
 }
 
 namespace {
@@ -123,6 +143,8 @@ void protobuf_RegisterTypes(const ::std::string&) {
   protobuf_AssignDescriptorsOnce();
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     Hero_descriptor_, &Hero::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    HPos_descriptor_, &HPos::default_instance());
 }
 
 }  // namespace
@@ -130,6 +152,8 @@ void protobuf_RegisterTypes(const ::std::string&) {
 void protobuf_ShutdownFile_common_2fhero_5fcommon_2eproto() {
   delete Hero::default_instance_;
   delete Hero_reflection_;
+  delete HPos::default_instance_;
+  delete HPos_reflection_;
 }
 
 void protobuf_AddDesc_common_2fhero_5fcommon_2eproto() {
@@ -143,7 +167,7 @@ void protobuf_AddDesc_common_2fhero_5fcommon_2eproto() {
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
     "\n\030common/hero_common.proto\022\rprotos.commo"
     "n\032\031common/skill_common.proto\032\030common/ite"
-    "m_common.proto\"\245\t\n\004Hero\022\n\n\002id\030\001 \001(\005\022\016\n\006h"
+    "m_common.proto\"\313\t\n\004Hero\022\n\n\002id\030\001 \001(\005\022\016\n\006h"
     "eroId\030\002 \001(\005\022\014\n\004name\030\003 \001(\t\022\r\n\005level\030\004 \001(\005"
     "\022\020\n\010maxLevel\030\005 \001(\005\022\020\n\010coldDown\030\006 \001(\005\022\023\n\013"
     "atkInterval\030\007 \001(\002\022\n\n\002hp\030\010 \001(\005\022\013\n\003atk\030\t \001"
@@ -173,12 +197,16 @@ void protobuf_AddDesc_common_2fhero_5fcommon_2eproto() {
     "s.common.Item\022#\n\006armor5\0305 \001(\0132\023.protos.c"
     "ommon.Item\022\r\n\005prate\0306 \001(\005\022\016\n\006battle\0307 \001("
     "\010\022\016\n\006remove\0308 \001(\010\022\r\n\005color\030/ \001(\005\022\014\n\004evol"
-    "\0309 \001(\010B4\n$dass.server.gameserver.protos."
-    "commonB\nHeroCommonH\001", 1340);
+    "\0309 \001(\010\022$\n\007heroPos\030B \001(\0132\023.protos.common."
+    "HPos\"\034\n\004HPos\022\t\n\001x\030\001 \002(\005\022\t\n\001y\030\002 \002(\005B4\n$da"
+    "ss.server.gameserver.protos.commonB\nHero"
+    "CommonH\001", 1408);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "common/hero_common.proto", &protobuf_RegisterTypes);
   Hero::default_instance_ = new Hero();
+  HPos::default_instance_ = new HPos();
   Hero::default_instance_->InitAsDefaultInstance();
+  HPos::default_instance_->InitAsDefaultInstance();
   ::google::protobuf::internal::OnShutdown(&protobuf_ShutdownFile_common_2fhero_5fcommon_2eproto);
 }
 
@@ -253,6 +281,7 @@ const int Hero::kBattleFieldNumber;
 const int Hero::kRemoveFieldNumber;
 const int Hero::kColorFieldNumber;
 const int Hero::kEvolFieldNumber;
+const int Hero::kHeroPosFieldNumber;
 #endif  // !_MSC_VER
 
 Hero::Hero()
@@ -271,6 +300,7 @@ void Hero::InitAsDefaultInstance() {
   armor3_ = const_cast< ::protos::common::Item*>(&::protos::common::Item::default_instance());
   armor4_ = const_cast< ::protos::common::Item*>(&::protos::common::Item::default_instance());
   armor5_ = const_cast< ::protos::common::Item*>(&::protos::common::Item::default_instance());
+  heropos_ = const_cast< ::protos::common::HPos*>(&::protos::common::HPos::default_instance());
 }
 
 Hero::Hero(const Hero& from)
@@ -342,6 +372,7 @@ void Hero::SharedCtor() {
   remove_ = false;
   color_ = 0;
   evol_ = false;
+  heropos_ = NULL;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -364,6 +395,7 @@ void Hero::SharedDtor() {
     delete armor3_;
     delete armor4_;
     delete armor5_;
+    delete heropos_;
   }
 }
 
@@ -489,6 +521,9 @@ void Hero::Clear() {
     remove_ = false;
     color_ = 0;
     evol_ = false;
+    if (has_heropos()) {
+      if (heropos_ != NULL) heropos_->::protos::common::HPos::Clear();
+    }
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
@@ -1452,6 +1487,20 @@ bool Hero::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(530)) goto parse_heroPos;
+        break;
+      }
+
+      // optional .protos.common.HPos heroPos = 66;
+      case 66: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_heroPos:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+               input, mutable_heropos()));
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -1793,6 +1842,12 @@ void Hero::SerializeWithCachedSizes(
       65, this->skill5(), output);
   }
 
+  // optional .protos.common.HPos heroPos = 66;
+  if (has_heropos()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      66, this->heropos(), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -2129,6 +2184,13 @@ void Hero::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
         65, this->skill5(), target);
+  }
+
+  // optional .protos.common.HPos heroPos = 66;
+  if (has_heropos()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        66, this->heropos(), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -2569,6 +2631,13 @@ int Hero::ByteSize() const {
       total_size += 2 + 1;
     }
 
+    // optional .protos.common.HPos heroPos = 66;
+    if (has_heropos()) {
+      total_size += 2 +
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+          this->heropos());
+    }
+
   }
   if (!unknown_fields().empty()) {
     total_size +=
@@ -2793,6 +2862,9 @@ void Hero::MergeFrom(const Hero& from) {
     if (from.has_evol()) {
       set_evol(from.evol());
     }
+    if (from.has_heropos()) {
+      mutable_heropos()->::protos::common::HPos::MergeFrom(from.heropos());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -2825,6 +2897,9 @@ bool Hero::IsInitialized() const {
   }
   if (has_armor5()) {
     if (!this->armor5().IsInitialized()) return false;
+  }
+  if (has_heropos()) {
+    if (!this->heropos().IsInitialized()) return false;
   }
   return true;
 }
@@ -2892,6 +2967,7 @@ void Hero::Swap(Hero* other) {
     std::swap(remove_, other->remove_);
     std::swap(color_, other->color_);
     std::swap(evol_, other->evol_);
+    std::swap(heropos_, other->heropos_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     std::swap(_has_bits_[1], other->_has_bits_[1]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
@@ -2904,6 +2980,255 @@ void Hero::Swap(Hero* other) {
   ::google::protobuf::Metadata metadata;
   metadata.descriptor = Hero_descriptor_;
   metadata.reflection = Hero_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int HPos::kXFieldNumber;
+const int HPos::kYFieldNumber;
+#endif  // !_MSC_VER
+
+HPos::HPos()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+}
+
+void HPos::InitAsDefaultInstance() {
+}
+
+HPos::HPos(const HPos& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+}
+
+void HPos::SharedCtor() {
+  _cached_size_ = 0;
+  x_ = 0;
+  y_ = 0;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+HPos::~HPos() {
+  SharedDtor();
+}
+
+void HPos::SharedDtor() {
+  if (this != default_instance_) {
+  }
+}
+
+void HPos::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* HPos::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return HPos_descriptor_;
+}
+
+const HPos& HPos::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_common_2fhero_5fcommon_2eproto();
+  return *default_instance_;
+}
+
+HPos* HPos::default_instance_ = NULL;
+
+HPos* HPos::New() const {
+  return new HPos;
+}
+
+void HPos::Clear() {
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    x_ = 0;
+    y_ = 0;
+  }
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool HPos::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+  ::google::protobuf::uint32 tag;
+  while ((tag = input->ReadTag()) != 0) {
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // required int32 x = 1;
+      case 1: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &x_)));
+          set_has_x();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(16)) goto parse_y;
+        break;
+      }
+
+      // required int32 y = 2;
+      case 2: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_y:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &y_)));
+          set_has_y();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectAtEnd()) return true;
+        break;
+      }
+
+      default: {
+      handle_uninterpreted:
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          return true;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+  return true;
+#undef DO_
+}
+
+void HPos::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // required int32 x = 1;
+  if (has_x()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->x(), output);
+  }
+
+  // required int32 y = 2;
+  if (has_y()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->y(), output);
+  }
+
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+}
+
+::google::protobuf::uint8* HPos::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // required int32 x = 1;
+  if (has_x()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(1, this->x(), target);
+  }
+
+  // required int32 y = 2;
+  if (has_y()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->y(), target);
+  }
+
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  return target;
+}
+
+int HPos::ByteSize() const {
+  int total_size = 0;
+
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // required int32 x = 1;
+    if (has_x()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->x());
+    }
+
+    // required int32 y = 2;
+    if (has_y()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->y());
+    }
+
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void HPos::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const HPos* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const HPos*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void HPos::MergeFrom(const HPos& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_x()) {
+      set_x(from.x());
+    }
+    if (from.has_y()) {
+      set_y(from.y());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void HPos::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void HPos::CopyFrom(const HPos& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool HPos::IsInitialized() const {
+  if ((_has_bits_[0] & 0x00000003) != 0x00000003) return false;
+
+  return true;
+}
+
+void HPos::Swap(HPos* other) {
+  if (other != this) {
+    std::swap(x_, other->x_);
+    std::swap(y_, other->y_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata HPos::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = HPos_descriptor_;
+  metadata.reflection = HPos_reflection_;
   return metadata;
 }
 

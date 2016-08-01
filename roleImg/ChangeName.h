@@ -4,11 +4,9 @@
 
 #include "AppUI.h"
 #include "scene/layer/LayerManager.h"
-#include "bag/bagData.h"
-#include "model/DataCenter.h"
-#include "common/CursorTextField.h"
-
 #include "model/RoleNameGM.h"
+
+class CursorTextField;
 
 class CChangeName: public BaseLayer
 {

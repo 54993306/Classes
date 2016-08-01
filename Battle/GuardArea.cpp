@@ -23,30 +23,44 @@ namespace BattleSpace{
 		}
 	}
 	//警戒区域的变化情况值跟武将的位置变化有关系,而且是武将的移动对象格子变化。不用每次都去刷新处理
-	int GuardArea::getAliveGuard( BaseRole* pAlive )
+	int GuardArea::getAliveGuard( BaseRole* pRole )
 	{
 		vector<int> Vecguard;
-		initAliveGuard(pAlive,Vecguard);
-		for (auto i:Vecguard)
+		initAliveGuard(pRole,Vecguard);
+		if (pRole->getOtherCamp())
 		{
-			for (auto tAlive:*mManage->inBattleMonsters())
+			vector<int>::reverse_iterator iter= Vecguard.rbegin();
+			for (;iter != Vecguard.rend();iter++)
 			{
-				vector<int>::reverse_iterator iter= tAlive->mStandGrids.rbegin();
-				for (;iter != tAlive->mStandGrids.rend();iter++)			//我方对怪物应该从最大的格子开始进行判断
-				{
-					if ( i != *iter )										//当前警戒区域范围内存在敌方目标
-						continue;
-					int tMoveGrid = i;
-					int tRow = i%C_GRID_ROW;
-					if ( tRow+pAlive->getBaseData()->getRoleRow() > C_GRID_ROW )				//我方武将占3行,地方怪物在row=3的位置，超出地图范围了
-						tMoveGrid = i-((pAlive->getBaseData()->getRoleRow()+tRow)-C_GRID_ROW);//把超出的部分减掉
-					if ( tMoveGrid < C_BEGINGRID || tMoveGrid > C_ENDGRID )
-						break;
-					return tMoveGrid;
-				}
+				if (hasTarget(pRole,*iter))
+					return *iter;
+			}
+		}else{
+			for (auto tGrid : Vecguard)
+			{
+				if (hasTarget(pRole,tGrid))
+					return tGrid;
 			}
 		}
 		return INVALID_GRID;												//没有警戒区域自动不处理
+	}
+
+	bool GuardArea::hasTarget( BaseRole* pRole,int pGrid )
+	{
+		for (auto tRole:*pRole->getCurrSkillTargets())
+		{
+			if (tRole->inStandGrid(pGrid))
+			{
+				int tMoveGrid = pGrid;
+				int tRow = pGrid%C_GRID_ROW;
+				if ( tRow+pRole->getBaseData()->getRoleRow() > C_GRID_ROW )				//我方武将占3行,地方怪物在row=3的位置，超出地图范围了
+					tMoveGrid = pGrid-((pRole->getBaseData()->getRoleRow()+tRow)-C_GRID_ROW);//把超出的部分减掉
+				if ( tMoveGrid < C_BEGINGRID || tMoveGrid > C_ENDGRID )
+					return false;
+				return true;
+			}
+		}
+		return false;
 	}
 
 	void GuardArea::initAliveGuard( BaseRole* pAlive,vector<int>& pGuards )
@@ -55,11 +69,17 @@ namespace BattleSpace{
 		{
 		case eFrontGuard:
 			{
-				guardFront(pAlive,pGuards);
+				if (pAlive->getOtherCamp())
+					guradBack(pAlive,pGuards);
+				else
+					guardFront(pAlive,pGuards);
 			}break;
 		case eBackGuard:
 			{
-				guradBack(pAlive,pGuards);
+				if (pAlive->getOtherCamp())
+					guardFront(pAlive,pGuards);
+				else
+					guradBack(pAlive,pGuards);
 			}break;
 		case eFrontAndBackGuard:
 			{
@@ -141,4 +161,5 @@ namespace BattleSpace{
 			}
 		}
 	}
+
 }

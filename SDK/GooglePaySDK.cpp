@@ -8,14 +8,17 @@
 GooglePaySDK *GooglePaySDK::m_pInstance = nullptr;
 
 GooglePaySDK::GooglePaySDK()
-	:m_sPurchaseInfo("")
+	:m_sProductID(""), m_sSignData(""), m_sPurchaseInfo(""),m_iPayTag(GooglePayTagNull)
 {
 
+	CCDirector::sharedDirector()->getScheduler()->scheduleSelector(schedule_selector(GooglePaySDK::updateForPurchase), this, 0, kCCRepeatForever, 0, false);
 }
 
 GooglePaySDK::~GooglePaySDK()
 {
 	m_pInstance = nullptr;
+
+	CCDirector::sharedDirector()->getScheduler()->unscheduleAllForTarget(this);
 }
 
 GooglePaySDK * GooglePaySDK::getInstance()
@@ -71,16 +74,12 @@ void GooglePaySDK::concumePurchase(int iMsg, string sPurchaseInfo )
 void GooglePaySDK::checkPurchase( string sProductID, string sSignData, string sPurchaseInfo )
 {
 	CCLOG("[ info ]--GooglePaySDK::checkPurchase");
+	
 	m_sPurchaseInfo = sPurchaseInfo;
-	//发送信息到服务器，等待结果
-	GAME_PRODUCT iGameProductId = getGameProductByGoogleProductId(sProductID);
-	//TODO
-	//验证订单
-	ValidateBilling *pReq = new ValidateBilling; 
-	pReq->set_inapp_data_signature(sSignData);
-	pReq->set_inapp_purchase_data(sPurchaseInfo);
-	GetTcpNet->sendData(pReq, ValidateBillingMsg);
-	delete pReq;
+	m_sProductID = sProductID;
+	m_sSignData = sSignData;
+
+	m_iPayTag = GooglePayTagCheckPurchase;
 }
 
 
@@ -101,18 +100,14 @@ void GooglePaySDK::recvServerMsg( int type, google::protobuf::Message *msg )
 void GooglePaySDK::checkPurchaseCallback( int iNum, bool bOk )
 {
 	CCLOG("[ info ]--GooglePaySDK::checkPurchaseCallback");
+
+	//不管验证成功还是失败，都发送到安卓端进行消除商品，android找不到对应订单则不处理
+	concumePurchase( G_CONCUME, m_sPurchaseInfo );
+
 	//验证成功
 	if(bOk)
 	{
 		CCLOG("[ info ]--GooglePaySDK::checkPurchaseCallback-success_check_purchase");
-
-		//购买成功
-		//TODO
-		//如果是可消耗的，发回android调用消耗
-		if(/*isConcumeable(GOOGLE_PRODUCT[iId].sProductID)*/true)
-		{
-			concumePurchase(G_CONCUME, m_sPurchaseInfo);
-		}
 
 		//获取数据
 		//TODO
@@ -165,5 +160,49 @@ void GooglePaySDK::payFail(string sProductID)
 bool GooglePaySDK::isConcumeable( string sProductID )
 {
 	return true;
+}
+
+void GooglePaySDK::updateForPurchase( float dt )
+{
+	switch (m_iPayTag)
+	{
+	case GooglePayTagNull:
+		break;
+	case GooglePayTagCheckPurchase:
+		{
+			CCLOG("[ info ]--GooglePaySDK::updateForCheckPurchase--case GooglePayTagCheckPurchase");
+
+			//向服务器验证订单
+			//发送信息到服务器，等待结果
+			GAME_PRODUCT iGameProductId = getGameProductByGoogleProductId(m_sProductID);
+
+			//TODO
+			//验证订单
+			ValidateBilling *pReq = new ValidateBilling; 
+			pReq->set_inapp_data_signature(m_sSignData);
+			pReq->set_inapp_purchase_data(m_sPurchaseInfo);
+			GetTcpNet->sendData(pReq, ValidateBillingMsg);
+			delete pReq;
+
+			m_iPayTag = GooglePayTagNull;
+		}
+		break;
+	case GooglePayTagPayFailed:
+		{
+			//购买失败
+
+			m_iPayTag = GooglePayTagNull;
+
+		}break;
+	default:
+		break;
+	}
+}
+
+void GooglePaySDK::startConsumeTroublePurchaes()
+{
+#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
+	c_start_consume_trouble_purchaes(START_CONSUME_TROUBLE);
+#endif
 }
 

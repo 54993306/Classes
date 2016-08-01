@@ -14,11 +14,16 @@
 #define G_PLATFORM_UC										3				//UC
 #define G_PLATFORM_360									4				//360
 
+#ifndef FACEBOOKSHARE
+#define FACEBOOKSHARE
+#endif // !FACEBOOKSHARE
+
+
 //选用支付平台
 #if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
 #define G_PLATFORM_TARGET						G_PLATFORM_UNKNOWN
 #else
-#define G_PLATFORM_TARGET						G_PLATFORM_UNKNOWN
+#define G_PLATFORM_TARGET						G_PLATFORM_FACEBOOK
 #endif
 
 

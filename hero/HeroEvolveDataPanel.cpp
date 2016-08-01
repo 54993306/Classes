@@ -107,6 +107,12 @@ void CHeroEvolveDataPanel::updateUI()
 	CLabel *pTitle = (CLabel *)m_pUi->findWidgetById("title");
 	pTitle->setString(GETLANGSTR(2004+m_pHero->quality));
 
+	//Warning特殊处理
+	if(m_pHero->quality == 6)
+	{
+		pTitle->setString(GETLANGSTR(2018));
+	}
+
 	//更新技能信息
 	updateSkillInfo();
 
@@ -133,6 +139,10 @@ void CHeroEvolveDataPanel::updateUI()
 	case 5:
 		{
 			showBaseInfo();
+		}break;
+	case 6://特殊
+		{
+			hideBaseInfo();
 		}break;
 	default:
 		break;
@@ -224,6 +234,11 @@ vector<CSkill*> CHeroEvolveDataPanel::getRankOpenSkill( int iRank )
 				m_pBaseHero->skill7.skillId = 90000;
 				vec.push_back(&m_pBaseHero->skill7);
 			}
+		}break;
+	case 6:
+		{
+			m_pBaseHero->skill7.skillId = 90000;
+			vec.push_back(&m_pBaseHero->skill7);
 		}break;
 	default:
 		break;
@@ -344,15 +359,7 @@ void CHeroEvolveDataPanel::fillOneSkillInfo( CLayout *pLay, CSkill *pSkill, bool
 		
 		if(showExtra)
 		{
-			//主/被
-			if(isInitiativeSkill(pSkill))
-			{
-				pType->setString(GETLANGSTR(1090));
-			}
-			else
-			{
-				pType->setString(GETLANGSTR(274));
-			}
+			pType->setString(GETLANGSTR(getSkillTypeDesId(pSkill)));
 
 			//cost
 			//添加火和数字
@@ -393,6 +400,34 @@ bool CHeroEvolveDataPanel::isInitiativeSkill( CSkill *pSkill )
 	}
 	return false;
 }
+
+
+int CHeroEvolveDataPanel::getSkillTypeDesId( CSkill *pSkill )
+{
+	if(pSkill == &m_pBaseHero->skill2)
+	{
+		return 2022;
+	}
+	else if(pSkill == &m_pBaseHero->skill3)
+	{
+		return 2019;
+	}
+	else if(pSkill == &m_pBaseHero->skill4)
+	{
+		return 2020;
+	}
+	else if(pSkill == &m_pBaseHero->skill5)
+	{
+		return 2021;
+	}
+	else if(pSkill == &m_pBaseHero->skill6)
+	{
+		return 2023;
+	}
+
+	return 2023;
+}
+
 
 void CHeroEvolveDataPanel::autoFixPos()
 {
@@ -443,7 +478,7 @@ void CHeroEvolveDataPanel::hideAllSkillPanel()
 
 bool CHeroEvolveDataPanel::isRealSkill( CSkill *pSkill )
 {
-	if(pSkill==&m_pBaseHero->skill1 || pSkill==&m_pBaseHero->skill6 || pSkill==&m_pBaseHero->skill7)
+	if(pSkill==&m_pBaseHero->skill1/* || pSkill==&m_pBaseHero->skill6*/ || pSkill==&m_pBaseHero->skill7)
 	{
 		return false;
 	}
@@ -506,5 +541,11 @@ HeroEvolveEffectuUnlockType CHeroEvolveDataPanel::getUnLockTypeWithRank( int iRa
 	}
 
 	return HeroEvolveEffectuUnlockType::UnlockSkill;
+}
+
+void CHeroEvolveDataPanel::resetAllHeroData()
+{
+	m_pHero = nullptr;
+	m_pBaseHero = nullptr;
 }
 

@@ -3,7 +3,8 @@
 #include "Battle/BaseRole.h"
 #include "Battle/BaseRoleData.h"
 #include "common/CGameSound.h"
-namespace BattleSpace{
+namespace BattleSpace
+{
 	bool RowUp_InBoundary( int originRow,int aimRow )
 	{
 		if (originRow-(aimRow-1)>= 0)
@@ -41,7 +42,7 @@ namespace BattleSpace{
 		{
 			newRow = C_GRID_ROW-1;
 		}else{
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+#if BATTLE_TEST
 			CCAssert(false,"[ *ERROR ] BattleTools::JudgeGridExceedBoundary ");
 #else
 			CCLOG("[ *ERROR ] BattleTools::JudgeGridExceedBoundary");			//数据错误了	
@@ -83,7 +84,7 @@ namespace BattleSpace{
 		{
 			newCol = goalCol + aim_col;
 		}else{
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+#if BATTLE_TEST
 			CCAssert(false,"[ *ERROR ] BattleTools::getHeroNewCol");//数据错误了
 #else
 			CCLOG("[ *ERROR ] BattleTools::getHeroNewCol");			//数据错误了	
@@ -111,7 +112,7 @@ namespace BattleSpace{
 		{
 			newCol = goalCol - aim_col;
 		}else{
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+#if BATTLE_TEST
 			CCAssert(false,"[ *ERROR ] BattleTools::getMonsterNewCol");	//数据错误了	
 #else
 			CCLOG("[ *ERROR ] BattleTools::getMonsterNewCol");			//数据错误了	
@@ -146,7 +147,7 @@ namespace BattleSpace{
 			}else{
 				child->setGridIndex(C_GRID_ROW-1+(C_GRID_COL-1-aimCol)*C_GRID_ROW);
 			}
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+#if BATTLE_TEST
 			CCAssert(false,"[ *ERROR ] BattleTools::CallAliveByFixRange");	//数据错误了	
 #else
 			CCLOG("[ *ERROR ] BattleTools::CallAliveByFixRange");			//数据错误了	
@@ -157,7 +158,7 @@ namespace BattleSpace{
 	void PlaySound( int id )
 	{
 		char str[60] = {0};
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+#if BATTLE_TEST
 		sprintf(str,"SFX/Test/%d.mp3",id);											
 #else
 		sprintf(str,"SFX/%d.ogg",id);												
@@ -199,10 +200,12 @@ namespace BattleSpace{
 	}
 	//SortAliveHp(VecAlive,0,VecAlive->size()-1);			//快速排序得出血量百分比由小到大的数组
 
-	void VectorUnique( vector<int>& pVector )
+	void VectorUnique( vector<int>& pVector , bool pReverse /*= false*/)
 	{
 		sort(pVector.begin(),pVector.end());
 		pVector.erase(unique(pVector.begin(),pVector.end()),pVector.end());
+		if (pReverse)
+			sort(pVector.begin(),pVector.end(),greater<int>());
 	}
 	//升序
 	bool sortGrid(const BaseRole*apAlive,const BaseRole*bpAlive)	
@@ -261,6 +264,20 @@ namespace BattleSpace{
 	int converCol( int pGrid )
 	{
 		return pGrid/C_GRID_ROW;
+	}
+
+	bool sameRow( int pGrid1 , int pGrid2 )
+	{
+		if (converRow(pGrid1) == converRow(pGrid2))
+			return true;
+		return false;
+	}
+
+	bool sameCol( int pGrid1 , int pGrid2 )
+	{
+		if (converCol(pGrid1) == converCol(pGrid2))
+			return true;
+		return false;
 	}
 
 }

@@ -24,7 +24,7 @@ namespace BattleSpace
 
 	void AffectAnyAlive::initArea(AreaCountInfo& pInfo)
 	{
-		vector<BaseRole*>* tAlives = pInfo.getAlive()->getSkillTargets();
+		vector<BaseRole*>* tAlives = pInfo.getAlive()->getCurrSkillTargets();
 		int tRange = min((int)tAlives->size(),pInfo.getAreaRange());		// num < val 表示武将不足	
 		int tLoopNumberMax = 200;
 		for (int tLoopNum = 0;tLoopNum < tLoopNumberMax;tLoopNum++)

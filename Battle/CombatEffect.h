@@ -14,6 +14,7 @@ namespace BattleSpace{
 	class BattleScene;
 	class BaseRole;
 	class WarManager;
+	class CombatLogic;
 	class CombatEffect : public CCObject
 	{
 	public:
@@ -35,6 +36,8 @@ namespace BattleSpace{
 		void BatterSpine(int index);
 		void continuousHurt();													//计算连击伤害
 		float CountAliveAtk();
+		void showVsAnimate( CombatLogic *pCombatLogic );	//pvp的开场vs动画
+		void showVsAnimateCallBack(CCNode *pSender);
 		CC_SYNTHESIZE(int, m_PlayerNum, PlayerNum);
 	private:
 		BattleScene* m_Scene;

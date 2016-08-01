@@ -32,6 +32,7 @@
 #include "tools/UICloneMgr.h"
 #include "Battle/BattleTools.h"
 #include "Battle/BattleMessage.h"
+#include "Battle/BattleModel.h"
 #include "common/CSpecialProgress.h"
 
 #include "Battle/RoleSkill.h"
@@ -39,6 +40,9 @@
 #include "Battle/BaseRole.h"
 #include "Battle/BaseRoleData.h"
 #include "Battle/BattleDataCenter.h"
+#include "Battle/BattleLayer/BattleTips.h"
+#include "model/DataCenter.h"
+#include "Global.h"
 
 namespace BattleSpace
 {
@@ -86,26 +90,32 @@ namespace BattleSpace
 		{
 		case CL_AddSpeedBtn:
 			{
-#if CC_PLATFORM_WIN32 == CC_TARGET_PLATFORM
+#if BATTLE_TEST
 				return eWidgetTouchTransient;
 #else
 				if (!user->getVip())
 				{
+					BattleTips* tips = BattleTips::create();
+					tips->showConfirmOnly();
 					string str = GETLANGSTR(2016);
-					ShowPopTextTip(str.c_str());
+					tips->addContentTip(str.c_str());
+					this->addChild(tips);
 					return eWidgetTouchNone;
 				}	
 #endif
 			}break;
 		case CL_AutoPlay:
 			{
-#if CC_PLATFORM_WIN32 == CC_TARGET_PLATFORM
+#if BATTLE_TEST
 				return eWidgetTouchTransient;
 #else
 				if (user->getLevel() <= 14 )
 				{
+					BattleTips* tips = BattleTips::create();
+					tips->showConfirmOnly();
 					string str = GETLANGSTR(2017);
-					ShowPopTextTip(str.c_str());
+					tips->addContentTip(str.c_str());
+					this->addChild(tips);
 					return eWidgetTouchNone;
 				}
 #endif
@@ -149,7 +159,7 @@ namespace BattleSpace
 			}break;
 		case TEST_Role:
 			{
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+#if BATTLE_TEST
 				const RolesMap* tRoleMap = mManage->getRolesMap();
 				for (auto tPair : *tRoleMap)
 				{
@@ -209,7 +219,7 @@ namespace BattleSpace
 		TestTips->setColor(ccc3(0,255,0));
 		m_ControLayer->addChild(TestTips);
 
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+#if BATTLE_TEST
 		tStarButton->setVisible(true);
 		tGuideTest->setVisible(true);
 		MoveTest->setVisible(true);
@@ -284,36 +294,74 @@ namespace BattleSpace
 	void WarControl::initUIAbove()
 	{
 		CButton* bt_return = (CButton*)m_ControLayer->getChildByTag(CL_Menu);								//返回按钮
+		bt_return->setOnClickListener(this,ccw_click_selector(WarControl::OnClick));		
 		CCheckBox* tAutoPlay = CCheckBox::create();
 		tAutoPlay->setNormalImage("warScene/Auto.png");
 		tAutoPlay->setCheckedImage("warScene/Auto_on.png");
 		tAutoPlay->setPosition(ccpAdd(bt_return->getPosition(),ccp(-200,0)));
 		tAutoPlay->setTag(CL_AutoPlay);
+		tAutoPlay->setVisible(false);
 		tAutoPlay->setOnTouchBeganListener(this,ccw_touchbegan_selector(WarControl::onTouchBegin));
 		tAutoPlay->setOnClickListener(this,ccw_click_selector(WarControl::OnClick));
 		m_ControLayer->addChild(tAutoPlay);
+		if (BattleData->getBattleModel()->isPvEBattle())
+		{
+			m_ControLayer->findWidgetById("layer_up_boss")->setVisible(false);
+			m_ControLayer->findWidgetById("layer_up_normal")->setVisible(false);
+			m_ControLayer->findWidgetById("layer_up_pvp")->setVisible(true);
+			m_ControLayer->findWidgetById("layer_time")->setVisible(true);
+			initPvEAbove();
+			return ;
+		}
 
 		BaseRole* boss = mManage->getAliveByType(sMonsterSpecies::eWorldBoss);
 		if (boss)
 		{
-			tAutoPlay->setVisible(false);
+			
 			m_ControLayer->findWidgetById("layer_up_boss")->setVisible(true);
 			m_ControLayer->findWidgetById("layer_up_normal")->setVisible(false);
+			m_ControLayer->findWidgetById("layer_up_pvp")->setVisible(false);
+			m_ControLayer->findWidgetById("layer_time")->setVisible(true);
 			updateTimeCountUI(180);																			//时间
 			initWorldBossAbove(boss);
 		}else{
+			tAutoPlay->setVisible(true);
 			m_ControLayer->findWidgetById("layer_up_boss")->setVisible(false);
 			m_ControLayer->findWidgetById("layer_up_normal")->setVisible(true);
+			m_ControLayer->findWidgetById("layer_up_pvp")->setVisible(false);
+			m_ControLayer->findWidgetById("layer_time")->setVisible(false);
 			initNormalAbove();
 			return;
 		}
 	}
 
+	void WarControl::initPvEAbove()
+	{
+		CCheckBox* bt_speed = (CCheckBox*)m_ControLayer->getChildByTag(CL_AddSpeedBtn);						//加速按钮
+		bt_speed->setOnTouchBeganListener(this,ccw_touchbegan_selector(WarControl::onTouchBegin));
+		bt_speed->setOnClickListener(this,ccw_click_selector(WarControl::OnClick));
+
+		CLayout* pLayoutPvp = (CLayout*)m_ControLayer->findWidgetById("layer_up_pvp");
+
+		m_iGameTimeCount = 90;			//世界boss打180s,3min
+		m_bCountDown = true;
+
+		//vs数据
+		VsAnimateData &vsData = DataCenter::sharedData()->getVsAnimateData();
+
+		//名字
+		CLabel *pName1 = (CLabel *)pLayoutPvp->findWidgetById("pvp_name1");
+		pName1->setString(vsData.sEnemyRoleName.c_str());
+		CLabel *pName2 = (CLabel *)pLayoutPvp->findWidgetById("pvp_name2");
+		pName2->setString(vsData.sSelfRoleName.c_str());
+
+		//更新头像
+		updateHeadIcon();
+
+	}
+
 	void WarControl::initNormalAbove()
 	{
-		CButton* bt_return = (CButton*)m_ControLayer->getChildByTag(CL_Menu);								//返回按钮
-		bt_return->setOnClickListener(this,ccw_click_selector(WarControl::OnClick));		
-
 		CCheckBox* bt_speed = (CCheckBox*)m_ControLayer->getChildByTag(CL_AddSpeedBtn);						//加速按钮
 		bt_speed->setOnTouchBeganListener(this,ccw_touchbegan_selector(WarControl::onTouchBegin));
 		bt_speed->setOnClickListener(this,ccw_click_selector(WarControl::OnClick));
@@ -422,7 +470,7 @@ namespace BattleSpace
 		CCARRAY_FOREACH(arr,obj)
 		{
 			BaseRole* alive = (BaseRole*)obj;
-			costMax += alive->getCostmax();
+			costMax += alive->getCostMax();
 			costNum += alive->getInitCost();
 		}
 		CProgressBar* pBar = (CProgressBar*)m_ControLayer->getChildByTag(CL_CostBar);//cost进度条
@@ -467,16 +515,21 @@ namespace BattleSpace
 		pCircle->addChild(Eff);
 	}
 	//初始化武将按钮信息
-	void WarControl::initAliveButton(CCNode* Layout,BaseRole* alive)
+	void WarControl::initAliveButton(CCNode* Layout,BaseRole* pRole)
 	{
 		CButton* btn = (CButton*)Layout->getChildByTag(CL_Btn);
 		btn->setLoingClickTime(0.5f);
 		btn->setVisible(true);
-		btn->setUserObject(alive);														//按钮和武将绑定
+		btn->setUserObject(pRole);														//按钮和武将绑定
 		btn->setOnClickListener(this,ccw_click_selector(WarControl::AliveButtonClick));
 		btn->setOnTouchBeganListener(this,ccw_touchbegan_selector(WarControl::AliveButtonBeginClick));
 		btn->setOnLongClickListener(this,ccw_longclick_selector(WarControl::AliveButtonLongClick));
 		btn->getSelectedImage()->setScale(0.95f);
+		if (BattleData->getBattleModel()->isPvEBattle() && pRole->getCaptain())
+		{
+			btn->setEnabled(false);
+			btn->setColor(ccc3(150,150,150));
+		}
 
 		EffectObject* CallAliveEffect = EffectObject::create("10028",sPlayType::eRepeat);			//call role effect
 		CallAliveEffect->setTag(CL_BtnCallEff);
@@ -489,7 +542,7 @@ namespace BattleSpace
 		AliveSkillEffect->setPosition(btn->getPosition());
 		Layout->addChild(AliveSkillEffect, -1);
 
-		const skEffectData* effect = alive->getBaseData()->getActiveSkill()->getSummonEffect();		//这个方法是应该放在武将身上的
+		const skEffectData* effect = pRole->getBaseData()->getActiveSkill()->getSummonEffect();		//这个方法是应该放在武将身上的
 		if (!effect)
 			return;
 		initButtonBackImage(btn,effect->getCallNumber());											//reason call number init back image
@@ -721,6 +774,8 @@ namespace BattleSpace
 	void WarControl::AliveBattleDispose(CCObject* ob)
 	{
 		BaseRole* tRole = (BaseRole*)ob;
+		if (tRole->getOtherCamp())
+			return;
 		if (tRole->getFatherID())
 		{
 			CallRoleEntranceBattle(tRole);
@@ -742,12 +797,12 @@ namespace BattleSpace
 			if (m_iAimCost >= skill->getExpendCost() && btn->isEnabled())
 			{
 				AliveButtonClick(btn);
-				this->scheduleOnce(schedule_selector(WarControl::upAutoSkillState),6.0f);
+				this->scheduleOnce(schedule_selector(WarControl::upAutoSkillState),6.0f);		//技能释放间隔最少6秒
 			}
 		}else{
 			if(m_iAimCost >= tRole->getBaseData()->getExpendCost() && btn->isEnabled())
 			{
-				bNotification->postNotification(MsgSendButtonState,CCBool::create	(true));
+				bNotification->postNotification(MsgSendButtonState,CCBool::create(true));
 			}else{
 				bNotification->postNotification(MsgSendButtonState,CCBool::create(false));
 			}
@@ -771,16 +826,16 @@ namespace BattleSpace
 				BaseRole* atRole = tRole->getCallRole(skill);
 				if (!atRole)
 					return eWidgetTouchTransient;
-				CaptainSkill::create()->ExecuteSkill();
+				mManage->executeCaptainSkill();
 				bNotification->postNotification(B_EntranceBattle,atRole);			//召唤成功才能扣减Cost值
 				return eWidgetTouchNone;
 			}	
 			return eWidgetTouchTransient;											//武将为上阵状态则触摸不传递到下层,否则将触摸传递到下层处理
 		}else{
-			if (tRole->getHp()<=0)
+			if (!tRole->getAliveState())
 			{
 				tRole->initAliveData();
-				CaptainSkill::create()->ExecuteSkill();
+				mManage->executeCaptainSkill();
 			}
 			if (cost < tRole->getBaseData()->getExpendCost())
 				return eWidgetTouchTransient;
@@ -798,12 +853,15 @@ namespace BattleSpace
 		if (  skill->getSkillType() == eCallAtk
 			||mManage->getCurrCost()<skill->getExpendCost() 
 			||!tRole->getBattle() 
-			||!tRole->getRoleObject())
+			||!tRole->getRoleObject()
+			||tRole->getLogicState() == sLogicState::eFree
+			||tRole->getLogicState() == sLogicState::eInvincible)
 			return;
 		CCNode* MoveLaout = getMoveLayout(tRole->getUiLayout()-CL_BtnLayout1);
 		btn->setEnabled(false);
 		if (guideStateButtonEffect(MoveLaout,true))
 			return;
+		tRole->getRoleObject()->setMoveState(sStateCode::eNullState);
 		tRole->getRoleObject()->TurnStateTo(sStateCode::eStandState);
 		tRole->ResetAttackState();																	//点击了必杀技按钮，但是武将并没有进入必杀技状态的情况,强制切换至必杀技状态
 		tRole->setCriAtk(true);
@@ -819,6 +877,7 @@ namespace BattleSpace
 
 	void WarControl::ResetButtonState( CCObject* ob )
 	{
+		if (!ob)return;
 		BaseRole* tRole = (BaseRole*)ob;
 		CCNode* MoveLaout = getMoveLayout(tRole->getUiLayout() - CL_BtnLayout1);
 		CProgressBar* CdBar = (CProgressBar*)MoveLaout->getChildByTag(CL_HeroPro);
@@ -1065,6 +1124,66 @@ namespace BattleSpace
 			NOTIFICATION->postNotification(MsgBattleOver);
 		}else{
 			updateTimeCountUI(m_iGameTimeCount);							//更新计时器
+		}
+	}
+
+	void WarControl::imageLoadSuccessCallBack( string sTag, vector<char>* pBuffer )
+	{
+		CCImage* img = new CCImage;
+		img->initWithImageData((unsigned char*)pBuffer->data(), pBuffer->size());
+		CCTexture2D* texture = new CCTexture2D();
+		texture->initWithImage(img);
+		//保存facebook 头像
+		string path = HttpLoadImage::getInstance()->getStoragePath("download/fbImg",sTag.c_str())+".jpg";
+		string buff(pBuffer->begin(), pBuffer->end());
+		CCLOG("path: %s", path.c_str());
+		FILE *fp = fopen(path.c_str(), "wb+");
+		fwrite(buff.c_str(), 1, pBuffer->size(),  fp);
+		fclose(fp);
+
+		updateHeadIcon();
+	}
+
+	void WarControl::updateHeadIcon()
+	{
+		CLayout* pLayoutPvp = (CLayout*)m_ControLayer->findWidgetById("layer_up_pvp");
+
+		//vs数据
+		VsAnimateData &vsData = DataCenter::sharedData()->getVsAnimateData();
+
+		//头像
+		const char *sHead[2] = {"pvp_head1", "pvp_head2"};
+		int iThumb[2] = {vsData.iEnemyHead, vsData.iSelfHead};
+		string iFbId[2] = {vsData.sEnemyFacebookId, vsData.sSelfFacebookId};
+
+		for(int i=0; i<2; i++)
+		{
+			CCSprite* pHead = (CCSprite*)pLayoutPvp->findWidgetById(sHead[i]);
+			CCString* pHeadStr = CCString::createWithFormat("headImg/%d.png", iThumb[i]);
+			if ( iThumb[i]>0 )
+			{
+				std::string strFullPathHead = CCFileUtils::sharedFileUtils()->fullPathForFilename(pHeadStr->getCString());
+				if(CCFileUtils::sharedFileUtils()->isFileExist(strFullPathHead))
+				{
+					pHead->setTexture(CCTextureCache::sharedTextureCache()->addImage(pHeadStr->getCString()));
+				} 
+			}
+			else
+			{
+				//加载facebook头像
+				string fbName = iFbId[i]+".jpg";
+				string fullName = CCFileUtils::sharedFileUtils()->fullPathForFilename(fbName.c_str());
+				bool isFileExist = CCFileUtils::sharedFileUtils()->isFileExist(fullName);
+				if(isFileExist)
+				{
+					pHead->setTexture(CCTextureCache::sharedTextureCache()->addImage(fullName.c_str()));
+				}
+				else
+				{
+					CCString *imgUrl = CCString::createWithFormat(FACEBOOKIMG, iFbId[i].c_str());
+					HttpLoadImage::getInstance()->requestUrlImage(imgUrl->getCString(), iFbId[i].c_str());
+				}
+			}
 		}
 	}
 

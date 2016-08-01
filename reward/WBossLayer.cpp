@@ -4,7 +4,6 @@
 #include "common/CGameSound.h"
 #include "Resources.h"
 #include "tools/UICloneMgr.h"
-#include "model/DataCenter.h"
 #include "common/CommonFunction.h"
 #include "tools/ShowTexttip.h"
 #include "hero/SkillDesc.h"

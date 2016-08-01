@@ -58,6 +58,7 @@ namespace BattleSpace{
 		CC_SYNTHESIZE(sCallType,mCallType,CallType);					//召唤类型(Control)
 		CC_SYNTHESIZE(float,mDelayTime,DelayTime);						//出现延迟时间
 		CC_SYNTHESIZE(sDataType,mRoleNature,RoleNature);				//角色种类(后续接口)
+		CC_SYNTHESIZE(bool,mOtherCamp,OtherCamp);						//其他阵营武将(非玩家阵营)
 		bool isAttribute(sProperty pType);
 		float judgeAttribute( sProperty pType );
 	public:

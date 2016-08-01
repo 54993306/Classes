@@ -5,6 +5,7 @@
 #include "AppUI.h"
 #include "scene/layer/LayerManager.h"
 #include "bag/bagData.h"
+
 class CShopBuy: public BaseLayer
 {
 public:

@@ -31,10 +31,12 @@ public:
     virtual bool init();
     void onEnter();
     void onExit();
-	
+
 public:
 	void show(CHero *pBaseHero, CHero *pHero = nullptr, bool bForceChange=false);
 	void hide();
+
+	void resetAllHeroData();
 
 	CLayout* createSkillPanel(CHero *pBaseHero, CHero *pHero = nullptr, CLayout *pLay=nullptr);			//创建额外的技能面板层-目前给特效显示使用
 
@@ -58,6 +60,8 @@ private:
 	void fillOneSkillInfo(CLayout *pLay, CSkill*, bool showExtra);			// 更新单个技能面板信息  || showExtra是否显示主动/被动技标签和cost
 
 	bool isInitiativeSkill(CSkill *pSkill);				//是否主动技
+
+	int getSkillTypeDesId(CSkill *pSkill);
 
 	bool isRealSkill(CSkill *pSkill);					//是否为正常技能
 

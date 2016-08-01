@@ -16,13 +16,15 @@
 #include "AppUI.h"
 #include "Global.h"
 #include "scene/layer/LayerManager.h"
+#include "activity/HttpLoadImage.h"
+
 class CSpecialProgress;
 
 namespace BattleSpace{
 	class BaseRole;
 	class BattleScene;
 	class WarManager;
-	class WarControl : public BaseLayer
+	class WarControl : public BaseLayer, public  HttpLoadImageDelegate
 	{
 	public:
 		WarControl();
@@ -31,6 +33,9 @@ namespace BattleSpace{
 		CREATE_FUNC(WarControl);
 		virtual void onEnter();
 		virtual void onExit();
+
+		void imageLoadSuccessCallBack(string sTag, vector<char>* pBuffer);
+
 	public:												//
 		void AddEvent(CCObject* ob = nullptr);
 		void RemoveEvent(CCObject* ob = nullptr);
@@ -79,6 +84,8 @@ namespace BattleSpace{
 
 		void initNormalAbove();										//init normal panel above part
 
+		void initPvEAbove();
+
 		void initWorldBossAbove(BaseRole* boss);					//have word init panel above part
 
 		void initCostBar();											//init cost bar
@@ -108,6 +115,8 @@ namespace BattleSpace{
 		void changeSpeed();
 
 		void upAutoSkillState(float dt);
+
+		void updateHeadIcon();		//更新头像
 
 		void showFlyCostToBar(CCObject* ob);
 

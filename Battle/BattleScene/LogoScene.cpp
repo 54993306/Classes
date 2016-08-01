@@ -16,6 +16,7 @@
 #include "common/CGameSound.h"
 #include "common/ShaderDataHelper.h"
 #include "Battle/ActionNameDefine.h"
+#include "Battle/BattleMacro.h"
 
 using namespace CocosDenshion;
 LogoScene::LogoScene():m_XmlLayer(nullptr),m_ModeIndex(0),m_PauseAction(""),m_Body(nullptr),m_InputScale(nullptr)
@@ -96,7 +97,7 @@ void LogoScene::onExit()
 }
 void LogoScene::start(float dt)
 {
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+#if BATTLE_TEST
 	CSceneManager::sharedSceneManager()->replaceScene(GETSCENE(LoginScene));
 #else
 	CSceneManager::sharedSceneManager()->replaceScene(GETSCENE(LoginScene));
@@ -866,7 +867,7 @@ bool SpineboyExample::SpineThread( vector<int>& Vec,bool LoadData /*= false*/ )
 		}
 		if (!m_TotalSpineNum)
 		{
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+#if BATTLE_TEST
 			std::packaged_task<bool(vector<int>&,bool)>dTask(std::bind(&SpineboyExample::SpineThread,this,std::placeholders::_1,std::placeholders::_2));		//spine异步加载处理
 			pFuture = dTask.get_future();
 			std::thread cthread(std::move(dTask),m_VecSpine,true);
@@ -923,7 +924,7 @@ void SpineboyExample::SpineAsyncLoadImage( int ModelID,bool isModel /*= true*/ )
 void SpineboyExample::SpineThreadCallBack( CCObject* ob )
 {
 	m_LoadSpineNum++;
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+#if BATTLE_TEST
 	if (m_LoadSpineNum < m_TotalSpineNum )
 		return;
 	std::packaged_task<bool(vector<int>&,bool)>dTask(std::bind(&SpineboyExample::SpineThread,this,std::placeholders::_1,std::placeholders::_2));		//spine异步加载处理

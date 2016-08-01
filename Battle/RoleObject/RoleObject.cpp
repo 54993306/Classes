@@ -28,7 +28,7 @@
 namespace BattleSpace
 {
 	RoleObject::RoleObject()
-	:m_MapData(nullptr),m_armatureEventData(nullptr), m_lastFrame(-1),m_Reset(false),mFirstBattle(true)
+		:m_MapData(nullptr),m_armatureEventData(nullptr), m_lastFrame(-1),m_Reset(false),mFirstBattle(true)
 	{}
 
 	RoleObject::~RoleObject()
@@ -50,8 +50,14 @@ namespace BattleSpace
 		initStateManage(); 
 		if (!mRole->getAliveID())
 			return;															//挂在层显示拖动的目标(可以单独抽出一个方法来)
-		mRole->setRoleObject(this);										//逻辑对象与显示对象绑定
-		setEnemy(pRole->getEnemy());
+		mRole->setRoleObject(this);											//逻辑对象与显示对象绑定
+		if (pRole->getOtherCamp())
+		{
+			setEnemy(true);
+		}else{
+			setEnemy(false);
+		}
+
 		setModel(mRole->getModel());
 		setHp(nullptr);
 		getBody()->setScale(mRole->getZoom());
@@ -272,16 +278,16 @@ namespace BattleSpace
 	void RoleObject::attackActionEnd()
 	{
 		TurnStateTo(sStateCode::eStandState);
-		if (mRole->getCritEffect()&&!mEnemy)		
+		if (mRole->getCritEffect()&&!mRole->getEnemy())		
 			bNotification->postNotification(B_CritEnd,mRole);
 		if (mRole->getHp()<=0 || !mRole->getAliveState())
-			this->AliveDie();									//释放完技能后自己死亡的情况处理
+			mRole->roleDie();									//释放完技能后自己死亡的情况处理
 		else if (mRole->getBaseData()->getCallType() == sCallType::eAutoSkill||
 			mRole->getBaseData()->getCallType() == sCallType::eOnlyOnce)				//陨石类释放攻击后死亡OnlyOnces
-			this->AliveDie();	
+			mRole->roleDie();	
 		AtkEnd_Event();	
 	}
-
+	//动作结束判断可在 StateManager::leaveState 进行
 	void RoleObject::ActionEnd( const char* ActionName )
 	{
 		if (strcmp(ActionName,Attack_Action) == 0		||			//普攻转站立
@@ -380,8 +386,6 @@ namespace BattleSpace
 
 	void RoleObject::dieActionEnd()
 	{
-		if (mRole->getCritEffect()&&!mEnemy)					//放技能的过程中把自己炸死的特殊情况
-			bNotification->postNotification(B_CritEnd,mRole);
 		CCFadeOut* fadeout = CCFadeOut::create(0.5f);
 		m_Armature->runAction(fadeout);
 		getHp()->setVisible(false);
@@ -448,7 +452,7 @@ namespace BattleSpace
 	{
 		CCPoint tPosition = m_MapData->getPoint(mRole->getMoveGrid());
 		this->setPosition(tPosition+this->getoffs());
-		if (!mEnemy&&mRole->getCallType()!=sCallType::eAutoMove)
+		if (!mRole->getEnemy()&&mRole->getCallType()!=sCallType::eAutoMove)
 			this->TurnStateTo(sStateCode::eStandState);											//站立时会自动将武将方向调转回来
 		this->setSpeed(CCPointZero);
 		this->setMoveState(sStateCode::eNullState);
@@ -521,7 +525,7 @@ namespace BattleSpace
 		CCPoint p = m_MapData->getPoint(MoveGrid) + getoffs();							//目标点
 		if (firstBattle(p))
 			return ;
-		if ( mRole->singleGrid()&&mEnemy )
+		if ( mRole->singleGrid()&&mRole->getEnemy() )
 			p = CCPoint(p.x+CCRANDOM_0_1()*15+5,p.y);									//防止武将叠在一起
 		walkDirection(p);
 		this->setSpeed((p - getPosition()) / getMoveTime());
@@ -552,11 +556,13 @@ namespace BattleSpace
 
 	void RoleObject::initMoveObject( CCNode* pMoveParent )
 	{
-		if (mRole->getEnemy()	||
-			mRole->getCaptain()||
+		if (mRole->getEnemy()		||
+			mRole->getCaptain()		||
 			mRole->getCallType() != sCallType::eCommon)
 			return;
 		MoveObject* tMoveObj = MoveObject::create();
+		if (mRole->getOtherCamp())
+			tMoveObj->setVisible(false);
 		tMoveObj->setRowCol(mRole->getBaseData()->getRoleRow(),mRole->getBaseData()->getRoleCol());
 		tMoveObj->setMoveAlive(mRole);
 		tMoveObj->setOffs(getoffs().x,getoffs().y);
@@ -570,6 +576,7 @@ namespace BattleSpace
 
 	void RoleObject::setActMoveGrid( int pGird )
 	{
+		if (!getMoveObject())return;
 		getMoveObject()->setgrid(pGird);
 		mRole->setMoveGrid(pGird);
 		setMoveState(sStateCode::eWalkState);
@@ -577,14 +584,10 @@ namespace BattleSpace
 
 	void RoleObject::AliveDie()
 	{
-		if ( mRole->getAliveState() )
-		{
-			mRole->setAliveState(false);
-			setMoveState(sStateCode::eNullState);
-			TurnStateTo(sStateCode::eStandState);
-			TurnStateTo(sStateCode::eDeathState);
-			AliveObject::AliveDie();
-		}
+		setMoveState(sStateCode::eNullState);
+		TurnStateTo(sStateCode::eStandState);
+		TurnStateTo(sStateCode::eDeathState);
+		AliveObject::AliveDie();
 	}
 
 	bool RoleObject::TurnStateTo( sStateCode pCode )

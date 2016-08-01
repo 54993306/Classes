@@ -12,7 +12,7 @@
 //请求规则奖励
 void inline AskForPvpRule()
 {
-	GetTcpNet->sendDataType(BossPrizesMsg);
+	GetTcpNet->sendDataType(PvpPrizeListMsg);
 }
 
 
@@ -33,7 +33,7 @@ public:
 
 private:
 	void updateShowInfoScroll(CCSize size);
-	void initRank(BossPrizes* pPrizes);
+	void initRank(PvpPrizeList* pPrizes);
 	void goRank(CCObject* pSender);
 
 private:

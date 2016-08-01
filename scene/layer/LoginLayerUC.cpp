@@ -35,6 +35,8 @@
 #include "Battle/EffectObject.h"
 #include "update/CUpdateData.h"
 #include "model/DataCenter.h"
+#include "ApplicationDefine.h"
+#include "SDK/GamePlatformManager.h"
 
 using namespace BattleSpace;
 
@@ -365,16 +367,9 @@ bool LoginLayerUC::ProcessMsg(int type, google::protobuf::Message *msg)
 				CCUserDefault::sharedUserDefault()->flush();
 			}
 
-			//检查版本号，是否要更新
-			bool isNeedUpdate = CUpdateLayer::checkUpdate(serverInfo->game_version().c_str());
-			//创建更新
-			if(isNeedUpdate)
-			{				
-				CUpdateLayer* pLayer = CUpdateLayer::create();
-				pLayer->setVersion(m_serverInfo.game_version().c_str());
-				this->addChild(pLayer, 999);
-			}
-			else
+			//版本更新
+			bool bUpdate = GamePlatformMgr->VersionUpdateWithPlatform( serverInfo->game_version() );
+			if(!bUpdate)
 			{
 				initLogin();
 			}
@@ -787,7 +782,7 @@ void LoginLayerUC::directConnectGameServer()
 
 void LoginLayerUC::showLabelRoll( const char* sInfo )
 {
-	if(checkDay())
+	if(CheckDay(LoginDayUC))
 	{
 		return;
 	}
@@ -812,36 +807,9 @@ void LoginLayerUC::hideLableRoll()
 	this->removeChildByTag(88888);
 }
 
-bool LoginLayerUC::checkDay()
-{
-	struct   tm  * tm ;  
-	time_t  timep;  
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)   
-	time(&timep);  
-#else   
-	struct  cc_timeval now;   
-	CCTime::gettimeofdayCocos2d(&now, NULL);   
-	timep = now.tv_sec;  
-#endif   
-
-	tm  = localtime(&timep);  
-	int  year =  tm ->tm_year + 1900;  
-	int  month =  tm ->tm_mon + 1;  
-	int  day =  tm ->tm_mday;  
-	int  hour= tm ->tm_hour;  
-
-	CCString* sDay = CCString::createWithFormat("%d-%s%d-%s%d-%s%d", year, month>9?"":"0", month, day>9?"":"0", day, hour>9?"":"0", hour);
-	if(sDay->compare("2016-05-07-11")>0)
-	{
-		return true;
-	}
-
-	return false;
-}
-
 void LoginLayerUC::updateForCheckDay( float dt )
 {
-	if(checkDay())
+	if(CheckDay(LoginDayUC))
 	{
 		hideLableRoll();
 		unschedule(schedule_selector(LoginLayerUC::updateForCheckDay));

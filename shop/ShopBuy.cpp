@@ -1,8 +1,6 @@
 ﻿#include "ShopBuy.h"
-#include "scene/layer/LayerManager.h"
 #include "net/CNetClient.h"
 #include "netcontrol/CPlayerControl.h"
-#include "scene/layer/LayerManager.h"
 #include "model/DataCenter.h"
 #include "GMessage.h"
 
@@ -11,14 +9,11 @@
 #include "tools/UICloneMgr.h"
 
 #include "mainCity/MainCityControl.h"
-#include "model/DataCenter.h"
 #include "common/CShowToBuyResource.h"
 #include "common/CheckMoney.h"
 #include "Battle/AnimationManager.h"
 
 #include "common/CGameSound.h"
-#include "Resources.h"
-#include "cctk/scenemanager.h"
 
 CShopBuy::CShopBuy()
 	:m_buyNum(1),m_maxNum(1)

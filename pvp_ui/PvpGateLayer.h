@@ -29,6 +29,10 @@ public:
 
 	void onClose(CCObject* pSender);
 
+	void setGateLevel( int iRank );
+
+	bool ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent);
+
 public:
 	//特效入场
 	void showEffectIn();
@@ -58,6 +62,9 @@ private:
 	//后端云
 	void runCloud();
 
+	//UI面板出场
+	void showUI();
+	void callbackForSpineAnimate( CCNode *pSender );
 private:
 	//同步PVP
 	void pvpSynchronization(CCObject* pSender);
@@ -73,4 +80,7 @@ private:
 	CLayout										*m_fogLay;
 	CLayout										*m_fogLay1;
 	CLayout										*m_fMiddleLayer;
-};
+	int												m_iRank;				//排名
+	int												m_iGateLevel;		//建筑等级
+	int												m_iRoleRank;		//角色阶段
+};		

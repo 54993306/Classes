@@ -51,23 +51,36 @@ public:
 
 	void update(float dt);
 
+	void callbackForRestart();
+
+	//更新中断，弹窗口提示重启还是下载新的apk
+	void  showHelpTips( const char *str , bool bShowOkOnly);
+	void showHelpTipsClick( CCObject *pSender );
+
 private:
 	void initDownloadDir();
 	void downloadVersionByIndex();
 	void updateTextShow();
+
+	//随机换图片
+	void changeStoryPicture( CCSprite* pSprite );
+
 private:
-	CProgressBar*							m_progress;
+	CProgressBar*								m_progress;
 	//CCSprite*									m_pZombieSprite;
-	CLabel*										m_pLabel;
-	CLabel*										m_pInfoLabel;
-	std::string									m_pathToSave;
-	CLayout*									m_ui;
-	AssetsManager*						m_pAssetManager;
+	CLabel*											m_pLabel;
+	CLabel*											m_pInfoLabel;
+	std::string										m_pathToSave;
+	CLayout*										m_ui;
+	AssetsManager*							m_pAssetManager;
 	int												m_iPackageIndex;
 	int												m_iPackageMax;
-	CPackageVersionJson*			m_VersionJson;
-	CPackageVersionData				m_versionNeedData;
+	CPackageVersionJson*					m_VersionJson;
+	CPackageVersionData					m_versionNeedData;
 	int												m_iCurrentIPixelndex;
 	int												m_iMaxPixel;
 	int												m_iPercent;
+	int												m_iErrorTimes;
+	int												m_iStoryIndex;			//故事标签
+	int												m_iStoryMax;			//故事数量
 };

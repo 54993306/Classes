@@ -23,7 +23,7 @@ namespace BattleSpace
 
 	void AffectCenterSingle::initArea(AreaCountInfo& pInfo)
 	{
-		vector<BaseRole*>* tAlives = pInfo.getAlive()->getSkillTargets();
+		vector<BaseRole*>* tAlives = pInfo.getAlive()->getCurrSkillTargets();
 		if (!tAlives->size())
 			return;
 		pInfo.addGrid(tAlives->at(tAlives->size()/2)->getGridIndex());

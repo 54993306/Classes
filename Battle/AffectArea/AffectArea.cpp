@@ -192,7 +192,8 @@ namespace BattleSpace
 		}
 		if ( !CountGrid.size() )
 			return;
-		if (pRole->getEnemy() || pRole->getOpposite())					//武将反向攻击
+		if (pRole->getEnemy() || pRole->getOpposite() || 
+			(pRole->getOtherCamp() && !pRole->getOpposite()) )								//武将反向攻击
 		{
 			for (int i=0;i<pRole->getBaseData()->getRoleRow();i++)							//获取向后攻击的判断格子(我方武将反向)
 				pValids.push_back(CountGrid.at(CountGrid.size()-i-1));
@@ -204,7 +205,6 @@ namespace BattleSpace
 
 	void AffectArea::commonHandle(AreaCountInfo& pInfo)
 	{
-		
 		initArea(pInfo);
 	}
 

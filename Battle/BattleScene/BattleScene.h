@@ -70,9 +70,9 @@ namespace BattleSpace
 		CC_SYNTHESIZE(CombatLogic*,m_Loginc,CombatLogic);
 		CC_SYNTHESIZE(CombatGuideLayer*,m_GuideLayer,CombatGuideLayer);
 		CC_SYNTHESIZE(bool,mMoveState,MoveState);
-		CCArray* getTaskArray();
 		void OnBattleFinish(int type, google::protobuf::Message *msg);
 		void onWordBossFinish(int type, google::protobuf::Message *msg);
+		void onPVEBattleFinish(int type, google::protobuf::Message *msg);
 	protected:
 		CCPoint m_StartPos;				//记录触摸起始点
 		DropItem* _dropItem;

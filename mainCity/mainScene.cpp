@@ -9,6 +9,7 @@
 #include "pvp_ui/PvpGateLayer.h"
 #include "mainCity/mainCityBuild.h"
 #include "scene/layer/BackLayer.h"
+#include "mainCity/TopLayer.h"
 
 CMainScene::CMainScene()
 	:m_pCityBuildLayer(nullptr), m_pPvpGateLayer(nullptr)
@@ -22,6 +23,11 @@ void CMainScene::onCreate()
 
 	//初始化
 	addCityBuildLayer();
+
+	CTopLayer *pTopLay = CTopLayer::create();
+	pTopLay->setTouchPriority(-2);
+	this->addChild(pTopLay, 100, 2000);
+
 
 	BackLayer *pBackLayer = BackLayer::create();
 	pBackLayer->setZOrder(10);

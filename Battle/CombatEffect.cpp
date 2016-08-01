@@ -30,6 +30,8 @@
 #include "Battle/BaseRoleData.h"
 #include "Battle/RoleSkill.h"
 #include "Battle/skEffectData.h"
+#include "model/DataCenter.h"
+
 namespace BattleSpace{
 
 	CombatEffect::CombatEffect()
@@ -135,7 +137,7 @@ namespace BattleSpace{
 					if(alive->getHp()<=0 
 						&& alive->getRoleObject() != nullptr
 						&& alive->getAliveState())
-						alive->getRoleObject()->AliveDie();
+						alive->roleDie();
 				}
 			}break;
 		default:
@@ -261,7 +263,7 @@ namespace BattleSpace{
 			if (Result->m_LostHp[*iter].hitNum < 0)													//播放受击动作
 			{
 				pAliveOb->TurnStateTo(sStateCode::eHitState); 
-				if (!alive->getEnemy())
+				if (!alive->getOtherCamp())
 					NOTIFICATION->postNotification(B_ContinuousNumber);			//刷新连击处理
 			}
 			pAliveOb->playerNum(Result->m_LostHp[*iter].hitNum,Result->m_LostHp[*iter].hitType);	
@@ -482,5 +484,120 @@ namespace BattleSpace{
 	{
 		CCNode* pNode = (CCNode*)ob;
 		pNode->removeFromParentAndCleanup(true);
+	}
+
+	void CombatEffect::showVsAnimate( CombatLogic *pCombatLogic )
+	{
+		WarControl* m_ui = m_Scene->getWarUI();
+		CCLayer *pLayerShow = CCLayer::create();
+		m_Scene->addChild(pLayerShow, 999);
+		pLayerShow->setPosition(m_ui->convertToWorldSpace(CCPointZero));
+
+		
+		pLayerShow->setVisible(false);
+		pLayerShow->runAction(CCSequence::create(
+			CCDelayTime::create(0.3f),
+			CCCallFuncN::create(this, callfuncN_selector(CombatEffect::showVsAnimateCallBack)),
+			CCDelayTime::create(2.0f),
+			CCRemoveSelf::create(),
+			CCCallFuncO::create(pCombatLogic, callfuncO_selector(CombatLogic::moveStoryEnd), nullptr),
+			nullptr
+			));
+	}
+
+	void CombatEffect::showVsAnimateCallBack( CCNode *pSender )
+	{
+		CCLayer *pLayerShow = (CCLayer *)pSender;
+		pLayerShow->setVisible(true);
+
+		PlayEffectSound(SFX_515);
+
+		//动画数据
+		VsAnimateData &vsData = DataCenter::sharedData()->getVsAnimateData();
+
+		//播放动画
+		SkeletonAnimation *pLow = SkeletonAnimation::createWithFile("pvp/vs/pvp_vs_ani_1.json", "pvp/vs/pvp_vs_ani_1.atlas", 1);
+		pLow->setPosition(ccp(DESIGN_WIDTH/2, 0));
+		pLow->setAnimation(0, "stand", false);
+		pLayerShow->addChild(pLow, 3);
+		CCTextureCache::sharedTextureCache()->removeTextureForKey("pvp/vs/pvp_vs_ani_1.png");
+		CCTextureCache::sharedTextureCache()->removeTextureForKey("pvp/vs/pvp_vs_ani_12.png");
+
+		SkeletonAnimation *pHigh = SkeletonAnimation::createWithFile("pvp/vs/pvp_vs_ani_2.json", "pvp/vs/pvp_vs_ani_2.atlas", 1);
+		pHigh->setPosition(ccp(DESIGN_WIDTH/2, 0));
+		pHigh->setAnimation(0, "stand", false);
+		pLayerShow->addChild(pHigh, 1);
+		CCTextureCache::sharedTextureCache()->removeTextureForKey("pvp/vs/pvp_vs_ani_2.png");
+
+		//上贴图和名字
+		CCSprite *pBodyPic[2] = {nullptr, nullptr};
+		int iBodyId[2] = {vsData.iEnemyLeader, vsData.iSelfLeader};
+		CCPoint pAnchor[2] = { ccp(1.0f, 0), ccp(0.0f, 1.0f) };
+		bool bFlipX[2] = { true, false };
+		CCPoint pPosMove[2] = { ccp(0, 150), ccp(DESIGN_WIDTH, 516) };
+		std::string sName[2] = {vsData.sEnemyRoleName, vsData.sSelfRoleName};
+		CCPoint pNamePos[2] = { ccp(429, 288), ccp(709, 392) };
+		float fRotation = -18.4f;
+		for( int i=0; i<2; i++ )
+		{
+			//贴图
+			CCSprite	*pBody = CCSprite::create( CCString::createWithFormat("warScene/playerSkill/%d.png", iBodyId[i])->getCString() );
+			if(!pBody)
+			{
+				pBody = CCSprite::create("warScene/playerSkill/146.png");
+				CCLOG("[ ERROR ] no file found warScene/playerSkil/%d", iBodyId[i]);
+			}
+			pLayerShow->addChild(pBody, 2);
+			pBody->setOpacity(0);
+			pBody->setAnchorPoint(pAnchor[i]);
+			pBody->setFlipX(bFlipX[i]);
+			pBody->setPosition( pPosMove[i] );
+			pBody->setRotation( -18.4f);
+			pBody->runAction(
+				CCRepeat::create(
+				CCSequence::create(
+				CCDelayTime::create(0.1f),
+				CCSpawn::create(
+				CCMoveTo::create( 0.2f, pPosMove[1-i] ),
+				CCFadeIn::create( 0.2f ), 
+				nullptr
+				),
+				CCDelayTime::create(1.2f),
+				CCSpawn::create(
+				CCMoveTo::create( 0.2f, pPosMove[i] ),
+				CCFadeOut::create( 0.2f ), 
+				nullptr
+				),
+				nullptr)
+				, 1)
+				);
+			CCTextureCache::sharedTextureCache()->removeTexture(pBody->getTexture());
+
+			//名字
+			CLabel *pName = CLabel::create(sName[i].c_str(), DEFAULT_FONT, 54);
+			pLayerShow->addChild(pName, 4);
+			pName->setPosition(pPosMove[i]);
+			pName->setColor(ccc3(255, 255, 255));
+			pName->setAnchorPoint(pAnchor[i]);
+			pName->setRotation(fRotation);
+			pName->runAction(
+				CCRepeat::create(
+				CCSequence::create(
+				CCDelayTime::create(0.1f),
+				CCSpawn::create(
+				CCMoveTo::create( 0.2f, pNamePos[i] ),
+				CCFadeIn::create( 0.2f ), 
+				nullptr
+				),
+				CCDelayTime::create(1.2f),
+				CCSpawn::create(
+				CCMoveTo::create( 0.2f, pPosMove[i] ),
+				CCFadeOut::create( 0.2f ), 
+				nullptr
+				),
+				nullptr)
+				, 1)
+				);
+		}
 	}
 };

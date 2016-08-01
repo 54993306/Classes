@@ -414,8 +414,9 @@ void CWShopLayer::addCell(CGridPageViewCell* pCell, unsigned int uIdx)
 		}
 		break;
 	case 4:
+	case 5:
 		{
-			CCTexture2D *texture =  CCTextureCache::sharedTextureCache()->addImage("worldBoss/icon_ghost.png");
+			CCTexture2D *texture =  CCTextureCache::sharedTextureCache()->addImage(CCString::createWithFormat("prop/%d.png", item.moneyType==4?2:5)->getCString());
 			coinIcon->setTexture(texture);
 			coinIcon->setTextureRect(CCRectMake(0,0,texture->getContentSize().width,texture->getContentSize().height));
 
@@ -477,6 +478,10 @@ void CWShopLayer::loadUiByType(int type)
 	else if (type == 4)
 	{
 		m_ui = LoadComponent("PvpShop.xaml");
+		CImageView *gold = (CImageView*)m_ui->findWidgetById("gold");
+		CCTexture2D *texture = CCTextureCache::sharedTextureCache()->addImage("prop/5.png");
+		gold->setTexture(texture);
+		gold->setTextureRect(CCRectMake(0,0,texture->getPixelsWide(),texture->getPixelsHigh()));
 	}	
 	m_ui->setPosition(VCENTER);
 	this->addChild(m_ui);
