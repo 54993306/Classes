@@ -96,16 +96,16 @@ namespace BattleSpace
 		{
 			mCurrCost += (mCostSpeed * dt + dt);
 #if BATTLE_TEST
-			mCurrCost += 100;
+			//mCurrCost += 100;
 #endif
 			if (mCurrCost >= mMaxCost)
 				mCurrCost = mMaxCost;
 		}
-
-		if (!mExcuteStrategy)
-			return;
-		mExcuteStrategy = false;
-		excuteStrategy();
+		if (mExcuteStrategy)
+		{
+			mExcuteStrategy = false;
+			excuteStrategy();
+		}
 	}
 
 	void PvEStrategy::excuteStrategy()

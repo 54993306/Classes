@@ -96,7 +96,7 @@ void CRankLayer::onEnter()
 	{
 		CRadioButton *radioBtn= (CRadioButton*)(radioGroup->getChildByTag(i+1));
 		radioBtn->setOnCheckListener(this,ccw_check_selector(CRankLayer::onSwitchBtn));
-		if (!CMainCityControl::getInstance()->isCityOpen(3)&&i==2)
+		if (!CMainCityControl::getInstance()->isCityOpen(17)&&i==2)
 		{
 			radioBtn->setVisible(false);
 		}

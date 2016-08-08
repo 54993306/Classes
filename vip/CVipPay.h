@@ -26,7 +26,7 @@ public:
 	void enableSmsCodeBtn();
 	void imageLoadSuccessCallBack(string sTag, vector<char>* pBuffer);
 	void showVerifyCode(const char* str);
-	void setPayItem(const char* name, const char* desc, int price);
+	void setPayItem(int iTag, int price);
 
 private:
 	void hideErrorCode();
@@ -51,4 +51,5 @@ private:
 	int m_iTimeRemain;
 	int m_buyMoney;
 	int m_payStep;
+	int m_iTag;			//购买标记展示图片
 };

@@ -35,12 +35,12 @@
 namespace BattleSpace
 {
 	WarManager::WarManager()
-	:m_efdata(nullptr),m_armatureEventDataMgr(nullptr),mMaxCost(0),mCurrBatch(0)
-	,mStageID(-1),mBatch(0),m_iLastStageId(0),m_StageType(0),mLogicState(false)
-	,m_bNormal(true),m_ChapterCount(0),m_ChapterIndex(0), m_BossModel(false),mCostSpeed(0)
-	,m_VerifyNum(0),m_BossHurtCount(0),mBossHurtPe(0),m_iWorldBossRank(0),mCurrCost(0)
-	,mBattleOver(false),mFirstStage(true),mStoryData(nullptr),mBuffData(nullptr)
-	,mCaptainSkill(nullptr)
+		:m_efdata(nullptr),m_armatureEventDataMgr(nullptr),mMaxCost(0),mCurrBatch(0)
+		,mStageID(-1),mBatch(0),m_iLastStageId(0),m_StageType(0),mLogicState(false)
+		,m_bNormal(true),m_ChapterCount(0),m_ChapterIndex(0), m_BossModel(false),mCostSpeed(0)
+		,m_VerifyNum(0),m_BossHurtCount(0),mBossHurtPe(0),m_iWorldBossRank(0),mCurrCost(0)
+		,mBattleOver(false),mFirstStage(true),mStoryData(nullptr),mBuffData(nullptr)
+		,mCaptainSkill(nullptr)
 	{
 		parseSpineModelFile(m_SpineID);
 	}
@@ -176,11 +176,17 @@ namespace BattleSpace
 			tRole->setEnemy(false);
 			tRole->initAliveData();
 			mMaxCost += tRole->getCostMax();
-			if (tRole->getCaptain())
-				mCurrCost = tRole->getInitCost();
+			if (BattleData->getBattleModel()->isPvEBattle())
+			{
+				if (!tRole->getCaptain())
+					mCurrCost += tRole->getBaseData()->getExpendCost();
+			}else{
+				if (tRole->getCaptain())
+					mCurrCost = tRole->getInitCost();
+			}
 			addBattleRole(tRole);
 		}
-		
+
 		if (BattleData->getBattleModel()->isPvEBattle())
 		{
 			const vector<HeroData*>tVector = BattleData->getPvPHeros();
@@ -410,6 +416,13 @@ namespace BattleSpace
 			if (!tAlive->getBattle()		||
 				!tAlive->getRoleObject())
 				continue;
+			if (tAlive->getCallType() == sCallType::eBoxHaveRole)
+			{
+				mBattleMonsters.push_back(tAlive);
+				mBattleHeros.push_back(tAlive);
+				mBattleRoles.push_back(tAlive);
+				continue;
+			}
 			if (tAlive->getOtherCamp())
 			{
 				if (tAlive->getGridIndex()<C_MOSTERATKGRID)
@@ -500,7 +513,7 @@ namespace BattleSpace
 		{
 			pRole->SkillActionAndEffect(tInfo->getActionID(),tInfo->getusEft());
 		}else{
-			pRole->SkillActionAndEffect(1,0);
+			pRole->SkillActionAndEffect(5,0);
 			CCLOG("[ *ERROR ] WarManager::initRoleSkillInfo %d",pEffectID);
 		}
 	}

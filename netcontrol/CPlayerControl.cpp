@@ -222,7 +222,7 @@ void CPlayerControl::sendEnterStage(int stageId,int hero1,int hero2, int hero3, 
 	delete batReq;
 }
 
-void CPlayerControl::sendPvEBattleInfo( int pRoleID,bool pAiState,vector<int>& pHeroID )
+void CPlayerControl::sendPvEBattleInfo( int pRoleID,bool pAiState,vector<int>& pHeroID, bool bReven )
 {
 	StartPvpReq *tPvEInfo = new StartPvpReq;
 	for (auto tRoleID : pHeroID)
@@ -231,6 +231,7 @@ void CPlayerControl::sendPvEBattleInfo( int pRoleID,bool pAiState,vector<int>& p
 	}
 	tPvEInfo->set_opp_id(pRoleID);
 	tPvEInfo->set_is_robot(pAiState);
+	tPvEInfo->set_reven(bReven);
 	GetTcpNet->sendData(tPvEInfo, PvpAsyncBattle);
 	delete tPvEInfo;
 }

@@ -39,6 +39,9 @@ public:
 	//特效出场
 	void showEffectOut();
 
+	//异步pvp
+	void showAsynPvp();
+
 private:
 	//初始化过场云
 	void initCloundyTranstion();

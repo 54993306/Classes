@@ -731,22 +731,32 @@ class StartPvpReq : public ::google::protobuf::Message {
   inline ::google::protobuf::RepeatedField< ::google::protobuf::int32 >*
       mutable_battle_hero();
 
+  // optional bool reven = 4;
+  inline bool has_reven() const;
+  inline void clear_reven();
+  static const int kRevenFieldNumber = 4;
+  inline bool reven() const;
+  inline void set_reven(bool value);
+
   // @@protoc_insertion_point(class_scope:protos.StartPvpReq)
  private:
   inline void set_has_opp_id();
   inline void clear_has_opp_id();
   inline void set_has_is_robot();
   inline void clear_has_is_robot();
+  inline void set_has_reven();
+  inline void clear_has_reven();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
   ::google::protobuf::int32 opp_id_;
   bool is_robot_;
+  bool reven_;
   ::google::protobuf::RepeatedField< ::google::protobuf::int32 > battle_hero_;
   mutable int _battle_hero_cached_byte_size_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
 
   friend void  protobuf_AddDesc_pvp_5fprotocol_2eproto();
   friend void protobuf_AssignDesc_pvp_5fprotocol_2eproto();
@@ -1200,15 +1210,25 @@ class PvpRecordRes : public ::google::protobuf::Message {
   inline ::google::protobuf::RepeatedPtrField< ::protos::Record >*
       mutable_record_list();
 
+  // optional int32 reven_time = 2;
+  inline bool has_reven_time() const;
+  inline void clear_reven_time();
+  static const int kRevenTimeFieldNumber = 2;
+  inline ::google::protobuf::int32 reven_time() const;
+  inline void set_reven_time(::google::protobuf::int32 value);
+
   // @@protoc_insertion_point(class_scope:protos.PvpRecordRes)
  private:
+  inline void set_has_reven_time();
+  inline void clear_has_reven_time();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
   ::google::protobuf::RepeatedPtrField< ::protos::Record > record_list_;
+  ::google::protobuf::int32 reven_time_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
 
   friend void  protobuf_AddDesc_pvp_5fprotocol_2eproto();
   friend void protobuf_AssignDesc_pvp_5fprotocol_2eproto();
@@ -2345,6 +2365,28 @@ StartPvpReq::mutable_battle_hero() {
   return &battle_hero_;
 }
 
+// optional bool reven = 4;
+inline bool StartPvpReq::has_reven() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void StartPvpReq::set_has_reven() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void StartPvpReq::clear_has_reven() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void StartPvpReq::clear_reven() {
+  reven_ = false;
+  clear_has_reven();
+}
+inline bool StartPvpReq::reven() const {
+  return reven_;
+}
+inline void StartPvpReq::set_reven(bool value) {
+  set_has_reven();
+  reven_ = value;
+}
+
 // -------------------------------------------------------------------
 
 // StartPvpRes
@@ -2739,6 +2781,28 @@ PvpRecordRes::record_list() const {
 inline ::google::protobuf::RepeatedPtrField< ::protos::Record >*
 PvpRecordRes::mutable_record_list() {
   return &record_list_;
+}
+
+// optional int32 reven_time = 2;
+inline bool PvpRecordRes::has_reven_time() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void PvpRecordRes::set_has_reven_time() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void PvpRecordRes::clear_has_reven_time() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void PvpRecordRes::clear_reven_time() {
+  reven_time_ = 0;
+  clear_has_reven_time();
+}
+inline ::google::protobuf::int32 PvpRecordRes::reven_time() const {
+  return reven_time_;
+}
+inline void PvpRecordRes::set_reven_time(::google::protobuf::int32 value) {
+  set_has_reven_time();
+  reven_time_ = value;
 }
 
 // -------------------------------------------------------------------

@@ -103,6 +103,8 @@ void GamePlatformManager::InitPlatForm()
 
 BaseLayer *GamePlatformManager::getLoginLayer()
 {
+	//return LoginLayeFaceBook::create();
+
 	//平台登录相关
 	switch (G_PLATFORM_TARGET)
 	{
@@ -222,6 +224,13 @@ void GamePlatformManager::ShowPayUI()
 		{
 			CPaySelect *paySel = CPaySelect::create();
 			LayerManager::instance()->push(paySel);
+			return;
+		}break;
+	case G_PLATFORM_APP_STORE:
+		{
+			CPayList *pList = CPayList::create();
+			pList->setPayType(PayListTypeApple);
+			LayerManager::instance()->push(pList);
 			return;
 		}break;
 	default:

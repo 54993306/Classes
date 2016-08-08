@@ -122,6 +122,14 @@ void CEmailControl::ProcessMsg(int type, google::protobuf::Message *msg)
 							{
 								user->setRoleFood(user->getRoleFood()+m_selectMail->prize.prizeList.at(i).num);
 							}
+							else if (m_selectMail->prize.prizeList.at(i).type==6)
+							{
+								user->setRoleAction(user->getRoleAction()+m_selectMail->prize.prizeList.at(i).num);
+							}
+							else if (m_selectMail->prize.prizeList.at(i).type==7)
+							{
+								user->setRolePoints(user->getRolePoints()+m_selectMail->prize.prizeList.at(i).num);
+							}
 						}
 						CSceneManager::sharedSceneManager()->PostMessageA(UPDATE_HERO,0,nullptr,nullptr);
 						m_mailList.erase(iter);

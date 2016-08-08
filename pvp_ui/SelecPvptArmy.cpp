@@ -33,6 +33,7 @@ CSelectPvpArmy::CSelectPvpArmy()
 	:m_selectType(0),m_currPage(0),m_selectFriend(NULL),m_frdId(0),
 	m_friendId(0), m_stageId(0), m_questId(0), m_pActiveLay(nullptr),
 	m_bCaptainShowAction(false),m_WorldBoss(false),m_iRoleId(0),m_bRobot(false),m_sEnemyRoleName(""),m_iEnemyRoleHead(0),m_sEnemyRoleFaceBook("")
+	,m_bIsReven(false)
 {}
 
 bool CSelectPvpArmy::init()
@@ -448,7 +449,7 @@ void CSelectPvpArmy::onCombat(CCObject* pSender)
 	{
 		tMondels.push_back(tHero.id);
 	}
-	CPlayerControl::getInstance().sendPvEBattleInfo(m_iRoleId,m_bRobot,tMondels);
+	CPlayerControl::getInstance().sendPvEBattleInfo(m_iRoleId,m_bRobot,tMondels, m_bIsReven);
 
 	//存储vs动画数据
 	UserData *pUserData = DataCenter::sharedData()->getUser()->getUserData();

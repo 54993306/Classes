@@ -43,11 +43,11 @@ namespace BattleSpace
 			CC_SAFE_RELEASE(tData);
 		}
 		mMonsterVec.clear();
-		for (auto tData : mCallRoleVec)
+		for (auto tData : mChildRoleVec)
 		{
 			CC_SAFE_RELEASE(tData);
 		}
-		mCallRoleVec.clear();
+		mChildRoleVec.clear();
 		for (auto tData : mPvPHeros)
 		{
 			CC_SAFE_RELEASE(tData);
@@ -63,7 +63,7 @@ namespace BattleSpace
 		mBaseRoleData.insert(mBaseRoleData.end(),mHeroVec.begin(),mHeroVec.end());
 		mBaseRoleData.insert(mBaseRoleData.end(),mPvPHeros.begin(),mPvPHeros.end());
 		mBaseRoleData.insert(mBaseRoleData.end(),mMonsterVec.begin(),mMonsterVec.end());
-		mBaseRoleData.insert(mBaseRoleData.end(),mCallRoleVec.begin(),mCallRoleVec.end());
+		mBaseRoleData.insert(mBaseRoleData.end(),mChildRoleVec.begin(),mChildRoleVec.end());
 		DataCenter::sharedData()->getWar()->initCommonData();
 	}
 
@@ -82,9 +82,9 @@ namespace BattleSpace
 		return mMonsterVec;
 	}
 
-	const vector<MonsterData*>& BattleDataCenter::getCallRoleDatas() const
+	const vector<MonsterData*>& BattleDataCenter::getChildRoleDatas() const
 	{
-		return mCallRoleVec;
+		return mChildRoleVec;
 	}
 
 	const vector<HeroData*>& BattleDataCenter::getPvPHeros() const
@@ -105,9 +105,11 @@ namespace BattleSpace
 		if (pPvPHero)
 		{
 			tHeroData->setOtherCamp(true);
+			tHeroData->setRoleNature(sRoleType::eRivalRole);
 			mPvPHeros.push_back(tHeroData);
 		}else{
 			mHeroVec.push_back(tHeroData);
+			tHeroData->setRoleNature(sRoleType::eHeroRole);
 		}
 	}
 
@@ -116,17 +118,18 @@ namespace BattleSpace
 		MonsterData* tMonsterData = MonsterData::create();
 		tMonsterData->readData(pData);
 		tMonsterData->retain();
-		if (tMonsterData->getCallRole())
+		tMonsterData->setOtherCamp(true);
+		if (tMonsterData->getRoleNature() == sRoleType::eChildRole)
 		{
-			mCallRoleVec.push_back(tMonsterData);			//召唤类武将可能是英雄也可能是怪物
+			mChildRoleVec.push_back(tMonsterData);			//召唤类武将可能是英雄也可能是怪物
 		}else{
 			mMonsterVec.push_back(tMonsterData);
 		}
 	}
 
-	BaseRoleData* BattleDataCenter::getCallRoleData( int pRoleID ) const 
+	BaseRoleData* BattleDataCenter::getChildRoleData( int pRoleID ) const 
 	{
-		for (auto tRole : mCallRoleVec)
+		for (auto tRole : mChildRoleVec)
 		{
 			if (tRole->getMonsterID() == pRoleID)
 				return tRole;

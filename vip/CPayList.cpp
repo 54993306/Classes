@@ -32,9 +32,13 @@ bool CPayList::init()
 		CCSize winSize = CCDirector::sharedDirector()->getWinSize();
 
 		//黑底
-		MaskLayer* pMaskLayer = MaskLayer::create("PaySelect");
+		MaskLayer* pMaskLayer = MaskLayer::create("CPayListMask");
 		pMaskLayer->setContentSize(winSize);
-		LayerManager::instance()->push(pMaskLayer, true);
+		LayerManager::instance()->push(pMaskLayer);
+		pMaskLayer->setOpacity(255);
+		pMaskLayer->setIsShowBlack(true);
+
+		this->setVisible(true);
 
 		//其他放到onEnter里去
 
@@ -55,24 +59,38 @@ void CPayList::initUI()
 {
 	CCSize winSize = CCDirector::sharedDirector()->getWinSize();
 
-	string strXaml = (m_payType==PayListTypeGoogle?"GooglePayList.xaml":"PayList.xaml");
+	m_priceVec.push_back(50);
+	m_priceVec.push_back(100);
+	m_priceVec.push_back(300);
+	m_priceVec.push_back(500);
+	m_priceVec.push_back(1000);
+
+	string strXaml ="PayList.xaml";
+	switch (m_payType)
+	{
+	case PayListTypeGoogle:
+		{
+			strXaml = "GooglePayList.xaml";
+		}break;
+	case PayListTypeApple:
+		{
+			strXaml = "ApplePayList.xaml";
+			m_priceVec.clear();
+			m_priceVec.push_back(35);
+			m_priceVec.push_back(179);
+			m_priceVec.push_back(349);
+			m_priceVec.push_back(699);
+			m_priceVec.push_back(1750);
+			m_priceVec.push_back(3500);
+		}break;
+	default:
+		break;
+	}
 
 	m_ui = LoadComponent(strXaml.c_str());
 	m_ui->setTag(1);
 	m_ui->setPosition(VCENTER);
 	this->addChild(m_ui, 2);
-
-	CColorView *grad = CColorView::create(ccc4(53, 53, 53,255));
-	grad->setPosition(VCENTER);
-	grad->setContentSize(CCSize(1138,640));
-	m_ui->addChild(grad,-1);
-
-	CColorView *view = CColorView::create(ccc4(255, 255, 255,255));
-	view->setPosition(VCENTER);
-	view->setContentSize(CCSize(1138,400));
-	m_ui->addChild(view,-1);
-
-	this->setVisible(true);
 
 	CButton* pClose = CButton::create("common/back.png", "common/back.png");
 	pClose->getSelectedImage()->setScale(1.1f);
@@ -80,26 +98,14 @@ void CPayList::initUI()
 	pClose->setOnClickListener(this,ccw_click_selector(CPayList::onClose));
 	this->addChild(pClose, 999);
 
-
-	m_cell = (CLayout*)(m_ui->findWidgetById("Cell1"));
-	// 	m_cell->retain();
-	// 	m_ui->removeChild(m_cell);
-
-	m_priceVec.push_back(50);
-	m_priceVec.push_back(100);
-	m_priceVec.push_back(300);
-	m_priceVec.push_back(500);
-	m_priceVec.push_back(1000);
-
-	m_tableView = (CTableView *)(m_ui->findWidgetById("scroll"));
-	m_tableView->setDirection(eScrollViewDirectionVertical);
-	m_tableView->setSizeOfCell(m_cell->getContentSize());
-	//m_tableView->setSizeOfCell(CCSizeMake(790,115));
-	m_tableView->setCountOfCell(5);
-	m_tableView->setBounceable(false);
-	m_tableView->setDataSourceAdapter(this,ccw_datasource_adapter_selector(CPayList::tableviewDataSource));	
-	m_tableView->reloadData();
-
+	//5个按钮
+	for(int i=0; i<m_priceVec.size(); i++)
+	{
+		CButton *pButton = (CButton *)m_ui->findWidgetById(CCString::createWithFormat("btn_%d", i+1)->getCString());
+		pButton->setTag(i+1);
+		pButton->setOnClickListener(this,ccw_click_selector(CPayList::onPhonePay));
+		pButton->setUserData(&m_priceVec.at(i));
+	}
 }
 
 
@@ -110,31 +116,11 @@ void CPayList::onExit()
 	NOTIFICATION->postNotification(SHOW_TOP_LAYER);
 }
 
-CCObject* CPayList::tableviewDataSource(CCObject* pConvertCell, unsigned int uIdx)
-{
-	CTableViewCell *pCell = (CTableViewCell*)(pConvertCell);
-	if (!pCell)
-	{
-		pCell = new CTableViewCell;
-		pCell->autorelease();
-		addTableCell(uIdx, pCell);
-	}
-	else
-	{
-		pCell->removeAllChildren();
-		addTableCell(uIdx, pCell);
-	}
-	return pCell;
-}
-
-
 void CPayList::onPhonePay( CCObject * pSender )
 {
-	CButton *btn = (CButton*)pSender;
-	CLabel *name = (CLabel *)btn->getParent()->getChildByTag(2);
-	CLabel *desc = (CLabel *)btn->getParent()->getChildByTag(3);
-
-	int *price = (int*)(btn->getUserData());
+	CButton *pBtn = (CButton*)pSender;
+	int iTag = pBtn->getTag();
+	int *price = (int*)(pBtn->getUserData());
 
 	switch (m_payType)
 	{
@@ -143,19 +129,24 @@ void CPayList::onPhonePay( CCObject * pSender )
 			CVipPay *phone = CVipPay::create();
 			LayerManager::instance()->push(phone);
 			
-			phone->setPayItem(name->getString(),desc->getString(),*price);
+			phone->setPayItem(iTag, *price);
 		}
 		break;
 	case PayListTypeGoogle:
 		{
 			if(m_iIndexFlag == -1)
 			{
-				int iIndex = btn->getParent()->getTag();
+				int iIndex = pBtn->getTag();
 				CCLOG("[ warning ] : PayListTypeGoogle--iIndex--%d", iIndex);
 				m_iIndexFlag = iIndex;
 				scheduleOnce(schedule_selector(CPayList::updateForBuyForGoogle), 0.1f);
 			}
-			
+		}
+		break;
+	case PayListTypeApple:
+		{
+			//TODO
+
 		}
 		break;
 	default:
@@ -164,51 +155,10 @@ void CPayList::onPhonePay( CCObject * pSender )
 
 }
 
-void CPayList::onCardPay( CCObject * pSender )
-{
-// 	onClose(nullptr);
-	CVipCard *card = CVipCard::create();
-	LayerManager::instance()->push(card);
-}
-
 void CPayList::onClose( CCObject * pSender )
 {
 	LayerManager::instance()->pop();
 	LayerManager::instance()->pop();
-}
-
-void CPayList::addTableCell(unsigned int uIdx, CTableViewCell * pCell)
-{
-	CLayout *cell = (CLayout*)m_ui->findWidgetById(CCString::createWithFormat("Cell%d",uIdx+1)->getCString());
-// 	CLayout *lay = UICloneMgr::cloneLayout(cell);
-	pCell->setTag(uIdx);
-
-	for (int i = 0; i < 4; i++)
-	{
-		CCNode * node = (CCNode*)cell->getChildren()->objectAtIndex(i);
-
-		if (node->getTag()==1)
-		{
-			CButton *btn = CButton::createWith9Sprite(node->getContentSize(),"vip/payment_box2.png","vip/ais_box_on.jpg");
-			btn->setPosition(node->getPosition());
-			btn->setAnchorPoint(ccp(0,0));
-			btn->setTag(1);
-			btn->setOnClickListener(this,ccw_click_selector(CPayList::onPhonePay));
-			btn->setUserData(&m_priceVec.at(uIdx));
-			pCell->addChild(btn);
-		}
-		else if (node->getTag()==2||node->getTag()==3)
-		{
-			CLabel *lab = UICloneMgr::cloneLable((CLabel*)node);
-			pCell->addChild(lab);
-		}
-		else
-		{
-			CImageView *image = UICloneMgr::cloneImageView((CImageView*)node);
-			pCell->addChild(image);
-		}
-	}
-	cell->setVisible(false);
 }
 
 void CPayList::updateForBuyForGoogle( float dt )

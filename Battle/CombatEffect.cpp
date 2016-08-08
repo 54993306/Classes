@@ -356,13 +356,19 @@ namespace BattleSpace{
 	void CombatEffect::SkillEfHandleForEnemy( CCObject* ob )
 	{
 		CCNode* SkillEffect = (CCNode*)ob;
+
+		//获取技能文本
+		const SkillCfg* pSkillCfg = DataCenter::sharedData()->getSkill()->getCfg(((BaseRole*)SkillEffect->getUserData())->getCurrSkill()->getSkillID());
+		if(!pSkillCfg)
+		{
+			return;
+		}
+
 		CCSize size = CCDirector::sharedDirector()->getWinSize();
 		CCSprite* skillname = CCSprite::create("warScene/box4.png");//框
 		skillname->setPosition(ccp(size.width/2,size.height*0.6f));
 		SkillEffect->addChild(skillname);
 
-		//获取技能文本
-		const SkillCfg* pSkillCfg = DataCenter::sharedData()->getSkill()->getCfg(((BaseRole*)SkillEffect->getUserData())->getCurrSkill()->getSkillID());
 		std::string text = pSkillCfg->name;
 		CCSprite* pSprite = CCSprite::create(CCString::createWithFormat("warScene/playerSkill/%d.png", pSkillCfg->id)->getCString());
 		if(!pSprite)

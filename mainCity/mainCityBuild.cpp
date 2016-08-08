@@ -1556,6 +1556,7 @@ void CMainCityBuild::autoToPvp()
 		CPvpGateLayer *pLayer = pScene->addPvpGateLayer();
 		int iLevel = CMainCityControl::getInstance()->getCityDataById(Btn_Tower).level;
 		pLayer->setGateLevel(iLevel);
+		pLayer->showAsynPvp();
 	}
 
 	showPvpCallBack();

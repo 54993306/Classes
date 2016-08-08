@@ -311,21 +311,25 @@ void CTollgateLayer::addCell(unsigned int uIdx, CPageViewCell * pCell)
 				pNode = CButton::create(widget.normalImage.c_str());
 				btn = (CButton*)pNode;
 
+				//没有开放的关卡
+				//
 
 				//等级开放
 				if((widget.normalImage=="tollgate/xingxing_1.png" || widget.widgetId.find("hero")!=string::npos) )
 				{
 					CStage &stage = m_stageMap[m_chapterList[m_isStory][m_selectChapterIndex-1].id].at(widget.stageId-1);
 
-					if(m_iFirstLockedStage == -1)
-					{
-						if(stage.isOpen)
-						{
-							m_iFirstLockedStage = 0;
-						}
-					}
-					//关卡没有开，而且是第一个发现的未开关卡,
-					else if(m_iFirstLockedStage==0 && DataCenter::sharedData()->getUser()->getUserData()->getLevel() < stage.level)
+					//if(m_iFirstLockedStage == 0)
+					//{
+					//	//有一个关卡开了，而且没有星星（还未打过），就是目前有可以打的关卡，置为-1不显示等级限制标识
+					//	if(stage.isOpen && stage.star <= 0)
+					//	{
+					//		m_iFirstLockedStage = -1;
+					//	}
+					//}
+					
+					//关卡没有开，而且是第一个发现的未开关卡, 而且是当前章节
+					if(m_iFirstLockedStage==0 && stage.level > 0)
 					{
 						if(!stage.isOpen)
 						{

@@ -44,6 +44,4 @@ private:
 	std::string m_sTelNumber;
 	bool m_bStep1Success;
 	int m_iTimeRemain;
-	CTableView *m_tableView;
-	CLayout *m_cell;
 };

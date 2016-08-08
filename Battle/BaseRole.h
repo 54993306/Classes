@@ -119,6 +119,7 @@ namespace BattleSpace
 		vector<BaseRole*>* getCurrSkillTargets();
 		void roleDie();
 		bool hasOtherRole(int pGrid);
+		void byOtherKill(BaseRole* pRole);
 	public:
 		//public
 		CC_SYNTHESIZE(BaseRoleData*,mBaseData,BaseData);
@@ -157,6 +158,7 @@ namespace BattleSpace
 		CC_SYNTHESIZE(bool,m_Move,Move);								//是否可以移动
 		CC_SYNTHESIZE(float,m_Zoom,Zoom);								//缩放比
 		CC_SYNTHESIZE(bool,mFirstInit,FirstInit);						//武将初次初始化
+		CC_SYNTHESIZE(bool,mClearState,ClearState);						//是否在清理状态
 	public:
 		//data
 		CC_SYNTHESIZE(int,m_Model,Model);								//武将模型

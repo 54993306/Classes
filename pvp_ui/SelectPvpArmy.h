@@ -24,6 +24,7 @@ public:
 	CC_SYNTHESIZE(std::string , m_sEnemyRoleName, EnemyRoleName);		//敌人名字
 	CC_SYNTHESIZE(int ,				m_iEnemyRoleHead, EnemyRoleHead);			//敌人头像
 	CC_SYNTHESIZE(std::string , m_sEnemyRoleFaceBook, EnemyRoleFacebook);		//敌人facebookId
+	CC_SYNTHESIZE(bool, m_bIsReven, Reven);
 protected:
 	void onClose(CCObject* pSender);
 	void onCombat(CCObject* pSender);

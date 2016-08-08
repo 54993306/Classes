@@ -38,7 +38,7 @@ bool CPvpGateLayer::init()
 		{
 			CImageView* pBtn = (CImageView*)m_ui->findWidgetById("click_1");
 			pBtn->setTouchEnabled(true);
-			pBtn->setOnClickListener(this, ccw_click_selector(CPvpGateLayer::pvpSynchronization));
+			pBtn->setOnClickListener(this, ccw_click_selector(CPvpGateLayer::pvpAsynchronization));
 		}
 
 
@@ -46,7 +46,7 @@ bool CPvpGateLayer::init()
 		{
 			CImageView* pBtn = (CImageView*)m_ui->findWidgetById("click_2");
 			pBtn->setTouchEnabled(true);
-			pBtn->setOnClickListener(this, ccw_click_selector(CPvpGateLayer::pvpAsynchronization));
+			pBtn->setOnClickListener(this, ccw_click_selector(CPvpGateLayer::pvpSynchronization));
 		}
 
 		//退出
@@ -205,18 +205,8 @@ void CPvpGateLayer::pvpSynchronization( CCObject* pSender )
 void CPvpGateLayer::pvpAsynchronization( CCObject* pSender )
 {
 	PlayEffectSound(SFX_424);
-	//进入异步PVP，选择队伍
-		/*	CTranstionEffectLayer* pEffect = CTranstionEffectLayer::create();
-	pEffect->onOpen(this, 100);
-	return*/;
-	CSelectChallengeLayer* pChange = CSelectChallengeLayer::create();
-	LayerManager::instance()->push(pChange);
-	CPlayerControl::getInstance().askForPvpChallenge(false);
-
-	//CSelectDefense *pSelectDefense = CSelectDefense::create();
-	//LayerManager::instance()->push(pSelectDefense);
-	//CPlayerControl::getInstance().askForPvpTeamData();	
-	//return;
+	
+	showAsynPvp();
 }
 
 void CPvpGateLayer::showEffectIn()
@@ -313,6 +303,17 @@ void CPvpGateLayer::initBuilding()
 		pSkeletonAnimation->setPosition(ccp(180, 0));
 		pSkeletonAnimation->setAnimation(0, "stand", true);
 		m_fMiddleLayer->addChild(pSkeletonAnimation, 1);
+
+		//按钮
+		{
+			SkeletonAnimation *pSkeletonAnimation = SkeletonAnimation::createWithFile(
+				"pvp/gate/hong_pve.json", 
+				"pvp/gate/hong_pve.atlas", 
+				1);
+			pSkeletonAnimation->setPosition(ccp(303, 351));
+			pSkeletonAnimation->setAnimation(0, "stand", true);
+			m_fMiddleLayer->addChild(pSkeletonAnimation, 2);
+		}
 	}
 
 	//异步PVP
@@ -324,6 +325,17 @@ void CPvpGateLayer::initBuilding()
 		pSkeletonAnimation->setPosition(ccp(900, 0));
 		pSkeletonAnimation->setAnimation(0, "stand", true);
 		m_fMiddleLayer->addChild(pSkeletonAnimation, 2);
+
+		//按钮
+		{
+			SkeletonAnimation *pSkeletonAnimation = SkeletonAnimation::createWithFile(
+				"pvp/gate/lan_pvp.json", 
+				"pvp/gate/lan_pvp.atlas", 
+				1);
+			pSkeletonAnimation->setPosition(ccp(895, 331));
+			pSkeletonAnimation->setAnimation(0, "stand", true);
+			m_fMiddleLayer->addChild(pSkeletonAnimation, 2);
+		}
 	}
 
 }
@@ -499,5 +511,13 @@ void CPvpGateLayer::callbackForSpineAnimate( CCNode *pSender )
 	SkeletonAnimation *pSkeletonAnimation = ( SkeletonAnimation *)pSender;
 	pSkeletonAnimation->setAnimation(0, "stand1", false);
 	pSkeletonAnimation->setOpacity(255);
+}
+
+void CPvpGateLayer::showAsynPvp()
+{
+	//进入异步PVP，选择队伍
+	CSelectChallengeLayer* pChange = CSelectChallengeLayer::create();
+	LayerManager::instance()->push(pChange);
+	CPlayerControl::getInstance().askForPvpChallenge(false);
 }
 

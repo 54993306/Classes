@@ -44,7 +44,7 @@ namespace BattleSpace{
 	{
 		if ( !m_Skin)
 			return ;
-		if (m_Alive->getEnemy())
+		if (m_Alive->getOtherCamp())
 		{
 			m_Skin->setBarChangeRate(ccp(1,0));
 			m_Skin->setMidpoint(ccp(0,0));
@@ -56,7 +56,7 @@ namespace BattleSpace{
 
 	void HPObject::initSkinByEnemy()
 	{
-		if (m_Alive->getEnemy())
+		if (m_Alive->getOtherCamp())
 		{
 			initSkin("warScene/bar_yellow.png");
 		}else{

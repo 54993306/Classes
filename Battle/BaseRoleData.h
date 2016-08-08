@@ -27,11 +27,14 @@ namespace protos{
 	}
 }
 namespace BattleSpace{
-	enum struct sDataType
+	enum struct sRoleType
 	{
-		eNULL						= 0,//普通型武将
+		eNULL						= 0,//初始化值
 		eHeroRole					= 1,//英雄类角色
 		eMonsterRole				= 2,//怪物类角色
+		eRivalRole					= 3,//对手类角色
+		eChildRole					= 4,//召唤类角色
+		eNeutrality					= 5,//中立类角色
 	};
 	class RoleSkill;
 	class BaseRoleData : public cocos2d::CCObject
@@ -57,7 +60,7 @@ namespace BattleSpace{
 		CC_SYNTHESIZE(float,mAttackSpeed,AttackSpeed);					//攻击速度(秒/次)
 		CC_SYNTHESIZE(sCallType,mCallType,CallType);					//召唤类型(Control)
 		CC_SYNTHESIZE(float,mDelayTime,DelayTime);						//出现延迟时间
-		CC_SYNTHESIZE(sDataType,mRoleNature,RoleNature);				//角色种类(后续接口)
+		CC_SYNTHESIZE(sRoleType,mRoleNature,RoleNature);				//角色种类(后续接口)
 		CC_SYNTHESIZE(bool,mOtherCamp,OtherCamp);						//其他阵营武将(非玩家阵营)
 		bool isAttribute(sProperty pType);
 		float judgeAttribute( sProperty pType );
@@ -75,7 +78,6 @@ namespace BattleSpace{
 		//monster
 		CC_SYNTHESIZE(sBehavior,mBehavior,Behavior);						//行为类型
 		CC_SYNTHESIZE(int,mMaxHp,MaxHp);								//最大血量值(世界boss专用
-		CC_SYNTHESIZE(bool,mCallRole,CallRole);							//是否为召唤类武将(敌方怪物都可能,在怪物列表中读取)
 		CC_SYNTHESIZE(int,mInitGrid,InitGrid);							//武将初始位置
 		CC_SYNTHESIZE(int,mRoleDrop,RoleDrop);							//掉落物品类型1、蓝2、金3、彩4、道具5、金币
 		CC_SYNTHESIZE(float,mCritTime,CritTime);						//怪物释放必杀技时间

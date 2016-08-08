@@ -37,6 +37,8 @@ protected:
 
 	void updateTeamInfo(const RecordData& recordData, int iTag, CLayout *pParent);
 
+	void onReven(CCObject *pSender);
+
 private:
 	CLayout								*m_ui;
 	CTableView							*m_tableView;

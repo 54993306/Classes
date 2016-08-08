@@ -214,7 +214,7 @@ void CPvpRuleLayer::initRank(PvpPrizeList* pPrizes)
 
 void CPvpRuleLayer::goRank(CCObject* pSender)
 {
-	CRankLayer *rank = CRankLayer::create();
-	LayerManager::instance()->push(rank);
-	CPlayerControl::getInstance().sendRank(1);
+	//CRankLayer *rank = CRankLayer::create();
+	//LayerManager::instance()->push(rank);
+	//CPlayerControl::getInstance().sendRank(1);
 }

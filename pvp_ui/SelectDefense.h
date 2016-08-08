@@ -11,13 +11,11 @@
 #include "scene/layer/LayerManager.h"
 #include "protos/protocol.h"
 #include "model/BattleData.h"
+#include "spine/spine-cocos2dx.h"
 
-enum SelectDefenseLayerAction
-{
-	SelectDefenseLayerActionTouchHoldCheck = 1
-};
+#define SelectDefenseHeadWaitMoveAction 1
 
-#define SelectDefenseHoldTime 0.15f
+using namespace spine;
 
 class CSelectDefense:public BaseLayer
 {
@@ -30,12 +28,6 @@ public:
 	void onEnter();
 	void onExit();
 
-
-	virtual bool ccTouchBegan(CCTouch* pTouch, CCEvent* pEvent);
-	virtual void ccTouchMoved(CCTouch* pTouch, CCEvent* pEvent);
-	virtual void ccTouchEnded(CCTouch* pTouch, CCEvent* pEvent);
-	virtual void ccTouchCancelled(CCTouch* pTouch, CCEvent* pEvent);
-
 protected:
 	void onSwitchBtn(CCObject *pSender, bool bChecked);
 	void onSwitchStrategy(CCObject *pSender, bool bChecked);
@@ -43,8 +35,6 @@ protected:
 	void updateCurrHeroList();
 	void addGridCell(unsigned int uIdx, CGridViewCell* pCell);
 
-
-	void onSelectHero(CCObject *pSender);
 	CCObject* gridviewDataSource(CCObject* pConvertCell, unsigned int uIdx);
 	void processMessage(int type, google::protobuf::Message *msg);
 	void addHeroSelectCell(unsigned int uIdx, CGridViewCell* pCell);
@@ -52,20 +42,50 @@ protected:
 	//保存队伍信息
 	void saveTeamData();
 
-	//英雄选中状态效果
-	void setSelectHeroEffect( CImageView *pImage, bool bBlack);
-	//根据id获取scrollview中的英雄icon
-	CImageView *getHeroImageFromScrollViewById( int iId );
+	//选择英雄的边框效果
+	void setSelectHeroRect( int iId );
+
+	//英雄上阵选中状态效果
+	void setSelectHeroEffect( CGridViewCell *pCell, bool bSelected);
+	//根据id获取scrollview中的英雄cell
+	CGridViewCell *getHeroCellFromScrollViewById( int iId );
 	//是否在队伍里
 	bool isHeroSelected( int iId );
 	//更新选中英雄数量
 	void updateSelectHeroNum();
 
+	//选择英雄
+	void onClickHero( CCObject *pSender );
+	//点击普通格子
+	void onClickTile( CCObject *pSender );
+	//点击队长格子
+	void onClickCaptainTile( CCObject *pSender );
+	//点击已经生成的头像
+	void onClickIcon(CCObject *pSender);
+
+	//检查修改, 无修改，不上传
+	bool checkModify( const PvpTeamData&  newData);
+
+	//某个格子上是否有人
+	bool checkIsHeroStandOnTile( CCNode *pTile );
+
+	//待移动状态切换
+	void setWaitMoveState( CImageView *pIcon, bool bFlag );
+
+	//获取当前待移动状态的icon
+	CImageView *getWaitMoveIcon();
+
+	//根据id找heroicon
+	CImageView *getHeroIconById( int iId );
+
 private:
-	void callBackForTouchHold();
+	//初始化特效
+	void initEffect();
+
 	//初始化格子
 	bool initGreen();
 
+	//生成五个英雄icon
 	void createHeroIcon();
 
 	void initHeroIconByMsg();
@@ -87,31 +107,33 @@ private:
 
 	CCPoint getPointByGrid(int pGrid);
 
-	CCPoint getPointByTouch(CCTouch* pTouch);
+	//队长是否已选
+	bool isCaptainSelected( );
 
-	int getIndexByTouch(CCTouch* pTouch);
-
-	CImageView* hasIconByTouch(CCTouch* pTouch);
-
-	bool captainJudge(CCTouch* pTouch);
-
-	void initIconByTouch(CCTouch* pTouch);
+	//生成icon
+	void initIconByPos( CCPoint pos );
+	//替换icon
+	void changeIconByPos( CImageView *pIcon,  CCPoint pos );
+	//移除icon
+	void removeIcon( CImageView *pIcon );
 
 	bool hasInBattle();
-
-	void onTouchIcon(CCObject *pSender);
 
 	void clearIcon();
 
 	void changeFloor(bool pShow);
 
 	void reset(CCObject *pSender);
+
+	//底板效果
+	void setFloorEffect(bool bShow);
+
+	//播放策略特效
+	void playStrategyEffect(int iIndex);
+
 private:
 	CLayout *m_ui;
 
-	//当前选择的英雄
-	int  m_selectHero;
-	
 	//当前选择的策略
 	int m_iStrategyIndex;
 
@@ -120,14 +142,14 @@ private:
 
 	//英雄列表
 	CGridView *m_gridView;
-	
+
 	//英雄列表备份
 	vector<CHero> m_heroList;
 	//英雄地图备份
 	map<int,vector<CHero*>> m_heroMap;
 	//当前选中的英雄列表
 	vector<CHero*> *m_currHeroList;
-	
+
 	//当前英雄数据
 	CHero* m_pDragHeroData;
 
@@ -137,7 +159,7 @@ private:
 	bool m_bBaseTouch;
 
 	//4X4格子
-	CCSpriteBatchNode* m_pBatchGreen;
+	CLayout* m_pGreenLay;
 	//队长格子
 	CImageView* m_Captain;
 	CLayout* mIconNode;
@@ -149,4 +171,9 @@ private:
 	bool mgetBattleInfo;
 	bool mgetHeroList;
 	PvpTeamData mPvPData;
+
+	//人数已满
+	bool m_bAllSelected;
+	SkeletonAnimation	*m_pStrategyEffect[3];
+	MaskLayer *m_pEffectLayer;
 };

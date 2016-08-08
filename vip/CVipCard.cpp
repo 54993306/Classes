@@ -27,25 +27,20 @@ bool CVipCard::init()
 		CCSize winSize = CCDirector::sharedDirector()->getWinSize();
 
 		//黑底
-		MaskLayer* pMaskLayer = MaskLayer::create("VipCard");
+		MaskLayer* pMaskLayer = MaskLayer::create("VipCardMask");
 		pMaskLayer->setContentSize(winSize);
-		LayerManager::instance()->push(pMaskLayer, true);
+		LayerManager::instance()->push(pMaskLayer);
+		pMaskLayer->setOpacity(255);
+		pMaskLayer->setIsShowBlack(true);
+
+		this->setVisible(true);
 
 		m_ui = LoadComponent("VipCard.xaml");
 		m_ui->setTag(1);
 		m_ui->setPosition(VCENTER);
 		this->addChild(m_ui, 2);
 
-		this->setVisible(true);
-		CColorView *grad = CColorView::create(ccc4(53, 53, 53,255));
-		grad->setPosition(VCENTER);
-		grad->setContentSize(CCSize(1138,640));
-		m_ui->addChild(grad,-1);
 
-		CColorView *view = CColorView::create(ccc4(255, 255, 255,255));
-		view->setPosition(VCENTER);
-		view->setContentSize(CCSize(1138,425));
-		m_ui->addChild(view,-1);
 		return true;
 	}
 	return false;
@@ -68,24 +63,35 @@ void CVipCard::onEnter()
 	this->addChild(pClose, 999);
 	
 	CImageViewScale9* pRect1 = (CImageViewScale9*)m_ui->findWidgetById("rect1");
-	m_cardText = CursorTextField::textFieldWithPlaceHolder("", FONT_NAME, 22, CCSize(690, 60), ccBLACK);
+	m_cardText = CursorTextField::textFieldWithPlaceHolder("", FONT_NAME, 29, CCSize(690, 110), ccBLACK);
 	m_cardText->setPriority(this->getTouchPriority());
 	m_cardText->setLimitNum(17);
 	m_cardText->setAnchorPoint(ccp(0, 0.5f));
-	m_cardText->setPosition( ccp(pRect1->getPositionX()-370, pRect1->getPositionY()));
-	m_ui->addChild(m_cardText);
+	m_cardText->setPosition( ccp(pRect1->getPositionX()-440, pRect1->getPositionY()));
+	m_ui->addChild(m_cardText, 999);
 
+	//展示区图片
+	CLayout *pShowInfo = CLayout::create();
 
-	m_cell = (CLayout*)(m_ui->findWidgetById("Cell1"));
+	CScrollView *pScroll = (CScrollView*)m_ui->findWidgetById("scroll_info");
+	pScroll->setDirection(eScrollViewDirectionVertical);
+	pScroll->setBounceable(false);
+	pScroll->getContainer()->addChild(pShowInfo);
 
-	m_tableView = (CTableView *)(m_ui->findWidgetById("scroll"));
-	m_tableView->setDirection(eScrollViewDirectionVertical);
-	m_tableView->setSizeOfCell(m_cell->getContentSize());
-	//m_tableView->setSizeOfCell(CCSizeMake(790,115));
-	m_tableView->setCountOfCell(5);
-	m_tableView->setBounceable(false);
-	m_tableView->setDataSourceAdapter(this,ccw_datasource_adapter_selector(CVipCard::tableviewDataSource));	
-	m_tableView->reloadData();
+	CCSize size = CCSize(957, 471);
+	pShowInfo->setContentSize(size);
+	pScroll->setContainerSize(size);
+	pShowInfo->setPosition(ccp(pScroll->getContainerSize().width*0.5f, pScroll->getContainerSize().height*0.5f));
+	pScroll->setContentOffsetToTop();
+
+	//嫁接内容
+	CLayout* pLayout = (CLayout*)findWidgetById("layer_info");
+	pLayout->retain();
+	pLayout->removeFromParent();
+	pShowInfo->addChild(pLayout);
+	pLayout->release();
+	pLayout->setPosition(ccp(size.width/2, size.height/2+10));
+
 }
 
 void CVipCard::onExit()
@@ -161,53 +167,6 @@ bool CVipCard::getStep1Success()
 void CVipCard::updateClock( float dt )
 {
 
-}
-
-CCObject* CVipCard::tableviewDataSource(CCObject* pConvertCell, unsigned int uIdx)
-{
-	CTableViewCell *pCell = (CTableViewCell*)(pConvertCell);
-	if (!pCell)
-	{
-		pCell = new CTableViewCell;
-		pCell->autorelease();
-		addTableCell(uIdx, pCell);
-	}
-	else
-	{
-		pCell->removeAllChildren();
-		addTableCell(uIdx, pCell);
-	}
-	return pCell;
-}
-
-void CVipCard::addTableCell(unsigned int uIdx, CTableViewCell * pCell)
-{
-	CLayout *cell = (CLayout*)m_ui->findWidgetById(CCString::createWithFormat("Cell%d",uIdx+1)->getCString());
-	// 	CLayout *lay = UICloneMgr::cloneLayout(cell);
-	for (int i = 0; i < 4; i++)
-	{
-		CCNode * node = (CCNode*)cell->getChildren()->objectAtIndex(i);
-
-		if (node->getTag()==1)
-		{
-			CButton *btn = CButton::createWith9Sprite(node->getContentSize(),"vip/payment_box2.png","vip/payment_box2.png");
-			btn->setPosition(node->getPosition());
-			btn->setAnchorPoint(ccp(0,0));
-			btn->setTag(1);
-			pCell->addChild(btn);
-		}
-		else if (node->getTag()==2||node->getTag()==3)
-		{
-			CLabel *lab = UICloneMgr::cloneLable((CLabel*)node);
-			pCell->addChild(lab);
-		}
-		else
-		{
-			CImageView *image = UICloneMgr::cloneImageView((CImageView*)node);
-			pCell->addChild(image);
-		}
-	}
-	cell->setVisible(false);
 }
 
 void CVipCard::setPayEnable(bool isEnable)

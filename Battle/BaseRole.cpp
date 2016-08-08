@@ -37,7 +37,7 @@ namespace BattleSpace
 		,mDelaytime(0),mLogicState(sLogicState::eNormal),mMonsterSpecies(sMonsterSpecies::eCommon),mHurtCount(nullptr)
 		,m_AliveID(0),mBehavior(sBehavior::eNormal),mBaseData(nullptr),mLogicData(nullptr),mGuideManage(nullptr)
 		,mCommandGrid(0),mRoleLayer(nullptr),mAutoState(false),mMaxGrid(INVALID_GRID),mHasTarget(false),mEnterTime(0)
-		,mSkillEffect(nullptr)
+		,mSkillEffect(nullptr),mClearState(true)
 	{}
 	//AliveDefine
 	BaseRole::~BaseRole()
@@ -86,7 +86,8 @@ namespace BattleSpace
 		setModel(getBaseData()->getRoleModel());
 		setZoom(getBaseData()->getRoleZoom()*0.01f);
 		setInitCost(getBaseData()->getInitCost());				//召唤消耗的cost(根技能消耗的相等)
-		if (pFather->getMonsterSpecies() == sMonsterSpecies::eWorldBoss)
+		if (pFather->getMonsterSpecies() == sMonsterSpecies::eWorldBoss || 
+			pFather->getCallType() == sCallType::eBoxHaveRole )
 		{
 			setAtkInterval(getBaseData()->getAttackSpeed());
 			setMoveSpeed(getBaseData()->getMoveSpeed());
@@ -180,11 +181,11 @@ namespace BattleSpace
 		}
 		setHp(getBaseData()->getRoleHp());									//第一次进来是满血状态
 #if BATTLE_TEST
-		if (getOtherCamp() && !getBaseData()->getInitGrid())
-		{
-			setMaxHp(10000000);
-			setHp(10000000);	
-		}
+		//if (getOtherCamp() && !getBaseData()->getInitGrid())
+		//{
+		//	setMaxHp(10000000);
+		//	setHp(10000000);	
+		//}
 #endif
 		setCostMax(getBaseData()->getMaxCost());
 		setInitCost(getBaseData()->getInitCost());			
@@ -396,17 +397,27 @@ namespace BattleSpace
 		}
 		return false;
 	}
-
+	//在受击数组中的武将都是被打中的武将
 	void BaseRole::clearHitAlive()
 	{
-		for (auto tRole:HittingAlive)
+		if (mClearState)
 		{
-			if (tRole == this)
-				continue;
-			if (tRole->getAliveState()&&tRole->getHp()<=0 && tRole->getRoleObject())
-				tRole->roleDie();
+			mClearState = false;					//防止在for循环中出现多次调用的情况，炸弹把人炸死，人的受击数组里面有炸弹，会出现崩溃的情况
+			for (auto tRole:HittingAlive)
+			{
+				if (tRole == this)
+					continue;						//自爆类的在其他地方处理了,角色的阵亡有很多种情况,耗血比吸血多的情况角色也会自己死亡。
+				if (tRole->getAliveState() && 
+					tRole->getHp()<=0 && 
+					tRole->getRoleObject())
+				{
+					tRole->byOtherKill(this);				//被击杀的情况
+				}
+					
+			}
+			HittingAlive.clear();
+			mClearState = true;
 		}
-		HittingAlive.clear();
 	}
 
 	RoleSkill* BaseRole::getCurrSkill()
@@ -590,6 +601,7 @@ namespace BattleSpace
 	bool BaseRole::stateDispose(float pTime)
 	{
 		if (getCallType()   == sCallType::eNotAttack	||							//石头类武将不做攻击判断处理
+			getCallType()	== sCallType::eBoxHaveRole	||
 			getLogicState() == sLogicState::eUnAttack	||
 			getLogicState() == sLogicState::eInvincible	||							//超出边界的武将不再进行技能处理
 			getHp() <= 0 || !this->getAliveState()		)
@@ -683,7 +695,6 @@ namespace BattleSpace
 
 	bool BaseRole::walkState()
 	{
-		setHasTarget(false);
 		if (getEnemy() || getCallType()==sCallType::eAutoMove)		//我方自动移动类武将
 		{
 			return true;
@@ -692,6 +703,7 @@ namespace BattleSpace
 			{
 				return true;
 			}else{
+				setHasTarget(false);
 				return false;
 			}
 		}
@@ -1014,7 +1026,7 @@ namespace BattleSpace
 
 	BaseRole* BaseRole::createCallRole( int pRoleID )
 	{
-		MonsterData* tBaseData = (MonsterData*)BattleData->getCallRoleData(pRoleID);
+		MonsterData* tBaseData = (MonsterData*)BattleData->getChildRoleData(pRoleID);
 		if ( !tBaseData)
 		{
 			CCLOG("[ *ERROR ]WarManager::getNewCallAlive  CallId =%d ",pRoleID);
@@ -1389,7 +1401,7 @@ namespace BattleSpace
 			setAliveState(false);
 			setFirstInit(false);
 			mRoleObject->AliveDie();
-			clearHitAlive();//bug 点，在自动战斗状态下，当敌方被击杀时，会马上更新战场态势，而后产生新的AI指引去 引导武将移动，然后会再次刷新武将的打击列表，导致打击列表在循环时被改变，程序崩溃
+			clearHitAlive();
 			setHp(0);
 			setGridIndex(INVALID_GRID);
 			if (getMoveObject())getMoveObject()->removeFromParentAndCleanup(true);
@@ -1402,6 +1414,26 @@ namespace BattleSpace
 			NOTIFICATION->postNotification(MsgRoleDie,this);
 		}
 	}
+	//角色被击杀死亡时会进行的一些处理
+	void BaseRole::byOtherKill(BaseRole* pRole)
+	{
+		//被召唤出来的角色的初始化数据该怎样去做？
+		this->roleDie();
+		if (getCallType() == sCallType::eBoxHaveRole)
+		{
+			if (getBaseData()->hasActiveSkill())
+			{
+				BaseRole* tRole = getCallRole(getBaseData()->getActiveSkill());							//将必杀技配置成召唤类的技能 	
+				tRole->setGridIndex(getBaseData()->getInitGrid());
+				tRole->setOtherCamp(pRole->getOtherCamp());
+				tRole->setEnemy(pRole->getEnemy());
+				bNotification->postNotification(MsgCreateRoleObject,tRole);								//石头可被双方进行攻击。判断是否为敌对阵营的即可。
+			}else{
+				CCLOG("[ *ERROR ] BaseRole::getCurrSkill CritSKILL IS NULL");
+			}
+		}
+	}
+
 	//最好做成一个公用的方法，常用到,做是否可移动判断必须判断的
 	bool BaseRole::hasOtherRole( int pGrid )
 	{

@@ -26,9 +26,14 @@ CSelectDefense::~CSelectDefense()
 
 CSelectDefense::CSelectDefense()
 	:m_iStrategyIndex(0),m_pTouch(nullptr),m_bHold(false),m_pDragHeroData(nullptr),m_bBaseTouch(true)
-	,m_pBatchGreen(nullptr), m_Captain(nullptr),mIconNode(nullptr),mMoveIcon(nullptr),mStrategyIndex(1)
-	,mgetBattleInfo(false),mgetHeroList(false)
-{}
+	,m_pGreenLay(nullptr), m_Captain(nullptr),mIconNode(nullptr),mMoveIcon(nullptr),mStrategyIndex(1)
+	,mgetBattleInfo(false),mgetHeroList(false),m_bAllSelected(false),m_pEffectLayer(nullptr)
+{
+	for(int i=0; i<3; i++)
+	{
+		m_pStrategyEffect[i] = nullptr;
+	}
+}
 
 bool CSelectDefense::init()
 {
@@ -39,6 +44,7 @@ bool CSelectDefense::init()
 		this->addChild(m_ui);
 
 		setIsShowBlack(false);
+		
 		if (!initGreen())
 			return false;
 
@@ -46,6 +52,38 @@ bool CSelectDefense::init()
 	}
 	return false;
 }
+
+
+void CSelectDefense::initEffect()
+{
+	m_pEffectLayer = MaskLayer::create("CSelectDefenseEffectMask");
+	m_pEffectLayer->setContentSize(CCSizeMake(DESIGN_WIDTH, VIRTUAL_FIXED_HEIGHT));
+	m_pEffectLayer->setIsShowBlack(false);
+	m_pEffectLayer->setTouchEnabled(false);
+	m_pEffectLayer->setVisible(false);
+	m_pEffectLayer->setTouchPriority(LayerManager::instance()->getLayerManagerMinPriority()-2);
+	m_ui->addChild(m_pEffectLayer, 99);
+
+	for(int i=0; i<3; i++)
+	{
+		m_pStrategyEffect[i] = SkeletonAnimation::createWithFile(
+			CCString::createWithFormat("pvp/strategy/strategy%d.json", i+1)->getCString(), 
+			CCString::createWithFormat("pvp/strategy/strategy%d.atlas", i+1)->getCString(),
+			1
+			);
+		MaskLayer *pMask = m_pEffectLayer;
+		m_pStrategyEffect[i]->completeListener = std::bind(
+			[pMask](int iData1, int iDat2)
+		{
+			pMask->setTouchEnabled(false);
+			pMask->setVisible(false);
+		}, 
+		std::placeholders::_1, std::placeholders::_2);
+		m_pStrategyEffect[i]->setPosition(ccp(469, 333));
+		m_pEffectLayer->addChild(m_pStrategyEffect[i]);
+	}
+}
+
 
 void CSelectDefense::onEnter()
 { 
@@ -88,6 +126,9 @@ void CSelectDefense::onEnter()
 	CButton *pReset = (CButton *)m_ui->findWidgetById("reset");
 	pReset->setOnClickListener(this, ccw_click_selector(CSelectDefense::reset));
 
+	//初始化特效
+	initEffect();
+
 	GetTcpNet->registerMsgHandler(HeroListMsg,this,CMsgHandler_selector(CSelectDefense::processMessage));
 	GetTcpNet->registerMsgHandler(AskPvpTeamDataMsg,this,CMsgHandler_selector(CSelectDefense::processMessage));
 }
@@ -109,10 +150,17 @@ void CSelectDefense::onExit()
 
 void CSelectDefense::reset( CCObject *pSender )
 {
+	if(!isCaptainSelected())
+	{
+		return;
+	}
+
 	updateCaptainSkill(nullptr);
 	changeFloor(false);
 	clearIcon();
 	m_gridView->reloadData();
+
+	updateSelectHeroNum();
 }
 
 CCObject* CSelectDefense::gridviewDataSource(CCObject* pConvertCell, unsigned int uIdx)
@@ -157,6 +205,8 @@ void CSelectDefense::onSwitchStrategy( CCObject *pSender, bool bChecked )
 		PlayEffectSound(SFX_Button);
 
 		updateStrategy( iIndex );
+
+		playStrategyEffect(iIndex);
 	}
 }
 
@@ -174,12 +224,12 @@ void CSelectDefense::updateHeroList()
 
 void CSelectDefense::addHeroSelectCell(unsigned int uIdx, CGridViewCell* pCell)
 {
-	CHero *hero = m_currHeroList->at(uIdx);
+	CHero *pHero = m_currHeroList->at(uIdx);
 	CLayout *lay = UICloneMgr::cloneLayout(m_cell);
 
-	const HeroInfoData *c_data = DataCenter::sharedData()->getHeroInfo()->getCfg(hero->thumb);
+	const HeroInfoData *c_data = DataCenter::sharedData()->getHeroInfo()->getCfg(pHero->thumb);
 
-	for (int i = 1; i <=6; i++)
+	for (int i = 1; i <=7; i++)
 	{
 		CCNode *child = lay->getChildByTag(i);
 		lay->removeChild(child);
@@ -188,45 +238,61 @@ void CSelectDefense::addHeroSelectCell(unsigned int uIdx, CGridViewCell* pCell)
 		if (i==1)
 		{
 			CImageView *pBg = (CImageView*)child;
-			pBg->setUserData(hero);
+			pBg->setUserData(pHero);
 			pBg->setTouchEnabled(true);
-			pBg->setOnClickListener(this,ccw_click_selector(CSelectDefense::onSelectHero));
+			pBg->setOnClickListener(this,ccw_click_selector(CSelectDefense::onClickHero));
 
-			CImageView *pHead = CImageView::create(CCString::createWithFormat("headImg/%d.png", hero->thumb)->getCString());
+			CImageView *pHead = CImageView::create(CCString::createWithFormat("headImg/%d.png", pHero->thumb)->getCString());
 			if (!pHead)
 			{
 				pHead = CImageView::create("headImg/101.png");
-				CCLOG("[ ERROR ] CSelectDefense::addGridCell Lost Image = %d",hero->thumb);
+				CCLOG("[ ERROR ] CSelectDefense::addGridCell Lost Image = %d",pHero->thumb);
 			}
 			pHead->setTag(1);
-			pHead->setUserData(hero);
+			pHead->setUserData(pHero);
 			pBg->addChild(pHead);
 			NodeFillParent(pHead);
-
-			//变黑处理
-			setSelectHeroEffect( pHead,  isHeroSelected(hero->id));
-
 		}
 		else if (i==3)
 		{
 			CCSprite *mask = (CCSprite*)child;
-			mask->setTexture(SetRectColor(hero->roletype));
+			mask->setTexture(SetRectColor(pHero->roletype));
 
 			//添加星级
-			CLayout* pStarLayout = getStarLayout(hero->iColor);
+			CLayout* pStarLayout = getStarLayout(pHero->iColor);
 			mask->addChild(pStarLayout);
 		}	
 		else if (i==4)
 		{
 			CLabel *name = (CLabel *)child;
-			name->setString(ToString(hero->level));
+			name->setString(ToString(pHero->level));
 		}
+		//对勾黑底
 		else if (i==5)
 		{
 			CCNodeRGBA *pBlack = (CCNodeRGBA *)child;
 			pBlack->setOpacity(160);
 		}
+		//边框
+		else if(i==7)
+		{
+			CImageView *pRight = (CImageView *)child;
+			pRight->setUserData(pHero);
+			pRight->setVisible(false);
+			pRight->runAction(CCRepeatForever::create(CCSequence::createWithTwoActions(
+				CCFadeTo::create(0.3, 150),
+				CCFadeTo::create(0.3, 255)
+				)));
+			if(m_pDragHeroData!=nullptr)
+			{
+				pRight->setVisible(pHero->id==m_pDragHeroData->id);
+			}
+		}
 	}
+
+	//上阵状态处理
+	bool bPushDown = isHeroSelected(pHero->id);
+	setSelectHeroEffect( pCell,  bPushDown);
 }
 
 
@@ -248,30 +314,75 @@ bool CSelectDefense::isHeroSelected( int iId )
 }
 
 
-void CSelectDefense::setSelectHeroEffect( CImageView *pImage, bool bBlack )
+void CSelectDefense::setSelectHeroRect( int iId )
 {
-	if(pImage == nullptr)
+	m_pDragHeroData = nullptr;
+	setFloorEffect(false);
+	CCArray *pChildren = m_gridView->getContainer()->getChildren();
+	CCObject *pObj = nullptr;
+	CCARRAY_FOREACH(pChildren, pObj)
 	{
-		return;
-	}
-	if ( bBlack )
-	{
-		pImage->setShaderProgram(ShaderDataMgr->getShaderByType(ShaderStone));
-	}
-	else
-	{
-		pImage->setShaderProgram(ShaderDataMgr->getShaderByType(ShaderDefault));
+		CGridViewCell *pCell = (CGridViewCell *)pObj;
+		CImageView *pView = dynamic_cast<CImageView *>(pCell->getChildByTag(7));
+		if(pView)
+		{
+			pView->setVisible(false);
+			CHero *pHero = (CHero *)pView->getUserData();
+			if(pHero)
+			{
+				if( pHero->id == iId )
+				{
+					pView->setVisible(true);
+					m_pDragHeroData = pHero;
+					setFloorEffect(true);
+				}
+			}
+		}
 	}
 }
 
 
-CImageView * CSelectDefense::getHeroImageFromScrollViewById( int iId )
+void CSelectDefense::setSelectHeroEffect( CGridViewCell *pCell, bool bSelected )
+{
+	if(pCell == nullptr)
+	{
+		return;
+	}
+
+	//头像
+	CImageView *pHead = ( CImageView *)pCell->getChildByTag(1)->getChildByTag(1);
+	if ( bSelected )
+	{
+		pHead->setShaderProgram(ShaderDataMgr->getShaderByType(ShaderStone));
+	}
+	else
+	{
+		pHead->setShaderProgram(ShaderDataMgr->getShaderByType(ShaderDefault));
+	}
+
+	//对勾
+	CImageView *pBlack = (CImageView *)pCell->getChildByTag(5);
+	pBlack->setVisible(bSelected);
+	CImageView *pRight = (CImageView *)pCell->getChildByTag(6);
+	pRight->setVisible(bSelected);
+
+	//框
+	if ( bSelected )
+	{
+		CImageView *pRect = (CImageView *)pCell->getChildByTag(7);
+		pRect->setVisible(false);
+		setFloorEffect(false);
+	}
+}
+
+
+CGridViewCell * CSelectDefense::getHeroCellFromScrollViewById( int iId )
 {
 	CCArray *pChildren = m_gridView->getContainer()->getChildren();
 	CCObject *pObj = nullptr;
 	CCARRAY_FOREACH(pChildren, pObj)
 	{
-		CCNode *pCell = (CCNode *)pObj;
+		CGridViewCell *pCell = (CGridViewCell *)pObj;
 		CImageView *pHeadView = dynamic_cast<CImageView *>(pCell->getChildByTag(1)->getChildByTag(1));
 		if(pHeadView)
 		{
@@ -280,7 +391,7 @@ CImageView * CSelectDefense::getHeroImageFromScrollViewById( int iId )
 			{
 				if( pHero->id == iId )
 				{
-					return pHeadView;
+					return pCell;
 				}
 			}
 		}
@@ -289,10 +400,119 @@ CImageView * CSelectDefense::getHeroImageFromScrollViewById( int iId )
 }
 
 
-void CSelectDefense::onSelectHero(CCObject *pSender)
+void CSelectDefense::onClickHero(CCObject *pSender)
 {
 	//TODO
+	CCNode *pNode = (CCNode *)pSender;
+	CHero *pHero = (CHero *)pNode->getUserData();
+	
+	//上阵状态取消掉
+	if(isHeroSelected(pHero->id))
+	{
+		//根据id找icon
+		CImageView *pIcon = getHeroIconById(pHero->id);
+		if(pIcon)
+		{
+			//待移动对象
+			CImageView *pWaitMoveIcon = getWaitMoveIcon();
+			if (pWaitMoveIcon == pIcon)
+			{
+				//移除当前选择头像
+				setWaitMoveState(pWaitMoveIcon, false);
+			}
+			removeIcon(pIcon);
+		}
+
+		updateSelectHeroNum();
+	}
+	//没上阵选中
+	else
+	{
+		//相同英雄不重复选
+		if(m_pDragHeroData == pHero) return;
+		//有待移动对象，不可选
+		if(getWaitMoveIcon()) return;
+
+		//更新选中框状态
+		setSelectHeroRect(pHero->id);
+	}
 }
+
+
+void CSelectDefense::onClickTile( CCObject *pSender )
+{
+	//TODO
+	CCNode *pNode = (CCNode *)pSender;
+
+
+	//没有选中英雄
+	if(m_pDragHeroData==nullptr) return;
+	//格子上有人，不执行
+	if(checkIsHeroStandOnTile(pNode)) return;
+	
+
+	CImageView *pWaitMoveIcon = getWaitMoveIcon();
+	if(!pWaitMoveIcon)
+	{
+		//没有待移动格子，正常执行添加操作
+		initIconByPos(pNode->getPosition());
+	}
+	else
+	{
+		bool isCaptain = ( getGridByPoint(pWaitMoveIcon->getPosition()) == C_OtherCaptain);
+		if(!isCaptain)
+		{
+			//有待移动格子，执行位移
+			pWaitMoveIcon->setPosition(pNode->getPosition());
+			setWaitMoveState(pWaitMoveIcon, false);
+		}
+	}
+}
+
+void CSelectDefense::onClickCaptainTile( CCObject *pSender )
+{
+	//TODO
+	//没有选中英雄
+	if(m_pDragHeroData==nullptr) return;
+
+	CCNode *pNode = (CCNode *)pSender;
+
+	initIconByPos(pNode->getPosition());
+}
+
+
+void CSelectDefense::onClickIcon( CCObject *pSender )
+{
+	CImageView *pHead = (CImageView *)pSender;
+
+	//当前有选择框出现,或者待移动icon
+	if(m_pDragHeroData != nullptr )
+	{
+		//待移动对象点击了自己，移除掉
+		CImageView *pWaitMoveIcon = getWaitMoveIcon();
+		if (pWaitMoveIcon == pHead)
+		{
+			//移除当前选择头像
+			removeIcon(pHead);
+			setWaitMoveState(pHead, false);
+		}
+		else
+		{
+			//替换头像
+			changeIconByPos(pHead, pHead->getPosition());
+		}
+		
+	}
+	//没框, 没待移动对象
+	else
+	{
+		//当前头像为可移动
+		setWaitMoveState(pHead, true);
+	}
+	
+	updateSelectHeroNum();
+}
+
 
 void CSelectDefense::processMessage(int type, google::protobuf::Message *msg)
 {
@@ -412,151 +632,6 @@ void CSelectDefense::updateCurrHeroList()
 	}
 }
 
-bool CSelectDefense::ccTouchBegan( CCTouch* pTouch, CCEvent* pEvent )
-{
-	bool bTouched = false;
-
-	m_bBaseTouch = true;
-	//mTouchBegin = pTouch;
-	//是否触摸到gridview
-	CCPoint touchPointInView = m_gridView->getParent()->convertToNodeSpace(pTouch->getLocation());
-	if(m_gridView->boundingBox().containsPoint(touchPointInView))
-	{
-		//触摸处理
-		m_bBaseTouch = false;
-
-		bTouched = true;
-
-		m_bHold = false;
-
-		m_pDragHeroData = nullptr;
-
-		//判断是否点击到了头像
-		CCArray* pChildren = m_gridView->getContainer()->getChildren();
-		for(unsigned int i=0; i<pChildren->count(); i++)
-		{
-			CCNode* pNode = (CCNode*)pChildren->objectAtIndex(i);
-			if(pNode==nullptr)
-			{
-				break;
-			}
-			else
-			{
-				CImageView* pImage = (CImageView*)pNode->getChildByTag(1);
-				CCPoint touchPointInView = pImage->getParent()->convertToNodeSpace(pTouch->getLocation());
-				if(pImage->boundingBox().containsPoint(touchPointInView))
-				{
-					//点击到了头像，记录当前英雄数据
-					m_pDragHeroData = (CHero*)pImage->getUserData();
-
-					//按住检测
-					stopActionByTag(SelectDefenseLayerActionTouchHoldCheck);
-					CCSequence* pSeq = CCSequence::createWithTwoActions(CCDelayTime::create(SelectDefenseHoldTime), CCCallFunc::create(this, callfunc_selector(CSelectDefense::callBackForTouchHold)));
-					pSeq->setTag(SelectDefenseLayerActionTouchHoldCheck);
-					this->runAction(pSeq);
-
-					break;
-				}
-			}
-		}
-
-		if(m_pDragHeroData == nullptr)
-		{
-			m_gridView->onTouchBegan(pTouch);
-		}
-	}
-	else
-	{
-		//进入触摸控制
-		bTouched = BaseLayer::ccTouchBegan(pTouch, pEvent);
-	}
-
-	if(bTouched && m_pTouch == nullptr)
-	{
-		m_pTouch = pTouch;
-	}
-
-	return bTouched;
-}
-
-void CSelectDefense::ccTouchMoved( CCTouch* pTouch, CCEvent* pEvent )
-{
-	if(m_pTouch == pTouch)
-	{
-		//检测时间内
-		if(getActionByTag(SelectDefenseLayerActionTouchHoldCheck) != nullptr)
-		{
-			//检测变动范围
-			//计算是否丢失事件，8像素以内，判断为hold
-			CCPoint pStart = pTouch->getStartLocation();
-			CCPoint pCurrent = pTouch->getLocation();
-			float fDis = ccpDistance(pStart, pCurrent);
-			if(fDis>8)
-			{
-				stopActionByTag(SelectDefenseLayerActionTouchHoldCheck);
-			}
-			return;
-		}
-
-		//如果为hold状态
-		if(m_bHold)
-		{
-			//TODO
-			//执行拖动武将
-			//CCLOG("%f--%f", pTouch->getLocation().x, pTouch->getLocation().y);
-			dragHero( pTouch );
-		}
-		else
-		{
-			//执行scrollView
-			m_gridView->onTouchMoved(pTouch, 0.1f);
-		}
-
-		if(m_bBaseTouch)
-		{
-			BaseLayer::ccTouchMoved(pTouch, pEvent);
-		}
-	}
-}
-
-void CSelectDefense::ccTouchEnded( CCTouch* pTouch, CCEvent* pEvent )
-{
-	if(m_pTouch == pTouch)
-	{
-		m_pTouch = nullptr;
-		stopActionByTag(SelectDefenseLayerActionTouchHoldCheck);
-		if(m_bHold)
-		{
-			//TODO
-			//松手放置武将
-			putDownHero( pTouch );
-		}
-		else
-		{
-			m_gridView->onTouchEnded(pTouch, 0.1f);
-		}
-
-		if(m_bBaseTouch)
-		{
-			BaseLayer::ccTouchEnded(pTouch, pEvent);
-		}
-	}
-}
-
-void CSelectDefense::ccTouchCancelled( CCTouch* pTouch, CCEvent* pEvent )
-{
-	ccTouchEnded(pTouch, pEvent);
-}
-
-void CSelectDefense::callBackForTouchHold()
-{
-	//按住成功
-	m_bHold = true;
-
-	//生成被拖动武将
-	createDragHero();
-}
-
 void CSelectDefense::updateStrategy( int iIndex )
 {
 	//更新策略
@@ -568,11 +643,11 @@ void CSelectDefense::updateStrategy( int iIndex )
 
 void CSelectDefense::updateCaptainSkill( CHero *pHero )
 {
-	CCNode *pBg = (CCNode*)m_ui->findWidgetById("desc_bg");
+	CImageView *pBg = (CImageView*)m_ui->findWidgetById("desc_bg");
 	CCNode *pTitle = (CCNode*)m_ui->findWidgetById("desc_title");
 	CLabel *pDesc = (CLabel*)(m_ui->findWidgetById("desc"));
 
-	if( pHero==nullptr )
+	if( pHero==nullptr && pBg->getOpacity()!=0)
 	{
 		pBg->runAction(CCFadeOut::create(0.2f));
 		pTitle->runAction(CCFadeOut::create(0.2f));
@@ -626,73 +701,46 @@ CCPoint CSelectDefense::getPointByGrid(int pGrid)
 	return CCPoint(0,0);
 }
 
-int CSelectDefense::getIndexByTouch( CCTouch* pTouch )
-{
-	CCPoint p = mIconNode->convertToNodeSpace(pTouch->getLocation());
-	return getGridByPoint(p);
-}
-
-cocos2d::CCPoint CSelectDefense::getPointByTouch( CCTouch* pTouch )
-{
-	CCPoint p = mIconNode->convertToNodeSpace(pTouch->getLocation());
-	for(map<int,CCPoint>::iterator iter = mIconPoint.begin(); iter != mIconPoint.end(); ++iter)
-	{
-		CCRect rect(iter->second.x - mGridSize.x / 2,iter->second.y - mGridSize.y / 2,mGridSize.x,mGridSize.y);
-		if(rect.containsPoint(p))
-		{
-			CCLOG("CSelectDefense::getPointByTouch %d",iter->first);
-			return iter->second;
-		}
-	}
-	return CCPoint(0,0);
-}
-
-CImageView* CSelectDefense::hasIconByTouch( CCTouch* pTouch )
-{
-	CCPoint p = mIconNode->convertToNodeSpace(pTouch->getLocation());
-	for (auto tIcon : mHeroIcons)
-	{
-		if (!tIcon->isVisible())
-			continue;
-		if (tIcon->boundingBox().containsPoint(p))
-			return tIcon;
-	}
-	return nullptr;
-}
-
 bool CSelectDefense::initGreen()
 {
 	mIconNode = CLayout::create();
-	mIconNode->setPosition(350,340);
+	mIconNode->setPosition(ccp(1138/2+204, 640/2+192));
+	mIconNode->setContentSize(CCSizeMake(1138, 640));
 	m_ui->addChild(mIconNode);
 
-	m_pBatchGreen = CCSpriteBatchNode::create("pvp/pvp_box_blue.png");
-	m_pBatchGreen->setPosition(ccp(100,35));
-	mIconNode->addChild(m_pBatchGreen);
+	m_pGreenLay = CLayout::create();
+	m_pGreenLay->setContentSize(CCSizeMake(1138, 640));
+	m_pGreenLay->setAnchorPoint(CCPointZero);
+	m_pGreenLay->setPosition(CCPointZero);
+	m_pGreenLay->setCascadeOpacityEnabled(true);
+	mIconNode->addChild(m_pGreenLay);
 
 	//队长格子
 	m_Captain = (CImageView*)m_ui->findWidgetById("captain");
 	m_Captain->removeFromParent();
-	m_Captain->setPosition(ccp(38,120));
+	m_Captain->setPosition(ccp(55, 143));
 	mIconNode->addChild(m_Captain);
+	m_Captain->setTouchEnabled(true);
+	m_Captain->setOnClickListener(this, ccw_click_selector(CSelectDefense::onClickCaptainTile));
 	mIconPoint[C_OtherCaptain] = m_Captain->getPosition();
 
 	//拿到绿色格子
 	m_ui->findWidgetById("green_start")->setVisible(false);
 	//4X4
-	mGridSize = ccp(62,58);
+	mGridSize = ccp(76, 69);
 	for(int i=0; i<4; i++)
 	{
 		for(int j=0; j<4; j++)
 		{
-			CCSprite* pGreenTile = CCSprite::create("pvp/pvp_box_blue.png");
-			pGreenTile->setPosition(ccp(mGridSize.x*i, mGridSize.y*j));
-			m_pBatchGreen->addChild(pGreenTile);
-			CCPoint p = m_pBatchGreen->convertToWorldSpace(ccp(mGridSize.x*i, mGridSize.y*j));
-			mIconPoint[(i+C_PVPCol)*4+abs(j-3)] = mIconNode->convertToNodeSpace(p);
+			CImageView* pGreenTile = CImageView::create("pvp/pvp_box_blue.png");
+			pGreenTile->setPosition(ccp(mGridSize.x*i, mGridSize.y*j) + ccp(140, 40));
+			pGreenTile->setTouchEnabled(true);
+			pGreenTile->setOnClickListener(this, ccw_click_selector(CSelectDefense::onClickTile));
+			m_pGreenLay->addChild(pGreenTile);
+			mIconPoint[(i+C_PVPCol)*4+abs(j-3)] = pGreenTile->getPosition();
 
 			CCLabelTTF* lab = CCLabelTTF::create(ToString((i+C_PVPCol)*4+abs(j-3)),"arial",20);
-			lab->setPosition(mIconNode->convertToNodeSpace(p));
+			lab->setPosition(pGreenTile->getPosition());
 #if BATTLE_TEST
 			mIconNode->addChild(lab);
 #endif
@@ -705,7 +753,7 @@ bool CSelectDefense::initGreen()
 
 void CSelectDefense::changeFloor( bool pShow )
 {
-	CCArray* tChildren = m_pBatchGreen->getChildren();
+	CCArray* tChildren = m_pGreenLay->getChildren();
 	CCObject* obj = nullptr;
 	CCARRAY_FOREACH(tChildren,obj)
 	{
@@ -721,14 +769,15 @@ void CSelectDefense::clearIcon()
 		tIcon->setUserData(nullptr);
 		tIcon->setPosition(CCPointZero);
 		tIcon->setVisible(false);
+		setWaitMoveState(tIcon, false);
 	}
 }
 
 void CSelectDefense::createHeroIcon()
 {
 	mMoveIcon = CImageView::create("headImg/10005.png");
-	mMoveIcon->setScaleX(62.0f*0.85f/92.0f);
-	mMoveIcon->setScaleY(58.0f*0.85f/92.0f);
+	mMoveIcon->setScaleX(76.0f*0.85f/92.0f);
+	mMoveIcon->setScaleY(69.0f*0.85f/92.0f);
 #if BATTLE_TEST
 	mMoveIcon->setVisible(true);
 #else
@@ -738,37 +787,16 @@ void CSelectDefense::createHeroIcon()
 	for (int i=0;i<5;i++)
 	{
 		CImageView* tHeroIcon = CImageView::create();
-		tHeroIcon->setScaleX(62.0f*0.85f/92.0f);
-		tHeroIcon->setScaleY(58.0f*0.85f/92.0f);
+		tHeroIcon->setScaleX(76.0f*0.85f/92.0f);
+		tHeroIcon->setScaleY(69.0f*0.85f/92.0f);
 		tHeroIcon->setVisible(false);
 		tHeroIcon->setTouchEnabled(true);
-		tHeroIcon->setOnClickListener(this,ccw_click_selector(CSelectDefense::onTouchIcon));
+		tHeroIcon->setOnClickListener(this,ccw_click_selector(CSelectDefense::onClickIcon));
 		mIconNode->addChild(tHeroIcon);
 		mHeroIcons.push_back(tHeroIcon);
 	}
 }
 
-void CSelectDefense::onTouchIcon( CCObject *pSender )
-{
-	CImageView* tImageView = (CImageView*) pSender;
-	CHero *pHero = (CHero *)tImageView->getUserData();
-	if(pHero)
-	{
-		setSelectHeroEffect(getHeroImageFromScrollViewById(pHero->id), false);
-	}
-	if (getGridByPoint(tImageView->getPosition()) == C_OtherCaptain)
-	{
-		updateCaptainSkill(nullptr);
-		changeFloor(false);
-		clearIcon();
-		m_gridView->reloadData();
-	}else{
-		tImageView->setVisible(false);
-		tImageView->setUserObject(nullptr);
-	}
-
-	updateSelectHeroNum();
-}
 
 bool CSelectDefense::hasInBattle()
 {
@@ -811,72 +839,132 @@ void CSelectDefense::dragHero(  CCTouch* pTouch )
 
 void CSelectDefense::putDownHero( CCTouch* pTouch )
 {
-	if (!mMoveIcon->isVisible())
-		return;
-	mMoveIcon->setVisible(false);								//有可能当前位置上已经有图标了，执行替换处理
-	if (!captainJudge(pTouch))
-		return;
-	initIconByTouch(pTouch);
+	//if (!mMoveIcon->isVisible())
+	//	return;
+	//mMoveIcon->setVisible(false);								//有可能当前位置上已经有图标了，执行替换处理
+	//if (!captainJudge(pTouch))
+	//	return;
+	//initIconByPos(pTouch);
 }
 
-bool CSelectDefense::captainJudge(CCTouch* pTouch)
+bool CSelectDefense::isCaptainSelected()
 {
-	if ( !getIndexByTouch(pTouch) )						//落点不再格子区域内
-		return false;
-	if (getIndexByTouch(pTouch) != C_OtherCaptain)		//落点不再主帅位置
+	CCPoint p = getPointByGrid(C_OtherCaptain);
+	for (auto tIcon : mHeroIcons)
 	{
-		CCPoint p = getPointByGrid(C_OtherCaptain);
-		for (auto tIcon : mHeroIcons)
-		{
-			if (!tIcon->isVisible())
-				continue;
-			if (tIcon->boundingBox().containsPoint(p))
-				return true;
-		}
-		return false;
-	}else{
-		changeFloor(true);
+		if (!tIcon->isVisible())
+			continue;
+		if (tIcon->boundingBox().containsPoint(p))
+			return true;
 	}
-	return true;
+	return false;
 }
 
-void CSelectDefense::initIconByTouch( CCTouch* pTouch )
+void CSelectDefense::initIconByPos( CCPoint pos )
 {
+	//人数已满不可选
+	if(m_bAllSelected) return;
+
 	char path[60] = {0};
 	sprintf(path,"headImg/%d.png",m_pDragHeroData->thumb);
-	CCPoint p = getPointByTouch(pTouch);
-	CImageView* tIcon = hasIconByTouch(pTouch);
-	if (tIcon)
+	for (auto t2Icon : mHeroIcons)
 	{
-		if (!tIcon->initWithFile(path))
-			tIcon->initWithFile("headImg/10008.png");
-		tIcon->setPosition(p);
-		tIcon->setUserData(m_pDragHeroData);
-		setSelectHeroEffect(getHeroImageFromScrollViewById(m_pDragHeroData->id), true);
-		int tGrid = getGridByPoint(tIcon->getPosition());
+		if (t2Icon->isVisible())
+			continue;
+
+		t2Icon->setPosition(pos);
+		t2Icon->setVisible(true);
+		if (!t2Icon->initWithFile(path))
+			t2Icon->initWithFile("headImg/10008.png");
+		t2Icon->setUserData(m_pDragHeroData);
+		int tGrid = getGridByPoint(t2Icon->getPosition());
 		if ( tGrid == C_OtherCaptain ){
 			updateCaptainSkill(m_pDragHeroData);
+			changeFloor(true);
 		}
-	}else{
-		for (auto t2Icon : mHeroIcons)
-		{
-			if (t2Icon->isVisible())
-				continue;
-			t2Icon->setPosition(p);
-			t2Icon->setVisible(true);
-			if (!t2Icon->initWithFile(path))
-				t2Icon->initWithFile("headImg/10008.png");
-			t2Icon->setUserData(m_pDragHeroData);
-			setSelectHeroEffect(getHeroImageFromScrollViewById(m_pDragHeroData->id), true);
-			int tGrid = getGridByPoint(t2Icon->getPosition());
-			if ( tGrid == C_OtherCaptain ){
-				updateCaptainSkill(m_pDragHeroData);
-			}
-			break;
-		}
+		setSelectHeroEffect(getHeroCellFromScrollViewById(m_pDragHeroData->id), true);
+		m_pDragHeroData = nullptr;
+		break;
 	}
 	updateSelectHeroNum();
 }
+
+void CSelectDefense::changeIconByPos( CImageView *pIcon, CCPoint pos )
+{
+	CHero *pHeroOld = (CHero *)pIcon->getUserData();
+
+	CImageView *pWaitMoveIcon = getWaitMoveIcon();
+	//没有待移动格子，正常替换，移除旧的，换上新的
+	if(pWaitMoveIcon == nullptr)
+	{
+		//清除旧的
+		setSelectHeroEffect(getHeroCellFromScrollViewById(pHeroOld->id), false);
+		//换上新的
+		setSelectHeroEffect(getHeroCellFromScrollViewById(m_pDragHeroData->id), true);
+
+		char path[60] = {0};
+		sprintf(path,"headImg/%d.png",m_pDragHeroData->thumb);
+		if (!pIcon->initWithFile(path))
+			pIcon->initWithFile("headImg/10008.png");
+		pIcon->setPosition(pos);
+		pIcon->setUserData(m_pDragHeroData);
+		int tGrid = getGridByPoint(pIcon->getPosition());
+		if ( tGrid == C_OtherCaptain ){
+			updateCaptainSkill(m_pDragHeroData);
+		}
+
+		m_pDragHeroData = nullptr;
+	}
+	//有待移动格子，交换
+	else
+	{
+		CCPoint pPosFlag = pIcon->getPosition();
+		pIcon->setPosition(pWaitMoveIcon->getPosition());
+		pWaitMoveIcon->setPosition(pPosFlag);
+
+		if ( getGridByPoint(pWaitMoveIcon->getPosition()) == C_OtherCaptain )
+		{
+			updateCaptainSkill((CHero *)pWaitMoveIcon->getUserData());
+			changeFloor(true);
+		}
+		else if( getGridByPoint(pIcon->getPosition()) == C_OtherCaptain )
+		{
+			updateCaptainSkill((CHero *)pIcon->getUserData());
+			changeFloor(true);
+		}
+		
+		setWaitMoveState(pWaitMoveIcon, false);
+
+	}
+
+	updateSelectHeroNum();
+}
+
+
+void CSelectDefense::removeIcon( CImageView *pIcon )
+{
+	CHero *pHero = (CHero *)pIcon->getUserData();
+
+	if(pHero)
+	{
+		setSelectHeroEffect(getHeroCellFromScrollViewById(pHero->id), false);
+	}
+
+	if (getGridByPoint(pIcon->getPosition()) == C_OtherCaptain)
+	{
+		updateCaptainSkill(nullptr);
+		changeFloor(false);
+		clearIcon();
+		m_gridView->reloadData();
+	}
+	else
+	{
+		pIcon->setVisible(false);
+		pIcon->setUserObject(nullptr);
+	}
+}
+
+
 
 void CSelectDefense::saveTeamData()
 {
@@ -904,13 +992,43 @@ void CSelectDefense::saveTeamData()
 		pNewMember->CopyFrom(*pMember);
 		delete pMember;
 	}
+
 	if (tSendState)
 	{
-		GetTcpNet->sendData(pPvpTeamData, SendPvpTeamDataMsg);
-		GetTcpNet->closeWait(0);
+		if(checkModify(*pPvpTeamData))
+		{
+			GetTcpNet->sendData(pPvpTeamData, SendPvpTeamDataMsg);
+			GetTcpNet->closeWait(0);
+		}
 	}
 		
 	delete pPvpTeamData;
+}
+
+bool CSelectDefense::checkModify( const PvpTeamData& newData )
+{
+	int iSize = mPvPData.team_size();
+
+	if(iSize != newData.team_size())
+	{
+		return true;
+	}
+
+	for(int i=0; i<iSize; i++)
+	{
+		const Member& oldMember = mPvPData.team().Get(i);
+		const Member& newMember = newData.team().Get(i);
+		if( oldMember.hero_id() != newMember.hero_id() 
+			|| oldMember.captin() != newMember.captin() 
+			|| oldMember.pos_x() != newMember.pos_x()
+			|| oldMember.pos_y() != newMember.pos_y()
+			)
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 
 void CSelectDefense::updateSelectHeroNum()
@@ -925,5 +1043,152 @@ void CSelectDefense::updateSelectHeroNum()
 		}
 	}
 	pNum->setString(CCString::createWithFormat("%d/%d", iNum, 5)->getCString());
+
+	m_bAllSelected = (iNum==5);
+}
+
+void CSelectDefense::setFloorEffect( bool bShow )
+{
+	if( bShow )
+	{
+		CCRepeatForever *pRep = CCRepeatForever::create(CCSequence::createWithTwoActions(
+			CCFadeTo::create(0.2f, 150),
+			CCFadeTo::create(0.2f, 255)
+			));
+		pRep->setTag(1);
+
+
+		if(isCaptainSelected())
+		{
+			CCArray* tChildren = m_pGreenLay->getChildren();
+			CCObject* obj = nullptr;
+			CCARRAY_FOREACH(tChildren,obj)
+			{
+				CCNode* tChild = (CCNode*)obj;
+				tChild->setVisible(true);
+				if(m_Captain->getActionByTag(1)==nullptr)
+				{
+					//人满了, 非移动，则只能替换现有的
+					CImageView *pWaitMoveIcon = getWaitMoveIcon();
+					bool isCaptain = false;
+					if(pWaitMoveIcon)
+					{
+						isCaptain = ( getGridByPoint(pWaitMoveIcon->getPosition()) == C_OtherCaptain);
+					}
+
+					if( (m_bAllSelected && !pWaitMoveIcon)  || (pWaitMoveIcon && isCaptain) )
+					{
+						if(checkIsHeroStandOnTile(tChild))
+						{
+							tChild->runAction((CCAction *)(pRep->copy()));
+						}
+					}
+					else
+					{
+						tChild->runAction((CCAction *)(pRep->copy()));
+					}
+				}
+			}
+		}
+		
+		if(m_Captain->getActionByTag(1)==nullptr)
+		{
+			m_Captain->runAction(pRep);
+		}
+
+	}
+	else
+	{
+		{
+			CCArray* tChildren = m_pGreenLay->getChildren();
+			CCObject* obj = nullptr;
+			CCARRAY_FOREACH(tChildren,obj)
+			{
+				CCNode* tChild = (CCNode*)obj;
+				tChild->stopAllActions();
+			}
+		}
+
+		m_Captain->stopAllActions();
+	}
+}
+
+bool CSelectDefense::checkIsHeroStandOnTile( CCNode *pTile )
+{
+	for (auto tIcon : mHeroIcons)
+	{
+		if (!tIcon->isVisible())
+			continue;
+		if (ccpDistance( tIcon->getPosition(), pTile->getPosition()) == 0)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+void CSelectDefense::setWaitMoveState( CImageView *pIcon, bool bFlag )
+{
+	if(bFlag)
+	{
+		//进入
+		if(pIcon->getActionByTag(SelectDefenseHeadWaitMoveAction) == nullptr)
+		{
+			CCRepeatForever *pRep = CCRepeatForever::create(CCSequence::createWithTwoActions(CCFadeTo::create(0.2f, 180), CCFadeTo::create(0.2f, 255)));
+			pRep->setTag(SelectDefenseHeadWaitMoveAction);
+			pIcon->runAction(pRep);
+			setFloorEffect(true);
+			m_pDragHeroData = (CHero *)pIcon->getUserData();
+		}
+
+	}else
+	{
+		//出去
+		pIcon->stopAllActions();
+		pIcon->setOpacity(255);
+		setFloorEffect(false);
+		m_pDragHeroData = nullptr;
+	}
+}
+
+
+CImageView * CSelectDefense::getWaitMoveIcon()
+{
+	for (auto tIcon : mHeroIcons)
+	{
+		if (!tIcon->isVisible())
+			continue;
+		if (tIcon->getActionByTag(SelectDefenseHeadWaitMoveAction)!=nullptr)
+		{
+			return tIcon;
+		}
+	}
+	return nullptr;
+}
+
+CImageView * CSelectDefense::getHeroIconById( int iId )
+{
+	for (auto tIcon : mHeroIcons)
+	{
+		if (!tIcon->isVisible())
+			continue;
+
+		CHero *pHero = (CHero *)tIcon->getUserData();
+		if(pHero)
+		{
+			if(pHero->id == iId)
+			{
+				return tIcon;
+			}
+		}
+	}
+	return nullptr;
+}
+
+void CSelectDefense::playStrategyEffect( int iIndex )
+{
+	m_pEffectLayer->setTouchEnabled(true);
+	m_pEffectLayer->setVisible(true);
+	m_pStrategyEffect[iIndex-1]->setAnimation(0, "stand", false);
 }
 

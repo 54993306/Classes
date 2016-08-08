@@ -36,15 +36,15 @@ namespace BattleSpace
 	}
 
 	// << 血量变化 >> 、 << 怒气值变化 >> 、<< 打击位移效果 >> 处理,目标为受击数组
-	BattleResult* HurtCount::AttackExcute(BaseRole* alive)
+	BattleResult* HurtCount::AttackExcute(BaseRole* pRole)
 	{
 		BattleResult* Result = BattleResult::create();
-		Result->setAlive(alive);
-		vector<BaseRole*>::iterator iter = alive->mAreaTargets.begin();
-		for (;iter != alive->mAreaTargets.end();iter ++)
+		Result->setAlive(pRole);
+		vector<BaseRole*>::iterator iter = pRole->mAreaTargets.begin();
+		for (;iter != pRole->mAreaTargets.end();iter ++)
 		{
 			BaseRole* HitAlive = *iter;
-			HurtExcute(Result,alive,HitAlive);
+			HurtExcute(Result,pRole,HitAlive);
 		}
 		EffectTypeExcute(Result);												//用于计算我方受伤信息
 		return Result;
@@ -135,7 +135,6 @@ namespace BattleSpace
 			m_Manage->setVerifyNum(pHurt);
 		}
 	}
-
 	//对一个武将造成伤害计算
 	STR_LostHp HurtCount::lostCount(BaseRole* AtcTarget , BaseRole* HitTarget)
 	{
@@ -160,7 +159,7 @@ namespace BattleSpace
 		HitTarget->setHp(HitTarget->getHp() - TotlaHurt);									//实际扣血
 		return hp;
 	}
-
+	//加血的公式是不存在的。
 	STR_LostHp HurtCount::gainCount(BaseRole* AtcTarget, BaseRole* HitTarget)
 	{
 		STR_LostHp str;

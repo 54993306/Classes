@@ -77,8 +77,8 @@ namespace BattleSpace{
 		m_HpObject = HPObject::create();
 		m_HpObject->initHp(this);
 		m_HpObject->retain();
-		m_HpObject->setPosition(ccp(0,-5));
-		m_Armature->addChild(m_HpObject, 100);
+		m_HpObject->setPosition(ccp(0,-60));
+		m_Body->addChild(m_HpObject, 100);					//设置血量对象添加的父节点
 		initAliveTypeIcon();
 	}
 	HPObject* AliveObject::getHp() { return m_HpObject; }
@@ -106,7 +106,12 @@ namespace BattleSpace{
 			CCLOG("[ *ERROR ] AliveObject::initAliveTypeIcon %s",tPath);
 		}
 		tTypeIcon->setScale(0.5f);
-		tTypeIcon->setPosition(ccp(-m_HpObject->getContentSize().width/2,0));			//在body处设置了翻转了
+		if (mRole->getOtherCamp())
+		{
+			tTypeIcon->setPosition(ccp(-m_HpObject->getContentSize().width/2,0));
+		}else{
+			tTypeIcon->setPosition(ccp(m_HpObject->getContentSize().width/2,0));	
+		}
 		m_HpObject->addChild(tTypeIcon);
 	}
 

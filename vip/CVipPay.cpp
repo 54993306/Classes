@@ -10,7 +10,7 @@
 #include "common/ShaderDataHelper.h"
 #define BUY_NUM 5
 
-CVipPay::CVipPay():m_ui(nullptr),m_pTelInput(nullptr),m_pCodeInput(nullptr),m_iCardId(0),m_bStep1Success(false),m_iTimeRemain(0),m_buyMoney(0),m_payStep(1)
+CVipPay::CVipPay():m_ui(nullptr),m_pTelInput(nullptr),m_pCodeInput(nullptr),m_iCardId(0),m_bStep1Success(false),m_iTimeRemain(0),m_buyMoney(0),m_payStep(1),m_iTag(0)
 {
 
 }
@@ -29,23 +29,16 @@ bool CVipPay::init()
 		//黑底
 		MaskLayer* pMaskLayer = MaskLayer::create("CVipPaymask");
 		pMaskLayer->setContentSize(winSize);
-		LayerManager::instance()->push(pMaskLayer, true);
+		LayerManager::instance()->push(pMaskLayer);
+		pMaskLayer->setOpacity(255);
+		pMaskLayer->setIsShowBlack(true);
+		this->setVisible(true);
 
 		m_ui = LoadComponent("PayBox.xaml");
 		m_ui->setTag(1);
 		m_ui->setPosition(VCENTER);
 		this->addChild(m_ui, 2);
 
-		this->setVisible(true);
-		CColorView *grad = CColorView::create(ccc4(53, 53, 53,255));
-		grad->setPosition(VCENTER);
-		grad->setContentSize(CCSize(1138,640));
-		m_ui->addChild(grad,-1);
-
-		CColorView *view = CColorView::create(ccc4(255, 255, 255,255));
-		view->setPosition(VCENTER);
-		view->setContentSize(CCSize(1138,430));
-		m_ui->addChild(view,-1);
 		return true;
 	}
 	return false;
@@ -99,20 +92,20 @@ void CVipPay::onEnter()
 	string sTel = CCUserDefault::sharedUserDefault()->getStringForKey(TELEPHONE, "");
 
 	CImageViewScale9* pRect1 = (CImageViewScale9*)m_ui->findWidgetById("rect_1");
-	m_pTelInput = CursorTextField::textFieldWithPlaceHolder(sTel.c_str(), FONT_NAME, 22, CCSize(690, 50), ccBLACK);
+	m_pTelInput = CursorTextField::textFieldWithPlaceHolder(sTel.c_str(), FONT_NAME, 22, CCSize(480, 50), ccBLACK);
 	m_pTelInput->setPriority(this->getTouchPriority());
 	m_pTelInput->setTextInput(sTel);
 	m_pTelInput->setLimitNum(17);
 	m_pTelInput->setAnchorPoint(ccp(0, 0.5f));
-	m_pTelInput->setPosition( ccp(pRect1->getPositionX()-332, pRect1->getPositionY()));
+	m_pTelInput->setPosition( ccp(pRect1->getPositionX()-235, pRect1->getPositionY()));
 	m_ui->addChild(m_pTelInput);
 
 	//验证码
 	CImageViewScale9* pRect2 = (CImageViewScale9*)m_ui->findWidgetById("rect_2");
-	m_pCodeInput = CursorTextField::textFieldWithPlaceHolder("", FONT_NAME, 22, CCSize(470, 50), ccBLACK);
+	m_pCodeInput = CursorTextField::textFieldWithPlaceHolder("", FONT_NAME, 22, CCSize(360, 50), ccBLACK);
 	m_pCodeInput->setPriority(this->getTouchPriority());
 	m_pCodeInput->setTextInput("");
-	m_pCodeInput->setPosition(ccp(pRect2->getPositionX()-332, pRect2->getPositionY()));
+	m_pCodeInput->setPosition(ccp(pRect2->getPositionX()-235, pRect2->getPositionY()));
 	m_pCodeInput->setLimitNum(10);
 	m_pCodeInput->setAnchorPoint(ccp(0, 0.5f));
 	m_ui->addChild(m_pCodeInput);
@@ -357,11 +350,13 @@ void CVipPay::setConfirmState(bool bSuccess)
 	text_confirm->setVisible(bSuccess);
 }
 
-void CVipPay::setPayItem(const char* name, const char* desc, int price)
+void CVipPay::setPayItem(int iTag, int price)
 {
-	CLabel* nameLab = (CLabel*)m_ui->findWidgetById("name");
-	nameLab->setString(name);
-	CLabel* descLab = (CLabel*)m_ui->findWidgetById("price");
-	descLab->setString(desc);
+	m_iTag = iTag;
 	m_buyMoney = price;
+	CLayout *pLayShow = (CLayout *)m_ui->findWidgetById(CCString::createWithFormat("buy_%d", iTag)->getCString());
+	if (pLayShow)
+	{
+		pLayShow->setVisible(true);
+	}
 }

@@ -236,6 +236,9 @@ void CRecruit::InitRecrui(int num1,int num2,int num3)
 		{
 			//图片从prop里面拿
 			sprintf(str1, "prop/%d.png", lotteryData.thumb);
+
+			pQuality->setTexture(setItemQualityTexture(lotteryData.iColor));
+
 			////读取数据
 			//const ItemData *data = DataCenter::sharedData()->getItemDesc()->getCfg(lotteryData.id);
 			//if(data)

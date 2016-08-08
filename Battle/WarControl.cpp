@@ -528,7 +528,7 @@ namespace BattleSpace
 		if (BattleData->getBattleModel()->isPvEBattle() && pRole->getCaptain())
 		{
 			btn->setEnabled(false);
-			btn->setColor(ccc3(150,150,150));
+			btn->setVisible(false);
 		}
 
 		EffectObject* CallAliveEffect = EffectObject::create("10028",sPlayType::eRepeat);			//call role effect
@@ -591,7 +591,7 @@ namespace BattleSpace
 	{
 		const RoleSkill* tSkill = pRole->getBaseData()->getActiveSkill();
 		const skEffectData* tEffect = tSkill->getSummonEffect();
-		BaseRoleData* tBaseData = BattleData->getCallRoleData(tEffect->getCallRoleID());
+		BaseRoleData* tBaseData = BattleData->getChildRoleData(tEffect->getCallRoleID());
 		if ( !tBaseData)
 		{
 			CCLOG("[ *ERROR ]WarControl::initCaptinButton  CallId =%d ",tEffect->getCallRoleID());
@@ -726,19 +726,19 @@ namespace BattleSpace
 		}
 	}
 	//call role log in battlefield
-	void WarControl::CallRoleEntranceBattle(BaseRole*alive)
+	void WarControl::CallRoleEntranceBattle(BaseRole*pRole)
 	{
-		BaseRole* pAlive = mManage->getAlive(alive->getFatherID());
-		CCNode* MoveLaout = getMoveLayout(pAlive->getUiLayout()-CL_BtnLayout1);
+		BaseRole* tRole = mManage->getAlive(pRole->getFatherID());
+		CCNode* MoveLaout = getMoveLayout(tRole->getUiLayout()-CL_BtnLayout1);
 		CButton* btn = (CButton*)MoveLaout->getChildByTag(CL_Btn);
-		initButtonBackImage(btn,pAlive->getCallAliveNum());
+		initButtonBackImage(btn,tRole->getCallAliveNum());
 
 		CProgressBar* CdBar = (CProgressBar*)MoveLaout->getChildByTag(CL_HeroPro);
 		btn->setEnabled(false);
-		mManage->changeCost( - pAlive->getBaseData()->getActiveSkill()->getExpendCost());
-		float tCdTime = pAlive->getBaseData()->getActiveSkill()->getCooldown();
+		mManage->changeCost( - tRole->getBaseData()->getActiveSkill()->getExpendCost());
+		float tCdTime = tRole->getBaseData()->getActiveSkill()->getCooldown();
 		float tDirectorTime = CCDirector::sharedDirector()->getScheduler()->getTimeScale();
-		if (pAlive->canSummonAlive())														//is call full
+		if (tRole->canSummonAlive())														//is call full
 			CdBar->startProgressFromTo(0,100,tCdTime/tDirectorTime);
 	}
 	//role log in battlefield or leave
@@ -778,6 +778,9 @@ namespace BattleSpace
 			return;
 		if (tRole->getFatherID())
 		{
+			BaseRole* tFather = mManage->getAlive(tRole->getFatherID());
+			if (!tFather || tFather->getCallType() == sCallType::eBoxHaveRole)
+				return;
 			CallRoleEntranceBattle(tRole);
 		}else{
 			AliveBattlefield(tRole);

@@ -35,7 +35,7 @@ public:
 	void sendChapterList(int type);   //获取章节列表  (0 普通关卡，1 精英关卡）
 	
 	void sendEnterStageForBoss(int hero1,int hero2, int hero3, int hero4, int hero5); //进入世界BOSS关卡
-	void sendPvEBattleInfo(int pRoleID,bool pAiState,vector<int>& pHeroID);
+	void sendPvEBattleInfo(int pRoleID,bool pAiState,vector<int>& pHeroID, bool bReven=false);
 	void sendEnterStage(int stageId,int hero1,int hero2, int hero3, int hero4, int hero5=0, int fid=0, int questId=0); //进入关卡 , //选择参战的好友ID, //选择参战的好友英雄ID
 	void sendStageInfo(int stageId); //获取关卡预览信息(64)
 	/*0 全部， 1 出战英雄， 2 未出战, 3 可驻守  4 可招募*/

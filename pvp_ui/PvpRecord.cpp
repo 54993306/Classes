@@ -17,7 +17,8 @@
 #include "Resources.h"
 #include "common/CommonFunction.h"
 #include "Global.h"
-
+#include "SelectPvpArmy.h"
+#include "SelectChallengeLayer.h"
 
 CPvpRecord::CPvpRecord():m_cell(nullptr),m_sRoleName("")
 {
@@ -117,8 +118,8 @@ void CPvpRecord::addTableCell(unsigned int uIdx, CTableViewCell* pCell)
 
 	//时间
 	int iMinuteAll = pRecord.battle_time();
-	int iDay = iMinuteAll/86400;
-	int iHour = (iMinuteAll%86400)/60;
+	int iDay = iMinuteAll/1440;
+	int iHour = (iMinuteAll%1440)/60;
 	int iMinute = iMinuteAll%60;
 	CLabel *pTime = (CLabel *)lay->findWidgetById("time");
 	if(iDay>0)
@@ -144,6 +145,19 @@ void CPvpRecord::addTableCell(unsigned int uIdx, CTableViewCell* pCell)
 	//数据更新-头像（fb），名称，等级，排名变化，战斗队伍
 	updateTeamInfo(recordDataLeft, 1, lay);
 	updateTeamInfo(recordDataRight, 2, lay);
+
+
+	//复仇
+	CButton *pReven = (CButton *)lay->findWidgetById("play");
+	if(pRecord.record_id() > 0)
+	{
+		pReven->setTag(uIdx);
+		pReven->setOnClickListener(this, ccw_click_selector(CPvpRecord::onReven));
+	}
+	else
+	{
+		pReven->setVisible(false);
+	}
 
 	while (lay->getChildrenCount()>0)
 	{
@@ -350,6 +364,30 @@ void CPvpRecord::imageLoadSuccessCallBack( string sTag, vector<char>* pBuffer )
 			pHead->setTexture(CCTextureCache::sharedTextureCache()->addImage(path.c_str()));
 		}
 	};
+}
+
+void CPvpRecord::onReven( CCObject *pSender )
+{
+	//复仇
+	CCNode *pNode = (CCNode *)pSender;
+	int uIdx = pNode->getTag();
+	const Record &pRecord = m_recordRes.record_list().Get(uIdx);
+
+	//防守方-蓝-play2
+	const RecordData& recordDataLeft = pRecord.player2();
+
+	//进入选人界面
+	CSelectPvpArmy *pSelArmy = CSelectPvpArmy::create();
+	pSelArmy->setRoleId(pRecord.record_id());
+	pSelArmy->setIsRobot(false);
+	pSelArmy->setEnemyRoleName(recordDataLeft.role_name());
+	pSelArmy->setEnemyRoleHead(recordDataLeft.role_thumb());
+	pSelArmy->setEnemyRoleFacebook(recordDataLeft.fb_id());
+	pSelArmy->setReven(true);
+	LayerManager::instance()->push(pSelArmy);
+
+	AskForGoToSelectPvpArmy(pRecord.record_id(), false);
+	CPlayerControl::getInstance().sendUnion(0, 0);
 }
 
 

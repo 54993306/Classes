@@ -145,6 +145,9 @@ bool AppDelegate::applicationDidFinishLaunching()
 	CSceneManager::sharedSceneManager()->runScene(GETSCENE(LogoScene));
 
 
+
+
+
 	//平台相关初始化
 	GamePlatformMgr->InitPlatForm();
 	

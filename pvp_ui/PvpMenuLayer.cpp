@@ -196,6 +196,7 @@ void CPvpMenuLayer::updateShowArea()
 				m_pShopLayer->setTouchPriority(LayerManager::instance()->getLayerManagerMinPriority()-1);
 				pLayer->addChild(m_pShopLayer);
 				m_pShopLayer->setPosition(pLayer->convertToNodeSpace(m_pShopLayer->getPosition()));
+				m_pShopLayer->setPositionY(m_pShopLayer->getPositionY()+22);
 			}			
 			CMainCityControl::getInstance()->sendShopRequest(4);
 			m_pShopLayer->setVisible(true);

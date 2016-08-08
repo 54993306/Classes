@@ -178,10 +178,11 @@ void protobuf_AssignDesc_pvp_5fprotocol_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(OppTeamRes));
   StartPvpReq_descriptor_ = file->message_type(6);
-  static const int StartPvpReq_offsets_[3] = {
+  static const int StartPvpReq_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(StartPvpReq, opp_id_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(StartPvpReq, is_robot_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(StartPvpReq, battle_hero_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(StartPvpReq, reven_),
   };
   StartPvpReq_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -252,8 +253,9 @@ void protobuf_AssignDesc_pvp_5fprotocol_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(PvpOverRes));
   PvpRecordRes_descriptor_ = file->message_type(10);
-  static const int PvpRecordRes_offsets_[1] = {
+  static const int PvpRecordRes_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PvpRecordRes, record_list_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PvpRecordRes, reven_time_),
   };
   PvpRecordRes_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -471,36 +473,37 @@ void protobuf_AddDesc_pvp_5fprotocol_2eproto() {
     "\002(\010\"r\n\nOppTeamRes\022\016\n\006result\030\001 \002(\005\022\027\n\017cap"
     "tin_skill_id\030\002 \002(\005\022&\n\thero_list\030\003 \003(\0132\023."
     "protos.common.Hero\022\023\n\013team_combat\030\004 \001(\005\""
-    "H\n\013StartPvpReq\022\016\n\006opp_id\030\001 \002(\005\022\020\n\010is_rob"
-    "ot\030\002 \002(\010\022\027\n\013battle_hero\030\003 \003(\005B\002\020\001\"\253\001\n\013St"
-    "artPvpRes\022\016\n\006result\030\005 \002(\010\022\016\n\006status\030\001 \001("
-    "\005\022&\n\topponents\030\002 \003(\0132\023.protos.common.Her"
-    "o\022&\n\thero_list\030\003 \003(\0132\023.protos.common.Her"
-    "o\022,\n\014call_monster\030\004 \003(\0132\026.protos.common."
-    "Monster\"Z\n\nPvpOverReq\022\025\n\rbattle_result\030\001"
-    " \002(\010\022\023\n\013battle_time\030\002 \001(\005\022\017\n\007blood_1\030\003 \001"
-    "(\005\022\017\n\007blood_2\030\004 \001(\005\"\214\001\n\nPvpOverRes\022\016\n\006re"
-    "sult\030\001 \002(\005\022\022\n\norg_points\030\002 \001(\005\022\022\n\nadd_po"
-    "ints\030\003 \001(\021\022\020\n\010pvp_coin\030\004 \001(\005\022#\n\tnext_ran"
-    "k\030\005 \001(\0132\020.protos.Opponent\022\017\n\007my_rank\030\006 \001"
-    "(\005\"3\n\014PvpRecordRes\022#\n\013record_list\030\001 \003(\0132"
-    "\016.protos.Record\"z\n\006Record\022\021\n\trecord_id\030\001"
-    " \001(\005\022\023\n\013battle_time\030\002 \001(\005\022#\n\007player1\030\003 \001"
-    "(\0132\022.protos.RecordData\022#\n\007player2\030\004 \001(\0132"
-    "\022.protos.RecordData\"\210\001\n\nRecordData\022\022\n\nro"
-    "le_thumb\030\001 \001(\005\022\021\n\trole_name\030\002 \001(\t\022\022\n\nrol"
-    "e_level\030\003 \001(\005\022\014\n\004rank\030\004 \001(\021\022\"\n\005teams\030\005 \003"
-    "(\0132\023.protos.common.Hero\022\r\n\005fb_id\030\006 \001(\t\"V"
-    "\n\006Member\022\017\n\007hero_id\030\001 \002(\005\022\016\n\006captin\030\002 \002("
-    "\010\022\r\n\005pos_x\030\003 \001(\005\022\r\n\005pos_y\030\004 \001(\005\022\r\n\005index"
-    "\030\005 \001(\005\"\266\001\n\010Opponent\022\017\n\007role_id\030\001 \002(\005\022\021\n\t"
-    "role_name\030\002 \001(\t\022\022\n\nrole_thumb\030\006 \001(\005\022\017\n\007r"
-    "ole_lv\030\003 \001(\005\022\016\n\006points\030\004 \001(\005\022\016\n\006combat\030\005"
-    " \001(\005\022\022\n\nhero_thumb\030\007 \001(\005\022\020\n\010is_robot\030\010 \001"
-    "(\010\022\r\n\005fb_id\030\t \001(\t\022\014\n\004rank\030\n \001(\005\"N\n\010PvpPr"
-    "ize\022\014\n\004rank\030\001 \001(\005\022\016\n\006points\030\002 \001(\005\022$\n\006pri"
-    "zes\030\003 \003(\0132\024.protos.common.PrizeB.\n\035dass."
-    "server.gameserver.protosB\013PvpProtocolH\001", 1759);
+    "W\n\013StartPvpReq\022\016\n\006opp_id\030\001 \002(\005\022\020\n\010is_rob"
+    "ot\030\002 \002(\010\022\027\n\013battle_hero\030\003 \003(\005B\002\020\001\022\r\n\005rev"
+    "en\030\004 \001(\010\"\253\001\n\013StartPvpRes\022\016\n\006result\030\005 \002(\010"
+    "\022\016\n\006status\030\001 \001(\005\022&\n\topponents\030\002 \003(\0132\023.pr"
+    "otos.common.Hero\022&\n\thero_list\030\003 \003(\0132\023.pr"
+    "otos.common.Hero\022,\n\014call_monster\030\004 \003(\0132\026"
+    ".protos.common.Monster\"Z\n\nPvpOverReq\022\025\n\r"
+    "battle_result\030\001 \002(\010\022\023\n\013battle_time\030\002 \001(\005"
+    "\022\017\n\007blood_1\030\003 \001(\005\022\017\n\007blood_2\030\004 \001(\005\"\214\001\n\nP"
+    "vpOverRes\022\016\n\006result\030\001 \002(\005\022\022\n\norg_points\030"
+    "\002 \001(\005\022\022\n\nadd_points\030\003 \001(\021\022\020\n\010pvp_coin\030\004 "
+    "\001(\005\022#\n\tnext_rank\030\005 \001(\0132\020.protos.Opponent"
+    "\022\017\n\007my_rank\030\006 \001(\005\"G\n\014PvpRecordRes\022#\n\013rec"
+    "ord_list\030\001 \003(\0132\016.protos.Record\022\022\n\nreven_"
+    "time\030\002 \001(\005\"z\n\006Record\022\021\n\trecord_id\030\001 \001(\005\022"
+    "\023\n\013battle_time\030\002 \001(\005\022#\n\007player1\030\003 \001(\0132\022."
+    "protos.RecordData\022#\n\007player2\030\004 \001(\0132\022.pro"
+    "tos.RecordData\"\210\001\n\nRecordData\022\022\n\nrole_th"
+    "umb\030\001 \001(\005\022\021\n\trole_name\030\002 \001(\t\022\022\n\nrole_lev"
+    "el\030\003 \001(\005\022\014\n\004rank\030\004 \001(\021\022\"\n\005teams\030\005 \003(\0132\023."
+    "protos.common.Hero\022\r\n\005fb_id\030\006 \001(\t\"V\n\006Mem"
+    "ber\022\017\n\007hero_id\030\001 \002(\005\022\016\n\006captin\030\002 \002(\010\022\r\n\005"
+    "pos_x\030\003 \001(\005\022\r\n\005pos_y\030\004 \001(\005\022\r\n\005index\030\005 \001("
+    "\005\"\266\001\n\010Opponent\022\017\n\007role_id\030\001 \002(\005\022\021\n\trole_"
+    "name\030\002 \001(\t\022\022\n\nrole_thumb\030\006 \001(\005\022\017\n\007role_l"
+    "v\030\003 \001(\005\022\016\n\006points\030\004 \001(\005\022\016\n\006combat\030\005 \001(\005\022"
+    "\022\n\nhero_thumb\030\007 \001(\005\022\020\n\010is_robot\030\010 \001(\010\022\r\n"
+    "\005fb_id\030\t \001(\t\022\014\n\004rank\030\n \001(\005\"N\n\010PvpPrize\022\014"
+    "\n\004rank\030\001 \001(\005\022\016\n\006points\030\002 \001(\005\022$\n\006prizes\030\003"
+    " \003(\0132\024.protos.common.PrizeB.\n\035dass.serve"
+    "r.gameserver.protosB\013PvpProtocolH\001", 1794);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "pvp_protocol.proto", &protobuf_RegisterTypes);
   PvpTeamData::default_instance_ = new PvpTeamData();
@@ -2168,6 +2171,7 @@ void OppTeamRes::Swap(OppTeamRes* other) {
 const int StartPvpReq::kOppIdFieldNumber;
 const int StartPvpReq::kIsRobotFieldNumber;
 const int StartPvpReq::kBattleHeroFieldNumber;
+const int StartPvpReq::kRevenFieldNumber;
 #endif  // !_MSC_VER
 
 StartPvpReq::StartPvpReq()
@@ -2188,6 +2192,7 @@ void StartPvpReq::SharedCtor() {
   _cached_size_ = 0;
   opp_id_ = 0;
   is_robot_ = false;
+  reven_ = false;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -2225,6 +2230,7 @@ void StartPvpReq::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     opp_id_ = 0;
     is_robot_ = false;
+    reven_ = false;
   }
   battle_hero_.Clear();
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -2285,6 +2291,22 @@ bool StartPvpReq::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(32)) goto parse_reven;
+        break;
+      }
+
+      // optional bool reven = 4;
+      case 4: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_reven:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
+                 input, &reven_)));
+          set_has_reven();
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -2327,6 +2349,11 @@ void StartPvpReq::SerializeWithCachedSizes(
       this->battle_hero(i), output);
   }
 
+  // optional bool reven = 4;
+  if (has_reven()) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(4, this->reven(), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -2359,6 +2386,11 @@ void StartPvpReq::SerializeWithCachedSizes(
       WriteInt32NoTagToArray(this->battle_hero(i), target);
   }
 
+  // optional bool reven = 4;
+  if (has_reven()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(4, this->reven(), target);
+  }
+
   if (!unknown_fields().empty()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
@@ -2379,6 +2411,11 @@ int StartPvpReq::ByteSize() const {
 
     // required bool is_robot = 2;
     if (has_is_robot()) {
+      total_size += 1 + 1;
+    }
+
+    // optional bool reven = 4;
+    if (has_reven()) {
       total_size += 1 + 1;
     }
 
@@ -2433,6 +2470,9 @@ void StartPvpReq::MergeFrom(const StartPvpReq& from) {
     if (from.has_is_robot()) {
       set_is_robot(from.is_robot());
     }
+    if (from.has_reven()) {
+      set_reven(from.reven());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -2460,6 +2500,7 @@ void StartPvpReq::Swap(StartPvpReq* other) {
     std::swap(opp_id_, other->opp_id_);
     std::swap(is_robot_, other->is_robot_);
     battle_hero_.Swap(&other->battle_hero_);
+    std::swap(reven_, other->reven_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);
@@ -3599,6 +3640,7 @@ void PvpOverRes::Swap(PvpOverRes* other) {
 
 #ifndef _MSC_VER
 const int PvpRecordRes::kRecordListFieldNumber;
+const int PvpRecordRes::kRevenTimeFieldNumber;
 #endif  // !_MSC_VER
 
 PvpRecordRes::PvpRecordRes()
@@ -3617,6 +3659,7 @@ PvpRecordRes::PvpRecordRes(const PvpRecordRes& from)
 
 void PvpRecordRes::SharedCtor() {
   _cached_size_ = 0;
+  reven_time_ = 0;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -3651,6 +3694,9 @@ PvpRecordRes* PvpRecordRes::New() const {
 }
 
 void PvpRecordRes::Clear() {
+  if (_has_bits_[1 / 32] & (0xffu << (1 % 32))) {
+    reven_time_ = 0;
+  }
   record_list_.Clear();
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
@@ -3673,6 +3719,22 @@ bool PvpRecordRes::MergePartialFromCodedStream(
           goto handle_uninterpreted;
         }
         if (input->ExpectTag(10)) goto parse_record_list;
+        if (input->ExpectTag(16)) goto parse_reven_time;
+        break;
+      }
+
+      // optional int32 reven_time = 2;
+      case 2: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_reven_time:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &reven_time_)));
+          set_has_reven_time();
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -3701,6 +3763,11 @@ void PvpRecordRes::SerializeWithCachedSizes(
       1, this->record_list(i), output);
   }
 
+  // optional int32 reven_time = 2;
+  if (has_reven_time()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->reven_time(), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -3716,6 +3783,11 @@ void PvpRecordRes::SerializeWithCachedSizes(
         1, this->record_list(i), target);
   }
 
+  // optional int32 reven_time = 2;
+  if (has_reven_time()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->reven_time(), target);
+  }
+
   if (!unknown_fields().empty()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
@@ -3726,6 +3798,15 @@ void PvpRecordRes::SerializeWithCachedSizes(
 int PvpRecordRes::ByteSize() const {
   int total_size = 0;
 
+  if (_has_bits_[1 / 32] & (0xffu << (1 % 32))) {
+    // optional int32 reven_time = 2;
+    if (has_reven_time()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->reven_time());
+    }
+
+  }
   // repeated .protos.Record record_list = 1;
   total_size += 1 * this->record_list_size();
   for (int i = 0; i < this->record_list_size(); i++) {
@@ -3760,6 +3841,11 @@ void PvpRecordRes::MergeFrom(const ::google::protobuf::Message& from) {
 void PvpRecordRes::MergeFrom(const PvpRecordRes& from) {
   GOOGLE_CHECK_NE(&from, this);
   record_list_.MergeFrom(from.record_list_);
+  if (from._has_bits_[1 / 32] & (0xffu << (1 % 32))) {
+    if (from.has_reven_time()) {
+      set_reven_time(from.reven_time());
+    }
+  }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
 
@@ -3786,6 +3872,7 @@ bool PvpRecordRes::IsInitialized() const {
 void PvpRecordRes::Swap(PvpRecordRes* other) {
   if (other != this) {
     record_list_.Swap(&other->record_list_);
+    std::swap(reven_time_, other->reven_time_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

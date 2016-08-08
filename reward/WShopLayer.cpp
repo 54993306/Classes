@@ -72,7 +72,14 @@ void CWShopLayer::onEnter()
 
 	UserData *user = DataCenter::sharedData()->getUser()->getUserData();
 	CLabel *ghost = (CLabel *)(m_ui->findWidgetById("ghost"));
-	ghost->setString(ToString(user->getRoleFood()));
+	if (m_buyType == 4)
+	{
+		ghost->setString(ToString(user->getRolePoints()));
+	}
+	else
+	{
+		ghost->setString(ToString(user->getRoleFood()));
+	}
 
 	////绑定活动列表回调
 //	GetTcpNet->registerMsgHandler(ActListMsg, this, CMsgHandler_selector(CWShopLayer::processNetMsg));
@@ -207,7 +214,17 @@ void CWShopLayer::processNetMsg( int type, google::protobuf::Message *msg )
 					UserData *user = DataCenter::sharedData()->getUser()->getUserData();
 					user->read(res->role());
 					CLabel *ghost = (CLabel *)(m_ui->findWidgetById("ghost"));
-					ghost->setString(ToString(user->getRoleFood()));
+
+					if (m_buyType == 4)
+					{
+						ghost->setString(ToString(user->getRolePoints()));
+					}
+					else
+					{
+						ghost->setString(ToString(user->getRoleFood()));
+					}
+					
+					
 					CSceneManager::sharedSceneManager()->PostMessageA(UPDATE_HERO,0,nullptr,nullptr);
 				}
 

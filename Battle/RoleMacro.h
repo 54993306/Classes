@@ -26,6 +26,7 @@ namespace BattleSpace
 		eAutoSkill					= 5,//陨石类即刻释放必杀技武将
 		eUNAddHP					= 6,//不可被加血类型武将
 		eOnlyOnce					= 7,//只攻击一次类型
+		eBoxHaveRole				= 8,//盒子类怪物,死亡时角色被召唤出来
 	};
 
 	enum struct sBehavior				//怪物类型
