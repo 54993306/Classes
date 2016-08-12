@@ -1,15 +1,15 @@
 ﻿#include "Battle/MoveRule.h"
 #include "Battle/ConstNum.h"
-#include "model/DataCenter.h"
+#include "Battle/BattleCenter.h"
 #include "Battle/BaseRole.h"
-#include "model/WarManager.h"
-#include "model/MapManager.h"
+#include "Battle/WarManager.h"
+#include "Battle/MapManager.h"
 #include "Battle/RoleObject/RoleObject.h"
 #include "Battle/BattleMessage.h"
 namespace BattleSpace{
 	MoveRule::MoveRule(){}
 
-	MoveRule::~MoveRule(){NOTIFICATION->removeAllObservers(this);}
+	MoveRule::~MoveRule(){bNotification->removeAllObservers(this);}
 
 	bool MoveRule::init()
 	{
@@ -76,7 +76,7 @@ namespace BattleSpace{
 				return INVALID_GRID;
 			return grid;
 		}
-		BaseRole* tRole = DataCenter::sharedData()->getWar()->getAliveByGrid(grid);
+		BaseRole* tRole = BattleManage->getAliveByGrid(grid);
 		if( tRole == nullptr|| tRole == pRole ||tRole->getEnemy())
 		{
 			return CountMoveGrid(pRole,grid);	
@@ -112,7 +112,7 @@ namespace BattleSpace{
 					canMove = false;						//判断行列变化是否超出边界
 					break;
 				}
-				BaseRole* p_Alive = DataCenter::sharedData()->getWar()->getAliveByGrid(us_point+c_Num);
+				BaseRole* p_Alive = BattleManage->getAliveByGrid(us_point+c_Num);
 				if (alive->getEnemy())
 				{
 					if (alive->getGridIndex()<C_BEGINGRID)

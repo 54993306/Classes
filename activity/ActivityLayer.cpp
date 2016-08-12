@@ -413,7 +413,7 @@ void CActivityLayer::addTableCell( unsigned int uIdx, CTableViewCell * pCell )
 
 	CActivity& pInfo = m_activity_list[m_activity_type][uIdx];
 
-	for (unsigned int i=1; i<=4; i++)
+	for (unsigned int i=1; i<=5; i++)
 	{
 		CCNode *child = lay->getChildByTag(i);
 		lay->removeChild(child);
@@ -486,6 +486,14 @@ void CActivityLayer::addTableCell( unsigned int uIdx, CTableViewCell * pCell )
 				//}
 			}
 			break;
+		case 5:
+			{
+				//红点
+				CImageView *pRedPoint = (CImageView *)child;
+				pRedPoint->setVisible(pInfo.bTips);
+
+			}
+			break;
 		default:
 			break;
 		}
@@ -511,6 +519,15 @@ void CActivityLayer::activityCellClick( CCObject* pObj )
 	if(m_index_selected[m_activity_type] != iCurrentSelectedIndex)
 	{
 		m_index_selected[m_activity_type] = iCurrentSelectedIndex;
+
+		CActivity& activity =  m_activity_list[m_activity_type].at(m_index_selected[m_activity_type]);
+		//去红点
+		if(activity.bTips)
+		{
+			activity.bTips = false;
+			CImageView *pRedPoint = (CImageView *)pImageView->getParent()->getChildByTag(5);
+			pRedPoint->setVisible(false);
+		}
 
 		//更新table
 		updateTableSelected(m_tableView[m_activity_type], m_index_selected[m_activity_type]);
@@ -627,6 +644,7 @@ void CActivityLayer::updateShowArea()
 			}break;
 			//收集类型
 		case 100:
+		case 101:
 			{
 				//额外显示
 				CActivityCollectLayer* pLayer = getCActivityCollectLayerById(activity.iActId);
@@ -634,6 +652,7 @@ void CActivityLayer::updateShowArea()
 				{
 					pLayer = CActivityCollectLayer::create();
 					pLayer->setTouchPriority(LayerManager::instance()->getPriority()-3);
+					pLayer->setExchangeType((CActivityCollectLayer::ExchangeType)(activity.iType));
 					pLayer->initBaseData(activity.exlist, activity.iActId);
 					pLayer->setPosition(m_ui->convertToNodeSpace(pLayer->getPosition()));
 					m_ui->addChild(pLayer, 9999);

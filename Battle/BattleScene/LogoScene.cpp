@@ -1,7 +1,6 @@
 ﻿#include "Battle/BattleScene/LogoScene.h"
 #include "tools/commonDef.h"
 #include "AppUI.h"
-#include "Global.h"
 #include "Battle/RoleObject/RoleObject.h"
 #include "tools/StringUtil.h"
 #include "Battle/EffectObject.h"
@@ -12,7 +11,6 @@
 #include "SimpleAudioEngine.h"
 #include "Battle/BattleLayer/StoryLayer.h"
 #include "../../../../plugin/plugins/jpush-cocos2d-x-plugin/Plugins/JPushService.h"
-#include "Global.h"
 #include "common/CGameSound.h"
 #include "common/ShaderDataHelper.h"
 #include "Battle/ActionNameDefine.h"
@@ -29,7 +27,7 @@ void LogoScene::onCreate()
 	this->addChild(LayoutRoot, 2);
 
 	CCLayerColor* pColorLayer = CCLayerColor::create(ccc4(255, 255, 255, 255));
-	pColorLayer->setContentSize(WINSIZE);
+	pColorLayer->setContentSize(CCDirector::sharedDirector()->getWinSize());
 	pColorLayer->setPosition(CCPointZero);
 	this->addChild(pColorLayer, 1);
 

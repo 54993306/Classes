@@ -113,7 +113,7 @@ void protobuf_AssignDesc_act_5fprotocol_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(BuyGiftRes));
   Activity_descriptor_ = file->message_type(4);
-  static const int Activity_offsets_[8] = {
+  static const int Activity_offsets_[9] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Activity, actid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Activity, type_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Activity, name_),
@@ -121,6 +121,7 @@ void protobuf_AssignDesc_act_5fprotocol_2eproto() {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Activity, icon_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Activity, pic_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Activity, param_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Activity, tips_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Activity, exchange_),
   };
   Activity_reflection_ =
@@ -135,11 +136,12 @@ void protobuf_AssignDesc_act_5fprotocol_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Activity));
   ExList_descriptor_ = file->message_type(5);
-  static const int ExList_offsets_[4] = {
+  static const int ExList_offsets_[5] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ExList, exid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ExList, oitems_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ExList, titems_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ExList, achieve_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ExList, exlevel_),
   };
   ExList_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -209,15 +211,16 @@ void protobuf_AddDesc_act_5fprotocol_2eproto() {
     "\030\003 \001(\005\022!\n\007actList\030\002 \003(\0132\020.protos.Activit"
     "y\")\n\nBuyGiftReq\022\r\n\005actId\030\001 \002(\005\022\014\n\004exId\030\002"
     " \001(\005\"A\n\nBuyGiftRes\022\016\n\006result\030\001 \002(\005\022#\n\005it"
-    "ems\030\002 \003(\0132\024.protos.common.Prize\"\221\001\n\010Acti"
+    "ems\030\002 \003(\0132\024.protos.common.Prize\"\237\001\n\010Acti"
     "vity\022\r\n\005actId\030\001 \002(\005\022\014\n\004type\030\002 \001(\005\022\014\n\004nam"
     "e\030\003 \001(\t\022\016\n\006status\030\004 \001(\005\022\014\n\004icon\030\005 \001(\t\022\013\n"
-    "\003pic\030\006 \001(\t\022\r\n\005param\030\007 \001(\005\022 \n\010exchange\030\010 "
-    "\003(\0132\016.protos.ExList\"s\n\006ExList\022\014\n\004exId\030\001 "
-    "\002(\005\022$\n\006oItems\030\002 \003(\0132\024.protos.common.Priz"
-    "e\022$\n\006tItems\030\003 \003(\0132\024.protos.common.Prize\022"
-    "\017\n\007achieve\030\004 \001(\010B.\n\035dass.server.gameserv"
-    "er.protosB\013ActProtocolH\001", 584);
+    "\003pic\030\006 \001(\t\022\r\n\005param\030\007 \001(\005\022\014\n\004tips\030\t \001(\010\022"
+    " \n\010exchange\030\010 \003(\0132\016.protos.ExList\"\204\001\n\006Ex"
+    "List\022\014\n\004exId\030\001 \002(\005\022$\n\006oItems\030\002 \003(\0132\024.pro"
+    "tos.common.Prize\022$\n\006tItems\030\003 \003(\0132\024.proto"
+    "s.common.Prize\022\017\n\007achieve\030\004 \001(\010\022\017\n\007exLev"
+    "el\030\005 \001(\005B.\n\035dass.server.gameserver.proto"
+    "sB\013ActProtocolH\001", 616);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "act_protocol.proto", &protobuf_RegisterTypes);
   ActListReq::default_instance_ = new ActListReq();
@@ -1268,6 +1271,7 @@ const int Activity::kStatusFieldNumber;
 const int Activity::kIconFieldNumber;
 const int Activity::kPicFieldNumber;
 const int Activity::kParamFieldNumber;
+const int Activity::kTipsFieldNumber;
 const int Activity::kExchangeFieldNumber;
 #endif  // !_MSC_VER
 
@@ -1294,6 +1298,7 @@ void Activity::SharedCtor() {
   icon_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   pic_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   param_ = 0;
+  tips_ = false;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -1357,6 +1362,7 @@ void Activity::Clear() {
       }
     }
     param_ = 0;
+    tips_ = false;
   }
   exchange_.Clear();
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -1494,6 +1500,22 @@ bool Activity::MergePartialFromCodedStream(
           goto handle_uninterpreted;
         }
         if (input->ExpectTag(66)) goto parse_exchange;
+        if (input->ExpectTag(72)) goto parse_tips;
+        break;
+      }
+
+      // optional bool tips = 9;
+      case 9: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_tips:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
+                 input, &tips_)));
+          set_has_tips();
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -1569,6 +1591,11 @@ void Activity::SerializeWithCachedSizes(
       8, this->exchange(i), output);
   }
 
+  // optional bool tips = 9;
+  if (has_tips()) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(9, this->tips(), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -1634,6 +1661,11 @@ void Activity::SerializeWithCachedSizes(
         8, this->exchange(i), target);
   }
 
+  // optional bool tips = 9;
+  if (has_tips()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(9, this->tips(), target);
+  }
+
   if (!unknown_fields().empty()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
@@ -1694,6 +1726,11 @@ int Activity::ByteSize() const {
           this->param());
     }
 
+    // optional bool tips = 9;
+    if (has_tips()) {
+      total_size += 1 + 1;
+    }
+
   }
   // repeated .protos.ExList exchange = 8;
   total_size += 1 * this->exchange_size();
@@ -1751,6 +1788,9 @@ void Activity::MergeFrom(const Activity& from) {
     if (from.has_param()) {
       set_param(from.param());
     }
+    if (from.has_tips()) {
+      set_tips(from.tips());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -1785,6 +1825,7 @@ void Activity::Swap(Activity* other) {
     std::swap(icon_, other->icon_);
     std::swap(pic_, other->pic_);
     std::swap(param_, other->param_);
+    std::swap(tips_, other->tips_);
     exchange_.Swap(&other->exchange_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
@@ -1808,6 +1849,7 @@ const int ExList::kExIdFieldNumber;
 const int ExList::kOItemsFieldNumber;
 const int ExList::kTItemsFieldNumber;
 const int ExList::kAchieveFieldNumber;
+const int ExList::kExLevelFieldNumber;
 #endif  // !_MSC_VER
 
 ExList::ExList()
@@ -1828,6 +1870,7 @@ void ExList::SharedCtor() {
   _cached_size_ = 0;
   exid_ = 0;
   achieve_ = false;
+  exlevel_ = 0;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -1865,6 +1908,7 @@ void ExList::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     exid_ = 0;
     achieve_ = false;
+    exlevel_ = 0;
   }
   oitems_.Clear();
   titems_.Clear();
@@ -1935,6 +1979,22 @@ bool ExList::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(40)) goto parse_exLevel;
+        break;
+      }
+
+      // optional int32 exLevel = 5;
+      case 5: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_exLevel:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &exlevel_)));
+          set_has_exlevel();
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -1979,6 +2039,11 @@ void ExList::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteBool(4, this->achieve(), output);
   }
 
+  // optional int32 exLevel = 5;
+  if (has_exlevel()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(5, this->exlevel(), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -2011,6 +2076,11 @@ void ExList::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(4, this->achieve(), target);
   }
 
+  // optional int32 exLevel = 5;
+  if (has_exlevel()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(5, this->exlevel(), target);
+  }
+
   if (!unknown_fields().empty()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
@@ -2032,6 +2102,13 @@ int ExList::ByteSize() const {
     // optional bool achieve = 4;
     if (has_achieve()) {
       total_size += 1 + 1;
+    }
+
+    // optional int32 exLevel = 5;
+    if (has_exlevel()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->exlevel());
     }
 
   }
@@ -2085,6 +2162,9 @@ void ExList::MergeFrom(const ExList& from) {
     if (from.has_achieve()) {
       set_achieve(from.achieve());
     }
+    if (from.has_exlevel()) {
+      set_exlevel(from.exlevel());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -2113,6 +2193,7 @@ void ExList::Swap(ExList* other) {
     oitems_.Swap(&other->oitems_);
     titems_.Swap(&other->titems_);
     std::swap(achieve_, other->achieve_);
+    std::swap(exlevel_, other->exlevel_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

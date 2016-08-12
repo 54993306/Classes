@@ -27,9 +27,8 @@
 #include "Battle/BattleModel.h"
 
 #include "tools/ShowTexttip.h"
-#include "model/DataCenter.h"
-
-#include "model/WarManager.h"
+#include "Battle/BattleCenter.h"
+#include "Battle/WarManager.h"
 #include "common/CGameSound.h"
 #include "netcontrol/CPlayerControl.h"
 namespace BattleSpace
@@ -45,7 +44,7 @@ namespace BattleSpace
 	bool BattleClose::init()
 	{
 		eventMonitor();
-		mManage = DataCenter::sharedData()->getWar();
+		mManage = BattleManage;
 		return true;
 	}
 
@@ -71,7 +70,7 @@ namespace BattleSpace
 		bNotification->postNotification(MsgNextBatchEnemy);
 		if ( !mManage->lastBatch())
 			displayRoundTips(nullptr);
-		DataCenter::sharedData()->getCombatGuideMg()->setCurrBatchGuide(nullptr);
+		ManageCenter->getCombatGuideMg()->setCurrBatchGuide(nullptr);
 		if(mManage->lastBatch() && !mManage->getAliveByType(sMonsterSpecies::eBoss))
 			bNotification->postNotification(MsgShowStageWarning);
 	}

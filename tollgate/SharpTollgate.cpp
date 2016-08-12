@@ -13,9 +13,10 @@
 #include "tools/UICloneMgr.h"
 #include "StageData.h"
 #include "model/DataCenter.h"
-#include "model/WarManager.h"
+#include "Battle/WarManager.h"
 #include "Sweep.h"
 #include "TollgatePreview.h"
+#include "Battle/BattleCenter.h"
 #include "Battle/AnimationManager.h"
 
 using namespace BattleSpace;
@@ -222,14 +223,14 @@ void CSharpTollgate::onBattle(CCObject* pSender)
 	int zorder = btn->getZOrder();
 	if (stage&&stage->isOpen)
 	{
-		DataCenter::sharedData()->getWar()->setLastStageId(stage->id); 
+		BattleManage->setLastStageId(stage->id); 
 		if (stage->star>=1)
-			DataCenter::sharedData()->getWar()->setFirstStage(false);
+			BattleManage->setFirstStage(false);
 		//DataCenter::sharedData()->getWar()->setTollgate(*stage); 
-		DataCenter::sharedData()->getWar()->setStageType(zorder);
-		DataCenter::sharedData()->getWar()->setNormal(false);
-		DataCenter::sharedData()->getWar()->setChapterIndex(m_chapter);
-		DataCenter::sharedData()->getWar()->setChapterCount(m_openChapter);
+		BattleManage->setStageType(zorder);
+		BattleManage->setNormal(false);
+		BattleManage->setChapterIndex(m_chapter);
+		BattleManage->setChapterCount(m_openChapter);
 
 		CTollgatePreview *preview = CTollgatePreview::create();
 		preview->setIsLastStageInChapter(stage->id==m_stageList.at(m_stageList.size()-1).id&&stage->star<=0);

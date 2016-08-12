@@ -13,7 +13,8 @@
 #include "common/CCRollLabelAction.h"
 #include <spine/spine-cocos2dx.h>
 #include "model/DataCenter.h"
-#include "model/WarManager.h"
+#include "Battle/BattleCenter.h"
+#include "Battle/WarManager.h"
 
 using namespace spine;
 using namespace BattleSpace;
@@ -279,7 +280,7 @@ void CDefendWuJiang::onSelectHero(CCObject* pSender)
 		CImageView* pBoard = (CImageView*)m_ui->findWidgetById("board_2");
 		int m_ModeID = hero.thumb;
 		//===============================================================================================
-		if (DataCenter::sharedData()->getWar()->isSpine(m_ModeID))
+		if (BattleManage->isSpine(m_ModeID))
 		{ 
 			char json[60] = {0};
 			char altlas[60] = {0};

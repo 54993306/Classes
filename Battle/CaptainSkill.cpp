@@ -1,9 +1,9 @@
-﻿#include "CaptainSkill.h"
-#include "model/DataCenter.h"
+﻿#include "Battle/CaptainSkill.h"
+#include "Battle/BattleCenter.h"
 #include "Battle/BaseRole.h"
-#include "SkillRange.h"
-#include "model/WarManager.h"
-#include "model/MapManager.h"
+#include "Battle/SkillRange.h"
+#include "Battle/WarManager.h"
+#include "Battle/MapManager.h"
 #include "Battle/ConstNum.h"
 #include "Battle/RoleSkill.h"
 #include "Battle/BaseRoleData.h"
@@ -16,11 +16,11 @@ namespace BattleSpace
 		CCArray* tArray = nullptr;
 		if (pOther)
 		{
-			tRole  = DataCenter::sharedData()->getWar()->getAliveByGrid(C_OtherCaptain);
-			tArray = DataCenter::sharedData()->getWar()->getMonsters(true);
+			tRole  = BattleManage->getAliveByGrid(C_OtherCaptain);
+			tArray = BattleManage->getMonsters(true);
 		}else{
-			tRole  = DataCenter::sharedData()->getWar()->getAliveByGrid(C_CAPTAINGRID);
-			tArray = DataCenter::sharedData()->getWar()->getHeros(true);
+			tRole  = BattleManage->getAliveByGrid(C_CAPTAINGRID);
+			tArray = BattleManage->getHeros(true);
 		}
 		if (!tRole||!tArray|| !tArray->count()||
 			!tRole->getBaseData()->hasCaptainSkill())

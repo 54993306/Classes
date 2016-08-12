@@ -3,7 +3,7 @@
 #include "Battle/BaseRoleData.h"
 #include "Battle/ConstNum.h"
 #include "Battle/BattleTools.h"
-#include "model/WarManager.h"
+#include "Battle/WarManager.h"
 namespace BattleSpace{
 	GuardArea::GuardArea(WarManager* pManage)
 		:mManage(pManage)

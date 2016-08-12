@@ -7,7 +7,7 @@
 #include "tools/UICloneMgr.h"
 #include "netcontrol/CPlayerControl.h"
 #include "common/color.h"
-#include "model/WarManager.h"
+#include "Battle/WarManager.h"
 #include "Sweep.h"
 #include "TollgatePreview.h"
 #include "sign/PopItem.h"
@@ -16,7 +16,7 @@
 #include "guide/GuideManager.h"
 #include "tools/ShowTexttip.h"
 #include "common/CommonFunction.h"
-
+#include "Battle/BattleCenter.h"
 #include "common/CGameSound.h"
 #include "Resources.h"
 #include "common/ShaderDataHelper.h"
@@ -1098,14 +1098,14 @@ void CTollgateLayer::onBattle(CCObject* pSender)
 		if (stage&&stage->isOpen && stage->id!=m_iFirstLockedStage)
 		{
 			//DataCenter::sharedData()->getWar()->setChapter(m_chapterList[m_isStory][m_selectChapterIndex-1]);
-			DataCenter::sharedData()->getWar()->setLastStageId(stage->id); 
+			BattleManage->setLastStageId(stage->id); 
 			if (stage->star>=1)
-				DataCenter::sharedData()->getWar()->setFirstStage(false);
+				BattleManage->setFirstStage(false);
 			//DataCenter::sharedData()->getWar()->setTollgate(*stage); 
-			DataCenter::sharedData()->getWar()->setStageType(zorder);
-			DataCenter::sharedData()->getWar()->setNormal(m_isStory);
-			DataCenter::sharedData()->getWar()->setChapterIndex(m_selectChapterIndex);
-			DataCenter::sharedData()->getWar()->setChapterCount(m_iOpenChapterCount[m_isStory]);
+			BattleManage->setStageType(zorder);
+			BattleManage->setNormal(m_isStory);
+			BattleManage->setChapterIndex(m_selectChapterIndex);
+			BattleManage->setChapterCount(m_iOpenChapterCount[m_isStory]);
 
 			CTollgatePreview *preview = CTollgatePreview::create();
 			preview->setIsLastStageInChapter(isLasStageInChapter(*stage));

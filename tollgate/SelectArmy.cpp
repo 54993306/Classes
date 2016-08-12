@@ -21,8 +21,8 @@
 #include "Resources.h"
 
 #include "model/DataCenter.h"
-#include "model/WarManager.h"
-
+#include "Battle/WarManager.h"
+#include "Battle/BattleCenter.h"
 CSelectArmy::~CSelectArmy()
 {
 	CC_SAFE_RELEASE(m_cell);
@@ -440,7 +440,7 @@ void CSelectArmy::onCombat(CCObject* pSender)
 				m_union.heroList.at(2).id,
 				m_union.heroList.at(3).id,
 				m_union.heroList.at(4).id);
-			DataCenter::sharedData()->getWar()->setWorldBoss(true);
+			BattleManage->setWorldBoss(true);
 		}else{
 			CPlayerControl::getInstance().sendEnterStage(
 				m_stageId,

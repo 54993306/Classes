@@ -9,7 +9,7 @@
 
 #include "AppUI.h"
 #include "scene/layer/LayerManager.h"
-#include "model/BattleData.h"
+#include "model/CRoleData.h"
 
 enum struct HeroEvolveEffectuUnlockType;
 

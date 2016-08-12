@@ -19,6 +19,12 @@ class CItemInfo;
 class CActivityCollectLayer: public BaseLayer
 {
 public:
+	enum ExchangeType
+	{
+		ExchangeTypeNormal = 100,		//普通兑换
+		ExchangeTypeByLevel = 101		//按等级兑换
+	};
+
 	CActivityCollectLayer();
 	~CActivityCollectLayer();
 	
@@ -32,6 +38,8 @@ public:
 
 	//重置兑换信息
 	void restData();
+
+	CC_SYNTHESIZE(ExchangeType, m_iExchangeType, ExchangeType)
 
 private:
 	void initTableView();
@@ -69,5 +77,4 @@ private:
 
 	//当前兑换条目
 	ExList* m_pCurrentExlist;
-
 };

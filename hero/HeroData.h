@@ -1,7 +1,7 @@
 ﻿#ifndef __HERO_DATA_
 #define __HERO_DATA_
 #include "protos/protocol.h"
-#include "model/BattleData.h"
+#include "model/CRoleData.h"
 
 struct CEvolQuest 
 {

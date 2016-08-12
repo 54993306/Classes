@@ -10,7 +10,7 @@
 #include "AppUI.h"
 #include "scene/layer/LayerManager.h"
 #include "protos/protocol.h"
-#include "model/BattleData.h"
+#include "model/CRoleData.h"
 #include "spine/spine-cocos2dx.h"
 
 #define SelectDefenseHeadWaitMoveAction 1

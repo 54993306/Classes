@@ -15,10 +15,10 @@
 #include "Battle/ConstNum.h"
 #include "MoveRule.h"
 #include "Battle/BaseRoleData.h"
-#include "model/BuffManage.h"
+#include "Battle/BuffManage.h"
 #include "Battle/BaseRole.h"
-#include "model/DataCenter.h"
-#include "model/WarManager.h"
+#include "Battle/BattleCenter.h"
+#include "Battle/WarManager.h"
 #include "Battle/BattleResult.h"
 #include "common/CommonFunction.h"
 #include "Battle/RoleObject/HPObject.h"
@@ -31,7 +31,7 @@ namespace BattleSpace
 	HurtCount::~HurtCount(){}
 	bool HurtCount::init()
 	{
-		m_Manage = DataCenter::sharedData()->getWar();
+		m_Manage = BattleManage;
 		return true;
 	}
 
@@ -65,7 +65,7 @@ namespace BattleSpace
 		int grid = MoveRule::create()->FrontBack(HitAlive,effect->getRepel(),tEnemy);
 		if (grid != INVALID_GRID)
 		{
-			if (!DataCenter::sharedData()->getWar()->getNormal())
+			if (!m_Manage->getNormal())
 			{
 				if (grid >= C_PVEStopGrid)
 					return grid;
@@ -177,8 +177,8 @@ namespace BattleSpace
 		//属性影响类型*属性影响频率*浮动值+真实伤害
 		addNum = base_hp + hurt;
 		str.hitType = gainType;											//加血只显示一种字体
-		str.hitNum = addNum;		
-		if (HitTarget->getCallType() != sCallType::eUNAddHP)						//不可被加血类型武将
+		str.hitNum = HitTarget->getRenew()*effect->getDamageRate();		
+		if (HitTarget->getCallType() != sCallType::eUNAddHP)				//不可被加血类型武将
 			HitTarget->setHp(HitTarget->getHp() + str.hitNum);			//血量实际变化的位置
 		return str;
 	}
@@ -229,14 +229,14 @@ namespace BattleSpace
 	//根据不同的效果类型对攻击武将进行不同处理,扣自己血量给其他目标加血
 	void HurtCount::EffectTypeExcute( BattleResult*Result )
 	{
-		BaseRole *alive = Result->getAlive();
-		const skEffectData* effect = alive->getCurrEffect();
-		int tLostHp = getAllTargetLostHp(Result);
+		BaseRole *tRole = Result->getAlive();
+		const skEffectData* effect = tRole->getCurrEffect();
+		int tLostHp = abs(getAllTargetLostHp(Result));				//掉血的具体数字
 		switch (effect->getCountType())
 		{
 		case eEffectCountType::eSuckblood:	//吸血型效果
 			{		
-				alive->setHp(alive->getHp() + effect->getImpactRate()*tLostHp*0.01f);
+				tRole->setHp(tRole->getHp() + effect->getImpactRate()*tLostHp*0.01f);
 				Result->setusNum(effect->getImpactRate()*tLostHp*0.01f);																
 				Result->setusType(gainType);
 			}break;
@@ -244,24 +244,24 @@ namespace BattleSpace
 			{
 				Result->setusNum(- effect->getImpactRate());											//爆炸中用于计算自身伤害的血量
 				Result->setusType(generalType);
-				alive->setHp(alive->getHp() - effect->getImpactRate());
+				tRole->setHp(tRole->getHp() - effect->getImpactRate());
 			}break;
 		case eEffectCountType::eRateBlood:	//扣自己最大血量百分比型吸血技能,可加减血互换
 			{
-				alive->setHp(alive->getHp() - effect->getImpactNumber()*0.01f*alive->getMaxHp()+effect->getImpactRate()*tLostHp*0.01f);		
-				Result->setusNum(effect->getImpactRate()*tLostHp*0.01f- effect->getImpactNumber()*0.01f*alive->getMaxHp());																
+				tRole->setHp(tRole->getHp() - effect->getImpactNumber()*0.01f*tRole->getMaxHp()+effect->getImpactRate()*tLostHp*0.01f);		
+				Result->setusNum(effect->getImpactRate()*tLostHp*0.01f- effect->getImpactNumber()*0.01f*tRole->getMaxHp());																
 				Result->setusType(generalType);
 			}break;
 		case eEffectCountType::eNumberBoold:
 			{
-				alive->setHp(alive->getHp() - effect->getImpactNumber()+effect->getImpactRate()*tLostHp*0.01f);	//扣自己数值血量型吸血技能,可加减血互换
+				tRole->setHp(tRole->getHp() - effect->getImpactNumber()+effect->getImpactRate()*tLostHp*0.01f);	//扣自己数值血量型吸血技能,可加减血互换
 				Result->setusNum(effect->getImpactRate()*tLostHp*0.01f-effect->getImpactNumber());																
 				Result->setusType(generalType);
 			}break;
 		case eEffectCountType::eCurrBooldRate:
 			{
-				alive->setHp(alive->getHp() - effect->getImpactNumber()*0.01f*alive->getHp());		
-				Result->setusNum(effect->getImpactRate()*tLostHp*0.01f-effect->getImpactNumber()*0.01f*alive->getMaxHp());																
+				tRole->setHp(tRole->getHp() - effect->getImpactNumber()*0.01f*tRole->getHp());		
+				Result->setusNum(effect->getImpactRate()*tLostHp*0.01f-effect->getImpactNumber()*0.01f*tRole->getMaxHp());																
 				Result->setusType(generalType);
 			}break;
 		}
@@ -314,7 +314,7 @@ namespace BattleSpace
 	void HurtCount::BuffHandleLogic(BaseRole* pAlive)
 	{
 #if BATTLE_TEST
-		return ;
+		//return ;
 #endif
 		const skEffectData* tKillEffect = pAlive->getCurrEffect();
 		BuffManage* AtcbufManege = pAlive->getBuffManage();

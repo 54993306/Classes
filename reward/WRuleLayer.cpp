@@ -215,7 +215,7 @@ void CWRuleLayer::initRank(BossPrizes* pPrizes)
 
 void CWRuleLayer::goRank(CCObject* pSender)
 {
-	CRankLayer *rank = CRankLayer::create();
-	LayerManager::instance()->push(rank);
-	CPlayerControl::getInstance().sendRank(1);
+	//CRankLayer *rank = CRankLayer::create();
+	//LayerManager::instance()->push(rank);
+	//CPlayerControl::getInstance().sendRank(1);
 }

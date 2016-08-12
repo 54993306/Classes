@@ -1,5 +1,4 @@
 ﻿#include "PvpEndLayer.h"
-#include "Global.h"
 #include "netcontrol/CPlayerControl.h"
 #include "common/color.h"
 #include "net/CNetClient.h"
@@ -9,7 +8,7 @@
 #include "bag/bagData.h"
 #include "tollgate/Chapter.h"
 #include "model/DataCenter.h"
-#include "model/WarManager.h"
+#include "Battle/WarManager.h"
 #include "Battle/RandomBusineseMan.h"
 #include "guide/GuideManager.h"
 #include "tollgate/ItemInfo.h"
@@ -22,6 +21,7 @@
 #include "common/CCMixLabelAction.h"
 #include "sdk/FaceBookSDK.h"
 #include "Global.h"
+#include "Battle/BattleCenter.h"
 
 PvpEndLayer::PvpEndLayer():m_rank(0),m_bIsWin(true)
 {
@@ -298,7 +298,7 @@ void PvpEndLayer::onExitClick(CCObject *pSender)
 
 void PvpEndLayer::shareFb(CCObject *pSender)
 {
-	int stageId = DataCenter::sharedData()->getWar()->getStageID();
+	int stageId = BattleManage->getStageID();
 	const ShareData *data = DataCenter::sharedData()->getShareData()->getCfg(10);
 	CCString *desc = CCString::createWithFormat(data->desc.c_str(),m_rank);
 	CCString *url = CCString::createWithFormat(data->url.c_str(),stageId);

@@ -12,13 +12,13 @@
   *
   *************************************************************/
 
-#include "BattleScene.h"
+#include "Battle/BattleScene/BattleScene.h"
 #include "tools/commonDef.h"
-#include "model/DataCenter.h"
-#include "model/WarManager.h"
-#include "model/MapManager.h"
+#include "Battle/BattleCenter.h"
+#include "Battle/WarManager.h"
+#include "Battle/MapManager.h"
 #include "Battle/DropItem.h"
-#include "model/terrainLayer.h"
+#include "Battle/Landform/terrainLayer.h"
 #include "Battle/WarControl.h"
 #include "scene/layer/BackLayer.h"
 #include "Battle/ComBatLogic.h"
@@ -44,6 +44,7 @@
 #include "Battle/BattleDataCenter.h"
 #include "Battle/BattleModel.h"
 #include "Battle/PvpEndLayer.h"
+#include "model/DataCenter.h"
 
 namespace BattleSpace
 {
@@ -78,7 +79,7 @@ namespace BattleSpace
 
 	void BattleScene::onCreate()
 	{
-		WarMapData* mapData = DataCenter::sharedData()->getMap()->getCurrWarMap();
+		WarMapData* mapData = ManageCenter->getMap()->getCurrWarMap();
 		m_MoveLayer = CCNode::create();					//可以移动的节点包含地图和武将
 		addChild(m_MoveLayer);
 		if (BattleData->getBattleModel()->isPvEBattle())
@@ -106,7 +107,7 @@ namespace BattleSpace
 		m_GuideLayer = CombatGuideLayer::create();
 		m_GuideLayer->setTouchEnabled(false);
 		this->addChild(m_GuideLayer);
-		DataCenter::sharedData()->getCombatGuideMg()->setGuideLayer(m_GuideLayer);
+		ManageCenter->getCombatGuideMg()->setGuideLayer(m_GuideLayer);
 
 		m_StoryLayer = StoryLayer::create();
 		m_StoryLayer->setVisible(false);
@@ -160,7 +161,7 @@ namespace BattleSpace
 	void BattleScene::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)
 	{
 #if !BATTLE_TEST
-		if (!DataCenter::sharedData()->getWar()->getNormal() || 
+		if (!BattleManage->getNormal() || 
 			!BattleData->getBattleModel()->layerMove())
 			return;
 #endif
@@ -169,7 +170,7 @@ namespace BattleSpace
 		CCPoint pMove = m_Touch->getLocation();
 		float dx = pMove.x - m_StartPos.x;							//地图只能x轴移动
 		float newX = dx + m_MoveLayer->getPositionX();
-		WarMapData* mapData = DataCenter::sharedData()->getMap()->getCurrWarMap();
+		WarMapData* mapData = ManageCenter->getMap()->getCurrWarMap();
 		if( newX < MAP_MINX(mapData) )
 			newX = MAP_MINX(mapData);
 #if BATTLE_TEST
@@ -179,9 +180,9 @@ namespace BattleSpace
 		if (newX > 0)newX = 0;
 #endif
 		m_StartPos = pMove;											//不断更新触摸初始值
-		if (DataCenter::sharedData()->getCombatGuideMg()->IsGuide())//引导状态进行锁屏处理
+		if (ManageCenter->getCombatGuideMg()->IsGuide())//引导状态进行锁屏处理
 		{
-			CombatGuideStep* step = DataCenter::sharedData()->getCombatGuideMg()->getCurrStep();
+			CombatGuideStep* step = ManageCenter->getCombatGuideMg()->getCurrStep();
 			if (step->getLockLayer())
 				return ;
 		}
@@ -210,7 +211,7 @@ namespace BattleSpace
 #if BATTLE_TEST
 		bNotification->postNotification(MsgCreateStory,ob);
 #else
-		if (DataCenter::sharedData()->getWar()->getStageID())
+		if (BattleManage->getStageID())
 		{
 			bNotification->postNotification(MsgCreateStory,ob);
 		}else{

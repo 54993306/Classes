@@ -1,11 +1,11 @@
 ﻿
 #include "Battle/RoleObject/RoleObject.h"
 #include "tools/StringUtil.h"
-#include "model/WarManager.h"
-#include "model/DataCenter.h"
-#include "model/BuffManage.h"
+#include "Battle/WarManager.h"
+#include "Battle/BattleCenter.h"
+#include "Battle/BuffManage.h"
 #include "Battle/BaseRole.h"
-#include "model/MapManager.h"
+#include "Battle/MapManager.h"
 #include "Battle/ConstNum.h"
 #include "Battle/EffectData.h"
 #include "Battle/CombatTask.h"
@@ -39,8 +39,8 @@ namespace BattleSpace
 	{
 		if (!AliveObject::init())
 			return false;
-		m_MapData = DataCenter::sharedData()->getMap()->getCurrWarMap();
-		m_Manage = DataCenter::sharedData()->getWar();
+		m_MapData = ManageCenter->getMap()->getCurrWarMap();
+		m_Manage = BattleManage;
 		return true;
 	}
 
@@ -92,7 +92,7 @@ namespace BattleSpace
 			m_IsSpine = false;
 			initCocosModel();
 		}
-		m_Armature->setPosition(ccp(0,-GRID_HEIGHT/2));
+		m_Armature->setPosition(ccp(0,-GRID_HEIGHT/2));					//落点在格子中心,向下偏移半个格子才是站立点,不偏移则人站格子的中心了
 		m_Body->addChild(m_Armature);
 		this->getStateManage()->initState(this);							//设置人物的初始动作为站立也可为其他						
 	}

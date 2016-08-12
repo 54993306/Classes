@@ -563,11 +563,11 @@ void CRankLayer::addPvpRank(CLayout* pCell, CRankData * data)
 	{
 		CLayout *teamLay  = UICloneMgr::cloneLayout(m_heroLay);
 		CTeams *team = &data->teamList.at(i);
-		for (int j = 0; j < team->quality; j++)
-		{
-			CCNode *star = (CCNode*)(teamLay->findWidgetById(CCString::createWithFormat("star%d",j+1)->getCString()));
-			star->setVisible(true);
-		}
+		//for (int j = 0; j < team->quality; j++)
+		//{
+		//	CCNode *star = (CCNode*)(teamLay->findWidgetById(CCString::createWithFormat("star%d",j+1)->getCString()));
+		//	star->setVisible(true);
+		//}
 		CCSprite *bg = (CCSprite*)teamLay->findWidgetById("bg");
 		CCSprite *head = CCSprite::create(CCString::createWithFormat("headImg/%d.png", team->thumb)->getCString());
 		if (head)
@@ -584,6 +584,10 @@ void CRankLayer::addPvpRank(CLayout* pCell, CRankData * data)
 			pCell->addChild(node);
 			node->setPositionX(node->getPositionX()-55*i);
 		}
+
+		//添加星星
+		CLayout* pStarLayout = getStarLayout(team->color);
+		mask->addChild(pStarLayout);
 	}
 }
 

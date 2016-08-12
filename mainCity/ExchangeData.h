@@ -1,6 +1,6 @@
 ﻿#ifndef __EXCHANGDATA_H
 #define __EXCHANGDATA_H
-#include "model/BattleData.h"
+#include "model/CRoleData.h"
 #include "bag/bagData.h"
 
 struct CExchangeInfo

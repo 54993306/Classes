@@ -1,9 +1,7 @@
 ﻿#include "EffectObject.h"
 #include "Battle/AnimationManager.h"
-#include "AppUI.h"
 #include "Battle/EffectData.h"
-#include "model/DataCenter.h"
-#include "model/WarManager.h"
+#include "Battle/WarManager.h"
 #include "common/CGameSound.h"
 #include "Battle/BattleMessage.h"
 namespace BattleSpace{
@@ -187,7 +185,7 @@ namespace BattleSpace{
 
 	void EffectObject::ShakeMessage()
 	{
-		NOTIFICATION->postNotification(B_Shark,nullptr);
+		bNotification->postNotification(B_Shark,nullptr);
 	}
 
 	void EffectObject::PlayerMusic()

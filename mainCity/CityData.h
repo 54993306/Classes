@@ -1,6 +1,6 @@
 ﻿#ifndef __CITYDATA_H
 #define __CITYDATA_H
-#include "model/BattleData.h"
+#include "model/CRoleData.h"
 #include "bag/bagData.h"
 
 struct CCity

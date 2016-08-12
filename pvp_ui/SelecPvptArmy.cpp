@@ -21,7 +21,7 @@
 #include "Resources.h"
 
 #include "model/DataCenter.h"
-#include "model/WarManager.h"
+#include "Battle/WarManager.h"
 
 using namespace BattleSpace;
 CSelectPvpArmy::~CSelectPvpArmy()

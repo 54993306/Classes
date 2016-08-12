@@ -50,6 +50,22 @@ LoginScene::~LoginScene()
 
 void LoginScene::onCreate()
 {
+	////检查用户名和密码是不是空的
+	////初始默认本地的账号和密码
+	//string sUserName = CCUserDefault::sharedUserDefault()->getStringForKey(USER_NAME);
+	//string sPassword = CCUserDefault::sharedUserDefault()->getStringForKey(PASSWORD);
+	//if(sUserName.compare("") == 0 || sPassword.compare("") == 0)
+	//{
+	//	CCString *pStr1 = CCString::createWithFormat("ios%ld%d", getCurrentTime()/1000, CCRANDOM_0_1()*10000);
+	//	CCString *pStr2 = CCString::createWithFormat("ios%ld", getCurrentTime()/(CCRANDOM_0_1()*1000));
+	//	sUserName = pStr1->m_sString;
+	//	sPassword = pStr2->m_sString;
+
+	//	CCUserDefault::sharedUserDefault()->setStringForKey(USER_NAME, sUserName);
+	//	CCUserDefault::sharedUserDefault()->setStringForKey(PASSWORD, sPassword);
+	//	CCUserDefault::sharedUserDefault()->flush();
+	//}
+
 	//创建登录界面
 	BaseLayer *pLayer = getLoginLayerWithGamePlatfom();
 	if( pLayer !=nullptr)

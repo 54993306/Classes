@@ -6,7 +6,7 @@
 #include "reward/WRuleLayer.h"
 #include "reward/WShopLayer.h"
 #include "model/DataCenter.h"
-#include "model/WarManager.h"
+#include "Battle/WarManager.h"
 #include "mainCity/MainCityControl.h"
 #include "Battle/EffectObject.h"
 #include "Battle/ArmatureEventDataMgr.h"

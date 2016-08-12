@@ -8,7 +8,7 @@
 #include "AppUI.h"
 #include "scene/layer/LayerManager.h"
 #include "net/CNetClient.h"
-#include "model/BattleData.h"
+#include "model/CRoleData.h"
 #include <spine/spine-cocos2dx.h>
 
 using namespace spine;

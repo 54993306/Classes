@@ -1,24 +1,23 @@
 ﻿#include "CombatEffect.h"
-#include "model/DataCenter.h"
 #include "common/CommonFunction.h"
 #include "Battle/BattleLayer/BattleRoleLayer.h"
-#include "BufExp.h"
+#include "Battle/BufExp.h"
 #include "Battle/ConstNum.h"
-#include "WarAssist.h"
+#include "Battle/WarAssist.h"
 #include "tools/CCShake.h"
 #include "Battle/EffectData.h"
 #include "Battle/BaseRole.h"
 #include "Battle/RoleObject/RoleObject.h"
-#include "CombatTask.h"
+#include "Battle/CombatTask.h"
 #include "Battle/RoleObject/RageObject.h"
 #include "Battle/BattleLayer/BattleMapLayer.h"
 #include "Battle/EffectObject.h"
 #include "Battle/BattleResult.h"
 #include "Battle/WarControl.h"
 #include "Battle/BattleScene/BattleScene.h"
-#include "model/BuffManage.h"
-#include "model/WarManager.h"
-#include "model/MapManager.h"
+#include "Battle/BuffManage.h"
+#include "Battle/WarManager.h"
+#include "Battle/MapManager.h"
 #include "Battle/RoleObject/HPObject.h"
 #include "Battle/ComBatLogic.h"
 #include "Battle/CPlayerSkillData.h"
@@ -30,6 +29,7 @@
 #include "Battle/BaseRoleData.h"
 #include "Battle/RoleSkill.h"
 #include "Battle/skEffectData.h"
+#include "Battle/BattleCenter.h"
 #include "model/DataCenter.h"
 
 namespace BattleSpace{
@@ -62,7 +62,7 @@ namespace BattleSpace{
 	bool CombatEffect::init()
 	{
 		CCSize winSize = CCDirector::sharedDirector()->getWinSize();
-		mManage = DataCenter::sharedData()->getWar();
+		mManage = BattleManage;
 		addEvent();
 		//加载配置信息
 		_playerSkillData = new CPlayerSkillData;
@@ -249,7 +249,7 @@ namespace BattleSpace{
 			SkillEffect->setShaderEffect(aliveOb->getArmature()->getShaderProgram());
 			//       
 			EffectObject* FloorEffect = EffectObject::create(ToString(effectinfo->getFloorEf()));	//受击目标播放受击特效
-			WarMapData* map = DataCenter::sharedData()->getMap()->getCurrWarMap();
+			WarMapData* map = ManageCenter->getMap()->getCurrWarMap();
 			CCPoint p = pAlive->getRoleObject()->getPosition();
 			CCPoint wp = m_Scene->getBattleRoleLayer()->convertToWorldSpace(p);
 			CCPoint mp = m_Scene->getBattleMapLayer()->convertToNodeSpace(wp);
@@ -315,7 +315,7 @@ namespace BattleSpace{
 		CCNode* MoveLayer = m_Scene->getMoveLayer();
 		CCPoint p = MoveLayer->getPosition();
 		CCPoint p1 = aliveOb->getParent()->convertToWorldSpace(aliveOb->getPosition());
-		WarMapData* m_map = DataCenter::sharedData()->getMap()->getCurrWarMap();
+		WarMapData* m_map = ManageCenter->getMap()->getCurrWarMap();
 		//敌方大技能特效
 		if (alive->getEnemy())
 		{
@@ -580,7 +580,7 @@ namespace BattleSpace{
 			CCTextureCache::sharedTextureCache()->removeTexture(pBody->getTexture());
 
 			//名字
-			CLabel *pName = CLabel::create(sName[i].c_str(), DEFAULT_FONT, 54);
+			CLabel *pName = CLabel::create(sName[i].c_str(), "Arial", 54);
 			pLayerShow->addChild(pName, 4);
 			pName->setPosition(pPosMove[i]);
 			pName->setColor(ccc3(255, 255, 255));

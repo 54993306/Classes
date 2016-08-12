@@ -1,8 +1,8 @@
 
 #include "Battle/LoadSpineData.h"
 #include <spine/spine-cocos2dx.h>
-#include "model/DataCenter.h"
-#include "model/WarManager.h"
+#include "Battle/BattleCenter.h"
+#include "Battle/WarManager.h"
 #include "Battle/EffectData.h"
 #include "Battle/BattleTools.h"
 using namespace spine;
@@ -21,7 +21,7 @@ namespace BattleSpace{
 	//维护一个常用的模型列表。
 	bool LoadSpineData::init()
 	{
-		m_Manage = DataCenter::sharedData()->getWar();
+		m_Manage = BattleManage;
 		return true;
 	}
 
@@ -66,7 +66,7 @@ namespace BattleSpace{
 
 	void LoadSpineData::initStoryData()
 	{
-		map<StoryType,vector<StoryStep*>>* storymap = DataCenter::sharedData()->getWar()->getStoryData()->getStoryMap();
+		map<StoryType,vector<StoryStep*>>* storymap = BattleManage->getStoryData()->getStoryMap();
 
 		for (auto i : *storymap)
 			for (auto j:i.second)

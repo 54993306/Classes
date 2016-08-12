@@ -12,11 +12,8 @@
 #include "DataPool.h"
 #include "ShareGM.h"
 
-
-class CRroleData;
-class CDataPool;
-
-enum CityActionType{
+enum CityActionType
+{
 	CA_None = 0,
 	CA_GetHero,
 	CA_BlackSmith,
@@ -28,7 +25,6 @@ enum CityActionType{
 	CA_GoToWorldBoss,
 	CA_PVP
 };
-
 
 enum Task_Type
 {
@@ -47,16 +43,12 @@ struct VsAnimateData
 	std::string	sEnemyFacebookId;
 	std::string	sSelfFacebookId;
 public:
-	VsAnimateData():sEnemyRoleName(""),sSelfRoleName(""),iEnemyLeader(0),iSelfLeader(0),iEnemyHead(0),iSelfHead(0),sEnemyFacebookId(""),sSelfFacebookId("")
+	VsAnimateData():sEnemyRoleName(""),sSelfRoleName(""),iEnemyLeader(0),iSelfLeader(0),
+		iEnemyHead(0),iSelfHead(0),sEnemyFacebookId(""),sSelfFacebookId("")
 	{}
 };
 
-namespace BattleSpace{
-	class WarManager;
-	class MapManager;
-	class TerrainManager;
-	class CombatGuideManage;
-};
+class CDataPool;
 
 USING_NS_CC;
 
@@ -68,9 +60,6 @@ public:
 	static DataCenter* sharedData();
 	static void destroy();
 public:
-	BattleSpace::WarManager* getWar();
-	BattleSpace::TerrainManager* getTer();
-	BattleSpace::MapManager* getMap();
 	UserManager* getUser();
 	SkillGM* getSkill();
 	TaskGM* getTask(int taskType);
@@ -78,28 +67,21 @@ public:
 	HeroInfoGM* getHeroInfo();
 	ItemGM* getItemDesc();
 	CStageData* getStageData();
-	BattleSpace::CombatGuideManage* getCombatGuideMg();
-	bool initWar();
 	RewardDataGM* getRewardDataGM();
 	CDataPool* getDataPool();
 	ShareGM* getShareData();
 
 	CC_SYNTHESIZE(CityActionType, m_cityActionType, CityActionType);
-	CC_SYNTHESIZE(CRroleData*, m_RoleData, RoleData);
 	VsAnimateData& getVsAnimateData();
 protected:
 	virtual bool init();	
 protected:
-	BattleSpace::MapManager* m_map;
-	BattleSpace::WarManager* m_war;
-	BattleSpace::TerrainManager* m_ter;
 	UserManager* m_user;
 	SkillGM* m_skill;
 	TaskGM*  m_task;
 	TollgateGM* m_tollgate;
 	HeroInfoGM* m_heroInfo;
 	ItemGM* m_itemDesc;
-	BattleSpace::CombatGuideManage* m_CombatguideMG;
 	CStageData *m_stageData;
 	RewardDataGM *m_rewardData;
 	CDataPool *m_dataPool;

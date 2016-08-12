@@ -1,7 +1,6 @@
 ﻿#include "CombatTask.h"
-#include "model/DataCenter.h"
 #include "Battle/AnimationManager.h"
-#include "Global.h"
+
 using namespace cocos2d;
 
 CombatTask::CombatTask()

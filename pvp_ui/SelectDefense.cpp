@@ -280,8 +280,8 @@ void CSelectDefense::addHeroSelectCell(unsigned int uIdx, CGridViewCell* pCell)
 			pRight->setUserData(pHero);
 			pRight->setVisible(false);
 			pRight->runAction(CCRepeatForever::create(CCSequence::createWithTwoActions(
-				CCFadeTo::create(0.3, 150),
-				CCFadeTo::create(0.3, 255)
+				CCFadeTo::create(0.3f, 150),
+				CCFadeTo::create(0.3f, 255)
 				)));
 			if(m_pDragHeroData!=nullptr)
 			{

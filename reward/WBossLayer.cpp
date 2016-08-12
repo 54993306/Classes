@@ -14,11 +14,12 @@
 #include "tollgate/SelectArmy.h"
 #include "netcontrol/CPlayerControl.h"
 #include "model/DataCenter.h"
-#include "model/WarManager.h"
+#include "Battle/WarManager.h"
 #include "reward/WorldBoss.h"
 #include "Battle/EffectData.h"
 #include "Battle/ActionNameDefine.h"
 #include "Global.h"
+#include "Battle/BattleCenter.h"
 using namespace BattleSpace;
 bool WBossSortWarPrize(const Prize& data1, const Prize& data2)
 {
@@ -503,6 +504,12 @@ void CWBossLayer::updateDataBossWait( BossData* pData )
 {
 	//变黑
 	CImageView* pT1 = (CImageView*)m_ui->findWidgetById("shadow");
+	if(!pT1)
+	{
+		CCLOG("[ ERROR ]--CWBossLayer::updateDataBossWait--no child named 'shadow' ");
+		return;
+	}
+
 	pT1->setColor(ccc3(0, 0, 0));
 	//pT1->runAction(CCRepeatForever::create(CCSequence::createWithTwoActions(CCFadeTo::create(0.3f, 120), CCFadeTo::create(0.3f, 255))));
 	pT1->runAction(CCRepeatForever::create(CCSequence::create(CCScaleTo::create(0.25f, 1.05f), CCScaleTo::create(0.25f, 1.0f), nullptr)));
@@ -647,7 +654,7 @@ void CWBossLayer::onBattle( CCObject* pSender )
 		return;
 	}
 
-	DataCenter::sharedData()->getWar()->setWorldBossRank(m_pBoss.level);
+	BattleManage->setWorldBossRank(m_pBoss.level);
 
 	CSelectArmy *selArmy = CSelectArmy::create();
 	selArmy->setWordBoss(m_pBoss.mId);
@@ -752,7 +759,7 @@ void CWBossLayer::updateBossTexture()
 	//使用模型代替贴图
 	int m_ModeID = m_pBoss.thumb;
 	
-	if (DataCenter::sharedData()->getWar()->isSpine(m_ModeID))
+	if (BattleManage->isSpine(m_ModeID))
 	{ 
 		char json[60] = {0};
 		char altlas[60] = {0};

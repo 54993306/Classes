@@ -161,7 +161,7 @@ void CPvpMenuLayer::updateShowArea()
 			if(!m_pSelectDefenseLayer)
 			{
 				m_pSelectDefenseLayer = CSelectDefense::create();
-				m_pSelectDefenseLayer->setTouchPriority(LayerManager::instance()->getLayerManagerMinPriority()-1);
+				m_pSelectDefenseLayer->setTouchPriority(LayerManager::instance()->getLayerManagerMinPriority());
 				pLayer->addChild(m_pSelectDefenseLayer);
 				m_pSelectDefenseLayer->setPosition(pLayer->convertToNodeSpace(m_pSelectDefenseLayer->getPosition()));
 				CPlayerControl::getInstance().askForPvpTeamData();
@@ -178,7 +178,7 @@ void CPvpMenuLayer::updateShowArea()
 			if(!m_pPvpRuleLayer)
 			{
 				m_pPvpRuleLayer = CPvpRuleLayer::create();
-				m_pPvpRuleLayer->setTouchPriority(LayerManager::instance()->getLayerManagerMinPriority()-1);
+				m_pPvpRuleLayer->setTouchPriority(LayerManager::instance()->getLayerManagerMinPriority());
 				pLayer->addChild(m_pPvpRuleLayer);
 				m_pPvpRuleLayer->setPosition(pLayer->convertToNodeSpace(m_pPvpRuleLayer->getPosition()));
 				AskForPvpRule();
@@ -193,7 +193,7 @@ void CPvpMenuLayer::updateShowArea()
 			{
 				m_pShopLayer = CWShopLayer::create();
 				m_pShopLayer->loadUiByType(4);
-				m_pShopLayer->setTouchPriority(LayerManager::instance()->getLayerManagerMinPriority()-1);
+				m_pShopLayer->setTouchPriority(LayerManager::instance()->getLayerManagerMinPriority());
 				pLayer->addChild(m_pShopLayer);
 				m_pShopLayer->setPosition(pLayer->convertToNodeSpace(m_pShopLayer->getPosition()));
 				m_pShopLayer->setPositionY(m_pShopLayer->getPositionY()+22);
@@ -208,7 +208,7 @@ void CPvpMenuLayer::updateShowArea()
 			if(!m_pPvpRecordLayer)
 			{
 				m_pPvpRecordLayer = CPvpRecord::create();
-				m_pPvpRecordLayer->setTouchPriority(LayerManager::instance()->getLayerManagerMinPriority()-1);
+				m_pPvpRecordLayer->setTouchPriority(LayerManager::instance()->getLayerManagerMinPriority());
 				pLayer->addChild(m_pPvpRecordLayer);
 				m_pPvpRecordLayer->setPosition(pLayer->convertToNodeSpace(m_pPvpRecordLayer->getPosition()));
 				AskForPvpRecord();

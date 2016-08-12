@@ -1,14 +1,12 @@
 ﻿
 #include "Battle/WarControl.h"
-#include "Global.h"
-#include "scene/CPopTip.h"
 #include "Battle/BattleScene/LoadBattleResource.h"
 #include "tools/CCShake.h"
 #include "Battle/BattleScene/BattleScene.h"
-#include "model/DataCenter.h"
+#include "Battle/BattleCenter.h"
 #include "Battle/BaseRole.h"
-#include "model/WarManager.h"
-#include "model/MapManager.h"
+#include "Battle/WarManager.h"
+#include "Battle/MapManager.h"
 #include "tools/ShowTexttip.h"
 #include "Battle/ConstNum.h"
 #include "cctk/scenemanager.h"
@@ -42,7 +40,6 @@
 #include "Battle/BattleDataCenter.h"
 #include "Battle/BattleLayer/BattleTips.h"
 #include "model/DataCenter.h"
-#include "Global.h"
 
 namespace BattleSpace
 {
@@ -151,7 +148,7 @@ namespace BattleSpace
 			{
 				char path[60] = {0};
 				sprintf(path,"%d_%d",0,7);														//覆盖高亮区域的图片
-				DataCenter::sharedData()->getCombatGuideMg()->setCurrBatchGuide(path);
+				ManageCenter->getCombatGuideMg()->setCurrBatchGuide(path);
 			}break;
 		case TEST_MoveState:
 			{
@@ -247,7 +244,7 @@ namespace BattleSpace
 		this->setTouchPriority(WarControlPriority);
 		this->setTouchEnabled(false);
 		this->setOnTouchEndedAfterLongClickListener(this, ccw_afterlongclick_selector(WarControl::onlongClickEnd));		//只对开启了长按监听的控件有效
-		mManage = DataCenter::sharedData()->getWar();
+		mManage = BattleManage;
 		this->addChild(m_ControLayer);
 
 		initUIAbove();									//初始化界面上部分
@@ -275,7 +272,7 @@ namespace BattleSpace
 	{
 		for (int i=0;i<4;i++)
 		{
-			CCPoint p = DataCenter::sharedData()->getMap()->getCurrWarMap()->getPoint(i);
+			CCPoint p = ManageCenter->getMap()->getCurrWarMap()->getPoint(i);
 			EffectObject* ef = EffectObject::create("10030",sPlayType::eRepeat);
 			ef->setTag(CL_TipsEffect1+i);
 			ef->setPosition(ccp(100,p.y));
@@ -416,7 +413,7 @@ namespace BattleSpace
 		updateWorldBossBloodBar(CCInteger::create(boss->getHp()));
 
 		CLabel* pBuffRank = (CLabel*)m_ControLayer->findWidgetById("boss_fire_level");					//BUFF层次
-		pBuffRank->setString(ToString(DataCenter::sharedData()->getWar()->getWorldBossRank()));
+		pBuffRank->setString(ToString(mManage->getWorldBossRank()));
 	}
 	//update word boss damage
 	void WarControl::updateWorldBossDamage()
@@ -682,15 +679,15 @@ namespace BattleSpace
 	//guide state button effect dispose
 	bool WarControl::guideStateButtonEffect( CCNode* layout,bool pClick )
 	{
-		if (!DataCenter::sharedData()->getCombatGuideMg()->IsGuide())					//引导判断
+		if (!ManageCenter->getCombatGuideMg()->IsGuide())					//引导判断
 			return false;
-		CombatGuideStep* step = DataCenter::sharedData()->getCombatGuideMg()->getCurrStep();
+		CombatGuideStep* step = ManageCenter->getCombatGuideMg()->getCurrStep();
 		if (step->getType() == UI_Type || step->getType() == CallAalive_Type)
 		{
 			if (layout->getParent()->getTag() != (step->getUiType()-1)+CL_BtnLayout1)
 				return true;
 			else if (step->getType() == UI_Type && pClick)
-				DataCenter::sharedData()->getCombatGuideMg()->NextStep();
+				ManageCenter->getCombatGuideMg()->NextStep();
 		}
 		return false;
 	}
@@ -1183,7 +1180,7 @@ namespace BattleSpace
 				}
 				else
 				{
-					CCString *imgUrl = CCString::createWithFormat(FACEBOOKIMG, iFbId[i].c_str());
+					CCString *imgUrl = CCString::createWithFormat("http://graph.facebook.com/%s/picture?width=92&height=92", iFbId[i].c_str());
 					HttpLoadImage::getInstance()->requestUrlImage(imgUrl->getCString(), iFbId[i].c_str());
 				}
 			}

@@ -27,8 +27,8 @@
 #include "Battle/RoleObject/RoleObject.h"
 #include "Battle/MoveObject.h"
 
-#include "model/DataCenter.h"
-#include "model/WarManager.h"
+#include "Battle/BattleCenter.h"
+#include "Battle/WarManager.h"
 #include "Battle/ConstNum.h"
 
 namespace BattleSpace
@@ -45,7 +45,7 @@ namespace BattleSpace
 
 	bool PvEStrategy::init()
 	{
-		mManage = DataCenter::sharedData()->getWar();
+		mManage = BattleManage;
 		mBattleModel = BattleData->getBattleModel();
 		mPvEBattle = mBattleModel->isPvEBattle();
 		mManage->initOtherCamp(mOtherRoles);

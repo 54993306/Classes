@@ -14,7 +14,6 @@
 *
 *************************************************************/
 #include "AppUI.h"
-#include "Global.h"
 #include "scene/layer/LayerManager.h"
 #include "activity/HttpLoadImage.h"
 

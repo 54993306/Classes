@@ -1,16 +1,16 @@
-﻿#include "CombatGuideLayer.h"
+﻿#include "Battle/CombatGuideLayer.h"
 #include "TouchIntercept.h"
-#include "model/DataCenter.h"
-#include "model/WarManager.h"
-#include "model/MapManager.h"
+#include "Battle/BattleCenter.h"
+#include "Battle/WarManager.h"
+#include "Battle/MapManager.h"
 #include "Battle/RoleObject/RoleObject.h"
 #include "Battle/BattleLayer/BattleMapLayer.h"
 #include "Battle/BattleLayer/BattleRoleLayer.h"
-#include "CombatGuideData.h"
-#include "CombatGuideManage.h"
+#include "Battle/CombatGuideData.h"
+#include "Battle/CombatGuideManage.h"
 #include "Battle/ConstNum.h"
 #include "Battle/BattleScene/BattleScene.h"
-#include "WarControl.h"
+#include "Battle/WarControl.h"
 #include "common/CommonFunction.h"
 #include "Battle/LoadSpineData.h"
 #include "Battle/BattleMessage.h"
@@ -36,14 +36,14 @@ namespace BattleSpace{
 		this->setTouchPriority(guideLayerPriority);
 		this->setTouchEnabled(true);
 		this->setIsShowBlack(false);
-		mManage = DataCenter::sharedData()->getWar();
+		mManage = BattleManage;
 		m_root = CCNode::create();
 		m_root->setContentSize(CCSizeMake(1138, 640));
 		m_root->setAnchorPoint(ccp(0.5f, 0.5f));
 		m_root->setPosition(VCENTER);
 		m_root->retain();
 		addChild(m_root);
-		m_mapData = DataCenter::sharedData()->getMap()->getCurrWarMap();
+		m_mapData = ManageCenter->getMap()->getCurrWarMap();
 
 		m_LayerColor = CCLayerColor::create(ccc4(0,0,0,250));
 		CCSize size = CCDirector::sharedDirector()->getWinSize();
@@ -57,7 +57,7 @@ namespace BattleSpace{
 	void CombatGuideLayer::initScene( BattleScene*scene )
 	{
 		m_Scene = scene;
-		m_mapData = DataCenter::sharedData()->getMap()->getCurrWarMap();
+		m_mapData = ManageCenter->getMap()->getCurrWarMap();
 		m_MapLayer = m_Scene->getBattleMapLayer();
 		m_AliveLayer = m_Scene->getBattleRoleLayer();
 	}
@@ -139,7 +139,7 @@ namespace BattleSpace{
 			{
 				if (m_Step->getType() == ImageText_Type)
 				{
-					DataCenter::sharedData()->getCombatGuideMg()->NextStep();
+					ManageCenter->getCombatGuideMg()->NextStep();
 					return true;
 				}
 				return false;
@@ -343,7 +343,7 @@ namespace BattleSpace{
 		if (!step->getReset())						//是否重置武将处理
 			return;
 		NOTIFICATION->postNotification(MsgReleaseTouch);									//释放掉触摸消息
-		CCMoveTo* mt = CCMoveTo::create(0.2f,ccp(MAP_MINX(DataCenter::sharedData()->getMap()->getCurrWarMap()),0));	//飞到最右侧
+		CCMoveTo* mt = CCMoveTo::create(0.2f,ccp(MAP_MINX(ManageCenter->getMap()->getCurrWarMap()),0));	//飞到最右侧
 		m_Scene->getMoveLayer()->runAction(mt);
 		CCArray* arr = mManage->getHeros();
 		CCObject* obj = nullptr;

@@ -11,7 +11,7 @@
 #include "tollgate/Chapter.h"
 #include "model/DataCenter.h"
 #include "Battle/BaseRole.h"
-#include "model/WarManager.h"
+#include "Battle/WarManager.h"
 #include "Battle/RandomBusineseMan.h"
 #include "guide/GuideManager.h"
 #include "tollgate/ItemInfo.h"
@@ -23,7 +23,7 @@
 #include "mainCity/CNewHero.h"
 #include "common/CCRollLabelAction.h"
 #include "common/CommonFunction.h"
-
+#include "Battle/BattleCenter.h"
 const char WarWinLayer::WAR_WIN_RESULT[] = "war_win_show";
 
 using namespace BattleSpace;
@@ -190,7 +190,7 @@ void WarWinLayer::processBattleFinish(int type, google::protobuf::Message *msg)
 	}
 
 	 //非悬赏府才有重来按钮
-	if(DataCenter::sharedData()->getWar()->getLastStageId()!=-1)
+	if(BattleManage->getLastStageId()!=-1)
 	{
 		CButton *btnTry = (CButton*)m_ui->findWidgetById("retry");
 		btnTry->runAction(CCSequence::create(CCDelayTime::create(fDelayTime), CCShow::create(), CCScaleTo::create(0.2f, 1.2f), CCScaleTo::create(0.1f, 1), NULL));
@@ -551,7 +551,7 @@ void WarWinLayer::genStar(int numOfStar)
 
 	//中间的星星
 	CCSprite *grade2 = (CCSprite*)m_ui->findWidgetById("star2");
-	if (DataCenter::sharedData()->getWar()->getNormal())
+	if (BattleManage->getNormal())
 	{
 		grade2->setTexture(CCTextureCache::sharedTextureCache()->addImage("warscene2/starlight.png"));
 	}
@@ -570,7 +570,7 @@ void WarWinLayer::genStar(int numOfStar)
 
 	//左边的星星
 	CCSprite *grade1 = (CCSprite*)m_ui->findWidgetById("star1");
-	if (DataCenter::sharedData()->getWar()->getNormal())
+	if (BattleManage->getNormal())
 	{
 		grade1->setTexture(CCTextureCache::sharedTextureCache()->addImage("warscene2/starlight.png"));
 	}
@@ -588,7 +588,7 @@ void WarWinLayer::genStar(int numOfStar)
 
 	//右边的星星
 	CCSprite *grade3 = (CCSprite*)m_ui->findWidgetById("star3");
-	if (DataCenter::sharedData()->getWar()->getNormal())
+	if (BattleManage->getNormal())
 	{
 		grade3->setTexture(CCTextureCache::sharedTextureCache()->addImage("warscene2/starlight.png"));
 	}
@@ -656,12 +656,12 @@ void WarWinLayer::onRestartClick(CCObject *pSender){
 void WarWinLayer::onBackClick(CCNode* ob)
 {
 	//返回章节
-	if(DataCenter::sharedData()->getWar()->getLastStageId()!=-1)
+	if(BattleManage->getLastStageId()!=-1)
 	{
 		DataCenter::sharedData()->setCityActionType(CA_GoToChapater);
 
 		//预请求关卡信息
-		if(DataCenter::sharedData()->getWar()->getNormal())
+		if(BattleManage->getNormal())
 		{
 			CPlayerControl::getInstance().sendChapterList(0);
 		}
@@ -683,7 +683,7 @@ void WarWinLayer::onBackClick(CCNode* ob)
 void WarWinLayer::stageRestart(CCNode* pSender)
 {
 	//返回关卡
-	if(DataCenter::sharedData()->getWar()->getLastStageId()!=-1)
+	if(BattleManage->getLastStageId()!=-1)
 	{
 		DataCenter::sharedData()->setCityActionType(CA_GoToStage);
 	}

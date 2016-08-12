@@ -24,7 +24,7 @@
 #include "activity/ActivityLayer.h"
 #include "tollgate/TollgatePreview.h"
 #include "Battle/BattleScene/LoadBattleResource.h"
-#include "model/WarManager.h"
+#include "Battle/WarManager.h"
 #include "Battle/AnimationManager.h"
 #include "common/CGameSound.h"
 #include "guide/GuideManager.h"
@@ -34,6 +34,7 @@
 #include "common/CommonFunction.h"
 #include "tools/ShowTexttip.h"
 #include "tools/UICloneMgr.h"
+#include "Battle/BattleCenter.h"
 #define  FACEBOOKIMG "http://graph.facebook.com/%s/picture?width=106&height=106"
 
 #include "mail/EmailLayer.h"
@@ -458,19 +459,19 @@ void CMainCityUI::onClickBtn(CCObject *pSender)
 				m_bShowChapterFlag = false;
 
 				//直接获取消息
-				if(DataCenter::sharedData()->getWar()->getNormal())
+				if(BattleManage->getNormal())
 				{
 					pLayer->setStory(true);
 					pLayer->ProcessMsg(ChapterList, CNetClient::getShareInstance()->getSaveMsg(ChapterList));
-					pLayer->selectChapter(DataCenter::sharedData()->getWar()->getChapterCount(), DataCenter::sharedData()->getWar()->getChapterIndex());
+					pLayer->selectChapter(BattleManage->getChapterCount(), BattleManage->getChapterIndex());
 					DataCenter::sharedData()->setCityActionType(CA_None);
 				}
 				else
 				{
 					pLayer->setStory(false);
-					pLayer->setLastChapter(DataCenter::sharedData()->getWar()->getChapterIndex());
+					pLayer->setLastChapter(BattleManage->getChapterIndex());
 					CPlayerControl::getInstance().sendChapterList(1);
-					GetTcpNet->sendStageList(DataCenter::sharedData()->getWar()->getChapterIndex());
+					GetTcpNet->sendStageList(BattleManage->getChapterIndex());
 				}
 				
 			}
@@ -759,13 +760,13 @@ void CMainCityUI::showNoticeTip(CGameTips * ct)
 
 void CMainCityUI::runTollgatepreviewCallBack()
 {
-	int stage = DataCenter::sharedData()->getWar()->getStageID(); 
+	int stage = BattleManage->getStageID(); 
 
 	CTollgatePreview *preview = CTollgatePreview::create();
 	LayerManager::instance()->push(preview);
 	CPlayerControl::getInstance().sendStageInfo(stage);
 	preview->setStage(stage, "");
-	preview->setNormal(DataCenter::sharedData()->getWar()->getNormal());
+	preview->setNormal(BattleManage->getNormal());
 }
 
 void CMainCityUI::setShowHeadPart(bool isSHow)

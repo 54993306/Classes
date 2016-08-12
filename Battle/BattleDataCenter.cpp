@@ -10,9 +10,9 @@
 #include <protos/pvp_protocol.pb.h>
 
 /******************************************************/
-#include "model/DataCenter.h"
-#include "model/MapManager.h"
-#include "model/WarManager.h"
+#include "Battle/BattleCenter.h"
+#include "Battle/MapManager.h"
+#include "Battle/WarManager.h"
 #include "common/CommonFunction.h"							//随机函数
 namespace BattleSpace
 {
@@ -64,7 +64,7 @@ namespace BattleSpace
 		mBaseRoleData.insert(mBaseRoleData.end(),mPvPHeros.begin(),mPvPHeros.end());
 		mBaseRoleData.insert(mBaseRoleData.end(),mMonsterVec.begin(),mMonsterVec.end());
 		mBaseRoleData.insert(mBaseRoleData.end(),mChildRoleVec.begin(),mChildRoleVec.end());
-		DataCenter::sharedData()->getWar()->initCommonData();
+		BattleManage->initCommonData();
 	}
 
 	const vector<BaseRoleData*>& BattleDataCenter::getRoleDatas() const
@@ -140,7 +140,7 @@ namespace BattleSpace
 
 	void BattleDataCenter::initWordBossStage( const google::protobuf::Message *pResponse )
 	{
-		DataCenter::sharedData()->getWar()->clearOldData();
+		BattleManage->clearOldData();
 		protos::WarResponse* tData = (protos::WarResponse*)pResponse;
 		for (int i=0; i<tData->herolist_size(); i++)
 			initHeroData(&tData->herolist(i));
@@ -151,11 +151,11 @@ namespace BattleSpace
 			if (tData->monsters(j).isboss())
 				tBossID = tData->monsters(j).id();
 		}
-		DataCenter::sharedData()->getWar()->setBossHurtPe(tData->addhurt());
-		DataCenter::sharedData()->getWar()->setWorldBoss(true);
-		DataCenter::sharedData()->getWar()->setBatch(0);
-		DataCenter::sharedData()->getWar()->setStageID(tBossID);
-		DataCenter::sharedData()->getMap()->initMap(tBossID);
+		BattleManage->setBossHurtPe(tData->addhurt());
+		BattleManage->setWorldBoss(true);
+		BattleManage->setBatch(0);
+		BattleManage->setStageID(tBossID);
+		ManageCenter->getMap()->initMap(tBossID);
 		mBattleModel = BattleModel::CreateBattleModel(sBattleType::eWordBossBattle);
 		mBattleModel->retain();
 		initBaseRoleDataVector();
@@ -163,15 +163,15 @@ namespace BattleSpace
 
 	void BattleDataCenter::initNormalStage( const google::protobuf::Message *pResponse )
 	{
-		DataCenter::sharedData()->getWar()->clearOldData();
+		BattleManage->clearOldData();
 		protos::BattleResponse*tData = (protos::BattleResponse*)pResponse;
 		for (int i=0; i< tData->herolist_size(); i++)				//英雄		  
 			initHeroData(&tData->herolist(i));
 		for (int j=0; j< tData->monsterlist_size(); j++)			//怪物
 			initMonsterData(&tData->monsterlist(j));
-		DataCenter::sharedData()->getWar()->setBatch(tData->batch());
-		DataCenter::sharedData()->getWar()->setStageID(tData->stageid());
-		DataCenter::sharedData()->getMap()->initMap(tData->stageid()); 
+		BattleManage->setBatch(tData->batch());
+		BattleManage->setStageID(tData->stageid());
+		ManageCenter->getMap()->initMap(tData->stageid()); 
 		mBattleModel = BattleModel::CreateBattleModel(sBattleType::eNormalBattle);
 		mBattleModel->retain();
 		initBaseRoleDataVector();
@@ -182,7 +182,7 @@ namespace BattleSpace
 		protos::StartPvpRes*tData = (protos::StartPvpRes*)pResponse;
 		if (!tData->result())		//挑战次数不足挑战失败
 			return ;
-		DataCenter::sharedData()->getWar()->clearOldData();
+		BattleManage->clearOldData();
 		mBattleModel = BattleModel::CreateBattleModel(sBattleType::ePvEBattle);
 		mBattleModel->retain();
 		mBattleModel->setStrategyType((sPvEStrategy)tData->status());
@@ -192,11 +192,9 @@ namespace BattleSpace
 			initHeroData(&tData->hero_list(i));
 		for (int i=0;i<tData->call_monster_size();i++)
 			initMonsterData(&tData->call_monster(i));
-		DataCenter::sharedData()->getWar()->setBatch(0);	
-		DataCenter::sharedData()->getWar()->setStageID(C_PVEStage);		//关卡ID类的需要做特殊的处理
-		DataCenter::sharedData()->getMap()->initMap(C_PVEStage); 
+		BattleManage->setBatch(0);	
+		BattleManage->setStageID(C_PVEStage);		//关卡ID类的需要做特殊的处理
+		ManageCenter->getMap()->initMap(C_PVEStage); 
 		initBaseRoleDataVector();
 	}
-
-
 }

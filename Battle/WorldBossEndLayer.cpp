@@ -8,8 +8,8 @@
 #include "common/ProgressLabel.h"
 #include "bag/bagData.h"
 #include "tollgate/Chapter.h"
-#include "model/DataCenter.h"
-#include "model/WarManager.h"
+#include "Battle/BattleCenter.h"
+#include "Battle/WarManager.h"
 #include "Battle/RandomBusineseMan.h"
 #include "guide/GuideManager.h"
 #include "tollgate/ItemInfo.h"
@@ -225,10 +225,9 @@ void WorldBossEndLayer::onExitClick(CCObject *pSender)
 
 void WorldBossEndLayer::shareFb(CCObject *pSender)
 {
-	int stageId = DataCenter::sharedData()->getWar()->getStageID();
 	const ShareData *data = DataCenter::sharedData()->getShareData()->getCfg(10);
 	CCString *desc = CCString::createWithFormat(data->desc.c_str(),m_rank);
-	CCString *url = CCString::createWithFormat(data->url.c_str(),stageId);
+	CCString *url = CCString::createWithFormat(data->url.c_str(),BattleManage->getStageID());
 	FaceBookSDK::sharedInstance()->onShareToFb(desc->getCString(),url->getCString());
 }
 

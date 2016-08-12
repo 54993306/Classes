@@ -1,7 +1,6 @@
 ﻿#ifndef _COMBATGUIDE_
 #define _COMBATGUIDE_
-#include "AppUI.h"
-#include "Global.h"
+
 #include "scene/layer/LayerManager.h"
 
 //************************************************************************/

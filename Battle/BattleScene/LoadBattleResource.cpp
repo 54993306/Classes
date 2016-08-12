@@ -1,17 +1,16 @@
 ﻿#include "Battle/BattleScene/LoadBattleResource.h"
 #include "SimpleAudioEngine.h"
-#include "Global.h"
 #include "Battle/AnimationManager.h"
 #include "tools/ToolDefine.h"
-#include "model/DataCenter.h"
+#include "Battle/BattleCenter.h"
 #include "Battle/BattleScene/BattleScene.h"
 #include "common/CommonFunction.h"
 #include "Battle/EffectData.h"
 #include "Battle/CombatGuideManage.h"
 #include "Battle/BaseRoleData.h"
-#include "model/TerrainManager.h"
-#include "model/WarManager.h"
-#include "model/MapManager.h"
+#include "Battle/Landform/TerrainManager.h"
+#include "Battle/WarManager.h"
+#include "Battle/MapManager.h"
 #include "scene/layer/LayerManager.h"
 #include "common/CGameSound.h"
 #include "Battle/LoadSpineData.h"
@@ -106,7 +105,7 @@ namespace BattleSpace{
 		m_tip->setHorizontalAlignment(kCCTextAlignmentLeft);				//设置对齐样式
 		m_tip->setAnchorPoint(ccp(0,0.5));
 		m_Layer->addChild(m_tip);
-		m_Manage = DataCenter::sharedData()->getWar();
+		m_Manage = BattleManage;
 		m_LoadSpine = LoadSpineData::create();
 		m_LoadSpine->retain();
 		srandNum();
@@ -122,7 +121,7 @@ namespace BattleSpace{
 	void LoadBattleResource::onEnter()
 	{
 		CScene::onEnter();
-		CSVFile* file = (CSVFile*)FileUtils::sharedFileUtils()->loadCSVFile(CSV_ROOT("loadWar.csv"));
+		CSVFile* file = (CSVFile*)FileUtils::sharedFileUtils()->loadCSVFile("csv/loadWar.csv");
 		m_publicNum = file->getRowNum() - 1;					//一个资源加载完成继续加载另外一个文件的资源，一个类加载多个文件资源
 		if (m_publicNum<public_time)m_publicNum = public_time;
 		m_totalNum = m_publicNum+total_time+50;
@@ -134,15 +133,15 @@ namespace BattleSpace{
 	void LoadBattleResource::onExit()
 	{
 		CScene::onExit();
-		FileUtils::sharedFileUtils()->releaseFile(CSV_ROOT("warTips.csv"));
-		FileUtils::sharedFileUtils()->releaseFile(CSV_ROOT("loadWar.csv"));
-		FileUtils::sharedFileUtils()->releaseFile(CSV_ROOT("preloadRes.csv"));
+		FileUtils::sharedFileUtils()->releaseFile("csv/warTips.csv");
+		FileUtils::sharedFileUtils()->releaseFile("csv/loadWar.csv");
+		FileUtils::sharedFileUtils()->releaseFile("csv/preloadRes.csv");
 	}
 	void LoadBattleResource::updateTips(float fdetal)
 	{
-		CSVFile* file = (CSVFile*)FileUtils::sharedFileUtils()->getFile(CSV_ROOT("warTips.csv"));//从缓存中获取配置文件
+		CSVFile* file = (CSVFile*)FileUtils::sharedFileUtils()->getFile("csv/warTips.csv");//从缓存中获取配置文件
 		if (!file)
-			file = (CSVFile*)FileUtils::sharedFileUtils()->loadCSVFile(CSV_ROOT("warTips.csv"));//将文件加载到缓存中
+			file = (CSVFile*)FileUtils::sharedFileUtils()->loadCSVFile("csv/warTips.csv");//将文件加载到缓存中
 		string tips = string(GETLANGSTR(1003)) + file->get(CCRANDOM_0_1()*(file->getRowNum()-1),0);
 		m_tip->setString(tips.c_str());
 		m_tip->setVisible(false);
@@ -189,6 +188,9 @@ namespace BattleSpace{
 			SkillParse(tRoleData,VecEffect,VecBuff);	
 		}
 		m_LoadSpine->AddRoleSpineID(146);
+#if BATTLE_TEST
+		m_LoadSpine->AddRoleSpineID(2342);
+#endif
 		m_LoadSpine->AddRoleSpineID(9999);
 		VecRole.push_back(516);
 		VectorUnique(VecRole);
@@ -322,7 +324,7 @@ namespace BattleSpace{
 	//加载公共资源
 	void LoadBattleResource::LoadPublic()
 	{
-		CSVFile* file = (CSVFile*)FileUtils::sharedFileUtils()->getFile(CSV_ROOT("loadWar.csv"));			//加载战斗公共资源
+		CSVFile* file = (CSVFile*)FileUtils::sharedFileUtils()->getFile("csv/loadWar.csv");			//加载战斗公共资源
 		char ExportJson_str[60] = {0};
 		for (int i=1;i < file->getRowNum(); i++)
 		{
@@ -495,7 +497,7 @@ namespace BattleSpace{
 		}
 		CCArmatureDataManager::sharedArmatureDataManager()->addArmatureFileInfo("warScene/open/taiwen.ExportJson");
 		//在新手引导关卡才加载公共信息，否则在进入主城时加载
-		CSVFile* file = (CSVFile*)FileUtils::sharedFileUtils()->loadCSVFile(CSV_ROOT("preloadRes.csv"));
+		CSVFile* file = (CSVFile*)FileUtils::sharedFileUtils()->loadCSVFile("csv/preloadRes.csv");
 		int row = file->getRowNum();
 		for(int i = 1; i < row;++i)
 		{
@@ -522,14 +524,14 @@ namespace BattleSpace{
 		if ( !m_Manage->getStageID())	//统一释放了spine动画,是否可以统一的去释放骨骼动画资源
 			CCArmatureDataManager::sharedArmatureDataManager()->removeArmatureFileInfo("warpublic/open.ExportJson");
 		this->unscheduleAllSelectors();
-		DataCenter::sharedData()->getCombatGuideMg()->clearGuideData(true);
+		ManageCenter->getCombatGuideMg()->clearGuideData(true);
 		m_Manage->BattleDataClear();
-		DataCenter::sharedData()->getWar()->setWorldBoss(false);
-		DataCenter::sharedData()->getWar()->setWorldBossRank(0);
-		DataCenter::sharedData()->getTer()->clear();
-		DataCenter::sharedData()->getMap()->clearMap();
+		BattleManage->setWorldBoss(false);
+		BattleManage->setWorldBossRank(0);
+		ManageCenter->getTer()->clear();
+		ManageCenter->getMap()->clearMap();
 		CCTextureCache::sharedTextureCache()->removeUnusedTextures();				//清理掉所有的不使用的图片
-		FileUtils::sharedFileUtils()->releaseFile(CSV_ROOT("loadWar.csv"));
+		FileUtils::sharedFileUtils()->releaseFile("csv/loadWar.csv");
 		LayerManager::instance()->closeAll();
 		switch (m_SceneType)
 		{
@@ -555,7 +557,7 @@ namespace BattleSpace{
 	void LoadBattleResource::ProgressEnd()
 	{
 		if ((m_loadResNum>=m_resVec.size() && m_LoadSpine->getLoadSucceed()) || 
-			 (m_CurrIndex >= m_totalNum + 1000) )
+			(m_CurrIndex >= m_totalNum + 1000) )
 		{
 			if (m_CurrIndex >= m_totalNum + 1000)
 				CCLOG("[ *ERROR ] LoadBattleResource::ProgressEnd");

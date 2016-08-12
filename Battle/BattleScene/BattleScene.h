@@ -15,7 +15,6 @@
  *
  *************************************************************/
 #include "AppUI.h"
-#include "Global.h"
 namespace google {
 	namespace protobuf{
 		class Message;

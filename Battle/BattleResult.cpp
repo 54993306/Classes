@@ -1,6 +1,6 @@
 #include "BattleResult.h"
 #include "model/DataCenter.h"
-#include "model/WarManager.h"
+#include "Battle/WarManager.h"
 namespace BattleSpace{
 
 	STR_LostHp::STR_LostHp():hitType(0),hitNum(0),anger(0)

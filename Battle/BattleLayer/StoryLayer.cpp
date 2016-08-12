@@ -1,9 +1,8 @@
 ﻿#include "Battle/BattleLayer/StoryLayer.h"
-#include "Global.h"
 #include "Battle/BattleScene/BattleScene.h"
 #include "tools/ToolDefine.h"
-#include "model/DataCenter.h"
-#include "model/WarManager.h"
+#include "Battle/BattleCenter.h"
+#include "Battle/WarManager.h"
 #include "common/CommonFunction.h"
 #include "tools/CCShake.h"
 #include "common/CGameSound.h"
@@ -66,10 +65,10 @@ namespace BattleSpace{
 		if(!pStoryData)
 		{
 #if !BATTLE_TEST
-			if (!DataCenter::sharedData()->getWar()->getFirstStage())		//第一次打关卡才出现关卡剧情
+			if (!BattleManage->getFirstStage())		//第一次打关卡才出现关卡剧情
 				return false;
 #endif	
-			pStoryData = DataCenter::sharedData()->getWar()->getStoryData();
+			pStoryData = BattleManage->getStoryData();
 		}
 		vector<StoryStep*>* vec = pStoryData->getStory(StoryType(storytype));
 		if (! vec) return false;
@@ -331,7 +330,7 @@ namespace BattleSpace{
 				return (SkeletonAnimation*)m_ui->getChildByTag(leftImg_tag);
 			}
 		}else{
-			SpData* data = DataCenter::sharedData()->getWar()->getSpineData(ToString(m_StoryStep->getRoleID()));
+			SpData* data = BattleManage->getSpineData(ToString(m_StoryStep->getRoleID()));
 			if (!data)
 			{
 				CCLOG("[ *ERROR ] StoryLayer::storyrole roleId=%d",m_StoryStep->getRoleID());

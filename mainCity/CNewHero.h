@@ -2,7 +2,7 @@
 
 #include "AppUI.h"
 #include "scene/layer/LayerManager.h"
-#include "model/BattleData.h"
+#include "model/CRoleData.h"
 #include "mainCity/RecruitData.h"
 
 typedef void (CCObject::*newHeroEffectCallBack)();

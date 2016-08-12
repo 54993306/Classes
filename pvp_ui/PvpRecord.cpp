@@ -146,10 +146,11 @@ void CPvpRecord::addTableCell(unsigned int uIdx, CTableViewCell* pCell)
 	updateTeamInfo(recordDataLeft, 1, lay);
 	updateTeamInfo(recordDataRight, 2, lay);
 
+	UserData *pData = DataCenter::sharedData()->getUser()->getUserData();
 
 	//复仇
 	CButton *pReven = (CButton *)lay->findWidgetById("play");
-	if(pRecord.record_id() > 0)
+	if(pRecord.record_id() > 0 &&  pData->getName() != recordDataRight.role_name() )
 	{
 		pReven->setTag(uIdx);
 		pReven->setOnClickListener(this, ccw_click_selector(CPvpRecord::onReven));
@@ -208,6 +209,12 @@ void CPvpRecord::updateUI()
 	m_tableView->setCountOfCell(iRecordNum);
 	m_tableView->reloadData();
 
+	//复仇次数
+	CLabel *pRevenTimes = (CLabel *)m_ui->findWidgetById("num");
+	pRevenTimes->setString(CCString::createWithFormat("%d/5", m_recordRes.reven_time())->getCString());
+
+	CLayout *pLayerUp = (CLayout *)m_ui->findWidgetById("layer_up");
+	pLayerUp->setVisible(iRecordNum > 0);
 
 }
 
@@ -278,7 +285,7 @@ void CPvpRecord::updateTeamInfo( const RecordData& recordData, int iTag, CLayout
 	for (int i = 0; i < iSize; i++)
 	{
 		CLayout *heroLay = UICloneMgr::cloneLayout(m_heroLay);
-		const Hero& hero = recordData.teams().Get(iSize-1-i);
+		const Hero& hero = recordData.teams().Get(i);
 		const HeroInfoData *data = DataCenter::sharedData()->getHeroInfo()->getCfg(hero.thumb());
 		while (heroLay->getChildrenCount()>0)
 		{
@@ -368,6 +375,12 @@ void CPvpRecord::imageLoadSuccessCallBack( string sTag, vector<char>* pBuffer )
 
 void CPvpRecord::onReven( CCObject *pSender )
 {
+	if (m_recordRes.reven_time() <= 0)
+	{
+		ShowPopTextTip(GETLANGSTR(2043));
+		return;
+	}
+
 	//复仇
 	CCNode *pNode = (CCNode *)pSender;
 	int uIdx = pNode->getTag();

@@ -25,8 +25,8 @@
 #include "common/CGameSound.h"
 #include "Resources.h"
 #include "common/CCRollLabelAction.h"
-#include "model/DataCenter.h"
-#include "model/WarManager.h"
+#include "Battle/BattleCenter.h"
+#include "Battle/WarManager.h"
 #include <spine/spine-cocos2dx.h>
 
 using namespace spine;
@@ -328,7 +328,7 @@ void CHeroAttribute::onExit()
 	vector<int>::iterator iter = m_VecMode.begin();
 	for (;iter!=m_VecMode.end();iter++)
 	{
-		if (DataCenter::sharedData()->getWar()->isSpine(*iter))
+		if (BattleManage->isSpine(*iter))
 		{
 			continue;
 		}
@@ -689,7 +689,7 @@ void CHeroAttribute::showBaseInfo(CHero* hero)
 	//使用模型代替贴图
 	int m_ModeID = hero->thumb;
 
-	if (DataCenter::sharedData()->getWar()->isSpine(m_ModeID))
+	if (BattleManage->isSpine(m_ModeID))
 	{ 
 		char json[60] = {0};
 		char altlas[60] = {0};

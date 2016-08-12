@@ -33,12 +33,10 @@ public:
 	void onStage(CCObject* pSender);
 	void onClose(CCObject* pSender);
 	void onHero(CCObject* pSender);
-	static int TableViewOffSet;
+	static int m_iFlagId;				//上一次进入时点击到的活动id
+
 private:
 	void showEffectStart();
-	void callBackForShake();
-	void showShakeCallBack();
-	void showEffectCallBack();
 	void onSelect(CCObject* pSender);
 
 	void updateOverTime(CBounty * bounty);
@@ -56,6 +54,4 @@ private:
 	CCSprite* m_pBgEffect;
 	CImageView *m_selectSpr;
 };
-
-
 #endif

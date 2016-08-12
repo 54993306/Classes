@@ -9,13 +9,14 @@
 #include "RewardLayer.h"
 #include "tollgate/TollgatePreview.h"
 #include "tollgate/Chapter.h"
-#include "model/WarManager.h"
+#include "Battle/WarManager.h"
 #include "tools/ShowTexttip.h"
 #include "common/CheckMoney.h"
 #include "common/CShowToBuyResource.h"
 #include "common/CGameSound.h"
 #include "Resources.h"
 #include "common/ShaderDataHelper.h"
+#include "Battle/BattleCenter.h"
 
 bool CRewardHardLayer::init()
 {
@@ -158,7 +159,7 @@ void CRewardHardLayer::onStage(CCObject* pSender)
 		stage.id = bounty->id;
 		CChapter chapter;
 		chapter.id = getChapterId();
-		DataCenter::sharedData()->getWar()->setLastStageId(-1); 
+		BattleManage->setLastStageId(-1); 
 		CPlayerControl::getInstance().sendStageInfo(bounty->id);
 		CTollgatePreview *preview = CTollgatePreview::create();
 		LayerManager::instance()->push(preview);

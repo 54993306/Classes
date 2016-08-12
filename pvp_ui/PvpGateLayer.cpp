@@ -347,7 +347,7 @@ void CPvpGateLayer::showBuilding()
 		CCSequence::create(
 		CCDelayTime::create(0.5f), 
 		CCScaleTo::create(1.2f, 1.0f),
-		CCCallFunc::create(this, callfunc_selector(CPvpGateLayer::showUI)),
+		CCCallFunc::create(this, callfunc_selector(CPvpGateLayer::showAllDownLayer)),
 		nullptr
 		));
 }
@@ -414,14 +414,22 @@ bool CPvpGateLayer::ccTouchBegan( CCTouch *pTouch, CCEvent *pEvent )
 	return true;
 }
 
-void CPvpGateLayer::showUI()
+void CPvpGateLayer::showAllDownLayer()
+{
+	CLayout *pDownLayer1 = (CLayout *)m_ui->findWidgetById("down_1");
+	showUI(pDownLayer1);
+	CLayout *pDownLayer3 = (CLayout *)m_ui->findWidgetById("down_3");
+	pDownLayer3->setVisible(true);
+}
+
+void CPvpGateLayer::showUI( CLayout *pDownLayer )
 {
 	//底层UI
-	CLayout *pLayout = (CLayout *)m_ui->findWidgetById("down");
+	CLayout *pLayout = pDownLayer;
 	pLayout->setVisible(true);
 
 	//奖杯
-	CImageView *pCupImage = (CImageView *)m_ui->findWidgetById("cup");
+	CImageView *pCupImage = (CImageView *)pDownLayer->getChildByTag(2);
 	CCTexture2D *pCupTexture = CCTextureCache::sharedTextureCache()->addImage(CCString::createWithFormat("pvp/gate/cup_%d.png", m_iRoleRank)->getCString());
 	if (pCupTexture)
 	{
@@ -434,7 +442,7 @@ void CPvpGateLayer::showUI()
 
 	//添加六边形特效
 	SkeletonAnimation *pSkeletonAnimation = SkeletonAnimation::createWithFile("pvp/gate/pian.json", "pvp/gate/pian.atlas", 1);
-	pSkeletonAnimation->setPosition(ccp(789, 26));
+	pSkeletonAnimation->setPosition(ccp(349, 26));
 	pLayout->addChild(pSkeletonAnimation, 2);
 	pSkeletonAnimation->completeListener = std::bind(
 		[pSkeletonAnimation]( int iData1, int iData2 ){ 
@@ -442,14 +450,14 @@ void CPvpGateLayer::showUI()
 			{
 				pSkeletonAnimation->setAnimation(1, "stand2", true); 
 			}
-		},	
+		},
 		std::placeholders::_1, std::placeholders::_2
 		);
 	//pSkeletonAnimation->setVisible(pCupImage->isVisible());
 	
 
 	//称号
-	CImageView *pTitle = (CImageView *)m_ui->findWidgetById("title");
+	CImageView *pTitle = (CImageView *)pDownLayer->getChildByTag(3);
 	CCTexture2D *pTitleTexture = CCTextureCache::sharedTextureCache()->addImage(CCString::createWithFormat("pvp/gate/type_%d.png", m_iRoleRank)->getCString());
 	if (pTitleTexture)
 	{
@@ -463,7 +471,7 @@ void CPvpGateLayer::showUI()
 
 	//排名
 	CLabelAtlas *pRank = CLabelAtlas::create(ToString(m_iRank), "pvp/gate/pvp_number2.png", 34, 54, '0');
-	pRank->setPosition(ccp(950, 35));
+	pRank->setPosition(ccp(188, 35));
 	pRank->setAnchorPoint(CCPointCenter);
 	if(m_iRank > 1000)
 	{
@@ -473,15 +481,15 @@ void CPvpGateLayer::showUI()
 	pLayout->addChild(pRank);
 
 	//横条
-	CImageView *pBlank = (CImageView *)m_ui->findWidgetById("blank");
+	CImageView *pBlank = (CImageView *)pDownLayer->getChildByTag(4);
 
 	//ranking
-	CLabel *pRanking = (CLabel *)m_ui->findWidgetById("ranking");
+	CLabel *pRanking = (CLabel *)pDownLayer->getChildByTag(5);
 	
 
 	//动画-横条飞出-ranking显示-（六边形显示-奖杯落下）-名字显示
-	pBlank->setPositionX(pBlank->getPositionX()+410);
-	pBlank->runAction(CCMoveBy::create(0.2f, ccp(-410, 0)));
+	pBlank->setPositionX(pBlank->getPositionX()-410);
+	pBlank->runAction(CCMoveBy::create(0.2f, ccp(+410, 0)));
 
 	pRank->setOpacity(0);
 	pRank->runAction(CCSequence::createWithTwoActions(CCDelayTime::create(0.2f), CCFadeIn::create(0.3f)));

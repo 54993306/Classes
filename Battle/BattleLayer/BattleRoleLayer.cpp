@@ -1,7 +1,6 @@
 ﻿
 #include "Battle/BattleLayer/BattleRoleLayer.h"
-#include "model/DataCenter.h"
-#include "Global.h"
+#include "Battle/BattleCenter.h"
 #include "Battle/AnimationManager.h"
 #include "common/CommonFunction.h"
 #include "Battle/ConstNum.h"
@@ -12,8 +11,8 @@
 #include "Battle/MoveRule.h"
 #include "Battle/EffectObject.h"
 #include "tools/CCShake.h"
-#include "model/WarManager.h"
-#include "model/MapManager.h"
+#include "Battle/WarManager.h"
+#include "Battle/MapManager.h"
 #include "Battle/CombatGuideManage.h"
 #include "Battle/CombatGuideData.h"
 #include "Battle/BattleScene/BattleScene.h"
@@ -77,8 +76,8 @@ namespace BattleSpace
 		addChild(m_MoveNode);
 		m_AliveNode = CCNode::create();
 		addChild(m_AliveNode);
-		mManage = DataCenter::sharedData()->getWar();
-		m_map = DataCenter::sharedData()->getMap()->getCurrWarMap();
+		mManage = BattleManage;
+		m_map = ManageCenter->getMap()->getCurrWarMap();
 
 		createMoveTarget();
 		createLayerColor();

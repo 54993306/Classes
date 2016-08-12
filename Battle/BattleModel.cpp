@@ -16,9 +16,8 @@
 #include "Battle/ConstNum.h"
 #include "Battle/MoveObject.h"
 #include "Battle/RoleObject/RoleObject.h"
-
-#include "model/DataCenter.h"
-#include "model/WarManager.h"
+#include "Battle/BattleCenter.h"
+#include "Battle/WarManager.h"
 namespace BattleSpace
 {
 	BattleModel::BattleModel()
@@ -45,7 +44,7 @@ namespace BattleSpace
 
 	bool BattleModel::init()
 	{
-		mManage = DataCenter::sharedData()->getWar();
+		mManage = BattleManage;
 		return true;
 	}
 

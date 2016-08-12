@@ -7,7 +7,7 @@
 #include "common/CommonFunction.h"
 #include "Battle/EffectObject.h"
 #include "model/DataCenter.h"
-#include "model/WarManager.h"
+#include "Battle/WarManager.h"
 
 using namespace CocosDenshion;
 namespace BattleSpace

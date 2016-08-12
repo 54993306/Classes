@@ -2,7 +2,7 @@
 #include "Battle/RoleObject/RoleObject.h"
 #include "tools/ToolDefine.h"
 #include "model/DataCenter.h"
-#include "model/WarManager.h"
+#include "Battle/WarManager.h"
 #include "Battle/EffectData.h"
 #include "Battle/ActionNameDefine.h"
 #define MAX_EFFECT_FRAME 40

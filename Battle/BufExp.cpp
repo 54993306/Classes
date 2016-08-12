@@ -1,10 +1,9 @@
 ﻿#include "BufExp.h"
-#include "Global.h"
 #include "Battle/ConstNum.h"
 #include "Battle/BaseRole.h"
-#include "model/BuffManage.h"
-#include "model/DataCenter.h"
-#include "model/WarManager.h"
+#include "Battle/BuffManage.h"
+#include "Battle/BattleCenter.h"
+#include "Battle/WarManager.h"
 #include "Battle/EffectData.h"
 #include "Battle/RoleObject/HPObject.h"
 #include "Battle/RoleObject/RoleObject.h"
@@ -17,72 +16,71 @@ namespace BattleSpace{
 
 	BufExp::~BufExp()
 	{
-		NOTIFICATION->removeAllObservers(this);											//不解绑,map会崩找不到原因
+		bNotification->removeAllObservers(this);											//不解绑,map会崩找不到原因
 	}
 
 	bool BufExp::init()
 	{
 		CCSpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile("warScene/bufficon.plist");
-		NOTIFICATION->addObserver(this,callfuncO_selector(BufExp::AddBuffExcute),B_AddBuff,nullptr);
-		NOTIFICATION->addObserver(this,callfuncO_selector(BufExp::updatePosition),B_RemoveBuff,nullptr);
-		NOTIFICATION->addObserver(this,callfuncO_selector(BufExp::upBuffEffect),B_UpdateBuffEffect,nullptr);
+		bNotification->addObserver(this,callfuncO_selector(BufExp::AddBuffExcute),B_AddBuff,nullptr);
+		bNotification->addObserver(this,callfuncO_selector(BufExp::updatePosition),B_RemoveBuff,nullptr);
+		bNotification->addObserver(this,callfuncO_selector(BufExp::upBuffEffect),B_UpdateBuffEffect,nullptr);
 		return true;
 	}
 	//每个buff新添加时都发送一条消息
 	void BufExp::AddBuffExcute( CCObject* ob )
 	{
-		BaseRole* alive = (BaseRole*)ob;
+		BaseRole* tRole = (BaseRole*)ob;
 		if (m_hpSize.equals(CCPointZero))
 		{
-			m_hpSize.x = alive->getRoleObject()->getHp()->getContentSize().width;
-			m_hpSize.y = alive->getRoleObject()->getHp()->getContentSize().height-GRID_HEIGHT/2;
+			m_hpSize.x = tRole->getRoleObject()->getHp()->getContentSize().width;
+			m_hpSize.y = tRole->getRoleObject()->getHp()->getContentSize().height-GRID_HEIGHT/2;
 		}
-		BuffMap* buffMap = alive->getBuffManage()->getBuffMap();
+		BuffMap* buffMap = tRole->getBuffManage()->getBuffMap();
 		for (auto i:*buffMap)
 		{
 			if (!i.second->getAddFirst())										//找到数组中没有处理过添加效果的buff
 				continue;
 			i.second->setAddFirst(false);
-			BuffEffect* effect = DataCenter::sharedData()->getWar()->getBuffData()->getBuffEffect(i.second->getBuffType(),i.second->getIsDBuff());
+			BuffEffect* effect = BattleManage->getBuffData()->getBuffEffect(i.second->getBuffType(),i.second->getIsDBuff());
 			vector<CCNode*> VecEffect;
 			if (effect)
 			{
-				float scaleNum = 1/alive->getRoleObject()->getBody()->getScale();
 				if (effect->getEffect_up())
 				{
 					EffectObject* ef = EffectObject::create(ToString(effect->getEffect_up()));
 					ef->setSkewing(true);		
-					ef->setScale(scaleNum);
+					ef->setScale(1/tRole->getZoom());
 					if (effect->getup_Loop())						//定身类的效果需要持续显示
 					{
 						ef->setPlayerType(sPlayType::eRepeat);
 						VecEffect.push_back(ef);
 					}
 					ef->setPosition(ccp(0,30));
-					alive->getRoleObject()->getBody()->addChild(ef);
+					tRole->getRoleObject()->getBody()->addChild(ef);
 				}
 				if (effect->getEffect_down())
 				{
 					EffectObject* ef = EffectObject::create(ToString(effect->getEffect_down()));
 					ef->setSkewing(true);
-					ef->setScale(scaleNum);
+					ef->setScale(1/tRole->getZoom());
 					if (effect->getdown_Loop())						//定身类的效果需要持续显示
 					{
 						ef->setPlayerType(sPlayType::eRepeat);
 						VecEffect.push_back(ef);
 					}
 					ef->setPosition(ccp(0,30));
-					alive->getRoleObject()->getBody()->addChild(ef,-1);
+					tRole->getRoleObject()->getBody()->addChild(ef,-1);
 				}
 			}
 			CCSprite* smallIcon = CreateSmallIcon(i.second,VecEffect);			//创建小图标
-			alive->getBuffManage()->AddEffectVec(i.second->getBuffID(),VecEffect);	//加入到map才能刷新位置
+			tRole->getBuffManage()->AddEffectVec(i.second->getBuffID(),VecEffect);	//加入到map才能刷新位置
 			if (smallIcon)
 			{
-				alive->getRoleObject()->getBody()->addChild(smallIcon);
-				updatePosition(alive);											//刷新小图标位置
+				tRole->getRoleObject()->getBody()->addChild(smallIcon);
+				updatePosition(tRole);											//刷新小图标位置
 			}
-			CreateBigIcon(i.second,alive->getRoleObject()->getBody());			//创建大图标
+			CreateBigIcon(i.second,tRole->getRoleObject()->getBody());			//创建大图标
 			return;																//每一条添加消息只处理一个buff的效果
 		}
 	}
@@ -153,14 +151,12 @@ namespace BattleSpace{
 	void BufExp::updatePosition( CCObject* ob )
 	{
 		BaseRole* alive = (BaseRole*)ob;
-		float scaleNum = 1/alive->getRoleObject()->getBody()->getScale();
 		if (m_hpSize.equals(CCPointZero))
 		{
 			m_hpSize.x = alive->getRoleObject()->getHp()->getContentSize().width;
 			m_hpSize.y = alive->getRoleObject()->getHp()->getContentSize().height-GRID_HEIGHT/2+3;
 		}
 		BuffEffectMapList* EffectMap = alive->getBuffManage()->getEffectMap();
-		float scaleNem = 1/alive->getRoleObject()->getBody()->getScale();
 		int index = 0;
 		for (auto i:*EffectMap)
 		{
@@ -170,7 +166,7 @@ namespace BattleSpace{
 				if (!smallIcon)
 					continue;
 				int x = smallIcon->getContentSize().width+3;
-				smallIcon->setScale(scaleNum);
+				smallIcon->setScale(1/alive->getZoom());
 				if (index>3)
 					smallIcon->setVisible(false);		//最多同时显示4个小图标
 				if (alive->getEnemy())

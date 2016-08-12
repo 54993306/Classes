@@ -2,23 +2,23 @@
 #include "Battle/AnimationManager.h"
 #include "common/CommonFunction.h"
 #include "Battle/ConstNum.h"
-#include "model/DataCenter.h"
+#include "Battle/BattleCenter.h"
 #include "tools/StringUtil.h"
 #include "Battle/RoleObject/HPObject.h"
 #include "Battle/RoleObject/RageObject.h"
 #include "Battle/EffectObject.h"
-#include "Global.h"
 #include "Battle/BaseRole.h"
 #include "Battle/BattleLayer/BattleRoleLayer.h"
-#include "model/WarManager.h"
+#include "Battle/WarManager.h"
 #include "Battle/BaseRoleData.h"
 #include "common/CGameSound.h"
 #include "common/ShaderDataHelper.h"
 #include "Battle/CHeroSoundData.h"
-#include "model/BuffManage.h"
+#include "Battle/BuffManage.h"
 #include "Battle/BattleMessage.h"
 #include "Battle/MoveObject.h"
 #include "Battle/ActionNameDefine.h"
+#include "model/DataCenter.h"
 
 namespace BattleSpace{
 	AliveObject::AliveObject()
@@ -77,8 +77,8 @@ namespace BattleSpace{
 		m_HpObject = HPObject::create();
 		m_HpObject->initHp(this);
 		m_HpObject->retain();
-		m_HpObject->setPosition(ccp(0,-60));
-		m_Body->addChild(m_HpObject, 100);					//设置血量对象添加的父节点
+		m_HpObject->setPosition(ccp(0,10-GRID_HEIGHT/2));
+		this->addChild(m_HpObject, 1);					//设置血量对象添加的父节点
 		initAliveTypeIcon();
 	}
 	HPObject* AliveObject::getHp() { return m_HpObject; }
@@ -140,7 +140,7 @@ namespace BattleSpace{
 	void AliveObject::setRoleDirection(int direction)//设置人物方向
 	{
 		m_Direction = direction;
-		if (m_IsSpine && DataCenter::sharedData()->getRoleData()->isTurn(mModel))
+		if (m_IsSpine && ManageCenter->getRoleConfig()->isTurn(mModel))
 		{
 			if(m_Direction == Ditection_Left)
 			{
@@ -249,7 +249,7 @@ namespace BattleSpace{
 
 	void AliveObject::lostHpDispose()
 	{		//这个函数应该是多余的,在武将创建的时候，应该就经过一次武将的特殊信息初始化，根据配置文件来初始化武将的一些配置的信息，而不是每次武将受击的时候才去找
-		CCNode* Effect = DataCenter::sharedData()->getRoleData()->getActionEffect(mRole->getModel());			
+		CCNode* Effect = ManageCenter->getRoleConfig()->getActionEffect(mRole->getModel());			
 		if (Effect)
 			this->addChild(Effect);
 		m_Armature->runAction(CCSequence::create(

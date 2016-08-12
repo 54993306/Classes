@@ -1,11 +1,10 @@
 ﻿#include "WarBackLayer.h"
 #include "scene/CPopTip.h"
 #include "Battle/BattleScene/BattleScene.h"
-#include "model/DataCenter.h"
+#include "Battle/BattleCenter.h"
 #include "Battle/BattleScene/LoadBattleResource.h"
 #include "netcontrol/CPlayerControl.h"
-#include "model/DataCenter.h"
-#include "model/WarManager.h"
+#include "Battle/WarManager.h"
 #include "common/CGameSound.h"
 #include "jni/CJniHelper.h"
 #include "Battle/ComBatLogic.h"
@@ -13,6 +12,7 @@
 #include "common/CGameSound.h"
 #include "Battle/BattleDataCenter.h"
 #include "Battle/BattleModel.h"
+#include "model/DataCenter.h"
 
 namespace BattleSpace
 {
@@ -117,7 +117,7 @@ namespace BattleSpace
 			this->setVisible(false);
 
 			//如果是在引导,重启游戏
-			if( !DataCenter::sharedData()->getWar()->getStageID())
+			if( !BattleManage->getStageID())
 			{
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 				CJniHelper::getInstance()->restartGame();
@@ -127,8 +127,7 @@ namespace BattleSpace
 			}
 
 			//如果是世界BOSS，申请结算
-			WarManager* Manage = DataCenter::sharedData()->getWar();
-			if(Manage->getWorldBoss())
+			if(BattleManage->getWorldBoss())
 			{
 				NOTIFICATION->postNotification(MsgBattleOver,CCBool::create(false));
 				return;
@@ -144,7 +143,7 @@ namespace BattleSpace
 			//其他类型结算
 			BattleScene* Wscene = (BattleScene*)this->getParent();
 			CScene* scene = GETSCENE(LoadBattleResource);
-			if (DataCenter::sharedData()->getWar()->getStageID())
+			if (BattleManage->getStageID())
 			{
 				((LoadBattleResource*)scene)->setRelease(true,SkipcityScene);
 				CPlayerControl::getInstance().sendBattleFinish(2,false,0);
@@ -155,12 +154,12 @@ namespace BattleSpace
 
 
 			//返回章节
-			if(DataCenter::sharedData()->getWar()->getLastStageId()!=-1)
+			if(BattleManage->getLastStageId()!=-1)
 			{
 				DataCenter::sharedData()->setCityActionType(CA_GoToChapater);
 
 				//预请求关卡信息
-				if(DataCenter::sharedData()->getWar()->getNormal())
+				if(BattleManage->getNormal())
 				{
 					CPlayerControl::getInstance().sendChapterList(0);
 				}

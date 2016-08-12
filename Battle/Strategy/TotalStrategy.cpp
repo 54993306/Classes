@@ -21,8 +21,8 @@
 #include "Battle/Strategy/PvEStrategy.h"
 #include "Battle/MoveObject.h"
 
-#include "model/DataCenter.h"
-#include "model/WarManager.h"
+#include "Battle/BattleCenter.h"
+#include "Battle/WarManager.h"
 namespace BattleSpace
 {
 #define eGuardGrid 63					//用于判断开始策略的格子(可能需要根据不同的关卡计算出来，或者由关卡中配置传送过来的值)
@@ -61,7 +61,7 @@ namespace BattleSpace
 		addEvent();
 		mAutoData = AutoData::create();
 		mAutoData->retain();
-		mManage = DataCenter::sharedData()->getWar();
+		mManage = BattleManage;
 		initCrossArea();
 		mPveStrategy = PvEStrategy::create();
 		mPveStrategy->retain();

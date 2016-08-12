@@ -4,7 +4,7 @@
 #include "scene/layer/LayerManager.h"
 
 #include "CityData.h"
-#include "model/BattleData.h"
+#include "model/CRoleData.h"
 
 class CDefendWuJiang:public BaseLayer
 {

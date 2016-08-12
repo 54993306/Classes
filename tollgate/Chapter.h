@@ -3,7 +3,7 @@
 #include "AppUI.h"
 #include "bag/bagData.h"
 #include "protos/protocol.h"
-#include "model/BattleData.h"
+#include "model/CRoleData.h"
 
 struct CChapter
 {

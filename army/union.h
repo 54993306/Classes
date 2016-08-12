@@ -2,7 +2,7 @@
 #define __UNIONDATA_
 
 #include "bag/bagData.h"
-#include "model/BattleData.h"
+#include "model/CRoleData.h"
 struct CUnion
 {
 	vector<CHero> heroList;

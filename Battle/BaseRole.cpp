@@ -11,9 +11,9 @@
 #include "Battle/BattleModel.h"
 #include "Battle/StateManage/StateManager.h"
 
-#include "model/DataCenter.h"
-#include "model/WarManager.h"
-#include "model/BuffManage.h"
+#include "battle/BattleCenter.h"
+#include "Battle/WarManager.h"
+#include "Battle/BuffManage.h"
 #include "Battle/RoleObject/RoleObject.h"
 #include "Battle/ConstNum.h"
 #include "Battle/SkillRange.h"
@@ -56,12 +56,12 @@ namespace BattleSpace
 		mSkillArea.clear();
 		mAreaTargets.clear();
 	}
-
+	//可以开一个适配器，将相应的外部功能封装在一个对象中
 	bool BaseRole::init()
 	{
-		mManage = DataCenter::sharedData()->getWar();
+		mManage = BattleManage;
 		mBattleModel = BattleData->getBattleModel();
-		mGuideManage = DataCenter::sharedData()->getCombatGuideMg();
+		mGuideManage = ManageCenter->getCombatGuideMg();
 
 		mBuffManage = BuffManage::create();
 		mBuffManage->setAlive(this);
@@ -180,13 +180,6 @@ namespace BattleSpace
 			setMaxHp(getBaseData()->getRoleHp());
 		}
 		setHp(getBaseData()->getRoleHp());									//第一次进来是满血状态
-#if BATTLE_TEST
-		//if (getOtherCamp() && !getBaseData()->getInitGrid())
-		//{
-		//	setMaxHp(10000000);
-		//	setHp(10000000);	
-		//}
-#endif
 		setCostMax(getBaseData()->getMaxCost());
 		setInitCost(getBaseData()->getInitCost());			
 		setAddCost(getBaseData()->getCostSpeed());
@@ -196,8 +189,19 @@ namespace BattleSpace
 		setHit(getBaseData()->getRoleHit());
 		setRenew(getBaseData()->getRoleRegain());
 		setDoge(getBaseData()->getRoleDodge());
-
 		setZoom(getBaseData()->getRoleZoom()*0.01f);
+#if BATTLE_TEST
+		if (getOtherCamp())
+		{
+			if (getModel() == 709)
+			{
+				setModel(2342);
+				setZoom(1.4f);
+			}
+		}else{
+			setAtk(1000900);
+		}
+#endif
 	}
 
 	void BaseRole::setAtkNum(int var)
@@ -798,8 +802,8 @@ namespace BattleSpace
 		}
 		return false;
 	}
-
-	int BaseRole::getMonsterMove()//怪物的移动处理是，哪个最先返回值不是INVALID_GRID就以哪个为标准，后面的不做处理了
+	//怪物实际执行下一个移动格子判断
+	int BaseRole::getMonsterMove()
 	{
 #if BATTLE_TEST
 		if (getRoleLayer()->gettestState())
@@ -1411,7 +1415,7 @@ namespace BattleSpace
 			setEnterTime(getBaseData()->getColdDown()/tDirectorTime);
 			setSkillTime(0);
 			setBattle(false);
-			NOTIFICATION->postNotification(MsgRoleDie,this);
+			bNotification->postNotification(MsgRoleDie,this);
 		}
 	}
 	//角色被击杀死亡时会进行的一些处理

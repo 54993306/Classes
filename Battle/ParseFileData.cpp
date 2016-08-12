@@ -1,7 +1,7 @@
 #include "ParseFileData.h"
 #include "tools/ToolDefine.h"
 #include "model/DataCenter.h"
-#include "model/WarManager.h"
+#include "Battle/WarManager.h"
 #include "Battle/ConstNum.h"
 #include "Battle/BattleTools.h"
 using namespace BattleSpace;

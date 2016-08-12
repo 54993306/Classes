@@ -9,7 +9,7 @@
 
 CActivityCollectLayer::CActivityCollectLayer():
 m_ui(nullptr), m_cellIcon(nullptr), m_cellBlank(nullptr), m_tableView(nullptr),m_pData(nullptr),m_iActId(0)
-,m_pMonsterInfo(nullptr), m_pItemInfo(nullptr),m_pCurrentExlist(nullptr)
+,m_pMonsterInfo(nullptr), m_pItemInfo(nullptr),m_pCurrentExlist(nullptr),m_iExchangeType(ExchangeTypeNormal)
 {
 
 }
@@ -107,28 +107,44 @@ void CActivityCollectLayer::addTableCell( unsigned int uIdx, CTableViewCell * pC
 	//获取数据
 	ExList* pInfo = m_pData->Mutable(uIdx);
 
-
 	//添加兑换规则
 	CCPoint pPos(80, 54);
 	int iGapX = 94;
-	//收集品列表
-	bool isNotEnough = initListCellIcon(pInfo->mutable_oitems(), pPos, iGapX, pCell, true);
+	bool isNotEnough = false;
+	switch (m_iExchangeType)
+	{
+	case CActivityCollectLayer::ExchangeTypeNormal:
+		{
+			//收集品列表
+			isNotEnough = initListCellIcon(pInfo->mutable_oitems(), pPos, iGapX, pCell, true);
 
-	pPos = pPos+ccp(pInfo->oitems_size()*iGapX, 0);
+			int iOItemSize = pInfo->oitems_size();
+			pPos = pPos+ccp(pInfo->oitems_size()*iGapX, 0);
 
-	//箭头
-	CCSprite* pSprite = CCSprite::create("activity/jiantou.png");
-	//pSprite->setScale(0.8f);
-	pSprite->setPosition(ccp(pPos.x, pPos.y));
-	pCell->addChild(pSprite, 10);
 
-	pPos = pPos+ccp(iGapX, 0);
+			//箭头
+			CCSprite* pSprite = CCSprite::create("activity/jiantou.png");
+			//pSprite->setScale(0.8f);
+			pSprite->setPosition(ccp(pPos.x, pPos.y));
+			pCell->addChild(pSprite, 10);
+
+			pPos = pPos+ccp(iGapX, 0);
+		}
+		break;
+	case CActivityCollectLayer::ExchangeTypeByLevel:
+		{
+			pPos = pPos+ccp(180, 0);
+		}
+		break;
+	default:
+		break;
+	}
 
 	//兑换列表
 	initListCellIcon(pInfo->mutable_titems(), pPos, iGapX, pCell, false);
 
 
-	for (unsigned int i=1; i<=5; i++)
+	for (unsigned int i=1; i<=6; i++)
 	{
 		CCNode *child = lay->getChildByTag(i);
 		lay->removeChild(child);
@@ -164,33 +180,101 @@ void CActivityCollectLayer::addTableCell( unsigned int uIdx, CTableViewCell * pC
 				{
 					return;
 				}
-				//可用
-				if(pInfo->achieve() && !isNotEnough)
-				{
-					pButton->setEnabled(true);
-					pButton->getDisabledImage()->setShaderProgram(ShaderDataMgr->getShaderByType(ShaderDefault));
-				}
-				else
-				{
-					pButton->setEnabled(false);
-					pButton->getDisabledImage()->setShaderProgram(ShaderDataMgr->getShaderByType(ShaderStone));
-				}
 				pButton->setOnClickListener(this, ccw_click_selector(CActivityCollectLayer::collectCellClick));
+			}
+			break;
+		case 4:
+			{
+				CLabel* pLabel = dynamic_cast<CLabel*>(child);
+				if(!pLabel)
+				{
+					return;
+				}
 			}
 			break;
 			//兑换限定
 		case 5:
 			{
-				int iCurrent = 1;
-				int iMax = 2;
+				int iCurrent = pInfo->exlevel();
 				CLabel* pLabel = dynamic_cast<CLabel*>(child);
-				pLabel->setString(CCString::createWithFormat(GETLANGSTR(121), iCurrent, iMax)->getCString());
-				pLabel->setVisible(false);
+				pLabel->setString(CCString::createWithFormat(GETLANGSTR(2045), iCurrent)->getCString());
 			}
 			break;
 		default:
 			break;
 		}
+	}
+
+
+	CButton* pButton = dynamic_cast<CButton*>(pCell->getChildByTag(3));
+	CLabel* pButtonLab = dynamic_cast<CLabel*>(pCell->getChildByTag(4));
+	CImageView* pRight = dynamic_cast<CImageView*>(pCell->getChildByTag(6));
+	CLabel* pLabel = dynamic_cast<CLabel*>(pCell->getChildByTag(5));
+
+	switch (m_iExchangeType)
+	{
+	case CActivityCollectLayer::ExchangeTypeNormal:
+		{
+			//收集品列表
+			CButton* pButton = dynamic_cast<CButton*>(pCell->getChildByTag(3));
+			//可用
+			if(pInfo->achieve() && !isNotEnough)
+			{
+				pButton->setEnabled(true);
+				pButton->getDisabledImage()->setShaderProgram(ShaderDataMgr->getShaderByType(ShaderDefault));
+			}
+			else
+			{
+				pButton->setEnabled(false);
+				pButton->getDisabledImage()->setShaderProgram(ShaderDataMgr->getShaderByType(ShaderStone));
+			}
+
+			//对勾隐藏
+			pRight->setVisible(false);
+			pLabel->setVisible(false);
+		}
+		break;
+	case CActivityCollectLayer::ExchangeTypeByLevel:
+		{
+			pLabel->setVisible(true);
+
+			//等级是否达到
+			UserData *pUserData = DataCenter::sharedData()->getUser()->getUserData();
+			bool isLevelOk = pUserData->getLevel()>=pInfo->exlevel();
+			//等级到达，却标记不可领，说明已经领取了
+			if(!pInfo->achieve() && isLevelOk)
+			{
+				//对勾显示，按钮隐藏
+				pRight->setVisible(true);
+				pButton->setVisible(false);
+				pButtonLab->setVisible(false);
+			}
+			//等级到达，标记可以领，待领取
+			else if( pInfo->achieve() && isLevelOk )
+			{
+				//对勾隐藏，按钮显示
+				pRight->setVisible(false);
+				pButton->setVisible(true);
+				pButtonLab->setVisible(true);
+
+				pButton->setEnabled(true);
+				pButton->getDisabledImage()->setShaderProgram(ShaderDataMgr->getShaderByType(ShaderDefault));
+			}
+			//等级未到达，标记不可领，不能领
+			else if ( !pInfo->achieve() && !isLevelOk  )
+			{
+				//对勾隐藏，按钮显示
+				pRight->setVisible(false);
+				pButton->setVisible(true);
+				pButtonLab->setVisible(true);
+
+				pButton->setEnabled(false);
+				pButton->getDisabledImage()->setShaderProgram(ShaderDataMgr->getShaderByType(ShaderStone));
+			}
+		}
+		break;
+	default:
+		break;
 	}
 }
 
@@ -445,40 +529,52 @@ void CActivityCollectLayer::restData()
 {
 	if(m_pCurrentExlist!=nullptr)
 	{
-		//消耗了哪几种东西, 这几种东西分别剩余多少个
-		std::map<int, int> mapConcume;
-
-		int iSize = m_pCurrentExlist->oitems_size();
-		for(int i=0; i<iSize; i++)
+		switch (m_iExchangeType)
 		{
-			Prize* prize= m_pCurrentExlist->mutable_oitems(i);
-			int iNeed = prize->num();
-			int iAll = prize->param();
-			int iRemain = iAll-iNeed;
-			iRemain = iRemain<0?0:iRemain;
-			mapConcume.insert(std::pair<int, int>(prize->id(), iRemain));
-		}
-
-		//拿到所有的列，然后重置物品数量
-		for(int i=0; i<m_pData->size(); i++)
-		{
-			ExList* pInfo = m_pData->Mutable(i);
-			int iSize = pInfo->oitems_size();
-			for(int j=0; j<iSize; j++)
+		case CActivityCollectLayer::ExchangeTypeNormal:
 			{
-				Prize* prize= pInfo->mutable_oitems(j);
-				std::map<int, int>::iterator iterator = mapConcume.find(prize->id());
-				if( iterator != mapConcume.end())
+				//消耗了哪几种东西, 这几种东西分别剩余多少个
+				std::map<int, int> mapConcume;
+
+				int iSize = m_pCurrentExlist->oitems_size();
+				for(int i=0; i<iSize; i++)
 				{
-					prize->set_param(iterator->second);
+					Prize* prize= m_pCurrentExlist->mutable_oitems(i);
+					int iNeed = prize->num();
+					int iAll = prize->param();
+					int iRemain = iAll-iNeed;
+					iRemain = iRemain<0?0:iRemain;
+					mapConcume.insert(std::pair<int, int>(prize->id(), iRemain));
+				}
+
+				//拿到所有的列，然后重置物品数量
+				for(int i=0; i<m_pData->size(); i++)
+				{
+					ExList* pInfo = m_pData->Mutable(i);
+					int iSize = pInfo->oitems_size();
+					for(int j=0; j<iSize; j++)
+					{
+						Prize* prize= pInfo->mutable_oitems(j);
+						std::map<int, int>::iterator iterator = mapConcume.find(prize->id());
+						if( iterator != mapConcume.end())
+						{
+							prize->set_param(iterator->second);
+						}
+					}
 				}
 			}
+			break;
+		case CActivityCollectLayer::ExchangeTypeByLevel:
+			{
+				m_pCurrentExlist->set_achieve(false);
+			}
+			break;
+		default:
+			break;
 		}
-
-		m_pCurrentExlist = nullptr;
+		
 	}
 
+	m_pCurrentExlist = nullptr;
 	ReloadTableViewWithSameOffset(m_tableView);
 }
-
-

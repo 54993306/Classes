@@ -15,6 +15,14 @@ using namespace spine;
 
 USING_NS_CC;
 
+enum PvpGateUiTag
+{
+	PvpGateUiTagCup				= 2,
+	PvpGateUiTagTitle			= 3,
+	PvpGateUiTagBlank			= 4,
+	PvpGateUiTagRanking		= 5
+};
+
 class CPvpGateLayer: public BaseLayer
 {
 public:
@@ -66,7 +74,8 @@ private:
 	void runCloud();
 
 	//UI面板出场
-	void showUI();
+	void showAllDownLayer();
+	void showUI( CLayout *pDownLayer );
 	void callbackForSpineAnimate( CCNode *pSender );
 private:
 	//同步PVP

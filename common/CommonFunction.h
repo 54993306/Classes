@@ -4,7 +4,7 @@
 #include "CCTK/TableView.h"
 #include "protos/protocol.h"
 #include "tollgate/Chapter.h"
-#include "model/BattleData.h"
+#include "model/CRoleData.h"
 #include "model/HeroInfoGM.h"
 
 USING_NS_CC_WIDGET;
@@ -21,9 +21,9 @@ void runEffect_ShakeY(CCNode *node, float range, float runTime, int times,CCCall
 
 //设置随机种子
 void srandNum();
-
-#define MAP_MINX(mapData) WINSIZE.width / 2 - abs(( WINSIZE.width - (mapData)->getWidth() ) / 2)
-#define MAP_MAXX(mapData) WINSIZE.width / 2 + abs(WINSIZE.width / 2 - (mapData)->getWidth() / 2)
+#define WinSize (CCDirector::sharedDirector()->getWinSize())
+#define MAP_MINX(mapData) WinSize.width / 2 - abs(( WinSize.width - (mapData)->getWidth() ) / 2)
+#define MAP_MAXX(mapData) WinSize.width / 2 + abs(WinSize.width / 2 - (mapData)->getWidth() / 2)
 
 //滤镜功能
 static void setEnableRecursiveCascading(CCNode* node, bool enable,ccColor3B color,GLubyte alpha)

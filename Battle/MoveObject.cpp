@@ -1,8 +1,8 @@
 
 #include "Battle/MoveObject.h"
 #include "Battle/BaseRole.h"
-#include "model/DataCenter.h"
-#include "model/MapManager.h"
+#include "Battle/BattleCenter.h"
+#include "Battle/MapManager.h"
 #include "Battle/ConstNum.h"
 #include "Battle/RoleObject/RoleObject.h"
 #include "Battle/BaseRoleData.h"
@@ -21,7 +21,7 @@ namespace BattleSpace{
 			for (int i=0;i<m_Row;i++)
 				grids.push_back(m_grid+j*C_GRID_ROW+i);
 		sort(grids.begin(),grids.end());
-		WarMapData* mapData = DataCenter::sharedData()->getMap()->getCurrWarMap();
+		WarMapData* mapData = ManageCenter->getMap()->getCurrWarMap();
 		setPosition(ccpAdd(mapData->getPoint(m_grid),ccp(m_OffsX,m_OffsY)));
 	}
 	int MoveObject::getgrid(){return m_grid;}

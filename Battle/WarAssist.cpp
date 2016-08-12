@@ -5,7 +5,7 @@
 #include "tools/commonDef.h"
 #include "common/color.h"
 #include "tools/CCShake.h"
-#include "model/DataCenter.h"
+#include "Battle/BattleCenter.h"
 #include "Battle/RoleObject/RoleObject.h"
 #include "Battle/BattleLayer/BattleRoleLayer.h"
 #include "Battle/WarControl.h"
@@ -17,13 +17,13 @@
 #include "cctk/scenemanager.h"
 #include "Battle/ConstNum.h"
 #include "Battle/RoleObject/HPObject.h"
-#include "model/WarManager.h"
+#include "Battle/WarManager.h"
 #include "Battle/ComBatLogic.h"
 #include "common/CGameSound.h"
 #include "Battle/BattleLayer/BattleMapLayer.h"
 #include "common/CommonFunction.h"
-#include "Global.h"
-#include "model/MapManager.h"
+#include "model/DataCenter.h"
+#include "Battle/MapManager.h"
 #include "Battle/BattleMessage.h"
 #include "model/CWholeBodyShowData.h"
 #include "Battle/BattleTools.h"
@@ -47,7 +47,7 @@ namespace BattleSpace
 		NOTIFICATION->addObserver(this,callfuncO_selector(WarAssist::starActionEnd),MsgStarActionEnd,nullptr);
 		NOTIFICATION->addObserver(this,callfuncO_selector(WarAssist::WinEffect),MsgPlayWinEffect,nullptr);
 		NOTIFICATION->addObserver(this,callfuncO_selector(WarAssist::displayBossWarningBegin),MsgShowStageWarning,nullptr);
-		mManage = DataCenter::sharedData()->getWar();
+		mManage = BattleManage;
 		return true;
 	}
 
@@ -775,7 +775,7 @@ namespace BattleSpace
 	{
 		//7
 		//精英关卡置回右边
-		if( !mManage->getNormal() && DataCenter::sharedData()->getWar()->getStageID())
+		if( !mManage->getNormal() && BattleManage->getStageID())
 		{
 			float fDelay = fixMoveLayBorder(0);
 			m_ui->runAction(

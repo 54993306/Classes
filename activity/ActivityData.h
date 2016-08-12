@@ -49,6 +49,7 @@ struct CActivity
 	string		sIconFile;		//活动图标
 	string		sInfoFile;		//描述图片
 	int			iExtraParam;				//其他参数，可能是价格
+	bool			bTips;						//红点
 	google::protobuf::RepeatedPtrField< ::protos::ExList >	 exlist;				//额外列表数据，用于收集活动
 	void read(const Activity& activity);
 };

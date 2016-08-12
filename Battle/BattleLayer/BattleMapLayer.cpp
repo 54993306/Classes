@@ -1,5 +1,5 @@
 ﻿#include "Battle/BattleLayer/BattleMapLayer.h"
-#include "model/DataCenter.h"
+#include "Battle/BattleCenter.h"
 #include "tools/ToolDefine.h"
 #include "common/CommonFunction.h"
 #include "Battle/ConstNum.h"
@@ -10,10 +10,9 @@
 #include "Battle/BattleLayer/BattleRoleLayer.h"
 #include "Battle/MoveRule.h"
 #include "Battle/EffectObject.h"
-#include "Global.h"
 #include "tools/CCShake.h"
-#include "model/WarManager.h"
-#include "model/MapManager.h"
+#include "Battle/WarManager.h"
+#include "Battle/MapManager.h"
 #include "Battle/MapEffect.h"
 #include "Battle/ParseFileData.h"
 #include "tools/ShowTexttip.h"
@@ -64,7 +63,7 @@ namespace BattleSpace{
 	bool BattleMapLayer::init()
 	{
 		bool res = CCNode::init();
-		mManage = DataCenter::sharedData()->getWar();
+		mManage = BattleManage;
 		m_SkillRange = SkillRange::create(mManage);
 		m_SkillRange->retain();
 		mGuardArea = GuardArea::create(mManage);
@@ -111,7 +110,7 @@ namespace BattleSpace{
 
 	void BattleMapLayer::createBackImage()
 	{
-		WarMapData* map = DataCenter::sharedData()->getMap()->getCurrWarMap();
+		WarMapData* map = ManageCenter->getMap()->getCurrWarMap();
 		if (!map) return;
 #if BATTLE_TEST
 		for(int i = 0; i < C_GRID_ROW * C_GRID_COL;++i)
@@ -161,7 +160,7 @@ namespace BattleSpace{
 	void BattleMapLayer::OpenGuide( int gird )
 	{
 		m_DisPlayArea->getChildByTag(map_guide)->setVisible(true);
-		WarMapData* map = DataCenter::sharedData()->getMap()->getCurrWarMap();
+		WarMapData* map = ManageCenter->getMap()->getCurrWarMap();
 		m_DisPlayArea->getChildByTag(map_guide)->setPosition(map->getPoint(gird));
 	}
 

@@ -2,8 +2,8 @@
 #include "Battle/BattleScene/LoadBattleResource.h"
 #include "Battle/WarAssist.h"
 #include "tools/CCShake.h"
-#include "model/DataCenter.h"
-#include "model/WarManager.h"
+#include "Battle/BattleCenter.h"
+#include "Battle/WarManager.h"
 #include "protos/ProtoDefine.h"
 #include "net/CNetClient.h"
 #include "netcontrol/CPlayerControl.h"
@@ -13,6 +13,7 @@
 #include "common/ShaderDataHelper.h"
 #include "mainCity/MainCityControl.h"
 #include "tools/ShowTexttip.h"
+#include "model/DataCenter.h"
 
 
 WarFailLayer::WarFailLayer(void)
@@ -204,10 +205,10 @@ void WarFailLayer::onExitClick(CCObject* pSender){
 }
 void WarFailLayer::onExitWait(CCNode *pSender){	
 
-	if(DataCenter::sharedData()->getWar()->getLastStageId()!=-1)
+	if(BattleManage->getLastStageId()!=-1)
 	{
 		//预请求关卡信息
-		if(DataCenter::sharedData()->getWar()->getNormal())
+		if(BattleManage->getNormal())
 		{
 			CPlayerControl::getInstance().sendChapterList(0);
 		}

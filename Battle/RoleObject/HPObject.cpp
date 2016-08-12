@@ -91,7 +91,6 @@ namespace BattleSpace{
 		initSkinByEnemy();
 		this->setHpNumberMax(m_Alive->getMaxHp());
 		this->setHpNumber(m_Alive->getHp());
-		this->setScale(1/m_Alive->getZoom());
 		this->setVisible(false);
 	}
 

@@ -1,13 +1,13 @@
 ﻿
-#include "AppUI.h"
-#include "Global.h"
+
 #include "PostureState.h"
 #include "Battle/BaseRole.h"
 #include "Battle/ConstNum.h"
 #include "common/CommonFunction.h"
 #include "Battle/ActionNameDefine.h"
 #include "Battle/RoleObject/RoleObject.h"
-namespace BattleSpace{
+namespace BattleSpace
+{
 	bool PostureState::ExecuteNextState(StateManager* actor,StateMachine* self)
 	{
 		if (actor&&self)

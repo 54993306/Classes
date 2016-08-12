@@ -4,8 +4,8 @@
 #include "Battle/BattleScene/BattleScene.h"
 #include "Battle/BattleLayer/BattleRoleLayer.h"
 #include "Battle/ConstNum.h"
-#include "model/WarManager.h"
-#include "model/DataCenter.h"
+#include "Battle/WarManager.h"
+#include "Battle/BattleCenter.h"
 #include "common/CGameSound.h"
 namespace BattleSpace{
 	CombatGuideManage::CombatGuideManage()
@@ -373,13 +373,12 @@ namespace BattleSpace{
 
 	void CombatGuideManage::setCurrBatchGuide(const char* FilePath)
 	{
-		WarManager* manage = DataCenter::sharedData()->getWar();
 		if (!FilePath)
 		{
-			if (!manage->getStageID())
+			if (!BattleManage->getStageID())
 			{
 				char path[60] = {0};
-				sprintf(path,"%d_%d",0,manage->getCurrBatch()+1);										//覆盖高亮区域的图片
+				sprintf(path,"%d_%d",0,BattleManage->getCurrBatch()+1);										//覆盖高亮区域的图片
 				FilePath = path;
 			}else{
 				return ;

@@ -23,7 +23,8 @@ USING_NS_CC_EXT;
 using namespace std;
 using namespace spine; 
    
-namespace BattleSpace{
+namespace BattleSpace
+{
 	class HPObject;
 	class EffectObject;
 	class BaseRole;

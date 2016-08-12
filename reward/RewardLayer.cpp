@@ -16,7 +16,7 @@
 #include "common/ShaderDataHelper.h"
 
 
-int CRewardLayer::TableViewOffSet = 0;
+int CRewardLayer::m_iFlagId = 0;
 using namespace BattleSpace;
 bool CRewardLayer::init()
 {
@@ -186,9 +186,9 @@ void CRewardLayer::onExit()
 
 	NOTIFICATION->postNotification(SHOW_MAIN_SCENE);
 	NOTIFICATION->postNotification(SHOW_TOP_LAYER);
-
-	TableViewOffSet = m_pageView->getContentOffset().y;
 	NOTIFICATION->removeAllObservers(this);
+
+	m_iFlagId = m_iCurrentChapterId;
 }
 
 
@@ -223,17 +223,12 @@ void CRewardLayer::ProcessMsg(int type, google::protobuf::Message *msg)
 			bounty.openLevel = res->blist(i).openlevel();
 			m_bountyList.push_back(bounty);
 		}
-		m_pageView->setCountOfCell(m_bountyList.size());
-		m_pageView->reloadData();
 
-		if(bFirst)
-		{
-			if(TableViewOffSet == 0)
-			{
-				TableViewOffSet = m_pageView->getContentOffset().y;
-			}
-		//	 showEffectStart();
-		}
+		//排序
+		std::sort(m_bountyList.begin(), m_bountyList.end(), 
+			std::bind([](const CBounty& bounty1, const CBounty& bounty2){
+				return bounty1.id  > bounty2.id;
+		}, std::placeholders::_1, std::placeholders::_2));
 
 		if (m_bountyList.empty())
 		{
@@ -242,9 +237,9 @@ void CRewardLayer::ProcessMsg(int type, google::protobuf::Message *msg)
 		CBounty *bounty = &m_bountyList.at(0);
 		m_iCurrentChapterId = bounty->id;
 
-		m_selectSpr->removeFromParent();
-		m_selectSpr->setPosition(m_pageView->cellAtIndex(0)->getChildByTag(1)->getPosition());
-		m_pageView->cellAtIndex(0)->addChild(m_selectSpr);
+		m_pageView->setCountOfCell(m_bountyList.size());
+		m_pageView->reloadData();
+
 
 		const RewardData *reward = DataCenter::sharedData()->getRewardDataGM()->getRewardCfg(bounty->id);
 
@@ -259,6 +254,9 @@ void CRewardLayer::ProcessMsg(int type, google::protobuf::Message *msg)
 		}
 		updateOverTime(bounty);
 		this->schedule(schedule_selector(CRewardLayer::updateRewardTime),1.0,kCCRepeatForever,0);
+
+		showEffectStart();
+
 	}
 	else if (type==BountyHardMsg)
 	{
@@ -332,7 +330,7 @@ void CRewardLayer::onSelect(CCObject* pSender)
 	CImageView *btn = (CImageView*)pSender;
 	CBounty *bounty = (CBounty*)btn->getUserData();
 	m_iCurrentChapterId = bounty->id;
-	
+
 	m_selectSpr->removeFromParent();
 	m_selectSpr->setPosition(btn->getPosition());
 	//m_selectSpr->setPosition(ccp(btn->getContentSize().width/2,btn->getContentSize().height/2));
@@ -379,59 +377,22 @@ void CRewardLayer::onHero(CCObject* pSender)
 	story->setString(data->getStoryStr(m_pos));
 }
 
-void CRewardLayer::callBackForShake()
-{
-	m_ui->setScale(1.02f);
-	m_ui->runAction(CCSequence::createWithTwoActions(CCShake::create(0.08f, 8), CCCallFunc::create(this, callfunc_selector(CRewardLayer::showShakeCallBack))));
-}
-
-void CRewardLayer::showShakeCallBack()
-{
-	m_ui->setScale(1.0f);
-}
-
 void CRewardLayer::showEffectStart()
 {
-	//上板块移动
-	CLayout* pUpbar = (CLayout*)m_ui->findWidgetById("up_bar");
-	pUpbar->setPositionY(pUpbar->getPositionY()+300);
-	pUpbar->runAction(CCMoveBy::create(0.15f, ccp(0, -300)));
-
-	//光效
-	CCAnimation *culAnim = AnimationManager::sharedAction()->getAnimation("9014");
-	culAnim->setDelayPerUnit(0.05f);
-	CCAnimate* pAnimate = CCAnimate::create(culAnim);
-	CCSprite* pSprite = CCSprite::create();
-	pSprite->setPosition(ccp(578, 266));
-	pSprite->setScale(2.0f);
-	pSprite->setScaleY(2.1f);
-	m_ui->addChild(pSprite, m_pageView->getZOrder()-1);
-	pSprite->runAction(CCRepeatForever::create(pAnimate));
-	m_pBgEffect = pSprite;
-	m_pBgEffect->setOpacity(0);
-	m_pBgEffect->runAction(CCSequence::createWithTwoActions(CCDelayTime::create(0.15f), CCFadeIn::create(0.2f)));
-
-	float fTimeGap = 0.15f;
-	for(unsigned int i=0; i<m_pageView->getContainer()->getChildrenCount(); i++)
+	int iTimes = 0;
+	for(int i=0; i<m_bountyList.size(); i++)
 	{
-		CCNode* pNode = (CCNode*)m_pageView->getContainer()->getChildren()->objectAtIndex(i);
-		pNode->setVisible(false);
-		pNode->runAction(CCSequence::create(
-			CCMoveBy::create(0.0f, ccp(0, -400)),
-			CCDelayTime::create(fTimeGap*(i+1)),
-			CCShow::create(),
-			CCMoveBy::create(fTimeGap, ccp(0, 400)),
-			CCCallFunc::create(this, callfunc_selector(CRewardLayer::callBackForShake)),
-			nullptr));
-		if(i==4) break;
+		if(m_bountyList.at(i).id == m_iFlagId)
+		{
+			iTimes = i;
+		}
 	}
 
-	this->runAction(CCSequence::create(CCDelayTime::create(0.75f), CCCallFunc::create(this, callfunc_selector(CRewardLayer::showEffectCallBack)),nullptr));
-}
-
-void CRewardLayer::showEffectCallBack()
-{
-	m_pageView->setContentOffsetInDuration(ccp(0, TableViewOffSet), 0.5f);
+	for(int i=0; i<iTimes; i++)
+	{
+		onRight(nullptr);
+	}
+	onSelect(m_pageView->cellAtIndex(iTimes)->getChildByTag(2));
 }
 
 void CRewardLayer::updateOverTime(CBounty * bounty)

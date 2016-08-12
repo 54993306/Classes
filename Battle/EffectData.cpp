@@ -1,6 +1,6 @@
 ﻿#include "EffectData.h"
 #include "tools/ToolDefine.h"
-#include "Global.h"
+
 namespace BattleSpace{
 	EffectInfo::EffectInfo()
 		:m_EFid(0)			//ID
@@ -35,7 +35,7 @@ namespace BattleSpace{
 
 	bool EffectData::init()
 	{
-		CSVFile* file = (CSVFile*)FileUtils::sharedFileUtils()->loadCSVFile(CSV_ROOT("Effect.csv"));
+		CSVFile* file = (CSVFile*)FileUtils::sharedFileUtils()->loadCSVFile("csv/Effect.csv");
 		if (! file)
 		{
 			CCLOG("ERROR : Effect File is NULL Function in EffectData::init()");
@@ -65,7 +65,7 @@ namespace BattleSpace{
 			efInfo->retain();
 			warEffect[efInfo->getEFid()] = efInfo;
 		}
-		FileUtils::sharedFileUtils()->releaseFile(CSV_ROOT("Effect.csv"));
+		FileUtils::sharedFileUtils()->releaseFile("csv/Effect.csv");
 		return true;
 	}
 
@@ -98,7 +98,7 @@ namespace BattleSpace{
 
 	bool SpecialEffectData::init()
 	{
-		CSVFile* file = (CSVFile*)FileUtils::sharedFileUtils()->loadCSVFile(CSV_ROOT("specialEffect.csv"));
+		CSVFile* file = (CSVFile*)FileUtils::sharedFileUtils()->loadCSVFile("csv/specialEffect.csv");
 		if (!file)
 		{
 			CCLOG("ERROR : Effect File is NULL Function in SpecialEffectData::init()");
@@ -126,7 +126,7 @@ namespace BattleSpace{
 			spEf->retain();
 			spEff[spEf->getEffID()] = spEf;
 		}
-		FileUtils::sharedFileUtils()->releaseFile(CSV_ROOT("specialEffect.csv"));
+		FileUtils::sharedFileUtils()->releaseFile("csv/specialEffect.csv");
 		return true;
 	}
 
@@ -177,7 +177,7 @@ namespace BattleSpace{
 	bool BuffConfig::init()
 	{
 		unsigned long size = 0;
-		unsigned char *buff = CCFileUtils::sharedFileUtils()->getFileData(CSV_ROOT("buff.json"),"r",&size);
+		unsigned char *buff = CCFileUtils::sharedFileUtils()->getFileData("csv/buff.json","r",&size);
 		string data ((const char*)buff,size);
 		rapidjson::Document doc;
 		doc.Parse<0>(data.c_str());

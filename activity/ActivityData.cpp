@@ -10,4 +10,5 @@ void CActivity::read(const Activity& activity)
 	this->sInfoFile = activity.pic();
 	this->iExtraParam = activity.param();
 	this->exlist = activity.exchange();
+	this->bTips = activity.tips();
 }

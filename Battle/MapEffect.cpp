@@ -1,5 +1,4 @@
 ﻿#include "MapEffect.h"
-#include "Global.h"
 #include "tools/FileUtils.h"
 #include "Battle/AnimationManager.h"
 #include "Battle/BattleLayer/BattleMapLayer.h"

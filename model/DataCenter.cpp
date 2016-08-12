@@ -1,47 +1,29 @@
 ﻿#include "DataCenter.h"
-#include "TerrainManager.h"
-#include "WarManager.h"
-#include "MapManager.h"
-#include "Battle/CombatGuideManage.h"
-#include "Battle/CHeroSoundData.h"
-#include "cocoa/CCArray.h"
 #include "common/CommonFunction.h"
 #include "DataPool.h"
-using namespace BattleSpace;
 
 DataCenter* DataCenter::m_dataCenter = nullptr;
 
 DataCenter::DataCenter()
-	:m_war(nullptr),m_map(nullptr),m_ter(nullptr),m_user(nullptr)
-	,m_skill(nullptr),m_tollgate(nullptr),m_task(nullptr)
-	,m_heroInfo(nullptr),m_itemDesc(nullptr),m_CombatguideMG(nullptr),m_stageData(nullptr)
-	,m_rewardData(nullptr), m_cityActionType(CA_None),m_RoleData(nullptr),m_shareData(nullptr)
-{
-}
+:m_user(nullptr),m_skill(nullptr),m_tollgate(nullptr),m_task(nullptr)
+,m_heroInfo(nullptr),m_itemDesc(nullptr),m_stageData(nullptr)
+,m_rewardData(nullptr), m_cityActionType(CA_None),m_shareData(nullptr)
+{}
 DataCenter::~DataCenter()
 {
-	CC_SAFE_RELEASE(m_war);
-	CC_SAFE_RELEASE(m_map);
-	CC_SAFE_RELEASE(m_ter);
 	CC_SAFE_RELEASE(m_user);
 	CC_SAFE_DELETE(m_skill);
 	CC_SAFE_DELETE(m_tollgate);
 	CC_SAFE_DELETE(m_task);
 	CC_SAFE_DELETE(m_heroInfo);
-	CC_SAFE_RELEASE(m_CombatguideMG);
 	CC_SAFE_DELETE(m_stageData);
 	CC_SAFE_DELETE(m_rewardData);
-	CC_SAFE_DELETE(m_RoleData);
 	CC_SAFE_DELETE(m_shareData);
-	m_map = nullptr;
-	m_war = nullptr;
-	m_ter = nullptr;
 	m_user = nullptr;
 	m_skill = nullptr;
 	m_tollgate = nullptr;
 	m_task = nullptr;
 	m_heroInfo = nullptr;
-	m_CombatguideMG = nullptr;
 	m_rewardData = nullptr;
 	m_shareData = nullptr;
 }
@@ -60,26 +42,8 @@ bool DataCenter::init()
 	m_user->retain();
 
 	m_dataPool = new CDataPool;
-	if (!initWar())
-	{
-		CCLOG("[ *ERROR ] DataCenter::init");
-		return false;
-	}
+
 	return true;
-}
-
-MapManager* DataCenter::getMap()
-{
-	return m_map;
-}
-
-WarManager* DataCenter::getWar()
-{
-	return m_war;
-}
-TerrainManager* DataCenter::getTer()
-{
-	return m_ter;
 }
 UserManager* DataCenter::getUser()
 {
@@ -102,42 +66,6 @@ TollgateGM* DataCenter::tollgate()
 		m_tollgate = new TollgateGM();
 	}
 	return m_tollgate;
-}
-
-//战斗数据初始化
-bool DataCenter::initWar()
-{
-	if(!m_RoleData)
-	{
-		m_RoleData = new CRroleData;
-		m_RoleData->initData();
-	}
-	if (!m_map)
-	{
-		m_map = MapManager::create();
-		m_map->retain();
-	}
-	if (! m_war)
-	{
-		m_war= WarManager::create();			
-		m_war->retain();
-	}
-	if (! m_ter)
-	{
-		m_ter = TerrainManager::create();
-		m_ter->retain();
-	}
-	if (! m_CombatguideMG)
-	{
-		m_CombatguideMG = CombatGuideManage::create();
-		m_CombatguideMG->retain();
-	}
-	if (m_war && m_ter && m_map)
-	{
-		return true;
-	}else{
-		return false;
-	}
 }
 
 TaskGM* DataCenter::getTask(int taskType)
@@ -173,11 +101,6 @@ ItemGM* DataCenter::getItemDesc()
 		m_itemDesc = new ItemGM();
 	}
 	return m_itemDesc;
-}
-
-CombatGuideManage* DataCenter::getCombatGuideMg()
-{
-	return m_CombatguideMG;
 }
 
 CStageData* DataCenter::getStageData()

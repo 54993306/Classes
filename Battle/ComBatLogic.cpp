@@ -3,10 +3,10 @@
 #include "Battle/BattleScene/LoadBattleResource.h"
 #include "Battle/BattleScene/BattleScene.h"
 #include "Battle/BufExp.h"
-#include "model/DataCenter.h"
-#include "model/WarManager.h"
-#include "model/BuffManage.h"
-#include "model/MapManager.h"
+#include "Battle/BattleCenter.h"
+#include "Battle/WarManager.h"
+#include "Battle/BuffManage.h"
+#include "Battle/MapManager.h"
 #include "tools/ShowTexttip.h"
 #include "Battle/ConstNum.h"
 #include "Battle/WarAssist.h"
@@ -26,8 +26,6 @@
 #include "common/CGameSound.h"
 #include "common/ShaderDataHelper.h"
 #include "Battle/BattleMessage.h"
-#include "update/CDownloadPackage.h"
-#include "jni/CJniHelper.h"
 #include "Battle/MoveObject.h"
 #include "Battle/BaseRole.h"
 #include "Battle/RoleSkill.h"
@@ -92,9 +90,9 @@ namespace BattleSpace
 		mCombatEffect->retain();
 		mTotalStrategy  = TotalStrategy::create();
 		mTotalStrategy->retain();
-		mManage = DataCenter::sharedData()->getWar();
-		mGuideManage = DataCenter::sharedData()->getCombatGuideMg();
-		m_MapData = DataCenter::sharedData()->getMap()->getCurrWarMap();
+		mManage = BattleManage;
+		mGuideManage = ManageCenter->getCombatGuideMg();
+		m_MapData = ManageCenter->getMap()->getCurrWarMap();
 		return true;
 	}
 

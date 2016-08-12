@@ -540,6 +540,13 @@ class Activity : public ::google::protobuf::Message {
   inline ::google::protobuf::int32 param() const;
   inline void set_param(::google::protobuf::int32 value);
 
+  // optional bool tips = 9;
+  inline bool has_tips() const;
+  inline void clear_tips();
+  static const int kTipsFieldNumber = 9;
+  inline bool tips() const;
+  inline void set_tips(bool value);
+
   // repeated .protos.ExList exchange = 8;
   inline int exchange_size() const;
   inline void clear_exchange();
@@ -568,6 +575,8 @@ class Activity : public ::google::protobuf::Message {
   inline void clear_has_pic();
   inline void set_has_param();
   inline void clear_has_param();
+  inline void set_has_tips();
+  inline void clear_has_tips();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
@@ -579,9 +588,10 @@ class Activity : public ::google::protobuf::Message {
   ::google::protobuf::int32 param_;
   ::std::string* pic_;
   ::google::protobuf::RepeatedPtrField< ::protos::ExList > exchange_;
+  bool tips_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(8 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(9 + 31) / 32];
 
   friend void  protobuf_AddDesc_act_5fprotocol_2eproto();
   friend void protobuf_AssignDesc_act_5fprotocol_2eproto();
@@ -684,12 +694,21 @@ class ExList : public ::google::protobuf::Message {
   inline bool achieve() const;
   inline void set_achieve(bool value);
 
+  // optional int32 exLevel = 5;
+  inline bool has_exlevel() const;
+  inline void clear_exlevel();
+  static const int kExLevelFieldNumber = 5;
+  inline ::google::protobuf::int32 exlevel() const;
+  inline void set_exlevel(::google::protobuf::int32 value);
+
   // @@protoc_insertion_point(class_scope:protos.ExList)
  private:
   inline void set_has_exid();
   inline void clear_has_exid();
   inline void set_has_achieve();
   inline void clear_has_achieve();
+  inline void set_has_exlevel();
+  inline void clear_has_exlevel();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
@@ -697,9 +716,10 @@ class ExList : public ::google::protobuf::Message {
   ::google::protobuf::int32 exid_;
   bool achieve_;
   ::google::protobuf::RepeatedPtrField< ::protos::common::Prize > titems_;
+  ::google::protobuf::int32 exlevel_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(5 + 31) / 32];
 
   friend void  protobuf_AddDesc_act_5fprotocol_2eproto();
   friend void protobuf_AssignDesc_act_5fprotocol_2eproto();
@@ -1259,6 +1279,28 @@ inline void Activity::set_param(::google::protobuf::int32 value) {
   param_ = value;
 }
 
+// optional bool tips = 9;
+inline bool Activity::has_tips() const {
+  return (_has_bits_[0] & 0x00000080u) != 0;
+}
+inline void Activity::set_has_tips() {
+  _has_bits_[0] |= 0x00000080u;
+}
+inline void Activity::clear_has_tips() {
+  _has_bits_[0] &= ~0x00000080u;
+}
+inline void Activity::clear_tips() {
+  tips_ = false;
+  clear_has_tips();
+}
+inline bool Activity::tips() const {
+  return tips_;
+}
+inline void Activity::set_tips(bool value) {
+  set_has_tips();
+  tips_ = value;
+}
+
 // repeated .protos.ExList exchange = 8;
 inline int Activity::exchange_size() const {
   return exchange_.size();
@@ -1380,6 +1422,28 @@ inline bool ExList::achieve() const {
 inline void ExList::set_achieve(bool value) {
   set_has_achieve();
   achieve_ = value;
+}
+
+// optional int32 exLevel = 5;
+inline bool ExList::has_exlevel() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void ExList::set_has_exlevel() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void ExList::clear_has_exlevel() {
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline void ExList::clear_exlevel() {
+  exlevel_ = 0;
+  clear_has_exlevel();
+}
+inline ::google::protobuf::int32 ExList::exlevel() const {
+  return exlevel_;
+}
+inline void ExList::set_exlevel(::google::protobuf::int32 value) {
+  set_has_exlevel();
+  exlevel_ = value;
 }
 
 

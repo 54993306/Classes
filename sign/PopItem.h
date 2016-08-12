@@ -8,7 +8,7 @@
 #include "SignData.h"
 #include "tollgate/Chapter.h"
 #include <map>
-#include "model/BattleData.h"
+#include "model/CRoleData.h"
 
 class CMonsterInfo;
 class CItemInfo;
