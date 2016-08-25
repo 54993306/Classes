@@ -1,36 +1,32 @@
 ﻿#include "EffectData.h"
 #include "tools/ToolDefine.h"
 
-namespace BattleSpace{
-	EffectInfo::EffectInfo()
-		:m_EFid(0)			//ID
-		,m_ActionID(0)		//人物动作ID
-		,usEft(0)			//施放特效
-		,foeEft(0)			//受击特效
-		,FloorEf(0)		    //地板特效id
-		,isblack(0)			//是否需要黑屏
-		,isShake(0)			//是否震屏
-		,usMusicId(0)		//施放音效
-		,foeMusicId(0)		//受击音效
+namespace BattleSpace
+{
+	EffectInfo::EffectInfo():m_EFid(0),m_ActionID(0),usEft(0),foeEft(0),FloorEf(0)
+	,isblack(0),isShake(0),usMusicId(0),foeMusicId(0)
 	{}
 
-	CCArray* EffectInfo::getEffIdList()
-	{
-		CCArray*arr= CCArray::create();
-		if (usEft)arr->addObject(CCInteger::create(usEft));
-		if (foeEft)arr->addObject(CCInteger::create(foeEft));
-		if (FloorEf)arr->addObject(CCInteger::create(FloorEf));
-		if (arr->count())return arr	;
-		return nullptr;
-	}
+	EffectData::EffectData():mNullEffect(nullptr)
+	{}
 
 	EffectData::~EffectData()
 	{
-		for (WarEffect::iterator iter = warEffect.begin();iter != warEffect.end();++iter)
+		map<int,EffectInfo*>::iterator iter = warEffect.begin();
+		for (;iter != warEffect.end();++iter)
 		{
 			CC_SAFE_RELEASE(iter->second);
 		}
 		warEffect.clear();
+		CC_SAFE_RELEASE(mNullEffect);
+		mNullEffect = nullptr;
+	}
+
+	void EffectInfo::initEffectList( vector<int>& pVec ) const
+	{
+		pVec.push_back(usEft);
+		pVec.push_back(foeEft);
+		pVec.push_back(FloorEf);
 	}
 
 	bool EffectData::init()
@@ -45,7 +41,7 @@ namespace BattleSpace{
 		for (int i = 1;i<row;++i)
 		{
 			int id = atoi(file->get(i,0));
-			WarEffect::iterator iter = warEffect.find(id);
+			map<int,EffectInfo*>::iterator iter = warEffect.find(id);
 			if (iter != warEffect.end())
 			{
 				CCLOG("[*ERROR]:Effect ID Repeat in [EffectData::init()] id=%d,row=%d",id,row);
@@ -66,34 +62,34 @@ namespace BattleSpace{
 			warEffect[efInfo->getEFid()] = efInfo;
 		}
 		FileUtils::sharedFileUtils()->releaseFile("csv/Effect.csv");
+		mNullEffect = EffectInfo::create();
+		mNullEffect->retain();
 		return true;
 	}
 
-	EffectInfo* EffectData::getEffectInfo(int EffectID)
+	const EffectInfo* EffectData::getEffectInfo(int EffectID) const
 	{
-		WarEffect::iterator iter = warEffect.find(EffectID);
-		if (iter != warEffect.end()) return iter->second;
+		map<int,EffectInfo*>::const_iterator iter = warEffect.find(EffectID);
+		if (iter != warEffect.end()) 
+			return iter->second;
 		CCLOG("[ ERROR ]: EffectData::getEffectInfo Lack id : %d",EffectID);
-		return nullptr;
-	}
-
-	CCArray* EffectData::getEffs()
-	{
-		CCArray* arr = CCArray::create();
-		for (WarEffect::iterator iter = warEffect.begin();iter != warEffect.end();++iter)
-			arr->addObject(iter->second);
-		return arr;
+		return mNullEffect;
 	}
 
 	SpecialEffectInfo::SpecialEffectInfo():m_EffID(0),p_x(0),p_y(0),Acp_x(0),Acp_y(0),scale(0){}
 
+	SpecialEffectData::SpecialEffectData():mNullInfo(nullptr)
+	{}
+
 	SpecialEffectData::~SpecialEffectData()
 	{
-		for (SpEff::iterator iter = spEff.begin();iter != spEff.end();++iter)
+		for (map<int , SpecialEffectInfo*>::iterator iter = mEffectMap.begin();iter != mEffectMap.end();++iter)
 		{
 			CC_SAFE_RELEASE(iter->second);
 		}
-		spEff.clear();
+		mEffectMap.clear();
+		CC_SAFE_RELEASE(mNullInfo);
+		mNullInfo = nullptr;
 	}
 
 	bool SpecialEffectData::init()
@@ -108,12 +104,12 @@ namespace BattleSpace{
 		for (int i= 1;i<row;++i)
 		{
 			int id = atoi(file->get(i,0));
-			SpEff::iterator iter = spEff.find(id);
-			if (iter!= spEff.end())
+			map<int , SpecialEffectInfo*>::iterator iter = mEffectMap.find(id);
+			if (iter!= mEffectMap.end())
 			{
 				CCLOG("[*ERROR]:Effect ID Repeat in [SpecialEffectData::init()]id=%d,row=%d",id,row);
 				CC_SAFE_RELEASE(iter->second);
-				spEff.erase(iter);
+				mEffectMap.erase(iter);
 			}
 			SpecialEffectInfo* spEf = SpecialEffectInfo::create();
 			spEf->setEffID(id);
@@ -124,55 +120,45 @@ namespace BattleSpace{
 			spEf->setscale(atof(file->get(i,5)));
 			spEf->setspeed(atof(file->get(i,6)));
 			spEf->retain();
-			spEff[spEf->getEffID()] = spEf;
+			mEffectMap[spEf->getEffID()] = spEf;
 		}
 		FileUtils::sharedFileUtils()->releaseFile("csv/specialEffect.csv");
+		mNullInfo = SpecialEffectInfo::create();
+		mNullInfo->retain();
 		return true;
 	}
 
-	SpecialEffectInfo* SpecialEffectData::getspEff(int spId)
+	SpecialEffectInfo* SpecialEffectData::getSpecialEffect(int pEffectID)
 	{
-		if (!spId)
-			return NULL;
-		SpEff::iterator iter = spEff.find(spId);
-		if (iter != spEff.end())return iter->second;
-		CCLOG("[ LOST ] : SpecialEffectData::getspEff spid =[ %d ]",spId);
-		return nullptr;
-	}
-
-	CCArray* SpecialEffectData::getspEffs()
-	{
-		CCArray* arr = CCArray::create();
-		for (SpEff::iterator iter = spEff.begin();iter != spEff.end();++iter)
-			arr->addObject(iter->second);
-		return arr;
-	}
-
-	int SpecialEffectData::getSpcialEfectId(int spId)
-	{
-		SpEff::iterator iter = spEff.find(spId);
-		if (iter != spEff.end())
-		{
-			SpecialEffectInfo*spif = iter->second;
-			return spif->getEffID();
-		} 
-		CCLOG("[ LOST ] : SpecialEffectData::getSpcialEfectId spid = %d",spId);
-		return 0;
+		if ( !pEffectID )return mNullInfo;
+		map<int , SpecialEffectInfo*>::iterator iter = mEffectMap.find(pEffectID);
+		if (iter != mEffectMap.end())
+			return iter->second;
+		CCLOG("[ LOST ] : SpecialEffectData::getspEff spid =[ %d ]",pEffectID);
+		return mNullInfo;
 	}
 
 	bool SpecialEffectData::JudgeSpcialEffect(int id)
 	{
-		SpEff::iterator iter = spEff.find(id);
-		if (iter != spEff.end())
+		map<int , SpecialEffectInfo*>::iterator iter = mEffectMap.find(id);
+		if (iter != mEffectMap.end())
 			return true;
 		return false;
 	}
 
 	BuffEffect::BuffEffect():m_BuffType(0),small_icon(0),big_icon(0),effect_up(0)
-		,effect_down(0),up_Loop(false),down_Loop(false),m_Dbuf(false)
+	,effect_down(0),up_Loop(false),down_Loop(false),m_Dbuf(false)
 	{}
 
-	BuffConfig::~BuffConfig() { ClearData(); }
+	BuffConfig::BuffConfig():mNullEffect(nullptr)
+	{}
+
+	BuffConfig::~BuffConfig() 
+	{
+		ClearData(); 
+		CC_SAFE_RELEASE(mNullEffect);
+		mNullEffect = nullptr;
+	}
 
 	bool BuffConfig::init()
 	{
@@ -251,6 +237,8 @@ namespace BattleSpace{
 			}
 			AddBuffEffect(buff_eff);
 		}
+		mNullEffect = BuffEffect::create();
+		mNullEffect->retain();
 		return true;
 	}
 
@@ -287,21 +275,22 @@ namespace BattleSpace{
 		}
 	}
 
-	BuffEffect* BuffConfig::getBuffEffect( int bufftype,bool Dbuf )
+	const BuffEffect* BuffConfig::getBuffEffect( int bufftype,bool Dbuf ) const
 	{
-		JsonEffectMap::iterator iter = m_JsonEffectMap.find(Dbuf);
+		JsonEffectMap::const_iterator iter = m_JsonEffectMap.find(Dbuf);
 		if (iter != m_JsonEffectMap.end())
 		{
-			BuffEffMap::iterator piter = iter->second.find(bufftype);
+			BuffEffMap::const_iterator piter = iter->second.find(bufftype);
 			if (piter != iter->second.end())
 				return piter->second;
 			CCLOG("[ TIPS ]BufExp::getBuffEffect Lost BUFF EFFECT type=%d",bufftype);
-			return nullptr;
+			return mNullEffect;
 		}else{
 			CCLOG("[ *ERROR ] BuffData::getBuffEffect");
-			return nullptr;
+			return mNullEffect;
 		}
 	}
+
 	//测试数据
 	//{
 	//	"bufftype":2,
@@ -320,16 +309,10 @@ namespace BattleSpace{
 	//		"down_Loop":false
 	//}
 
-	StoryStep::StoryStep()
-		:m_storyId(0),m_Texture(0),m_BGM(0),m_SFX(0),m_RoleID(0),m_Spine(true)
-		,m_RoleShark(false),m_Rolex(0),m_Roley(0),m_right(true),m_Turn(false),m_RoleName("")
-		,m_Aside(false),m_time(0),m_Content(""),m_Cx(0),m_Cy(0),m_ShowTalkBg(true),m_Shark(false)
+	StoryStep::StoryStep():m_storyId(0),m_Texture(0),m_BGM(0),m_SFX(0),m_RoleID(0),m_Spine(true)
+	,m_RoleShark(false),m_Rolex(0),m_Roley(0),m_right(true),m_Turn(false),m_RoleName("")
+	,m_Aside(false),m_time(0),m_Content(""),m_Cx(0),m_Cy(0),m_ShowTalkBg(true),m_Shark(false)
 	{}
-
-	StoryData::StoryData()
-	{
-
-	}
 
 	StoryData::~StoryData()
 	{
@@ -589,16 +572,16 @@ namespace BattleSpace{
 		}
 	}
 	//按设计要求，该方法应该由warManage来调用。
-	vector<StoryStep*>* StoryData::getStory( StoryType storytype )
+	const vector<StoryStep*>* StoryData::getStory( StoryType storytype ) const
 	{
-		map<StoryType,vector<StoryStep*>>::iterator iter = m_MapStoryData.find(storytype);
+		map<StoryType,vector<StoryStep*>>::const_iterator iter = m_MapStoryData.find(storytype);
 		if (iter != m_MapStoryData.end())
 			return &iter->second;
 		return nullptr;
 	}
 
-	map<StoryType,vector<StoryStep*>>* StoryData::getStoryMap()
+	const map<StoryType,vector<StoryStep*>>& StoryData::getStoryMap() const
 	{
-		return &m_MapStoryData;
+		return m_MapStoryData;
 	}
 }

@@ -10,6 +10,7 @@
 #include "Battle/EffectObject.h"
 #include "Battle/BattleMessage.h"
 #include "Battle/BuffData.h"
+#include "Battle/Config/ConfigManage.h"
 namespace BattleSpace{
 
 	BufExp::BufExp():m_hpSize(CCPointZero),m_interval(0){}
@@ -42,36 +43,33 @@ namespace BattleSpace{
 			if (!i.second->getAddFirst())										//找到数组中没有处理过添加效果的buff
 				continue;
 			i.second->setAddFirst(false);
-			BuffEffect* effect = BattleManage->getBuffData()->getBuffEffect(i.second->getBuffType(),i.second->getIsDBuff());
+			const BuffEffect* effect = BattleConfig->getBuffData()->getBuffEffect(i.second->getBuffType(),i.second->getIsDBuff());
 			vector<CCNode*> VecEffect;
-			if (effect)
+			if (effect->getEffect_up())
 			{
-				if (effect->getEffect_up())
+				EffectObject* ef = EffectObject::create(ToString(effect->getEffect_up()));
+				ef->setSkewing(true);		
+				ef->setScale(1/tRole->getZoom());
+				if (effect->getup_Loop())						//定身类的效果需要持续显示
 				{
-					EffectObject* ef = EffectObject::create(ToString(effect->getEffect_up()));
-					ef->setSkewing(true);		
-					ef->setScale(1/tRole->getZoom());
-					if (effect->getup_Loop())						//定身类的效果需要持续显示
-					{
-						ef->setPlayerType(sPlayType::eRepeat);
-						VecEffect.push_back(ef);
-					}
-					ef->setPosition(ccp(0,30));
-					tRole->getRoleObject()->getBody()->addChild(ef);
+					ef->setPlayerType(sPlayType::eRepeat);
+					VecEffect.push_back(ef);
 				}
-				if (effect->getEffect_down())
+				ef->setPosition(ccp(0,30));
+				tRole->getRoleObject()->getBody()->addChild(ef);
+			}
+			if (effect->getEffect_down())
+			{
+				EffectObject* ef = EffectObject::create(ToString(effect->getEffect_down()));
+				ef->setSkewing(true);
+				ef->setScale(1/tRole->getZoom());
+				if (effect->getdown_Loop())						//定身类的效果需要持续显示
 				{
-					EffectObject* ef = EffectObject::create(ToString(effect->getEffect_down()));
-					ef->setSkewing(true);
-					ef->setScale(1/tRole->getZoom());
-					if (effect->getdown_Loop())						//定身类的效果需要持续显示
-					{
-						ef->setPlayerType(sPlayType::eRepeat);
-						VecEffect.push_back(ef);
-					}
-					ef->setPosition(ccp(0,30));
-					tRole->getRoleObject()->getBody()->addChild(ef,-1);
+					ef->setPlayerType(sPlayType::eRepeat);
+					VecEffect.push_back(ef);
 				}
+				ef->setPosition(ccp(0,30));
+				tRole->getRoleObject()->getBody()->addChild(ef,-1);
 			}
 			CCSprite* smallIcon = CreateSmallIcon(i.second,VecEffect);			//创建小图标
 			tRole->getBuffManage()->AddEffectVec(i.second->getBuffID(),VecEffect);	//加入到map才能刷新位置

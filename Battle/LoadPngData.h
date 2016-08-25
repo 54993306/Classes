@@ -16,7 +16,6 @@
  #define __BATTLE_LOADPNGDATA__
  
  #include "cocos2d.h"
- 
  using namespace std;
  
  class LoadPngData : public cocos2d::CCObject

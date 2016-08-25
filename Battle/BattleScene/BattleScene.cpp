@@ -16,9 +16,9 @@
 #include "tools/commonDef.h"
 #include "Battle/BattleCenter.h"
 #include "Battle/WarManager.h"
-#include "Battle/MapManager.h"
+#include "Battle/CoordsManage.h"
 #include "Battle/DropItem.h"
-#include "Battle/Landform/terrainLayer.h"
+#include "Battle/Landform/TrapLayer.h"
 #include "Battle/WarControl.h"
 #include "scene/layer/BackLayer.h"
 #include "Battle/ComBatLogic.h"
@@ -53,11 +53,13 @@ namespace BattleSpace
 	,m_MoveLayer(nullptr),m_UILayer(nullptr),_dropItem(nullptr),mMoveState(true)
 	,m_Loginc(nullptr),m_Touch(nullptr),mBackLayer(nullptr),mBattleClose(nullptr)
 	{}
+
 	BattleScene::~BattleScene()
 	{
 		CC_SAFE_RELEASE(_dropItem);
 		_dropItem = nullptr;
 	}
+
 	void BattleScene::onEnter()
 	{
 		CScene::onEnter();
@@ -79,17 +81,16 @@ namespace BattleSpace
 
 	void BattleScene::onCreate()
 	{
-		WarMapData* mapData = ManageCenter->getMap()->getCurrWarMap();
 		m_MoveLayer = CCNode::create();					//可以移动的节点包含地图和武将
 		addChild(m_MoveLayer);
-		if (BattleData->getBattleModel()->isPvEBattle())
-			m_MoveLayer->setScale(0.85f);
+		//if (BattleModelManage->isPvEBattle())
+		//	m_MoveLayer->setScale(0.85f);
 
 		m_MapLayer = BattleMapLayer::create();
 		m_MoveLayer->addChild(m_MapLayer);
 
-		m_TerrainLayer = TerrainLayer::create();
-		m_MoveLayer->addChild(m_TerrainLayer);
+		mTrapLayer = TrapLayer::create();
+		m_MoveLayer->addChild(mTrapLayer);
 
 		m_AliveLayer = BattleRoleLayer::create();
 		m_MoveLayer->addChild(m_AliveLayer);
@@ -162,7 +163,7 @@ namespace BattleSpace
 	{
 #if !BATTLE_TEST
 		if (!BattleManage->getNormal() || 
-			!BattleData->getBattleModel()->layerMove())
+			!BattleModelManage->layerMove())
 			return;
 #endif
 		if (m_Touch != pTouch || !mMoveState)
@@ -170,12 +171,11 @@ namespace BattleSpace
 		CCPoint pMove = m_Touch->getLocation();
 		float dx = pMove.x - m_StartPos.x;							//地图只能x轴移动
 		float newX = dx + m_MoveLayer->getPositionX();
-		WarMapData* mapData = ManageCenter->getMap()->getCurrWarMap();
-		if( newX < MAP_MINX(mapData) )
-			newX = MAP_MINX(mapData);
+		if( newX < BattleCoords->CoordsMin() )
+			newX = BattleCoords->CoordsMin();
 #if BATTLE_TEST
-		if( newX > MAP_MAXX(mapData) )
-			newX = MAP_MAXX(mapData);
+		if( newX > BattleCoords->CoordsMax() )
+			newX = BattleCoords->CoordsMax();
 #else
 		if (newX > 0)newX = 0;
 #endif
@@ -211,7 +211,7 @@ namespace BattleSpace
 #if BATTLE_TEST
 		bNotification->postNotification(MsgCreateStory,ob);
 #else
-		if (BattleManage->getStageID())
+		if (BattleManage->getStageIndex())
 		{
 			bNotification->postNotification(MsgCreateStory,ob);
 		}else{

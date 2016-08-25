@@ -2,23 +2,11 @@
 #define _HPOBJECT_H_
 #include "cocos2d.h"
 #include "AppUI.h"
-namespace BattleSpace{
-	enum LostHpType
-	{
-		nullType			= 0,		//不显示掉血内容
-		typeface			= 1,		//显示字体类内容；1：闪避
-		gainType			= 2,		//加血
-		angerType			= 3,		//怒气类型
-		generalType			= 4,		//一般型掉血
-		cutType				= 5,		//减少型掉血
-		addType				= 6,		//增加型掉血
-		genralCritType		= 7,		//一般型暴击
-		cutCritType			= 8,		//减少型暴击
-		addCritType			= 9,		//增加型暴击
-	};
+namespace BattleSpace
+{
 	class AliveObject;
 	class BaseRole;
-	USING_NS_CC;
+	enum struct PlayHpType;
 	class HPObject : public CCNode
 	{
 	public:
@@ -32,7 +20,7 @@ namespace BattleSpace{
 		void setSkinDirection();
 		CC_PROPERTY(float,m_HpNumber,HpNumber);
 		CC_PROPERTY(float,m_HpNumberMax,HpNumberMax);
-		void playChangeNumber(int pChangeNumber,int pType);
+		void playChangeNumber(int pChangeNumber,PlayHpType pType);
 		void showHp(CCObject* ob);
 		void hideHp(float dt);
 	protected:
@@ -42,10 +30,11 @@ namespace BattleSpace{
 		CCSequence* critBackgroundAction(int pDistance);
 		void missEffect();
 		void critBackgroundEffect(int pDistance);
-		void runActionByType(int pType,CCNode* pLabel);
+		void runActionByType(PlayHpType pType,CCNode* pLabel);
 		void offsByEnemy(CCNode* pLabel);
 		void gainNumberPlay(int pChangeNumber);
-		void lostNumberPlay(int pChangeNumber,int pType);
+		void lostNumberPlay(int pChangeNumber,PlayHpType pType);
+		int maxMoveDistance(CCNode* pLabel);
 	protected:
 		CCProgressTimer* m_Skin;
 		CCSprite* m_Background;

@@ -11,6 +11,7 @@
 #include "UserDefaultData.h"
 #include "task/TaskControl.h"
 #include "SDK/GamePlatfomDefine.h"
+#include "scene/LoginScene.h"
 
 //根据typeName反射对象
 google::protobuf::Message* createMessage(const std::string& type_name)
@@ -78,11 +79,40 @@ void CNetClient::onConnected()
 	{
 		m_isReconnet = false;
 		m_reConnectType = ReconnNull;
-		string userName = CCUserDefault::sharedUserDefault()->getStringForKey(USER_NAME);
-		string psw = CCUserDefault::sharedUserDefault()->getStringForKey(PASSWORD);
-		string openId = CCUserDefault::sharedUserDefault()->getStringForKey(FACEBOOK_ID);
-		CCLOG("roleId %d", DataCenter::sharedData()->getUser()->getUserData()->getRoleID());
-		this->sendLogin(userName,psw, "", true, DataCenter::sharedData()->getUser()->getUserData()->getRoleID(),openId, G_PLATFORM_TARGET);
+		
+		int iRoleId = DataCenter::sharedData()->getUser()->getUserData()->getRoleID();
+		CCLOG("roleId %d", iRoleId);
+
+		LoginType iType = (LoginType)CCUserDefault::sharedUserDefault()->getIntegerForKey(LOGIN_TYPE, LoginTypeNull);
+
+		switch (iType)
+		{
+		case LoginTypeNull:
+		case LoginTypeTourist:
+			{
+				string sUserName = CCUserDefault::sharedUserDefault()->getStringForKey(USER_NAME);
+				string sPsw = CCUserDefault::sharedUserDefault()->getStringForKey(PASSWORD);
+				string sOpenId = CCUserDefault::sharedUserDefault()->getStringForKey(FACEBOOK_ID);
+				this->sendLogin(sUserName, sPsw, "", true, iRoleId, sOpenId, G_PLATFORM_TARGET);
+			}
+			break;
+		case LoginTypeFacebook:
+			{
+				string sOpenId = CCUserDefault::sharedUserDefault()->getStringForKey(FACEBOOK_ID);
+				this->sendLogin("", "", "", true, iRoleId, sOpenId, G_PLATFORM_TARGET);
+			}
+			break;
+		case LoginTypeGoogle:
+			{
+				string sUserName = CCUserDefault::sharedUserDefault()->getStringForKey(GOOGLE_USER_NAME);
+				string sPsw = CCUserDefault::sharedUserDefault()->getStringForKey(GOOGLE_PASSWORD);
+				this->sendLogin(sUserName, sPsw, "", true, iRoleId, "", G_PLATFORM_TARGET);
+			}
+			break;
+		default:
+			break;
+		}
+
 	}else{
 		m_reConnectType = ReconnNull;
 	}

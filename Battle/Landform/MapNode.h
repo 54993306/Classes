@@ -22,18 +22,15 @@ namespace BattleSpace
 	class MapNode : public CCObject
 	{
 	public:
-		MapNode();
-		virtual ~MapNode();
-		virtual bool init();
-		CREATE_FUNC(MapNode);
-		CC_SYNTHESIZE(int,mRow,Row);
-		CC_SYNTHESIZE(int,mCol,Col);
+		MapNode(int pGrid,MapNode* pFather);
+		static MapNode* createMapNode(int pGrid,MapNode* pParent);
+		CC_SYNTHESIZE(int,mXRow,XRow);
+		CC_SYNTHESIZE(int,mYCol,YCol);
 		CC_SYNTHESIZE(int,mGValue,GValue);
 		CC_SYNTHESIZE(int,mHValue,HValue);
 		CC_SYNTHESIZE(int,mFValue,FValue);
+		CC_PROPERTY(int,mGridIndex,GridIndex);
 		CC_SYNTHESIZE(MapNode*,mParentNode,ParentNode);
-
-
 	};
 };
 #endif

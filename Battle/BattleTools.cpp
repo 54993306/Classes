@@ -279,5 +279,41 @@ namespace BattleSpace
 			return true;
 		return false;
 	}
+	//得到格子周围区域
+	void initGridRound( vector<int>& pVec,int pGrid )
+	{
+		int tRow = pGrid % C_GRID_ROW;
+		int tCol = pGrid / C_GRID_ROW;
+		if ((tRow+1)<C_GRID_ROW)
+			pVec.push_back(tCol * C_GRID_ROW + tRow+1);
+		if ((tRow-1)>=0)
+			pVec.push_back(tCol * C_GRID_ROW + tRow-1);
+		if ((tCol+1)<C_GRID_COL)
+		{
+			pVec.push_back((tCol+1) * C_GRID_ROW + tRow);
+			if ((tRow+1)<C_GRID_ROW)
+				pVec.push_back((tCol+1) * C_GRID_ROW + tRow+1);
+			if ((tRow-1)>=0)
+				pVec.push_back((tCol+1) * C_GRID_ROW + tRow-1);
+		}	
+		if ((tCol-1)>=0)
+		{
+			pVec.push_back((tCol-1) * C_GRID_ROW + tRow);
+			if ((tRow+1)<C_GRID_ROW)
+				pVec.push_back((tCol-1) * C_GRID_ROW + tRow+1);
+			if ((tRow-1)>=0)
+				pVec.push_back((tCol-1) * C_GRID_ROW + tRow-1);
+		}
+	}
+
+	int getRandomByGrid( int pGrid )
+	{
+		vector<int> tVecGrid;
+		initGridRound(tVecGrid,pGrid);
+		if (tVecGrid.empty()) return pGrid;
+		float r = CCRANDOM_0_1();
+		if (r == 1) r = 0;			// index <= size
+		return tVecGrid.at(tVecGrid.size()*r);
+	}
 
 }

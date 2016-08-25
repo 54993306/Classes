@@ -127,7 +127,7 @@ namespace BattleSpace
 				return;
 			mManage->setLogicState(false);
 			bNotification->postNotification(MsgControlRemove);
-			if (mManage->getStageID())
+			if (mManage->getStageIndex())
 				CCDirector::sharedDirector()->getScheduler()->setTimeScale(0.3f);
 			mManage->setbattleOver(true);
 		}else{
@@ -172,7 +172,7 @@ namespace BattleSpace
 
 	void BattleClose::normalStage( CCObject* ob )
 	{
-		if ( mManage->getStageID() )
+		if ( mManage->getStageIndex() )
 		{
 			if( ob )				
 			{
@@ -222,7 +222,7 @@ namespace BattleSpace
 	{
 		if(mRecvFinish)
 			return;
-		if (BattleData->getBattleModel()->isPvEBattle())
+		if (BattleModelManage->isPvEBattle())
 		{
 			if (m_finishData.res)
 			{

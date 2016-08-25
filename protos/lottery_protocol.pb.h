@@ -24,6 +24,7 @@
 #include <google/protobuf/repeated_field.h>
 #include <google/protobuf/extension_set.h>
 #include <google/protobuf/unknown_field_set.h>
+#include "common/prize_common.pb.h"
 // @@protoc_insertion_point(includes)
 
 namespace protos {
@@ -33,12 +34,429 @@ void  protobuf_AddDesc_lottery_5fprotocol_2eproto();
 void protobuf_AssignDesc_lottery_5fprotocol_2eproto();
 void protobuf_ShutdownFile_lottery_5fprotocol_2eproto();
 
+class LuckyWheel;
+class DrawRequest;
+class DrawResponse;
+class Notice;
 class LotteryData;
 class LotteryRequest;
 class LotteryResponse;
 class Lottery;
 
 // ===================================================================
+
+class LuckyWheel : public ::google::protobuf::Message {
+ public:
+  LuckyWheel();
+  virtual ~LuckyWheel();
+
+  LuckyWheel(const LuckyWheel& from);
+
+  inline LuckyWheel& operator=(const LuckyWheel& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const LuckyWheel& default_instance();
+
+  void Swap(LuckyWheel* other);
+
+  // implements Message ----------------------------------------------
+
+  LuckyWheel* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const LuckyWheel& from);
+  void MergeFrom(const LuckyWheel& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // optional int32 price_1 = 1;
+  inline bool has_price_1() const;
+  inline void clear_price_1();
+  static const int kPrice1FieldNumber = 1;
+  inline ::google::protobuf::int32 price_1() const;
+  inline void set_price_1(::google::protobuf::int32 value);
+
+  // optional int32 price_10 = 2;
+  inline bool has_price_10() const;
+  inline void clear_price_10();
+  static const int kPrice10FieldNumber = 2;
+  inline ::google::protobuf::int32 price_10() const;
+  inline void set_price_10(::google::protobuf::int32 value);
+
+  // repeated .protos.common.Prize prize_list = 3;
+  inline int prize_list_size() const;
+  inline void clear_prize_list();
+  static const int kPrizeListFieldNumber = 3;
+  inline const ::protos::common::Prize& prize_list(int index) const;
+  inline ::protos::common::Prize* mutable_prize_list(int index);
+  inline ::protos::common::Prize* add_prize_list();
+  inline const ::google::protobuf::RepeatedPtrField< ::protos::common::Prize >&
+      prize_list() const;
+  inline ::google::protobuf::RepeatedPtrField< ::protos::common::Prize >*
+      mutable_prize_list();
+
+  // repeated .protos.Notice notices = 4;
+  inline int notices_size() const;
+  inline void clear_notices();
+  static const int kNoticesFieldNumber = 4;
+  inline const ::protos::Notice& notices(int index) const;
+  inline ::protos::Notice* mutable_notices(int index);
+  inline ::protos::Notice* add_notices();
+  inline const ::google::protobuf::RepeatedPtrField< ::protos::Notice >&
+      notices() const;
+  inline ::google::protobuf::RepeatedPtrField< ::protos::Notice >*
+      mutable_notices();
+
+  // @@protoc_insertion_point(class_scope:protos.LuckyWheel)
+ private:
+  inline void set_has_price_1();
+  inline void clear_has_price_1();
+  inline void set_has_price_10();
+  inline void clear_has_price_10();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::int32 price_1_;
+  ::google::protobuf::int32 price_10_;
+  ::google::protobuf::RepeatedPtrField< ::protos::common::Prize > prize_list_;
+  ::google::protobuf::RepeatedPtrField< ::protos::Notice > notices_;
+
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
+
+  friend void  protobuf_AddDesc_lottery_5fprotocol_2eproto();
+  friend void protobuf_AssignDesc_lottery_5fprotocol_2eproto();
+  friend void protobuf_ShutdownFile_lottery_5fprotocol_2eproto();
+
+  void InitAsDefaultInstance();
+  static LuckyWheel* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class DrawRequest : public ::google::protobuf::Message {
+ public:
+  DrawRequest();
+  virtual ~DrawRequest();
+
+  DrawRequest(const DrawRequest& from);
+
+  inline DrawRequest& operator=(const DrawRequest& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const DrawRequest& default_instance();
+
+  void Swap(DrawRequest* other);
+
+  // implements Message ----------------------------------------------
+
+  DrawRequest* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const DrawRequest& from);
+  void MergeFrom(const DrawRequest& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required int32 draw_type = 1;
+  inline bool has_draw_type() const;
+  inline void clear_draw_type();
+  static const int kDrawTypeFieldNumber = 1;
+  inline ::google::protobuf::int32 draw_type() const;
+  inline void set_draw_type(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:protos.DrawRequest)
+ private:
+  inline void set_has_draw_type();
+  inline void clear_has_draw_type();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::int32 draw_type_;
+
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+
+  friend void  protobuf_AddDesc_lottery_5fprotocol_2eproto();
+  friend void protobuf_AssignDesc_lottery_5fprotocol_2eproto();
+  friend void protobuf_ShutdownFile_lottery_5fprotocol_2eproto();
+
+  void InitAsDefaultInstance();
+  static DrawRequest* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class DrawResponse : public ::google::protobuf::Message {
+ public:
+  DrawResponse();
+  virtual ~DrawResponse();
+
+  DrawResponse(const DrawResponse& from);
+
+  inline DrawResponse& operator=(const DrawResponse& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const DrawResponse& default_instance();
+
+  void Swap(DrawResponse* other);
+
+  // implements Message ----------------------------------------------
+
+  DrawResponse* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const DrawResponse& from);
+  void MergeFrom(const DrawResponse& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required int32 result = 1;
+  inline bool has_result() const;
+  inline void clear_result();
+  static const int kResultFieldNumber = 1;
+  inline ::google::protobuf::int32 result() const;
+  inline void set_result(::google::protobuf::int32 value);
+
+  // repeated int32 prize_index = 2 [packed = true];
+  inline int prize_index_size() const;
+  inline void clear_prize_index();
+  static const int kPrizeIndexFieldNumber = 2;
+  inline ::google::protobuf::int32 prize_index(int index) const;
+  inline void set_prize_index(int index, ::google::protobuf::int32 value);
+  inline void add_prize_index(::google::protobuf::int32 value);
+  inline const ::google::protobuf::RepeatedField< ::google::protobuf::int32 >&
+      prize_index() const;
+  inline ::google::protobuf::RepeatedField< ::google::protobuf::int32 >*
+      mutable_prize_index();
+
+  // @@protoc_insertion_point(class_scope:protos.DrawResponse)
+ private:
+  inline void set_has_result();
+  inline void clear_has_result();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::RepeatedField< ::google::protobuf::int32 > prize_index_;
+  mutable int _prize_index_cached_byte_size_;
+  ::google::protobuf::int32 result_;
+
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+
+  friend void  protobuf_AddDesc_lottery_5fprotocol_2eproto();
+  friend void protobuf_AssignDesc_lottery_5fprotocol_2eproto();
+  friend void protobuf_ShutdownFile_lottery_5fprotocol_2eproto();
+
+  void InitAsDefaultInstance();
+  static DrawResponse* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class Notice : public ::google::protobuf::Message {
+ public:
+  Notice();
+  virtual ~Notice();
+
+  Notice(const Notice& from);
+
+  inline Notice& operator=(const Notice& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const Notice& default_instance();
+
+  void Swap(Notice* other);
+
+  // implements Message ----------------------------------------------
+
+  Notice* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const Notice& from);
+  void MergeFrom(const Notice& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // optional string player = 1;
+  inline bool has_player() const;
+  inline void clear_player();
+  static const int kPlayerFieldNumber = 1;
+  inline const ::std::string& player() const;
+  inline void set_player(const ::std::string& value);
+  inline void set_player(const char* value);
+  inline void set_player(const char* value, size_t size);
+  inline ::std::string* mutable_player();
+  inline ::std::string* release_player();
+  inline void set_allocated_player(::std::string* player);
+
+  // optional int32 prize_type = 2;
+  inline bool has_prize_type() const;
+  inline void clear_prize_type();
+  static const int kPrizeTypeFieldNumber = 2;
+  inline ::google::protobuf::int32 prize_type() const;
+  inline void set_prize_type(::google::protobuf::int32 value);
+
+  // optional int32 prize_num = 3;
+  inline bool has_prize_num() const;
+  inline void clear_prize_num();
+  static const int kPrizeNumFieldNumber = 3;
+  inline ::google::protobuf::int32 prize_num() const;
+  inline void set_prize_num(::google::protobuf::int32 value);
+
+  // optional int32 prize_id = 4;
+  inline bool has_prize_id() const;
+  inline void clear_prize_id();
+  static const int kPrizeIdFieldNumber = 4;
+  inline ::google::protobuf::int32 prize_id() const;
+  inline void set_prize_id(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:protos.Notice)
+ private:
+  inline void set_has_player();
+  inline void clear_has_player();
+  inline void set_has_prize_type();
+  inline void clear_has_prize_type();
+  inline void set_has_prize_num();
+  inline void clear_has_prize_num();
+  inline void set_has_prize_id();
+  inline void clear_has_prize_id();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::std::string* player_;
+  ::google::protobuf::int32 prize_type_;
+  ::google::protobuf::int32 prize_num_;
+  ::google::protobuf::int32 prize_id_;
+
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
+
+  friend void  protobuf_AddDesc_lottery_5fprotocol_2eproto();
+  friend void protobuf_AssignDesc_lottery_5fprotocol_2eproto();
+  friend void protobuf_ShutdownFile_lottery_5fprotocol_2eproto();
+
+  void InitAsDefaultInstance();
+  static Notice* default_instance_;
+};
+// -------------------------------------------------------------------
 
 class LotteryData : public ::google::protobuf::Message {
  public:
@@ -425,14 +843,14 @@ class Lottery : public ::google::protobuf::Message {
   inline ::std::string* release_name();
   inline void set_allocated_name(::std::string* name);
 
-  // required int32 quality = 2;
+  // optional int32 quality = 2;
   inline bool has_quality() const;
   inline void clear_quality();
   static const int kQualityFieldNumber = 2;
   inline ::google::protobuf::int32 quality() const;
   inline void set_quality(::google::protobuf::int32 value);
 
-  // required int32 thumb = 3;
+  // optional int32 thumb = 3;
   inline bool has_thumb() const;
   inline void clear_thumb();
   static const int kThumbFieldNumber = 3;
@@ -521,6 +939,321 @@ class Lottery : public ::google::protobuf::Message {
 
 
 // ===================================================================
+
+// LuckyWheel
+
+// optional int32 price_1 = 1;
+inline bool LuckyWheel::has_price_1() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void LuckyWheel::set_has_price_1() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void LuckyWheel::clear_has_price_1() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void LuckyWheel::clear_price_1() {
+  price_1_ = 0;
+  clear_has_price_1();
+}
+inline ::google::protobuf::int32 LuckyWheel::price_1() const {
+  return price_1_;
+}
+inline void LuckyWheel::set_price_1(::google::protobuf::int32 value) {
+  set_has_price_1();
+  price_1_ = value;
+}
+
+// optional int32 price_10 = 2;
+inline bool LuckyWheel::has_price_10() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void LuckyWheel::set_has_price_10() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void LuckyWheel::clear_has_price_10() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void LuckyWheel::clear_price_10() {
+  price_10_ = 0;
+  clear_has_price_10();
+}
+inline ::google::protobuf::int32 LuckyWheel::price_10() const {
+  return price_10_;
+}
+inline void LuckyWheel::set_price_10(::google::protobuf::int32 value) {
+  set_has_price_10();
+  price_10_ = value;
+}
+
+// repeated .protos.common.Prize prize_list = 3;
+inline int LuckyWheel::prize_list_size() const {
+  return prize_list_.size();
+}
+inline void LuckyWheel::clear_prize_list() {
+  prize_list_.Clear();
+}
+inline const ::protos::common::Prize& LuckyWheel::prize_list(int index) const {
+  return prize_list_.Get(index);
+}
+inline ::protos::common::Prize* LuckyWheel::mutable_prize_list(int index) {
+  return prize_list_.Mutable(index);
+}
+inline ::protos::common::Prize* LuckyWheel::add_prize_list() {
+  return prize_list_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::protos::common::Prize >&
+LuckyWheel::prize_list() const {
+  return prize_list_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::protos::common::Prize >*
+LuckyWheel::mutable_prize_list() {
+  return &prize_list_;
+}
+
+// repeated .protos.Notice notices = 4;
+inline int LuckyWheel::notices_size() const {
+  return notices_.size();
+}
+inline void LuckyWheel::clear_notices() {
+  notices_.Clear();
+}
+inline const ::protos::Notice& LuckyWheel::notices(int index) const {
+  return notices_.Get(index);
+}
+inline ::protos::Notice* LuckyWheel::mutable_notices(int index) {
+  return notices_.Mutable(index);
+}
+inline ::protos::Notice* LuckyWheel::add_notices() {
+  return notices_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::protos::Notice >&
+LuckyWheel::notices() const {
+  return notices_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::protos::Notice >*
+LuckyWheel::mutable_notices() {
+  return &notices_;
+}
+
+// -------------------------------------------------------------------
+
+// DrawRequest
+
+// required int32 draw_type = 1;
+inline bool DrawRequest::has_draw_type() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void DrawRequest::set_has_draw_type() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void DrawRequest::clear_has_draw_type() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void DrawRequest::clear_draw_type() {
+  draw_type_ = 0;
+  clear_has_draw_type();
+}
+inline ::google::protobuf::int32 DrawRequest::draw_type() const {
+  return draw_type_;
+}
+inline void DrawRequest::set_draw_type(::google::protobuf::int32 value) {
+  set_has_draw_type();
+  draw_type_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// DrawResponse
+
+// required int32 result = 1;
+inline bool DrawResponse::has_result() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void DrawResponse::set_has_result() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void DrawResponse::clear_has_result() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void DrawResponse::clear_result() {
+  result_ = 0;
+  clear_has_result();
+}
+inline ::google::protobuf::int32 DrawResponse::result() const {
+  return result_;
+}
+inline void DrawResponse::set_result(::google::protobuf::int32 value) {
+  set_has_result();
+  result_ = value;
+}
+
+// repeated int32 prize_index = 2 [packed = true];
+inline int DrawResponse::prize_index_size() const {
+  return prize_index_.size();
+}
+inline void DrawResponse::clear_prize_index() {
+  prize_index_.Clear();
+}
+inline ::google::protobuf::int32 DrawResponse::prize_index(int index) const {
+  return prize_index_.Get(index);
+}
+inline void DrawResponse::set_prize_index(int index, ::google::protobuf::int32 value) {
+  prize_index_.Set(index, value);
+}
+inline void DrawResponse::add_prize_index(::google::protobuf::int32 value) {
+  prize_index_.Add(value);
+}
+inline const ::google::protobuf::RepeatedField< ::google::protobuf::int32 >&
+DrawResponse::prize_index() const {
+  return prize_index_;
+}
+inline ::google::protobuf::RepeatedField< ::google::protobuf::int32 >*
+DrawResponse::mutable_prize_index() {
+  return &prize_index_;
+}
+
+// -------------------------------------------------------------------
+
+// Notice
+
+// optional string player = 1;
+inline bool Notice::has_player() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void Notice::set_has_player() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void Notice::clear_has_player() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void Notice::clear_player() {
+  if (player_ != &::google::protobuf::internal::kEmptyString) {
+    player_->clear();
+  }
+  clear_has_player();
+}
+inline const ::std::string& Notice::player() const {
+  return *player_;
+}
+inline void Notice::set_player(const ::std::string& value) {
+  set_has_player();
+  if (player_ == &::google::protobuf::internal::kEmptyString) {
+    player_ = new ::std::string;
+  }
+  player_->assign(value);
+}
+inline void Notice::set_player(const char* value) {
+  set_has_player();
+  if (player_ == &::google::protobuf::internal::kEmptyString) {
+    player_ = new ::std::string;
+  }
+  player_->assign(value);
+}
+inline void Notice::set_player(const char* value, size_t size) {
+  set_has_player();
+  if (player_ == &::google::protobuf::internal::kEmptyString) {
+    player_ = new ::std::string;
+  }
+  player_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* Notice::mutable_player() {
+  set_has_player();
+  if (player_ == &::google::protobuf::internal::kEmptyString) {
+    player_ = new ::std::string;
+  }
+  return player_;
+}
+inline ::std::string* Notice::release_player() {
+  clear_has_player();
+  if (player_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = player_;
+    player_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+inline void Notice::set_allocated_player(::std::string* player) {
+  if (player_ != &::google::protobuf::internal::kEmptyString) {
+    delete player_;
+  }
+  if (player) {
+    set_has_player();
+    player_ = player;
+  } else {
+    clear_has_player();
+    player_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  }
+}
+
+// optional int32 prize_type = 2;
+inline bool Notice::has_prize_type() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void Notice::set_has_prize_type() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void Notice::clear_has_prize_type() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void Notice::clear_prize_type() {
+  prize_type_ = 0;
+  clear_has_prize_type();
+}
+inline ::google::protobuf::int32 Notice::prize_type() const {
+  return prize_type_;
+}
+inline void Notice::set_prize_type(::google::protobuf::int32 value) {
+  set_has_prize_type();
+  prize_type_ = value;
+}
+
+// optional int32 prize_num = 3;
+inline bool Notice::has_prize_num() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void Notice::set_has_prize_num() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void Notice::clear_has_prize_num() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void Notice::clear_prize_num() {
+  prize_num_ = 0;
+  clear_has_prize_num();
+}
+inline ::google::protobuf::int32 Notice::prize_num() const {
+  return prize_num_;
+}
+inline void Notice::set_prize_num(::google::protobuf::int32 value) {
+  set_has_prize_num();
+  prize_num_ = value;
+}
+
+// optional int32 prize_id = 4;
+inline bool Notice::has_prize_id() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void Notice::set_has_prize_id() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void Notice::clear_has_prize_id() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void Notice::clear_prize_id() {
+  prize_id_ = 0;
+  clear_has_prize_id();
+}
+inline ::google::protobuf::int32 Notice::prize_id() const {
+  return prize_id_;
+}
+inline void Notice::set_prize_id(::google::protobuf::int32 value) {
+  set_has_prize_id();
+  prize_id_ = value;
+}
+
+// -------------------------------------------------------------------
 
 // LotteryData
 
@@ -832,7 +1565,7 @@ inline void Lottery::set_allocated_name(::std::string* name) {
   }
 }
 
-// required int32 quality = 2;
+// optional int32 quality = 2;
 inline bool Lottery::has_quality() const {
   return (_has_bits_[0] & 0x00000004u) != 0;
 }
@@ -854,7 +1587,7 @@ inline void Lottery::set_quality(::google::protobuf::int32 value) {
   quality_ = value;
 }
 
-// required int32 thumb = 3;
+// optional int32 thumb = 3;
 inline bool Lottery::has_thumb() const {
   return (_has_bits_[0] & 0x00000008u) != 0;
 }

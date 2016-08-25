@@ -14,4 +14,6 @@ static const char* DEFAULT_FONT = "Arial";
 
 #define  FACEBOOKIMG "http://graph.facebook.com/%s/picture?width=92&height=92"
 
+#define  FACEBOOKIMG_106 "http://graph.facebook.com/%s/picture?width=106&height=106"
+
 #endif // !_GLOBAL_H_

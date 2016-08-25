@@ -91,20 +91,12 @@ void CTollgateLayer::onEnter()
 	//左按钮
 	CButton* leftbtn = (CButton*)(m_ui->findWidgetById("left"));
 	leftbtn->setOnClickListener(this,ccw_click_selector(CTollgateLayer::onLeftStage));
-	/*
-	CCFadeTo *fade1 = CCFadeTo::create(0.8f,100);
-	CCFadeTo *fade2 = CCFadeTo::create(0.8f,255);
-	leftbtn->runAction(CCRepeatForever::create(CCSequence::createWithTwoActions(fade1,fade2)));
-	*/
+
 
 	//右按钮
 	CButton* rightbtn = (CButton*)(m_ui->findWidgetById("right"));
 	rightbtn->setOnClickListener(this,ccw_click_selector(CTollgateLayer::onRightStage));
-	/*
-	fade1 = CCFadeTo::create(0.8f,100);
-	fade2 = CCFadeTo::create(0.8f,255);
-	rightbtn->runAction(CCRepeatForever::create(CCSequence::createWithTwoActions(fade1,fade2)));
-	*/
+
 
 	CRadioBtnGroup *radioGroup = (CRadioBtnGroup *)m_ui->getChildByTag(10);
 	for (int i = 0; i < 2; i++)
@@ -125,18 +117,6 @@ void CTollgateLayer::onEnter()
 	GetTcpNet->registerMsgHandler(ChapterList,this,CMsgHandler_selector(CTollgateLayer::ProcessMsg));
 	GetTcpNet->registerMsgHandler(StageList,this,CMsgHandler_selector(CTollgateLayer::ProcessMsg));
 	GetTcpNet->registerMsgHandler(GetStagePrize,this,CMsgHandler_selector(CTollgateLayer::ProcessMsg));
-
-
-	CCSpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile("warpublic/warning.plist");//将plist文件加载进入缓存
-	AnimationManager::sharedAction()->ParseAnimation("warning");
-	CCAnimation *culAnim = AnimationManager::sharedAction()->getAnimation("warning");
-	culAnim->setDelayPerUnit(0.05f);
-	CCAnimate* pAnimate = CCAnimate::create(culAnim);
-	m_pWarning  = CCSprite::create();
-	m_pWarning->setPosition(ccp(1138/2, 640/2));
-	m_ui->addChild(m_pWarning, -1);
-	m_pWarning->runAction(CCRepeatForever::create(pAnimate));
-	m_pWarning->setVisible(!m_isStory);
 
 
 	UserData *user = DataCenter::sharedData()->getUser()->getUserData();
@@ -164,7 +144,6 @@ void CTollgateLayer::onExit()
 	}
 	NOTIFICATION->postNotification(SHOW_TOP_LAYER);
 	HttpLoadImage::getInstance()->bindUiTarget(nullptr);
-	//NOTIFICATION->postNotification(SHOW_MAIN_SCENE);
 }
 
 void CTollgateLayer::onLeftStage(CCObject* pSender)
@@ -188,8 +167,6 @@ void CTollgateLayer::onLeftStage(CCObject* pSender)
 				m_iCurrentTouchDir = TollgateTouchDirLeft;
 				GetTcpNet->sendStageList(m_isStory?m_selectChapterIndex-1:m_selectChapterIndex+200-1);
 			}
-
-			//showBookAnimate(m_ui, false);
 		}
 	}
 	else
@@ -783,11 +760,13 @@ void CTollgateLayer::updateChapter(CChapter *chapter)
 			maskBg->setVisible(false);
 			mask->setVisible(false);
 			prize->setVisible(false);
+			mask->setOnClickListener(nullptr, nullptr);
 		}
 		else
 		{
 			prize->stopAllActions();
 			prize->setShaderProgram(ShaderDataMgr->getShaderByType(ShaderStone));
+			mask->setOnClickListener(nullptr, nullptr);
 		}
 	}
 }
@@ -1108,7 +1087,8 @@ void CTollgateLayer::onBattle(CCObject* pSender)
 			BattleManage->setChapterCount(m_iOpenChapterCount[m_isStory]);
 
 			CTollgatePreview *preview = CTollgatePreview::create();
-			preview->setIsLastStageInChapter(isLasStageInChapter(*stage));
+			preview->setStar(stage->star);
+			preview->setIsLastStageInChapter(isLastStageInChapter(*stage));
 			LayerManager::instance()->push(preview);
 			preview->setStage(stage->id, stage->name.c_str());
 			CStageInfoRes *ir = DATAPOOL->getStageInfoById(stage->id);		
@@ -1199,8 +1179,6 @@ void CTollgateLayer::checkLeftAndRightButton()
 
 void CTollgateLayer::showEffectStoryOrNot()
 {
-	m_pWarning->setVisible(!m_isStory);
-
 	CRadioBtnGroup *radioGroup = (CRadioBtnGroup *)m_ui->getChildByTag(10);
 	CRadioButton *radioBtn1= (CRadioButton*)(radioGroup->getChildByTag(1));
 	CRadioButton *radioBtn2= (CRadioButton*)(radioGroup->getChildByTag(2));
@@ -1235,7 +1213,7 @@ void CTollgateLayer::selectChapter( int iLastChapterCount, int iIndexChapter )
 	GetTcpNet->sendStageList(m_isStory?iIndexChapter:iIndexChapter+200);
 }
 
-bool CTollgateLayer::isLasStageInChapter( const CStage& stage )
+bool CTollgateLayer::isLastStageInChapter( const CStage& stage )
 {
 	CStage& lastStage = m_stageMap[m_chapterList[m_isStory][m_selectChapterIndex-1].id].back();
 	bool bLast = (lastStage.id == stage.id);

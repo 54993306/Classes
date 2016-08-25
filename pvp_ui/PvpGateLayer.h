@@ -10,10 +10,16 @@
 #include "AppUI.h"
 #include "scene/layer/LayerManager.h"
 #include <spine/spine-cocos2dx.h>
+#include "net/CNetClient.h"
 
 using namespace spine;
 
 USING_NS_CC;
+
+void inline AskForPvpGateData()
+{
+	CNetClient::getShareInstance()->sendDataType(PvpCityDataMsg);
+}
 
 enum PvpGateUiTag
 {
@@ -37,8 +43,6 @@ public:
 
 	void onClose(CCObject* pSender);
 
-	void setGateLevel( int iRank );
-
 	bool ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent);
 
 public:
@@ -58,8 +62,8 @@ private:
 
 	void SpineComplete( int trackIndex, int loopCount );
 
-
 	void initBuilding();
+	void initBaseBuild();
 	void showBuilding();
 	void hideBuilding();
 
@@ -74,15 +78,27 @@ private:
 	void runCloud();
 
 	//UI面板出场
-	void showAllDownLayer();
+	void showAllUILayer();
 	void showUI( CLayout *pDownLayer );
 	void callbackForSpineAnimate( CCNode *pSender );
+
+	//初始化第一名角色信息
+	void initNumberOneInfo( const Opponent &pOpponent );
+	//初始化facebook按钮
+	void initFacebookShareBtn( int myRank );
+	//网络回调
+	void processNetMsg(int type, google::protobuf::Message *msg);
+
+	void setGateLevel( int iRank );
+
 private:
 	//同步PVP
 	void pvpSynchronization(CCObject* pSender);
 	//异步PVP
 	void pvpAsynchronization(CCObject* pSender);
 
+	//facebook 分享
+	void shareToFaceBook( CCObject *pSender );
 
 private:
 	CLayout										*m_ui;

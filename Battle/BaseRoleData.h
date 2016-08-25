@@ -26,16 +26,8 @@ namespace protos{
 		class Monster;
 	}
 }
-namespace BattleSpace{
-	enum struct sRoleType
-	{
-		eNULL						= 0,//初始化值
-		eHeroRole					= 1,//英雄类角色
-		eMonsterRole				= 2,//怪物类角色
-		eRivalRole					= 3,//对手类角色
-		eChildRole					= 4,//召唤类角色
-		eNeutrality					= 5,//中立类角色
-	};
+namespace BattleSpace
+{
 	class RoleSkill;
 	class BaseRoleData : public cocos2d::CCObject
 	{
@@ -44,7 +36,7 @@ namespace BattleSpace{
 		~BaseRoleData();		
 		CC_SYNTHESIZE(int,mServerID,ServerID);							//服务器角色ID
 		CC_SYNTHESIZE(int,mRoleModel,RoleModel);						//模型id
-		CC_SYNTHESIZE(int,mProperty,Property);							//武将属性(火1,水2,木3)
+		CC_SYNTHESIZE(sRoleNature,mProperty,Property);					//武将属性(火1,水2,木3)
 		CC_SYNTHESIZE(int,mRoleRow,RoleRow);							//武将所占行数
 		CC_SYNTHESIZE(int,mRoleCol,RoleCol);							//武将所占列数
 		CC_SYNTHESIZE(int,mRoleHp,RoleHp);								//血量
@@ -60,10 +52,11 @@ namespace BattleSpace{
 		CC_SYNTHESIZE(float,mAttackSpeed,AttackSpeed);					//攻击速度(秒/次)
 		CC_SYNTHESIZE(sCallType,mCallType,CallType);					//召唤类型(Control)
 		CC_SYNTHESIZE(float,mDelayTime,DelayTime);						//出现延迟时间
-		CC_SYNTHESIZE(sRoleType,mRoleNature,RoleNature);				//角色种类(后续接口)
+		CC_SYNTHESIZE(sRoleCamp,mRoleNature,RoleNature);				//角色阵营
+		CC_SYNTHESIZE(sMoveType,mMoveType,MoveType);					//移动类型
 		CC_SYNTHESIZE(bool,mOtherCamp,OtherCamp);						//其他阵营武将(非玩家阵营)
-		bool isAttribute(sProperty pType);
-		float judgeAttribute( sProperty pType );
+		bool isAttribute(sRoleNature pType);
+		float judgeAttribute( sRoleNature pType );
 	public:
 		//hero
 		CC_SYNTHESIZE(int,mAlertType,AlertType);						//警戒类型

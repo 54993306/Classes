@@ -8,9 +8,11 @@
 #include <functional>
 using namespace cocos2d;
 using namespace cocos2d::extension;
-
-class ArmatureEventDataMgr;
-class ArmatureEventData;
+namespace BattleSpace
+{
+	class ArmatureEventDataMgr;
+	class ArmatureEventData;
+}
 
 class LogoScene : public CScene
 {
@@ -39,8 +41,8 @@ private:
 	CursorTextField* m_InputScale;
 	CursorTextField* m_InputMap;
 	CursorTextField* m_InputAction;
-	ArmatureEventDataMgr* m_armatureEventDataMgr;
-	ArmatureEventData* m_armatureEventData;
+	BattleSpace::ArmatureEventDataMgr* m_armatureEventDataMgr;
+	BattleSpace::ArmatureEventData* m_armatureEventData;
 	CCArmature * m_Armature;
 	CCSprite* m_Body;
 	vector<int> m_VecModeId;

@@ -24,6 +24,7 @@
 #include "scene/CPopTip.h"
 #include "Battle/AnimationManager.h"
 #include "common/CGameSound.h"
+#include "mainCity/mainScene.h"
 
 bool CTopLayer::init()
 {
@@ -291,4 +292,19 @@ void CTopLayer::hide( CCObject* pObj )
 		this->setVisible(false);
 	}
 	CCLOG("CTopLayer::hide_%d", m_iIndexForShow);
+}
+
+bool CTopLayer::ccTouchBegan( CCTouch *pTouch, CCEvent *pEvent )
+{
+	//场景判断，进入loadingBattle界面时，触摸事件会先onExit执行，导致生成了关卡界面在loadingBattle场景上
+	//这里判断一下，如果当前场景是loadingBattle, 不执行触摸事件
+	//本来是放在cityUI的，但是发现这个层的触摸优先级比较高，就放在了这里
+	//mainscene 并没有注册触摸， 只有cityUI和cityBuild，topLay注册了，topLay优先级最高
+	CMainScene *pScene = dynamic_cast<CMainScene *>(CSceneManager::sharedSceneManager()->getCurrScene());
+	if ( pScene )
+	{
+		return BaseLayer::ccTouchBegan(pTouch, pEvent);
+	}
+
+	return true;
 }

@@ -29,7 +29,7 @@ namespace BattleSpace{
 		this->setMonsterID(monster->monsterid());
 		this->setBatchNumber(monster->batch());
 		this->setRoleModel(monster->thumb());
-		this->setProperty(monster->monstertype());
+		this->setProperty((sRoleNature)monster->monstertype());
 		this->setRoleHp(monster->hp());
 		this->setRoleAttack(monster->atk());
 		this->setRoleDefense(monster->def());
@@ -47,12 +47,12 @@ namespace BattleSpace{
 		{
 			if (this->getCallType() == sCallType::eBoxHaveRole)				//中立型的怪物
 			{
-				this->setRoleNature(sRoleType::eNeutrality);
+				this->setRoleNature(sRoleCamp::eNeutrality);
 			}else{
-				this->setRoleNature(sRoleType::eChildRole);
+				this->setRoleNature(sRoleCamp::eChildRole);
 			}
 		}else{
-			this->setRoleNature(sRoleType::eMonsterRole);
+			this->setRoleNature(sRoleCamp::eMonsterRole);
 		}
 		this->setCritTime(CCRANDOM_0_1()*(monster->maxround()- monster->minround()) +  monster->minround());
 		this->setDelayTime(monster->delay());

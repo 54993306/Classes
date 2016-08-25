@@ -96,8 +96,8 @@ void CHeroControl::processMessage(int type, google::protobuf::Message *msg)
 					m_heroList.push_back(obj);
 				}
 			}
-			
-		    if (CGuideManager::getInstance()->getIsRunGuide()&&(CGuideManager::getInstance()->getCurrTask()==16||CGuideManager::getInstance()->getCurrTask()==13))
+
+			if (CGuideManager::getInstance()->getIsRunGuide()&&(CGuideManager::getInstance()->getCurrTask()==16||CGuideManager::getInstance()->getCurrTask()==13))
 			{
 				for (int i = 0; i < m_heroList.size(); i++)
 				{
@@ -233,12 +233,12 @@ void CHeroControl::processMessage(int type, google::protobuf::Message *msg)
 	case HeroExpMsg:
 		{
 			HeroResponse *res =(HeroResponse*)msg;
-		    bool isSkillup = res->has_skilllvup()&&res->skilllvup()==1;
+			bool isSkillup = res->has_skilllvup()&&res->skilllvup()==1;
 			if (isSkillup||(res->has_hero()&&m_hero.level<res->hero().level()))
 			{
-// 				CHeroUpdate *protmo = CHeroUpdate::create();
-// 				LayerManager::instance()->push(protmo);		
-// 				protmo->levelSkillUp(&m_hero,&res->hero());
+				// 				CHeroUpdate *protmo = CHeroUpdate::create();
+				// 				LayerManager::instance()->push(protmo);		
+				// 				protmo->levelSkillUp(&m_hero,&res->hero());
 				m_heroAttrLayer->levelSkillUp(&m_hero,&res->hero());
 			}
 
@@ -265,13 +265,10 @@ void CHeroControl::processMessage(int type, google::protobuf::Message *msg)
 	case SkillLvUpMsg:
 		{
 			DoResult * res = (DoResult*)msg;
-			/*if (res->result()==1&&m_skillLayer)*/
+			m_skillLayer->levelUp(res->result());
+			if (m_heroAttrLayer)
 			{
-				m_skillLayer->levelUp(res->result());
-				if (m_heroAttrLayer)
-				{
-					m_heroAttrLayer->showSkillTip(false);
-				}
+				m_heroAttrLayer->showSkillTip(false);
 			}
 		}
 	default:
@@ -305,7 +302,7 @@ void CHeroControl::onHeroInfo(CHero *hero,int showType)
 
 	switch (showType)
 	{
-	
+
 	case 1:
 		{
 			if (!m_detailLayer)
@@ -381,7 +378,7 @@ void CHeroControl::onHeroInfo(CHero *hero,int showType)
 
 void CHeroControl::onResetLayer()
 {
- 	m_heroAttrLayer = nullptr;
+	m_heroAttrLayer = nullptr;
 	m_moveLayer = nullptr;
 	m_detailLayer = nullptr;
 	m_skillLayer = nullptr;
@@ -395,10 +392,10 @@ void CHeroControl::onResetLayer()
 
 void CHeroControl::sendEvolveInfo(int itemId)
 {
-// 	HeroEvolReq *evol = new HeroEvolReq;
-// 	evol->set_heroid(heroId);
-// 	GetTcpNet->sendData(evol,HeroEvolTaskMsg);
-// 	delete evol;
+	// 	HeroEvolReq *evol = new HeroEvolReq;
+	// 	evol->set_heroid(heroId);
+	// 	GetTcpNet->sendData(evol,HeroEvolTaskMsg);
+	// 	delete evol;
 	ItemInfoReq *req = new ItemInfoReq;
 	req->set_itemid(itemId);
 	GetTcpNet->sendData(req,ItemInfoMsg);
@@ -458,10 +455,10 @@ void CHeroControl::processEvolveMsg(int type, google::protobuf::Message *msg)
 					}
 				}
 
-// 				if (res->quests_size()>0)
-// 				{
-// 					m_evolveLayer->evolveTask(evoRes.evolInfo);
-// 				}	
+				// 				if (res->quests_size()>0)
+				// 				{
+				// 					m_evolveLayer->evolveTask(evoRes.evolInfo);
+				// 				}	
 			}
 			else
 			{
@@ -493,47 +490,47 @@ void CHeroControl::recruitMessage(int type, google::protobuf::Message *msg)
 				break;
 			}
 		}
-// 		vector<CHero>::iterator iter = m_heroList.begin();
-// 		for (;iter!=m_heroList.end();)
-// 		{
-// 			if (iter->heroid<=0)
-// 			{
-// 				iter = m_heroList.erase(iter);
-// 			}
-// 			else
-// 			{
-// 				++iter;
-// 			}
-// 		}
-// 
-// 		int i=0;
-// 		m_insertIndex = 0;
-// 		for (iter = m_heroList.begin();iter!=m_heroList.end();)
-// 		{
-// 			CHero &her = m_heroList.at(i);
-// 			CHero obj;
-// 	
-// 			//添加分割线
-// 			if (!her.own&&her.itemNum1<her.itemNum2)
-// 			{ 
-// 				m_insertIndex =i;
-// 				CHero hr;
-// 				hr.heroid =0;
-// 				iter = m_heroList.insert(iter,hr);
-// 				hr.heroid =-1;
-// 				iter = m_heroList.insert(iter,hr);
-// 				if (i%2==1)
-// 				{
-// 					hr.heroid=-2;
-// 					iter = m_heroList.insert(iter,hr);
-// 				}
-// 				break;
-// 			}
-// 			else
-// 			{
-// 				iter++;
-// 			}
-// 		}
+		// 		vector<CHero>::iterator iter = m_heroList.begin();
+		// 		for (;iter!=m_heroList.end();)
+		// 		{
+		// 			if (iter->heroid<=0)
+		// 			{
+		// 				iter = m_heroList.erase(iter);
+		// 			}
+		// 			else
+		// 			{
+		// 				++iter;
+		// 			}
+		// 		}
+		// 
+		// 		int i=0;
+		// 		m_insertIndex = 0;
+		// 		for (iter = m_heroList.begin();iter!=m_heroList.end();)
+		// 		{
+		// 			CHero &her = m_heroList.at(i);
+		// 			CHero obj;
+		// 	
+		// 			//添加分割线
+		// 			if (!her.own&&her.itemNum1<her.itemNum2)
+		// 			{ 
+		// 				m_insertIndex =i;
+		// 				CHero hr;
+		// 				hr.heroid =0;
+		// 				iter = m_heroList.insert(iter,hr);
+		// 				hr.heroid =-1;
+		// 				iter = m_heroList.insert(iter,hr);
+		// 				if (i%2==1)
+		// 				{
+		// 					hr.heroid=-2;
+		// 					iter = m_heroList.insert(iter,hr);
+		// 				}
+		// 				break;
+		// 			}
+		// 			else
+		// 			{
+		// 				iter++;
+		// 			}
+		// 		}
 		m_heroLayer->updateHeroList(m_heroList, m_insertIndex);
 		m_heroLayer->showNewHeroEffect(&hr);
 
@@ -569,11 +566,11 @@ void CHeroControl::sendAddHeroExp(int heroId, int itemId, int itemNum)
 
 void CHeroControl::sendHeroBreak(int heroId, int useFood)
 {
-// 	HeroBreakRequest *req = new HeroBreakRequest;
-// 	req->set_heroid(heroId);
-// 	req->set_usefood(useFood);
-// 	GetTcpNet->sendData(req,HeroBreakMsg);
-// 	delete req;
+	// 	HeroBreakRequest *req = new HeroBreakRequest;
+	// 	req->set_heroid(heroId);
+	// 	req->set_usefood(useFood);
+	// 	GetTcpNet->sendData(req,HeroBreakMsg);
+	// 	delete req;
 }
 
 void CHeroControl::onAddBreak(int food)
@@ -595,7 +592,7 @@ int CHeroControl::findHeroPosIndex(int heroId)
 
 void CHeroControl::onBeforeHero()
 {
-    int pos = findHeroPosIndex(m_hero.id);
+	int pos = findHeroPosIndex(m_hero.id);
 	if (pos<=0)
 	{
 		return;

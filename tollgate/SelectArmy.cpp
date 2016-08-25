@@ -31,7 +31,9 @@ using namespace BattleSpace	;
 CSelectArmy::CSelectArmy()
 	:m_selectType(0),m_currPage(0),m_selectFriend(NULL),m_frdId(0),
 	m_friendId(0), m_stageId(0), m_questId(0), m_pActiveLay(nullptr),
-	m_bCaptainShowAction(false),m_WorldBoss(false){}
+	m_bCaptainShowAction(false),m_WorldBoss(false),m_iStarLevel(0)
+	,m_iHeroTypeNeed(0),m_iLimitHeroNum(5)
+{}
 
 bool CSelectArmy::init()
 {
@@ -57,7 +59,7 @@ bool CSelectArmy::init()
 void CSelectArmy::onEnter()
 { 
 	BaseLayer::onEnter();
-	CPlayerControl::getInstance().sendHeroList(0);
+	CPlayerControl::getInstance().sendHeroList(0, 0, 0, m_iHeroTypeNeed);
 
 	//旋转3球
 	CCSprite* pCircle = (CCSprite*)m_ui->findWidgetById("circle_3");
@@ -136,12 +138,15 @@ void CSelectArmy::onEnter()
 	{
 		CRadioButton *radioBtn= (CRadioButton*)(radioGroup->getChildByTag(i+1));
 		radioBtn->setOnCheckListener(this,ccw_check_selector(CSelectArmy::onSwitchBtn));
+
 	}
+	setUIWithHeroTypeNeed();
 
     CRadioButton *myBat = (CRadioButton *)m_ui->findWidgetById("myBat");
 	myBat->setOnCheckListener(this,ccw_check_selector(CSelectArmy::onMyBat));
 	CRadioButton *friendBat = (CRadioButton *)m_ui->findWidgetById("friendBat");
 	
+
 	//有世界BOSS
 	if(m_WorldBoss)
 	{
@@ -230,12 +235,20 @@ void CSelectArmy::onClearHero(CCObject* pSender)
 	{
 		return;
 	}
+	
+	//禁止换下
+	if (!m_union.heroList.at(iIndex).remove)
+	{
+		ShowPopTextTip(GETLANGSTR(2051));
+		return;
+	}
+
 	if (m_union.heroList.at(iIndex).id == m_friendId)
 	{
 		m_frdId = 0;
 		m_friendId =0;
 	}
-    m_union.heroList.at(((CCInteger*)(heromask->getUserObject()))->getValue()) = hero;
+    m_union.heroList.at(iIndex) = hero;
 	m_armyView->reloadData();
 	updateCost();
 
@@ -292,30 +305,32 @@ void CSelectArmy::setUnionList(vector<CUnion> unionList)
 void CSelectArmy::addHeroCell(unsigned int uIdx, CPageViewCell * pCell)
 {
 	CUnion &nion = m_union;
-	for (int j = 0; j < 5&&j<nion.heroList.size(); j++)
+	for (int j = 0; j < 5 && j<nion.heroList.size(); j++)
 	{	
 		CLayout *lay = UICloneMgr::cloneLayout(m_cell1);
 
+		//空的
 		if (nion.heroList[j].id<=0)
 		{
 			lay->setVisible(false);
+
+			//是否超过了上限
+			if ( m_iLimitHeroNum <= j )
+			{
+				//加锁
+				CImageView *pImageView = CImageView::create("common/lock.png");
+				CCNode *pPosChild = lay->getChildByTag(2);
+				pImageView->setPositionX(pPosChild->getPositionX() + m_cell1->getContentSize().width*j + 49);
+				pImageView->setPositionY(pPosChild->getPositionY() + 49);
+				pCell->addChild(pImageView);
+				pImageView->setTouchEnabled(true);
+				pImageView->setOnClickListener(this,ccw_click_selector(CSelectArmy::lockedTile));
+			}
+
 			continue;
 		}
-		CHero &hero = nion.heroList[j];
-		for (int i=1; i<=5&&i<=hero.star;i++)
-		{
-			CCSprite *star = (CCSprite*)lay->findWidgetById(CCString::createWithFormat("star%d",i)->getCString());
-			star->setVisible(true);
-		}
-		if (hero.star==2||hero.star==4)
-		{
-			for (int i = 1; i <=hero.star; i++)
-			{
-				CCSprite *star = (CCSprite*)lay->findWidgetById(CCString::createWithFormat("star%d",i)->getCString());
-				star->setPositionX(star->getPositionX()+star->boundingBox().size.width/2-4);
-			}	
-		}
 
+		CHero &hero = nion.heroList[j];
 		const HeroInfoData *data = DataCenter::sharedData()->getHeroInfo()->getCfg(hero.thumb);
 		for (int i=1;i<=4;++i)
 		{
@@ -379,18 +394,6 @@ void CSelectArmy::addHeroCell(unsigned int uIdx, CPageViewCell * pCell)
 	}
 }
 
-// bool CSelectArmy::onlongClickFriend(CCObject* pSender, CCTouch* pTouch)
-// {
-// 	CImageViewScale9 *selectImg = (CImageViewScale9*)pSender;
-// 	CHero *hero = (CHero*)selectImg->getUserData();
-// 	CHeroControl *heroctl = CHeroControl::create();
-// 	heroctl->setIsHideOperation(true);
-// 	CSceneManager::sharedSceneManager()->getRunningScene()->removeChildByTag(1900);
-// 	CSceneManager::sharedSceneManager()->getRunningScene()->addChild(heroctl,0,1900);
-// 	CPlayerControl::getInstance().sendGetHeroInfo(hero->id,0,m_friendId);
-// 	return true;
-// }
-
 void CSelectArmy::updateMainSkillDesc()
 {
 	if(m_union.heroList.size()==0) return;
@@ -429,7 +432,7 @@ void CSelectArmy::onCombat(CCObject* pSender)
 		PlayEffectSound(SFX_430);
 
 		CButton *combat= (CButton *)pSender;
-		combat->setEnabled(false);
+		//combat->setEnabled(false);
 
 		//有世界BOSS
 		if(m_WorldBoss)
@@ -449,7 +452,7 @@ void CSelectArmy::onCombat(CCObject* pSender)
 				m_union.heroList.at(2).id,
 				m_union.heroList.at(3).id,
 				m_union.heroList.at(4).id,
-				m_frdId,m_questId);
+				m_frdId,m_questId, m_iStarLevel);
 		}
 	}
 
@@ -491,7 +494,7 @@ void CSelectArmy::onFriendBat(CCObject *pSender, bool bChecked)
 		if (m_friendList.empty())
 		{
 			GetTcpNet->registerMsgHandler(HeroListMsg,this,CMsgHandler_selector(CSelectArmy::processNetMsg));
-			CPlayerControl::getInstance().sendHeroList(100);
+			CPlayerControl::getInstance().sendHeroList(100, 0, 0, m_iHeroTypeNeed);
 		}
 		else
 		{
@@ -585,6 +588,7 @@ void CSelectArmy::addGridCell(unsigned int uIdx, CGridViewCell* pCell)
 			((CImageView*)child)->setUserData(hero);
 			((CImageView*)child)->setTouchEnabled(true);
 			((CImageView*)child)->setOnClickListener(this,ccw_click_selector(CSelectArmy::onSelectHero));
+
 		}
 		else if (i==3)
 		{
@@ -813,6 +817,12 @@ void CSelectArmy::onSelectHero(CCObject *pSender)
 		//已经存在队伍中
 		if (hr->id==hero->id&&!CGuideManager::getInstance()->getIsRunGuide())
 		{
+			//不能移除
+			if (!hr->remove)
+			{
+				ShowPopTextTip(GETLANGSTR(2051));
+				return;
+			}
 			//清除队长UI
 			if(i==0)
 			{
@@ -846,6 +856,7 @@ void CSelectArmy::onSelectHero(CCObject *pSender)
 			m_friendId = hero->id;
 			m_frdId = hero->heroid;
 			m_union.heroList.at(i) = *hero;
+			hero->remove = true;		//能装上，肯定能拿下来（不能拿下来的那些，肯定不存在待安装状态）
 			m_armyView->reloadData();
 			updateCost();
 			
@@ -855,6 +866,13 @@ void CSelectArmy::onSelectHero(CCObject *pSender)
 			//ShowPopTextTip("cann't select two friend hero!");
 			return;
 		}
+	}
+
+	//判断是否超过限制数量
+	if (m_iLimitHeroNum <= heroNum())
+	{
+		ShowPopTextTip(CCString::createWithFormat(GETLANGSTR(2053), m_iLimitHeroNum)->getCString());
+		return;
 	}
 
 	//找空位直接补上
@@ -873,6 +891,7 @@ void CSelectArmy::onSelectHero(CCObject *pSender)
 			}
 
 			*hr = *hero;
+			hr->remove = true;		//能装上，肯定能拿下来（不能拿下来的那些，肯定不存在待安装状态）
 			CCNode *selSpr = btn->getParent()->getChildByTag(11);
 			selSpr->setVisible(true);
 			CCSprite *selSpr1 = (CCSprite*)btn->getParent()->getChildByTag(2);
@@ -1211,8 +1230,43 @@ bool CSelectArmy::checkShowCaptain()
 
 void CSelectArmy::willToBatthle( CCObject* pObj )
 {
-	CButton *combat= (CButton *)m_ui->findWidgetById("combat");
-	combat->stopAllActions();
-	//停止所有触摸事件
-	CCDirector::sharedDirector()->getTouchDispatcher()->removeAllDelegates();
+	//CButton *combat= (CButton *)m_ui->findWidgetById("combat");
+	//combat->stopAllActions();
+	////停止所有触摸事件
+	//CCDirector::sharedDirector()->getTouchDispatcher()->removeAllDelegates();
+}
+
+void CSelectArmy::setUIWithHeroTypeNeed()
+{
+	bool isHeroTypeNeed = ( m_iHeroTypeNeed > 0 );
+	CRadioBtnGroup *pRadioGroup = (CRadioBtnGroup *)m_ui->getChildByTag(10);
+	CImageView *pAll = (CImageView *)m_ui->findWidgetById("icon_all");
+	CImageView *pT1 = (CImageView *)m_ui->findWidgetById("type1");
+	CImageView *pT2 = (CImageView *)m_ui->findWidgetById("type2");
+	CImageView *pT3 = (CImageView *)m_ui->findWidgetById("type3");
+
+	pRadioGroup->setVisible(!isHeroTypeNeed);
+	pAll->setVisible(!isHeroTypeNeed);
+	pT1->setVisible(!isHeroTypeNeed);
+	pT2->setVisible(!isHeroTypeNeed);
+	pT3->setVisible(!isHeroTypeNeed);
+}
+
+int CSelectArmy::heroNum()
+{
+	int iNum = 0;
+	for ( int i=0; i<m_union.heroList.size(); i++)
+	{
+		CHero *pHero = &m_union.heroList.at(i);
+		if (pHero->id != 0)
+		{
+			iNum++;
+		}
+	}
+	return iNum;
+}
+
+void CSelectArmy::lockedTile( CCObject *pSender )
+{
+	ShowPopTextTip(CCString::createWithFormat(GETLANGSTR(2053), m_iLimitHeroNum)->getCString());
 }

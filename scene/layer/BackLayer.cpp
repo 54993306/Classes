@@ -48,7 +48,7 @@ void BackLayer::keyBackClicked()
 			m_backTip->setTouchEnabled(true);
 			m_backTip->setTouchPriority(-100);
 			m_backTip->setButtonLisener(this,ccw_click_selector(BackLayer::onExitGame));
-			this->addChild(m_backTip,10,1);
+			scene->addChild(m_backTip,10,1);
 			return;
 		}
 		else if(LayerManager::instance()->getLayerCount()==0&&name=="BattleScene")
@@ -62,7 +62,7 @@ void BackLayer::keyBackClicked()
 			m_backTip->setTouchEnabled(true);
 			m_backTip->setTouchPriority(-100);
 			m_backTip->setButtonLisener(this,ccw_click_selector(BackLayer::onExitGame));
-			this->addChild(m_backTip,10,1);
+			scene->addChild(m_backTip, 999, 1);
 		}
 		else
 		{

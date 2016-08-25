@@ -59,7 +59,6 @@ namespace BattleSpace
 		void otherEnterMaxGrid(BaseRole* pOther);
 	protected:
 		WarManager *mManage;
-		BattleModel *mBattleModel;
 		bool mPvEBattle;
 		bool mExcuteStrategy;
 		vector<BaseRole*>mOtherRoles;

@@ -22,6 +22,7 @@ GateServer LoginScene::getGateServer()
 	const GateServer GATE_SERVER =    {"103.31.20.79",			7304};//外网服务器
 	//const GateServer GATE_SERVER = {"dashisha.lollab.co",			5203};//泰国-境外 
 	//const GateServer GATE_SERVER = {"dashisha.lollab.co",			7303};//泰国-境外 
+	//const GateServer GATE_SERVER = {"192.168.0.80",			7303};//小闫
 #else if CC_TARGET_PLATFORM==CC_PLATFORM_ANDROID	
 	const GateServer GATE_SERVER = {
 		CJniHelper::getInstance()->getGateServerIp(), 

@@ -8,11 +8,11 @@
 //							做引导显示处理
 //
 //************************************************************************/
-namespace BattleSpace{
+namespace BattleSpace
+{
 	class BaseRole;
 	class WarManager;
 	class BattleScene;
-	class WarMapData;
 	class BattleMapLayer;
 	class BattleRoleLayer;
 	class TouchIntercept;
@@ -61,7 +61,6 @@ namespace BattleSpace{
 		CCNode* m_root;
 		WarManager* mManage;
 		BattleScene* m_Scene;
-		WarMapData* m_mapData;
 		BattleMapLayer* m_MapLayer;
 		BattleRoleLayer* m_AliveLayer;	
 		vector<CCRect> m_VecRect;

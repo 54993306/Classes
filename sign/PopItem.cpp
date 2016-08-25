@@ -67,7 +67,7 @@ void CPopItem::onEnter()
 	CButton *btn= (CButton *)m_ui->findWidgetById("ok");
 	btn->setOnClickListener(this,ccw_click_selector(CPopItem::onClose));
 	this->setDescVisiable(false);
-
+	
 	m_cell = (CLayout*)(m_ui->findWidgetById("Cell"));
 	m_cell->retain();
 	m_ui->removeChild(m_cell);

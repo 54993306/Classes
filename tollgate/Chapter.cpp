@@ -45,4 +45,11 @@ void CStageInfoRes::read(const StageInfoRes& info)
 		prize.read(info.itemlist(i));
 		prizeList.push_back(prize);
 	}
+
+	bHasStar = (info.has_star1() && info.has_star2() && info.has_star3());
+
+	pStageStar1 = info.star1();
+	pStageStar2 = info.star2();
+	pStageStar3 = info.star3();
+
 }

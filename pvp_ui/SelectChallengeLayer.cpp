@@ -426,7 +426,7 @@ void CSelectChallengeLayer::updateOnePanel( CLayout* pPanel, const Opponent& pOp
 			pHead->removeFromParent();
 
 			CCSprite *sp = CCSprite::create(fbName.c_str());
-			CImageView* spr = maskedSprite(sp);
+			CImageView* spr = MakeFaceBookHeadToCircle(sp);
 			spr->setScale(0.53f);
 			spr->setPosition(pHeadBg->getPosition()+ccp(headbg->getContentSize().width*0.5f*headbg->getScaleX(), headbg->getContentSize().height*0.5f*headbg->getScaleY()));			
 			spr->setId("headImg");
@@ -655,7 +655,7 @@ void CSelectChallengeLayer::imageLoadSuccessCallBack(string sTag, vector<char>* 
 		CImageView *headImg = (CImageView *)pParent->findWidgetById("headImg");
 		headImg->removeFromParentAndCleanup(true);
 
-		CImageView *headSpr = maskedSprite(CCSprite::createWithTexture(texture));
+		CImageView *headSpr = MakeFaceBookHeadToCircle(CCSprite::createWithTexture(texture));
 		headSpr->setScale(0.53f);
 		headSpr->setPosition(pHeadBg->getPosition()+ccp(headbg->getContentSize().width*0.5f*headbg->getScaleX(), headbg->getContentSize().height*0.5f*headbg->getScaleY()));	
 		headSpr->setId("headImg");
@@ -664,31 +664,3 @@ void CSelectChallengeLayer::imageLoadSuccessCallBack(string sTag, vector<char>* 
 	}
 	img->release();
 }
-
-CImageView * CSelectChallengeLayer::maskedSprite(CCSprite *textureSprite)  
-{  
-	CCSprite * maskSprite = CCSprite::create("mainCity/tencil.png");  
-	CCRenderTexture * renderTexture = CCRenderTexture::create(maskSprite->getContentSize().width, maskSprite->getContentSize().height);  
-
-	maskSprite->setPosition(ccp(maskSprite->getContentSize().width / 2, maskSprite->getContentSize().height / 2));  
-	textureSprite->setPosition(ccp(textureSprite->getContentSize().width / 2, textureSprite->getContentSize().height / 2));  
-
-	ccBlendFunc bfun1;
-	bfun1.src = GL_ONE;
-	bfun1.dst = GL_ZERO;
-	maskSprite->setBlendFunc(bfun1);  
-	ccBlendFunc bfun2;
-	bfun2.src = GL_DST_ALPHA;
-	bfun2.dst = GL_ZERO;
-	textureSprite->setBlendFunc(bfun2);  
-
-	renderTexture->begin();  
-	maskSprite->visit();  
-	textureSprite->visit();  
-	renderTexture->end();  
-
-	CImageView * retval = CImageView::createWithTexture(renderTexture->getSprite()->getTexture());  
-	retval->setFlipY(true);  
-
-	return retval;  
-}  

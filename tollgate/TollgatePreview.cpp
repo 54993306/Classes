@@ -22,6 +22,8 @@
 #include "model/DataPool.h"
 #include "pvp_ui/SelectPvpArmy.h"
 #include "battle/AnimationManager.h"
+#include "common/ShaderDataHelper.h"
+
 using namespace BattleSpace;
 
 CTollgatePreview::CTollgatePreview():
@@ -33,7 +35,14 @@ CTollgatePreview::CTollgatePreview():
 	,m_bIsNormal(false)
 	,m_pBody(nullptr)
 	,m_bLastStage(false)
+	,m_iStar(-1)
+	,m_iStarLevel(0)
+	,m_iNeedHeroType(0)
+	,m_iNeedHeroTypeLevel(-1)
+	,m_iNeedHeroNum(5)
+	,m_iNeedHeroNumLevel(-1)
 {
+
 }
 
 bool CTollgatePreview::init()
@@ -63,6 +72,20 @@ void CTollgatePreview::onCombat(CCObject* pSender)
 		CShowToBuyResource* pShow = CShowToBuyResource::create();
 		pShow->showToBuyResourceByType(ShowBuyResourceAction);
 		return;
+	}
+
+	CCNode *pNode = (CCNode*)pSender;
+	int iTag = pNode->getTag();
+	m_iStarLevel = iTag;
+
+	if (m_iStarLevel != m_iNeedHeroTypeLevel)
+	{
+		m_iNeedHeroType = 0;
+	}
+
+	if (m_iStarLevel != m_iNeedHeroNumLevel)
+	{
+		m_iNeedHeroNum = 5;
 	}
 
 	onCombatEffect();
@@ -153,7 +176,13 @@ void CTollgatePreview::processNetMsg(int type, google::protobuf::Message *msg)
 	StageInfoRes *res =(StageInfoRes*)msg;
 	CStageInfoRes stageInfo;
 	stageInfo.read(*res);
-	DATAPOOL->setStageInfoById(m_stageId,stageInfo);
+
+	//普通/精英战斗关卡不缓存
+	if( m_iStar <= 0 )
+	{
+		DATAPOOL->setStageInfoById(m_stageId,stageInfo);
+	}
+	
 	showStageInfo(stageInfo);
 	return;
 }
@@ -432,10 +461,12 @@ void CTollgatePreview::onCombatEffectCallBack()
 	//onClose(nullptr);
 
  	CSelectArmy *selArmy = CSelectArmy::create();
+	selArmy->setStarLevel(m_iStarLevel);
+	selArmy->setHeroTypeNeed(m_iNeedHeroType);
+	selArmy->setLimitHeroNum(m_iNeedHeroNum);
  	LayerManager::instance()->push(selArmy);
-	CPlayerControl::getInstance().sendUnion(m_stageId,m_questId);
-	selArmy->setStagId(m_stageId,m_questId);
-
+	CPlayerControl::getInstance().sendUnion( m_stageId, m_questId, false, m_iStarLevel );
+	selArmy->setStagId(m_stageId, m_questId);
 	m_pBody->runAction(CCRepeatForever::create(CCSequence::createWithTwoActions(CCScaleTo::create(0.6f, 1.04f), CCScaleTo::create(0.6f, 1.0f))));
 }
 
@@ -645,5 +676,106 @@ void CTollgatePreview::showStageInfo(CStageInfoRes &stageInfo)
 	else
 	{
 		showEffect();
+	}
+
+	showCombatWithStar(stageInfo);
+}
+
+void CTollgatePreview::showCombatWithStar( CStageInfoRes &stageInfo )
+{
+	//消耗的位置
+	CLayout *pConsumeLay = (CLayout *)m_ui->findWidgetById("consume");
+	//战斗按钮状态
+	CButton *pBaseCombat = (CButton *)m_ui->findWidgetById("combat");
+	//星级战斗按钮
+	CLayout *pCombatLay = (CLayout *)m_ui->findWidgetById("combat_lay");
+
+	bool isStarStage = stageInfo.bHasStar;
+
+	//其他非星级关卡
+	if (!isStarStage)
+	{
+		pBaseCombat->setVisible(true);
+		pBaseCombat->setTag(0);
+		pCombatLay->setVisible(false);
+	}
+	//星级关卡，精英和普通
+	else
+	{
+		pConsumeLay->setPosition(pConsumeLay->getPosition()-ccp(690, 150));
+		pBaseCombat->setVisible(false);
+		pCombatLay->setVisible(true);
+
+		const StageStar* cStageStar[3] = {&stageInfo.pStageStar1, &stageInfo.pStageStar2, &stageInfo.pStageStar3};
+
+		for( int i=0; i<3; i++)
+		{
+			//按钮
+			CButton *pButton = (CButton *)pCombatLay->findWidgetById(CCString::createWithFormat("combat_%d", i+1)->getCString());
+			//图标
+			CImageView *pIcon = (CImageView *)pCombatLay->findWidgetById(CCString::createWithFormat("title_%d", i+1)->getCString());
+			//文字
+			CLabel *pText = (CLabel *)pCombatLay->findWidgetById(CCString::createWithFormat("tips_%d", i+1)->getCString());
+			//对勾
+			CImageView *pRight = (CImageView *)pCombatLay->findWidgetById(CCString::createWithFormat("got_%d", i+1)->getCString());
+
+			//TODO
+			//文字描述
+			updateStarLimitTips(pText, cStageStar[i]->type(), cStageStar[i]->param(), i+1);
+
+			//对勾
+			pRight->setVisible(m_iStar > i);
+
+			//可以进去打的
+			if (cStageStar[i]->open())
+			{
+				pButton->setTag(i+1);
+				pButton->setTouchEnabled(true);
+				pButton->setOnClickListener(this, ccw_click_selector(CTollgatePreview::onCombat));
+			}
+			//不能进去打的
+			else
+			{
+				pButton->setEnabled(false);
+				pButton->getDisabledImage()->setShaderProgram(ShaderDataMgr->getShaderByType(ShaderStone));
+				pIcon->setShaderProgram(ShaderDataMgr->getShaderByType(ShaderStone));
+			}
+		}
+	}
+
+}
+
+void CTollgatePreview::updateStarLimitTips( CLabel *pLabel, int iType, int iData, int iLevelStar )
+{
+	//条件类型(1 指定时间内通关，2 限制英雄数量，3 限定英雄属性，4 指定英雄)
+	switch (iType)
+	{
+	case 1:
+		{
+			pLabel->setString(CCString::createWithFormat(GETLANGSTR(2047), iData)->getCString());
+		}break;
+	case 2:
+		{
+			m_iNeedHeroNumLevel = iLevelStar;
+			m_iNeedHeroNum = iData;
+			pLabel->setString(CCString::createWithFormat(GETLANGSTR(2048), iData)->getCString());
+		}break;
+	case 3:
+		{
+			m_iNeedHeroTypeLevel = iLevelStar;
+			m_iNeedHeroType = iData;
+			pLabel->setString(CCString::createWithFormat(GETLANGSTR(2049), GETLANGSTR(1189+iData))->getCString());
+		}break;
+	case 4:
+		{
+			//根据id获取英雄信息
+			const HeroInfoData *pData = DataCenter::sharedData()->getHeroInfo()->getCfg( iData );
+			pLabel->setString(CCString::createWithFormat(GETLANGSTR(2050), pData->heroName.c_str())->getCString());
+		}break;
+	default:
+		{
+			pLabel->setString(GETLANGSTR(2052));
+		}
+		break;
 	}
 }

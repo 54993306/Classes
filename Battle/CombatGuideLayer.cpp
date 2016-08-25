@@ -2,7 +2,7 @@
 #include "TouchIntercept.h"
 #include "Battle/BattleCenter.h"
 #include "Battle/WarManager.h"
-#include "Battle/MapManager.h"
+#include "Battle/CoordsManage.h"
 #include "Battle/RoleObject/RoleObject.h"
 #include "Battle/BattleLayer/BattleMapLayer.h"
 #include "Battle/BattleLayer/BattleRoleLayer.h"
@@ -12,13 +12,14 @@
 #include "Battle/BattleScene/BattleScene.h"
 #include "Battle/WarControl.h"
 #include "common/CommonFunction.h"
-#include "Battle/LoadSpineData.h"
+#include "Battle/SpineDataManage.h"
 #include "Battle/BattleMessage.h"
 #include "Battle/MoveObject.h"
 #include "Battle/BaseRole.h"
-namespace BattleSpace{
+namespace BattleSpace
+{
 	CombatGuideLayer::CombatGuideLayer()
-		:m_Step(nullptr),m_root(nullptr),m_mapData(nullptr),mManage(nullptr)
+		:m_Step(nullptr),m_root(nullptr),mManage(nullptr)
 		,m_RenderTexture(nullptr),m_Scene(nullptr),m_LayerColor(nullptr)
 	{}
 
@@ -43,7 +44,6 @@ namespace BattleSpace{
 		m_root->setPosition(VCENTER);
 		m_root->retain();
 		addChild(m_root);
-		m_mapData = ManageCenter->getMap()->getCurrWarMap();
 
 		m_LayerColor = CCLayerColor::create(ccc4(0,0,0,250));
 		CCSize size = CCDirector::sharedDirector()->getWinSize();
@@ -57,7 +57,6 @@ namespace BattleSpace{
 	void CombatGuideLayer::initScene( BattleScene*scene )
 	{
 		m_Scene = scene;
-		m_mapData = ManageCenter->getMap()->getCurrWarMap();
 		m_MapLayer = m_Scene->getBattleMapLayer();
 		m_AliveLayer = m_Scene->getBattleRoleLayer();
 	}
@@ -160,7 +159,7 @@ namespace BattleSpace{
 
 	cocos2d::CCPoint CombatGuideLayer::getPointByMapGrid( int grid )
 	{
-		CCPoint p = m_mapData->getPoint( grid );							//得到绝对世界坐标系的店
+		CCPoint p = BattleCoords->getPoint( grid );							//得到绝对世界坐标系的店
 		CCPoint pWorld = m_AliveLayer->convertToWorldSpace(p);				//根据父节点的位置得到点当前相对世界坐标的点
 		CCPoint GuidePoint = m_root->convertToNodeSpace(pWorld);			//根据当前世界坐标上的点转化为节点上的点
 		return GuidePoint;
@@ -202,7 +201,7 @@ namespace BattleSpace{
 		char bg_path[60] = {0};
 		sprintf(bg_path,"888%d",imagedata.spineID);
 		spSkeletonData* data = nullptr;
-		SpData* pData = mManage->getSpineData(bg_path);
+		SpineData* pData = SpineManage->getSpineData(bg_path);
 		if (pData)
 		{
 			data = pData->first;
@@ -210,7 +209,7 @@ namespace BattleSpace{
 			CCLOG("[ *ERROR ] CombatGuideLayer::ImageArray roleId=%s",bg_path);
 			char path[60] = {0};
 			sprintf(path,"storyImage/Spine/888%d",imagedata.spineID);
-			data = LoadSpineData::create()->loadSpineImmediately(bg_path,path);
+			data = SpineManage->loadSpineImmediately(bg_path,path);
 		}
 		SkeletonAnimation*Animation = SkeletonAnimation::createWithData(data);
 		Animation->setPosition(imagedata.pos);
@@ -324,15 +323,15 @@ namespace BattleSpace{
 
 	void CombatGuideLayer::creaAliveByVector( vector<BaseRole*>VecAlive,CombatGuideStep* step )
 	{
-		for(BaseRole*alive:VecAlive)
+		for(BaseRole*tRole:VecAlive)
 		{
 			for (auto compel:step->m_VecCompel)
 			{
-				if (alive->getModel() != compel.model)
+				if (tRole->getModel() != compel.model)
 					continue;
-				alive->initAliveData();
-				m_AliveLayer->initActobject(alive);
-				alive->getRoleObject()->setActMoveGrid(compel.grid);
+				tRole->initAliveData();
+				m_AliveLayer->initActobject(tRole);
+				tRole->getRoleObject()->setActMoveGrid(compel.grid);
 				break;
 			}
 		}
@@ -343,7 +342,7 @@ namespace BattleSpace{
 		if (!step->getReset())						//是否重置武将处理
 			return;
 		NOTIFICATION->postNotification(MsgReleaseTouch);									//释放掉触摸消息
-		CCMoveTo* mt = CCMoveTo::create(0.2f,ccp(MAP_MINX(ManageCenter->getMap()->getCurrWarMap()),0));	//飞到最右侧
+		CCMoveTo* mt = CCMoveTo::create(0.2f,ccp(BattleCoords->CoordsMin(),0));	//飞到最右侧
 		m_Scene->getMoveLayer()->runAction(mt);
 		CCArray* arr = mManage->getHeros();
 		CCObject* obj = nullptr;
@@ -356,7 +355,7 @@ namespace BattleSpace{
 			VecAlive.push_back(tRole);
 			if (!tRole->getBattle()||!tRole->getRoleObject())
 				continue;
-			CCPoint p = m_mapData->getPoint(INVALID_GRID);
+			CCPoint p = BattleCoords->getPoint(INVALID_GRID);
 			if (tRole->getMoveObject())
 				tRole->getMoveObject()->setPosition(p);										//可重构点,这些操作都应该封装在武将的内部执行的
 			tRole->getRoleObject()->setPosition(p);											//在视野外进行死亡处理

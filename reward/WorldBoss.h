@@ -23,8 +23,11 @@ enum WorldBossTabType
 class CWBossLayer;
 class CWRuleLayer;
 class CWShopLayer;
-class ArmatureEventDataMgr;
-class ArmatureEventData;
+namespace BattleSpace
+{
+	class ArmatureEventDataMgr;
+	class ArmatureEventData;
+}
 
 class CWorldBoss: public BaseLayer
 {
@@ -73,7 +76,7 @@ private:
 	CWShopLayer* m_pShopLayer;
 
 	CCArmature* m_pArmature;
-	ArmatureEventDataMgr* m_armatureEventDataMgr;
-	ArmatureEventData* m_armatureEventData;
+	BattleSpace::ArmatureEventDataMgr* m_armatureEventDataMgr;
+	BattleSpace::ArmatureEventData* m_armatureEventData;
 	int m_lastFrame;
 };

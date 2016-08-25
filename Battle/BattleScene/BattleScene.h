@@ -25,7 +25,7 @@ namespace BattleSpace
 	class StoryLayer;
 	class BattleMapLayer;
 	class BattleRoleLayer;
-	class TerrainLayer;
+	class TrapLayer;
 	class CombatGuideLayer;
 	class CombatLogic;
 	class DropItem;
@@ -63,7 +63,7 @@ namespace BattleSpace
 		CC_SYNTHESIZE(CCNode*,m_MoveLayer,MoveLayer);
 		CC_SYNTHESIZE(BattleMapLayer*,m_MapLayer,BattleMapLayer);
 		CC_SYNTHESIZE(BattleRoleLayer*,m_AliveLayer,BattleRoleLayer);
-		CC_SYNTHESIZE(TerrainLayer*,m_TerrainLayer,TerrainLayer);
+		CC_SYNTHESIZE(TrapLayer*,mTrapLayer,TrapLayer);
 		CC_SYNTHESIZE(WarControl*,m_UILayer,WarUI);
 		CC_SYNTHESIZE(StoryLayer*,m_StoryLayer,StoryLayer);
 		CC_SYNTHESIZE(CombatLogic*,m_Loginc,CombatLogic);

@@ -36,6 +36,7 @@ void  protobuf_AddDesc_pvp_5fprotocol_2eproto();
 void protobuf_AssignDesc_pvp_5fprotocol_2eproto();
 void protobuf_ShutdownFile_pvp_5fprotocol_2eproto();
 
+class PvpCityData;
 class PvpTeamData;
 class PvpDataReq;
 class PvpDataRes;
@@ -54,6 +55,122 @@ class Opponent;
 class PvpPrize;
 
 // ===================================================================
+
+class PvpCityData : public ::google::protobuf::Message {
+ public:
+  PvpCityData();
+  virtual ~PvpCityData();
+
+  PvpCityData(const PvpCityData& from);
+
+  inline PvpCityData& operator=(const PvpCityData& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const PvpCityData& default_instance();
+
+  void Swap(PvpCityData* other);
+
+  // implements Message ----------------------------------------------
+
+  PvpCityData* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const PvpCityData& from);
+  void MergeFrom(const PvpCityData& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // optional int32 my_pve_rank = 1;
+  inline bool has_my_pve_rank() const;
+  inline void clear_my_pve_rank();
+  static const int kMyPveRankFieldNumber = 1;
+  inline ::google::protobuf::int32 my_pve_rank() const;
+  inline void set_my_pve_rank(::google::protobuf::int32 value);
+
+  // optional int32 my_pvp_rank = 2;
+  inline bool has_my_pvp_rank() const;
+  inline void clear_my_pvp_rank();
+  static const int kMyPvpRankFieldNumber = 2;
+  inline ::google::protobuf::int32 my_pvp_rank() const;
+  inline void set_my_pvp_rank(::google::protobuf::int32 value);
+
+  // optional .protos.Opponent pve_champion = 3;
+  inline bool has_pve_champion() const;
+  inline void clear_pve_champion();
+  static const int kPveChampionFieldNumber = 3;
+  inline const ::protos::Opponent& pve_champion() const;
+  inline ::protos::Opponent* mutable_pve_champion();
+  inline ::protos::Opponent* release_pve_champion();
+  inline void set_allocated_pve_champion(::protos::Opponent* pve_champion);
+
+  // optional .protos.Opponent pvp_champion = 4;
+  inline bool has_pvp_champion() const;
+  inline void clear_pvp_champion();
+  static const int kPvpChampionFieldNumber = 4;
+  inline const ::protos::Opponent& pvp_champion() const;
+  inline ::protos::Opponent* mutable_pvp_champion();
+  inline ::protos::Opponent* release_pvp_champion();
+  inline void set_allocated_pvp_champion(::protos::Opponent* pvp_champion);
+
+  // @@protoc_insertion_point(class_scope:protos.PvpCityData)
+ private:
+  inline void set_has_my_pve_rank();
+  inline void clear_has_my_pve_rank();
+  inline void set_has_my_pvp_rank();
+  inline void clear_has_my_pvp_rank();
+  inline void set_has_pve_champion();
+  inline void clear_has_pve_champion();
+  inline void set_has_pvp_champion();
+  inline void clear_has_pvp_champion();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::int32 my_pve_rank_;
+  ::google::protobuf::int32 my_pvp_rank_;
+  ::protos::Opponent* pve_champion_;
+  ::protos::Opponent* pvp_champion_;
+
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
+
+  friend void  protobuf_AddDesc_pvp_5fprotocol_2eproto();
+  friend void protobuf_AssignDesc_pvp_5fprotocol_2eproto();
+  friend void protobuf_ShutdownFile_pvp_5fprotocol_2eproto();
+
+  void InitAsDefaultInstance();
+  static PvpCityData* default_instance_;
+};
+// -------------------------------------------------------------------
 
 class PvpTeamData : public ::google::protobuf::Message {
  public:
@@ -1911,6 +2028,130 @@ class PvpPrize : public ::google::protobuf::Message {
 
 
 // ===================================================================
+
+// PvpCityData
+
+// optional int32 my_pve_rank = 1;
+inline bool PvpCityData::has_my_pve_rank() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void PvpCityData::set_has_my_pve_rank() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void PvpCityData::clear_has_my_pve_rank() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void PvpCityData::clear_my_pve_rank() {
+  my_pve_rank_ = 0;
+  clear_has_my_pve_rank();
+}
+inline ::google::protobuf::int32 PvpCityData::my_pve_rank() const {
+  return my_pve_rank_;
+}
+inline void PvpCityData::set_my_pve_rank(::google::protobuf::int32 value) {
+  set_has_my_pve_rank();
+  my_pve_rank_ = value;
+}
+
+// optional int32 my_pvp_rank = 2;
+inline bool PvpCityData::has_my_pvp_rank() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void PvpCityData::set_has_my_pvp_rank() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void PvpCityData::clear_has_my_pvp_rank() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void PvpCityData::clear_my_pvp_rank() {
+  my_pvp_rank_ = 0;
+  clear_has_my_pvp_rank();
+}
+inline ::google::protobuf::int32 PvpCityData::my_pvp_rank() const {
+  return my_pvp_rank_;
+}
+inline void PvpCityData::set_my_pvp_rank(::google::protobuf::int32 value) {
+  set_has_my_pvp_rank();
+  my_pvp_rank_ = value;
+}
+
+// optional .protos.Opponent pve_champion = 3;
+inline bool PvpCityData::has_pve_champion() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void PvpCityData::set_has_pve_champion() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void PvpCityData::clear_has_pve_champion() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void PvpCityData::clear_pve_champion() {
+  if (pve_champion_ != NULL) pve_champion_->::protos::Opponent::Clear();
+  clear_has_pve_champion();
+}
+inline const ::protos::Opponent& PvpCityData::pve_champion() const {
+  return pve_champion_ != NULL ? *pve_champion_ : *default_instance_->pve_champion_;
+}
+inline ::protos::Opponent* PvpCityData::mutable_pve_champion() {
+  set_has_pve_champion();
+  if (pve_champion_ == NULL) pve_champion_ = new ::protos::Opponent;
+  return pve_champion_;
+}
+inline ::protos::Opponent* PvpCityData::release_pve_champion() {
+  clear_has_pve_champion();
+  ::protos::Opponent* temp = pve_champion_;
+  pve_champion_ = NULL;
+  return temp;
+}
+inline void PvpCityData::set_allocated_pve_champion(::protos::Opponent* pve_champion) {
+  delete pve_champion_;
+  pve_champion_ = pve_champion;
+  if (pve_champion) {
+    set_has_pve_champion();
+  } else {
+    clear_has_pve_champion();
+  }
+}
+
+// optional .protos.Opponent pvp_champion = 4;
+inline bool PvpCityData::has_pvp_champion() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void PvpCityData::set_has_pvp_champion() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void PvpCityData::clear_has_pvp_champion() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void PvpCityData::clear_pvp_champion() {
+  if (pvp_champion_ != NULL) pvp_champion_->::protos::Opponent::Clear();
+  clear_has_pvp_champion();
+}
+inline const ::protos::Opponent& PvpCityData::pvp_champion() const {
+  return pvp_champion_ != NULL ? *pvp_champion_ : *default_instance_->pvp_champion_;
+}
+inline ::protos::Opponent* PvpCityData::mutable_pvp_champion() {
+  set_has_pvp_champion();
+  if (pvp_champion_ == NULL) pvp_champion_ = new ::protos::Opponent;
+  return pvp_champion_;
+}
+inline ::protos::Opponent* PvpCityData::release_pvp_champion() {
+  clear_has_pvp_champion();
+  ::protos::Opponent* temp = pvp_champion_;
+  pvp_champion_ = NULL;
+  return temp;
+}
+inline void PvpCityData::set_allocated_pvp_champion(::protos::Opponent* pvp_champion) {
+  delete pvp_champion_;
+  pvp_champion_ = pvp_champion;
+  if (pvp_champion) {
+    set_has_pvp_champion();
+  } else {
+    clear_has_pvp_champion();
+  }
+}
+
+// -------------------------------------------------------------------
 
 // PvpTeamData
 

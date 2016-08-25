@@ -39,6 +39,7 @@ void protobuf_ShutdownFile_stage_5fprotocol_2eproto();
 
 class StageInfoReq;
 class StageInfoRes;
+class StageStar;
 class ChapterRequest;
 class ChapterResponse;
 class StageListRequest;
@@ -224,16 +225,154 @@ class StageInfoRes : public ::google::protobuf::Message {
   inline ::google::protobuf::RepeatedPtrField< ::protos::common::Prize >*
       mutable_itemlist();
 
+  // optional .protos.StageStar star1 = 5;
+  inline bool has_star1() const;
+  inline void clear_star1();
+  static const int kStar1FieldNumber = 5;
+  inline const ::protos::StageStar& star1() const;
+  inline ::protos::StageStar* mutable_star1();
+  inline ::protos::StageStar* release_star1();
+  inline void set_allocated_star1(::protos::StageStar* star1);
+
+  // optional .protos.StageStar star2 = 6;
+  inline bool has_star2() const;
+  inline void clear_star2();
+  static const int kStar2FieldNumber = 6;
+  inline const ::protos::StageStar& star2() const;
+  inline ::protos::StageStar* mutable_star2();
+  inline ::protos::StageStar* release_star2();
+  inline void set_allocated_star2(::protos::StageStar* star2);
+
+  // optional .protos.StageStar star3 = 7;
+  inline bool has_star3() const;
+  inline void clear_star3();
+  static const int kStar3FieldNumber = 7;
+  inline const ::protos::StageStar& star3() const;
+  inline ::protos::StageStar* mutable_star3();
+  inline ::protos::StageStar* release_star3();
+  inline void set_allocated_star3(::protos::StageStar* star3);
+
   // @@protoc_insertion_point(class_scope:protos.StageInfoRes)
  private:
   inline void set_has_action();
   inline void clear_has_action();
+  inline void set_has_star1();
+  inline void clear_has_star1();
+  inline void set_has_star2();
+  inline void clear_has_star2();
+  inline void set_has_star3();
+  inline void clear_has_star3();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
   ::google::protobuf::RepeatedPtrField< ::protos::common::Monster > monsterlist_;
   ::google::protobuf::RepeatedPtrField< ::protos::common::Prize > itemlist_;
+  ::protos::StageStar* star1_;
+  ::protos::StageStar* star2_;
+  ::protos::StageStar* star3_;
   ::google::protobuf::int32 action_;
+
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(6 + 31) / 32];
+
+  friend void  protobuf_AddDesc_stage_5fprotocol_2eproto();
+  friend void protobuf_AssignDesc_stage_5fprotocol_2eproto();
+  friend void protobuf_ShutdownFile_stage_5fprotocol_2eproto();
+
+  void InitAsDefaultInstance();
+  static StageInfoRes* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class StageStar : public ::google::protobuf::Message {
+ public:
+  StageStar();
+  virtual ~StageStar();
+
+  StageStar(const StageStar& from);
+
+  inline StageStar& operator=(const StageStar& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const StageStar& default_instance();
+
+  void Swap(StageStar* other);
+
+  // implements Message ----------------------------------------------
+
+  StageStar* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const StageStar& from);
+  void MergeFrom(const StageStar& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // optional bool open = 1;
+  inline bool has_open() const;
+  inline void clear_open();
+  static const int kOpenFieldNumber = 1;
+  inline bool open() const;
+  inline void set_open(bool value);
+
+  // optional int32 type = 2;
+  inline bool has_type() const;
+  inline void clear_type();
+  static const int kTypeFieldNumber = 2;
+  inline ::google::protobuf::int32 type() const;
+  inline void set_type(::google::protobuf::int32 value);
+
+  // optional int32 param = 3;
+  inline bool has_param() const;
+  inline void clear_param();
+  static const int kParamFieldNumber = 3;
+  inline ::google::protobuf::int32 param() const;
+  inline void set_param(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:protos.StageStar)
+ private:
+  inline void set_has_open();
+  inline void clear_has_open();
+  inline void set_has_type();
+  inline void clear_has_type();
+  inline void set_has_param();
+  inline void clear_has_param();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  bool open_;
+  ::google::protobuf::int32 type_;
+  ::google::protobuf::int32 param_;
 
   mutable int _cached_size_;
   ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
@@ -243,7 +382,7 @@ class StageInfoRes : public ::google::protobuf::Message {
   friend void protobuf_ShutdownFile_stage_5fprotocol_2eproto();
 
   void InitAsDefaultInstance();
-  static StageInfoRes* default_instance_;
+  static StageStar* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -717,6 +856,13 @@ class BattleRequest : public ::google::protobuf::Message {
   inline ::google::protobuf::int32 fid() const;
   inline void set_fid(::google::protobuf::int32 value);
 
+  // optional int32 stageStar = 8;
+  inline bool has_stagestar() const;
+  inline void clear_stagestar();
+  static const int kStageStarFieldNumber = 8;
+  inline ::google::protobuf::int32 stagestar() const;
+  inline void set_stagestar(::google::protobuf::int32 value);
+
   // @@protoc_insertion_point(class_scope:protos.BattleRequest)
  private:
   inline void set_has_stageid();
@@ -733,6 +879,8 @@ class BattleRequest : public ::google::protobuf::Message {
   inline void clear_has_hero5();
   inline void set_has_fid();
   inline void clear_has_fid();
+  inline void set_has_stagestar();
+  inline void clear_has_stagestar();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
@@ -743,9 +891,10 @@ class BattleRequest : public ::google::protobuf::Message {
   ::google::protobuf::int32 hero4_;
   ::google::protobuf::int32 hero5_;
   ::google::protobuf::int32 fid_;
+  ::google::protobuf::int32 stagestar_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(7 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(8 + 31) / 32];
 
   friend void  protobuf_AddDesc_stage_5fprotocol_2eproto();
   friend void protobuf_AssignDesc_stage_5fprotocol_2eproto();
@@ -2103,6 +2252,190 @@ StageInfoRes::mutable_itemlist() {
   return &itemlist_;
 }
 
+// optional .protos.StageStar star1 = 5;
+inline bool StageInfoRes::has_star1() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void StageInfoRes::set_has_star1() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void StageInfoRes::clear_has_star1() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void StageInfoRes::clear_star1() {
+  if (star1_ != NULL) star1_->::protos::StageStar::Clear();
+  clear_has_star1();
+}
+inline const ::protos::StageStar& StageInfoRes::star1() const {
+  return star1_ != NULL ? *star1_ : *default_instance_->star1_;
+}
+inline ::protos::StageStar* StageInfoRes::mutable_star1() {
+  set_has_star1();
+  if (star1_ == NULL) star1_ = new ::protos::StageStar;
+  return star1_;
+}
+inline ::protos::StageStar* StageInfoRes::release_star1() {
+  clear_has_star1();
+  ::protos::StageStar* temp = star1_;
+  star1_ = NULL;
+  return temp;
+}
+inline void StageInfoRes::set_allocated_star1(::protos::StageStar* star1) {
+  delete star1_;
+  star1_ = star1;
+  if (star1) {
+    set_has_star1();
+  } else {
+    clear_has_star1();
+  }
+}
+
+// optional .protos.StageStar star2 = 6;
+inline bool StageInfoRes::has_star2() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void StageInfoRes::set_has_star2() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void StageInfoRes::clear_has_star2() {
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline void StageInfoRes::clear_star2() {
+  if (star2_ != NULL) star2_->::protos::StageStar::Clear();
+  clear_has_star2();
+}
+inline const ::protos::StageStar& StageInfoRes::star2() const {
+  return star2_ != NULL ? *star2_ : *default_instance_->star2_;
+}
+inline ::protos::StageStar* StageInfoRes::mutable_star2() {
+  set_has_star2();
+  if (star2_ == NULL) star2_ = new ::protos::StageStar;
+  return star2_;
+}
+inline ::protos::StageStar* StageInfoRes::release_star2() {
+  clear_has_star2();
+  ::protos::StageStar* temp = star2_;
+  star2_ = NULL;
+  return temp;
+}
+inline void StageInfoRes::set_allocated_star2(::protos::StageStar* star2) {
+  delete star2_;
+  star2_ = star2;
+  if (star2) {
+    set_has_star2();
+  } else {
+    clear_has_star2();
+  }
+}
+
+// optional .protos.StageStar star3 = 7;
+inline bool StageInfoRes::has_star3() const {
+  return (_has_bits_[0] & 0x00000020u) != 0;
+}
+inline void StageInfoRes::set_has_star3() {
+  _has_bits_[0] |= 0x00000020u;
+}
+inline void StageInfoRes::clear_has_star3() {
+  _has_bits_[0] &= ~0x00000020u;
+}
+inline void StageInfoRes::clear_star3() {
+  if (star3_ != NULL) star3_->::protos::StageStar::Clear();
+  clear_has_star3();
+}
+inline const ::protos::StageStar& StageInfoRes::star3() const {
+  return star3_ != NULL ? *star3_ : *default_instance_->star3_;
+}
+inline ::protos::StageStar* StageInfoRes::mutable_star3() {
+  set_has_star3();
+  if (star3_ == NULL) star3_ = new ::protos::StageStar;
+  return star3_;
+}
+inline ::protos::StageStar* StageInfoRes::release_star3() {
+  clear_has_star3();
+  ::protos::StageStar* temp = star3_;
+  star3_ = NULL;
+  return temp;
+}
+inline void StageInfoRes::set_allocated_star3(::protos::StageStar* star3) {
+  delete star3_;
+  star3_ = star3;
+  if (star3) {
+    set_has_star3();
+  } else {
+    clear_has_star3();
+  }
+}
+
+// -------------------------------------------------------------------
+
+// StageStar
+
+// optional bool open = 1;
+inline bool StageStar::has_open() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void StageStar::set_has_open() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void StageStar::clear_has_open() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void StageStar::clear_open() {
+  open_ = false;
+  clear_has_open();
+}
+inline bool StageStar::open() const {
+  return open_;
+}
+inline void StageStar::set_open(bool value) {
+  set_has_open();
+  open_ = value;
+}
+
+// optional int32 type = 2;
+inline bool StageStar::has_type() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void StageStar::set_has_type() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void StageStar::clear_has_type() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void StageStar::clear_type() {
+  type_ = 0;
+  clear_has_type();
+}
+inline ::google::protobuf::int32 StageStar::type() const {
+  return type_;
+}
+inline void StageStar::set_type(::google::protobuf::int32 value) {
+  set_has_type();
+  type_ = value;
+}
+
+// optional int32 param = 3;
+inline bool StageStar::has_param() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void StageStar::set_has_param() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void StageStar::clear_has_param() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void StageStar::clear_param() {
+  param_ = 0;
+  clear_has_param();
+}
+inline ::google::protobuf::int32 StageStar::param() const {
+  return param_;
+}
+inline void StageStar::set_param(::google::protobuf::int32 value) {
+  set_has_param();
+  param_ = value;
+}
+
 // -------------------------------------------------------------------
 
 // ChapterRequest
@@ -2438,6 +2771,28 @@ inline ::google::protobuf::int32 BattleRequest::fid() const {
 inline void BattleRequest::set_fid(::google::protobuf::int32 value) {
   set_has_fid();
   fid_ = value;
+}
+
+// optional int32 stageStar = 8;
+inline bool BattleRequest::has_stagestar() const {
+  return (_has_bits_[0] & 0x00000080u) != 0;
+}
+inline void BattleRequest::set_has_stagestar() {
+  _has_bits_[0] |= 0x00000080u;
+}
+inline void BattleRequest::clear_has_stagestar() {
+  _has_bits_[0] &= ~0x00000080u;
+}
+inline void BattleRequest::clear_stagestar() {
+  stagestar_ = 0;
+  clear_has_stagestar();
+}
+inline ::google::protobuf::int32 BattleRequest::stagestar() const {
+  return stagestar_;
+}
+inline void BattleRequest::set_stagestar(::google::protobuf::int32 value) {
+  set_has_stagestar();
+  stagestar_ = value;
 }
 
 // -------------------------------------------------------------------

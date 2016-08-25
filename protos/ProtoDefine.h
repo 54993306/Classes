@@ -118,7 +118,9 @@ enum protoTag
 	PvpAsyncBattle				= 108,//异步PVP
 	PvpOverReqMsg				= 109,//异步PVP结算
 	PvpRecordResMsg			= 110,//异步PVP记录
-
+	PvpCityDataMsg			= 112,//PVP主城数据
+	LuckyWheelMsg				=113,//获取转盘信息
+	DrawRequestMsg				=114,//抽奖请求
 	GameTipMsg					= 1000,
 	Reconnect					= 1001,//断线重连
 	ServerListMsg				= 1111,//版本号+服务器列表
@@ -233,6 +235,10 @@ static ProtoDefine protoDef[] =
 	{PvpAsyncBattle,"protos.StartPvpRes"},					//PvE数据返回
 	{PvpOverReqMsg,"protos.PvpOverRes"},					//Pvp结算
 	{PvpRecordResMsg,"protos.PvpRecordRes"},					//异步Pvp战斗记录
+	{111,""},
+	{PvpCityDataMsg,"protos.PvpCityData"},					//pvp天空场景数据
+	{LuckyWheelMsg,"protos.LuckyWheel"},					//获取转盘信息
+	{DrawRequestMsg,"protos.DrawResponse"},					//抽奖请求
 	{GameTipMsg,"protos.GameTips"},
 	{Reconnect,"protos.ReconnectResponse"},					//断线重连
 	{ServerListMsg,"protos.ServerList"}						//请求服务器列表

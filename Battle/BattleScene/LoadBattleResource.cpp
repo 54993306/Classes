@@ -8,12 +8,12 @@
 #include "Battle/EffectData.h"
 #include "Battle/CombatGuideManage.h"
 #include "Battle/BaseRoleData.h"
-#include "Battle/Landform/TerrainManager.h"
+#include "Battle/Landform/TrapManage.h"
 #include "Battle/WarManager.h"
-#include "Battle/MapManager.h"
+#include "Battle/CoordsManage.h"
 #include "scene/layer/LayerManager.h"
 #include "common/CGameSound.h"
-#include "Battle/LoadSpineData.h"
+#include "Battle/SpineDataManage.h"
 #include "Battle/BattleTools.h"
 /******************************************/
 #include "Battle/BaseRoleData.h"
@@ -22,7 +22,7 @@
 #include "Battle/BattleDataCenter.h"
 #include "Battle/MonsterData.h"
 #include "Battle/HeroData.h"
-#include "scene/LoginScene.h"
+#include "Battle/Config/ConfigManage.h"
 using namespace CocosDenshion;
 //using namespace Battle;
 namespace BattleSpace{
@@ -30,23 +30,17 @@ namespace BattleSpace{
 		,m_progress(nullptr),m_Release(false),m_SceneType(-1),m_loadResNum(0),m_Layer(nullptr)
 	{}
 
-	LoadBattleResource::~LoadBattleResource()
-	{
-		CC_SAFE_RELEASE(m_LoadSpine);
-		m_LoadSpine = nullptr;
-	}
-
 	//背景图片显示处理
 	void LoadBattleResource::BackImage()
 	{
 		CCSprite* backgroundImage = (CCSprite*)m_Layer->findWidgetById("bg");
 		int newID = 0;			
-		int stage = m_Manage->getStageID();
+		int stage = BattleManage->getStageIndex();
 		if (!stage||stage==101)								//（关卡0和关卡101特殊处理）
 		{
 			newID = stage;
 		}else{
-			int oldID = m_Manage->getLoadImage();
+			int oldID = BattleManage->getLoadImage();
 			do{
 				newID = CCRANDOM_0_1()*9;					//图片总数
 				CCLOG("----------%d",newID);
@@ -55,7 +49,7 @@ namespace BattleSpace{
 			} while (true);
 		}
 
-		m_Manage->setLoadImage(newID);
+		BattleManage->setLoadImage(newID);
 		char path [60] = {0};
 		sprintf(path,"warScene/LoadImage/%d.png",newID);
 		if (!backgroundImage->initWithFile(path))
@@ -105,9 +99,6 @@ namespace BattleSpace{
 		m_tip->setHorizontalAlignment(kCCTextAlignmentLeft);				//设置对齐样式
 		m_tip->setAnchorPoint(ccp(0,0.5));
 		m_Layer->addChild(m_tip);
-		m_Manage = BattleManage;
-		m_LoadSpine = LoadSpineData::create();
-		m_LoadSpine->retain();
 		srandNum();
 		BackImage();
 	}
@@ -126,6 +117,7 @@ namespace BattleSpace{
 		if (m_publicNum<public_time)m_publicNum = public_time;
 		m_totalNum = m_publicNum+total_time+50;
 		DataParse();											//得到战斗需显示的资源数据
+		TrapParse();
 		updateTips(0);
 		this->schedule(schedule_selector(LoadBattleResource::ResourceDispose));
 		this->schedule(schedule_selector(LoadBattleResource::updateTips),2);
@@ -159,12 +151,10 @@ namespace BattleSpace{
 				for (skEffectData* tEffectData:tVecEffect)
 				{
 					VecEffect.push_back(tEffectData->getEffectID());		//for (auto l:k.buffList){}		需要引入头文件
-					BuffConfig* Buffdata = m_Manage->getBuffData();
+					const BuffConfig* Buffdata = BattleConfig->getBuffData();
 					for (auto p:tEffectData->getBuffVector())
 					{
-						BuffEffect* effect = Buffdata->getBuffEffect(p->getBuffType(),p->getIsDBuff());
-						if (!effect)
-							continue;
+						const BuffEffect* effect = Buffdata->getBuffEffect(p->getBuffType(),p->getIsDBuff());
 						VecBuff.push_back(effect->getEffect_up());
 						VecBuff.push_back(effect->getEffect_down());
 					}
@@ -179,20 +169,21 @@ namespace BattleSpace{
 		vector<int> VecBuff;
 		for (auto tRoleData: tRoleDatas)
 		{
-			if (m_Manage->isSpine(tRoleData->getRoleModel()))
+			if (SpineManage->isSpineModel(tRoleData->getRoleModel()))
 			{
-				m_LoadSpine->AddRoleSpineID(tRoleData->getRoleModel());
+				SpineManage->AddRoleSpineID(tRoleData->getRoleModel());
 			}else{
 				VecRole.push_back(tRoleData->getRoleModel());
 			}
 			SkillParse(tRoleData,VecEffect,VecBuff);	
 		}
-		m_LoadSpine->AddRoleSpineID(146);
-#if BATTLE_TEST
-		m_LoadSpine->AddRoleSpineID(2342);
-#endif
-		m_LoadSpine->AddRoleSpineID(9999);
 		VecRole.push_back(516);
+		SpineManage->AddRoleSpineID(146);
+		SpineManage->AddRoleSpineID(9999);
+		
+#if BATTLE_TEST
+		//m_LoadSpine->AddRoleSpineID(2317);
+#endif
 		VectorUnique(VecRole);
 		VectorUnique(VecEffect);
 		VectorUnique(VecBuff);
@@ -200,16 +191,28 @@ namespace BattleSpace{
 		m_WarResouse[ResourceType::Load_Effect]		= VecEffect;
 		m_WarResouse[ResourceType::Load_Buff]		= VecBuff;
 	}
+
+	void LoadBattleResource::TrapParse()
+	{
+		const vector<TrapData*>tTrapVec = BattleData->getTraps();
+		if ( tTrapVec.empty() )
+			return;
+		SpineManage->AddTrapID(10000);
+		vector<int> tLoads;
+		for (auto tTrap : tTrapVec)
+		{
+			if (SpineManage->isSpineModel(tTrap->getTrapModel()))
+				SpineManage->AddTrapID(tTrap->getTrapModel());
+		}
+	}
 	//公共资源、地图特效技能特效一起加载、骨骼动画和骨骼动画效果一起加载
 	void LoadBattleResource::ResourceDispose(float delta)
 	{
-		CCObject* resouseID = nullptr;
 		switch(m_CurrIndex)
 		{
 		case LOAD_PUBLIC_EFFECT:
 			{
 				LoadPublic();
-				LoadTerrain();
 				LoadEffect();
 			}break;
 		case LOAD_ROLE:		
@@ -218,11 +221,11 @@ namespace BattleSpace{
 				for (auto id: m_WarResouse.find(ResourceType::Load_Role)->second)
 					CocosBoneThread(id);
 				if (!m_Release)
-					m_LoadSpine->LoadSpineAnimation();
+					SpineManage->LoadSpineAnimation();
 			}break;
 		case total_time:
 			{
-				if (m_Release||m_Manage->getStageID())
+				if (m_Release||BattleManage->getStageIndex())
 					break;		
 				LoadBeingAnimation();
 			}break;
@@ -245,7 +248,6 @@ namespace BattleSpace{
 			releaseResource();
 		}else{
 			ProgressEnd();
-
 		}
 	}
 	//应该是抽象出一个类来对这个进行处理
@@ -261,7 +263,6 @@ namespace BattleSpace{
 			m_resVec.push_back(res);
 		}
 	}
-
 	//加载角色,根据角色和是否存在技能加载释放技能所需图片
 	void LoadBattleResource::CocosBoneThread(int ModeID)
 	{
@@ -271,16 +272,16 @@ namespace BattleSpace{
 		if (m_Release)
 		{
 			CCLOG("Release WarResourse SKELETON = %d",ModeID);
-			if (outPutERRORMsg("LoadBattleResource::LoadRole can not find animationData",animationData))
+			if (outPutERRORMsg("LoadBattleResource::CocosBoneThread can not find animationData",animationData))
 				return;
 			CCArmatureDataManager::sharedArmatureDataManager()->removeArmatureFileInfo(ExportJson_str);
 		}else{
 			if (animationData)
 			{
-				CCLOG("[ *TIPS ] LoadBattleResource::LoadRole The Role Have Again");
+				CCLOG("[ *TIPS ] LoadBattleResource::CocosBoneThread The Role Have Again %d",ModeID);
 				return;
 			}
-			CCLOG("LoadWarResourse Load SKELETON = %d",ModeID);
+			CCLOG("CocosBoneThread Load SKELETON = %d",ModeID);
 			CCArmatureDataManager::sharedArmatureDataManager()->addArmatureFileInfoAsync(ExportJson_str,this,schedule_selector(LoadBattleResource::CocosBoneCallBack));//添加之前判断是否存在
 			LoadResourceInfo res;
 			res.FileName = ToString(ModeID);
@@ -377,35 +378,24 @@ namespace BattleSpace{
 	void LoadBattleResource::LoadEffect()
 	{
 		char plist_str[60] = {0};
-		EffectData* EfData = m_Manage->getEffData();
+		const EffectData* EfData = BattleConfig->getEffData();
 		vector<int> VecEffectID;
 		for (auto id:m_WarResouse.find(ResourceType::Load_Effect)->second)
-		{
-			if (EfData->getEffectInfo(id))
-			{
-				CCArray*arr = EfData->getEffectInfo(id)->getEffIdList();//特效id数组
-				CCObject*obj = nullptr; 
-				CCARRAY_FOREACH(arr,obj)
-				{
-					CCInteger* efid = (CCInteger*)obj;
-					VecEffectID.push_back(efid->getValue());
-				}
-			}else{ CCLOG("[ ERROE ]: LoadBattleResource::loadWarResourse in load skil Effect id =%d",id); }
-		}
+			EfData->getEffectInfo(id)->initEffectList(VecEffectID);
 		VectorUnique(VecEffectID);
-		for(auto i:VecEffectID)
+		for(auto tFileID:VecEffectID)
 		{
-			sprintf(plist_str,"skill/%d.plist",i);
+			if (!tFileID) continue;
+			sprintf(plist_str,"skill/%d.plist",tFileID);
 			if (m_Release)
 			{
-				CCLOG("Release WarResourse EFFectID = %d",i);
-				AnimationManager::sharedAction()->ReleaseAnimation(ToString(i));
+				CCLOG("Release WarResourse EFFectID = %d",tFileID);
+				AnimationManager::sharedAction()->ReleaseAnimation(ToString(tFileID));
 				CCSpriteFrameCache::sharedSpriteFrameCache()->removeSpriteFramesFromFile(plist_str);
 			}else{
-				TextureThread(plist_str,ToString(i));
+				TextureThread(plist_str,ToString(tFileID));
 			}
 		}
-		BuffConfig* Buffdata = m_Manage->getBuffData();
 		for (auto ptr:m_WarResouse.find(ResourceType::Load_Buff)->second)
 		{
 			if ( !ptr )continue;
@@ -417,38 +407,6 @@ namespace BattleSpace{
 				CCSpriteFrameCache::sharedSpriteFrameCache()->removeSpriteFramesFromFile(plist_str);
 			}else{
 				TextureThread(plist_str,ToString(ptr));
-			}
-		}
-	}
-	//地形和地形在人物身上特效
-	void LoadBattleResource::LoadTerrain()
-	{
-		return;
-		terData* data = nullptr/*m_Manage->getTerData()*/;
-		char plist_str[60] = {0};
-		for (auto id: m_WarResouse.find(ResourceType::Load_Terrain)->second)
-		{
-			sprintf(plist_str,"terrain/%d.plist",id);
-			if (m_Release)
-			{
-				CCLOG("Release WarResourse Terrain = %d",id);
-				AnimationManager::sharedAction()->ReleaseAnimation(ToString(id));
-				CCSpriteFrameCache::sharedSpriteFrameCache()->removeSpriteFramesFromFile(plist_str);
-			}else{
-				TextureThread(plist_str,ToString(id));
-			}
-			int effectID = data->getEffect(id);												//加载地形的人物身上效果
-			if (effectID)
-			{
-				sprintf(plist_str,"skill/%d.plist",effectID);
-				if (m_Release)
-				{
-					AnimationManager::sharedAction()->ReleaseAnimation(ToString(effectID));
-					CCSpriteFrameCache::sharedSpriteFrameCache()->removeSpriteFramesFromFile(plist_str);
-					CCLOG("Release WarResourse TerrainEffect = %d",effectID);
-				}else{
-					TextureThread(plist_str,ToString(effectID));
-				}
 			}
 		}
 	}
@@ -513,23 +471,16 @@ namespace BattleSpace{
 				{
 					SimpleAudioEngine::sharedEngine()->preloadEffect(url);
 				}break;
-			default:
-				break;
 			}
 		}
 	}
 
 	void LoadBattleResource::releaseResource()
 	{
-		if ( !m_Manage->getStageID())	//统一释放了spine动画,是否可以统一的去释放骨骼动画资源
+		if ( !BattleManage->getStageIndex())	//统一释放了spine动画,是否可以统一的去释放骨骼动画资源
 			CCArmatureDataManager::sharedArmatureDataManager()->removeArmatureFileInfo("warpublic/open.ExportJson");
 		this->unscheduleAllSelectors();
-		ManageCenter->getCombatGuideMg()->clearGuideData(true);
-		m_Manage->BattleDataClear();
-		BattleManage->setWorldBoss(false);
-		BattleManage->setWorldBossRank(0);
-		ManageCenter->getTer()->clear();
-		ManageCenter->getMap()->clearMap();
+		ManageCenter->clearBattleData();
 		CCTextureCache::sharedTextureCache()->removeUnusedTextures();				//清理掉所有的不使用的图片
 		FileUtils::sharedFileUtils()->releaseFile("csv/loadWar.csv");
 		LayerManager::instance()->closeAll();
@@ -556,7 +507,7 @@ namespace BattleSpace{
 
 	void LoadBattleResource::ProgressEnd()
 	{
-		if ((m_loadResNum>=m_resVec.size() && m_LoadSpine->getLoadSucceed()) || 
+		if ((m_loadResNum>=m_resVec.size() && SpineManage->getLoadSucceed()) || 
 			(m_CurrIndex >= m_totalNum + 1000) )
 		{
 			if (m_CurrIndex >= m_totalNum + 1000)
@@ -577,4 +528,5 @@ namespace BattleSpace{
 			CSceneManager::sharedSceneManager()->replaceScene(GETSCENE(BattleScene), 0.5f);
 		}
 	}
+
 }

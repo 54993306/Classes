@@ -6,7 +6,7 @@
 #include "Battle/BattleCenter.h"
 #include "Battle/WarManager.h"
 #include "Battle/BuffManage.h"
-#include "Battle/MapManager.h"
+#include "Battle/CoordsManage.h"
 #include "tools/ShowTexttip.h"
 #include "Battle/ConstNum.h"
 #include "Battle/WarAssist.h"
@@ -34,6 +34,8 @@
 #include "Battle/Strategy/TotalStrategy.h"
 #include "Battle/BattleDataCenter.h"
 #include "Battle/BattleModel.h"
+#include "Battle/Config/ConfigManage.h"
+#include "Battle/Landform/TrapManage.h"
 namespace BattleSpace
 {
 	CombatLogic::CombatLogic()
@@ -92,7 +94,6 @@ namespace BattleSpace
 		mTotalStrategy->retain();
 		mManage = BattleManage;
 		mGuideManage = ManageCenter->getCombatGuideMg();
-		m_MapData = ManageCenter->getMap()->getCurrWarMap();
 		return true;
 	}
 
@@ -109,7 +110,7 @@ namespace BattleSpace
 		if (mMapLayer->getBackgroundManage())
 		{
 			mMapLayer->getBackgroundManage()->setMap(mMapLayer);
-			mMapLayer->getBackgroundManage()->initWithStage(mManage->getStageID());
+			mMapLayer->getBackgroundManage()->initWithStage(mManage->getStageIndex());
 		}
 		bNotification->postNotification(MsgUpBatchNumber);
 	}
@@ -149,14 +150,13 @@ namespace BattleSpace
 	void CombatLogic::update(float delta)
 	{
 		mTime += delta;
-		mInterval += delta;
 		showRound();
 		updateTask();
 		mbufExp->ResetInterval(delta);
+		mManage->setCostSpeed(0);
 		runLogic(delta);
 		mControlLayer->updateCostNumber();
-		mControlLayer->updateCostSpeed(delta);
-		mManage->setCostSpeed(0);
+		
 	}
 
 	void CombatLogic::runLogic(float delta)
@@ -166,23 +166,28 @@ namespace BattleSpace
 			return;
 		mManage->updateAlive();							//更新武将信息
 		ExcuteAI(delta);
+		mInterval += delta;
 		if ( !mCritRole )
 		{
 			if (mInterval > 1.0f)						//每 1.0f 秒强行刷新一次策略
 			{
 				mInterval = 0;
 				mTotalStrategy->updateStrategy();
+				BattleTrapManage->updateActivateTrap();
+				mControlLayer->updateCostSpeed(delta);
 			}
 			mManage->costUpdate(delta);
 			mTotalStrategy->excuteStrategy(delta);
+			BattleTrapManage->updateTrap(delta);
 		}
 	}
-	//cost 计算(帧)或以秒为单位进行计算、位置实时更新
+	//cost 计算(帧)或以秒为单位进行计算、位置实时更新    //该方法位置有问题，可进行重构
 	void CombatLogic::CostCount(BaseRole* tRole,float dt)
 	{
-		if ( tRole->getOtherCamp() || tRole->getFatherID() || mCritRole)			
+		if ( tRole->getOtherCamp() || tRole->getFatherID() || mCritRole || 
+			 BattleModelManage->isPvEBattle() )			
 			return;
-		if (mManage->inAddCostArea(tRole->getGridIndex()) || tRole->getCaptain())
+		if (BattleConfig->inAddCostArea(tRole->getGridIndex()) || tRole->getCaptain())
 		{
 			float tSpeed = mManage->getCostSpeed() + (tRole->getAddCost()* dt);
 			mManage->setCostSpeed(tSpeed);
@@ -196,7 +201,8 @@ namespace BattleSpace
 		for (;iter != tMapRole->end(); iter++)
 		{
 			BaseRole* tRole = iter->second;
-			if (mCritRole && tRole != mCritRole)continue;									//一次只处理一个武将播放技能的情况，若是处理多个则以武将技能状态判断，而不用单一武将进行判断
+			if (mCritRole && tRole != mCritRole)
+				continue;																	//一次只处理一个武将播放技能的情况，若是处理多个则以武将技能状态判断，而不用单一武将进行判断
 			CostCount(tRole,pTime);															//计算我方所有武将cost值
 			tRole->excuteLogic(pTime);
 		}
@@ -215,7 +221,7 @@ namespace BattleSpace
 		mCombatEffect->setPlayerNum(m_PlayerNum);
 		if (m_PlayerNum >= m_RecordNum)
 		{
-			if (!BattleData->getBattleModel()->isPvEBattle())
+			if (!BattleModelManage->isPvEBattle())
 			{
 				mManage->setLogicState(false);
 				mCombatEffect->BatterSpine(m_RecordNum);
@@ -243,7 +249,7 @@ namespace BattleSpace
 	void CombatLogic::rolePlyaSkill( CCObject* ob )
 	{
 		BaseRole* tRole = (BaseRole*)ob;
-		if (BattleData->getBattleModel()->battlePause())
+		if (BattleModelManage->battlePause())
 		{
 			mCombatEffect->PlayerSkill(tRole);
 			if (!tRole->getEnemy())
@@ -258,7 +264,7 @@ namespace BattleSpace
 	}
 	void CombatLogic::beginStageFloorEffect()								//可以搬到maplayer
 	{
-		if (!mManage->getStageID())
+		if (!mManage->getStageIndex())
 		{
 			CCSize size  = CCDirector::sharedDirector()->getWinSize();
 			int grids[4] = {78,89,102,117};
@@ -270,7 +276,7 @@ namespace BattleSpace
 				ef->setDelaytime(i*0.35f);
 				ef->setLoopInterval(0.2f);
 				ef->setLoopNum(2);
-				ef->setPosition(m_MapData->getPoint(grids[i]));
+				ef->setPosition(BattleCoords->getPoint(grids[i]));
 				ef->setZOrder(10);
 				mMapLayer->addChild(ef);
 			}
@@ -281,17 +287,17 @@ namespace BattleSpace
 	{
 		beginStageFloorEffect();
 		PlayEffectSound(SFX_413);
-		if (BattleData->getBattleModel()->layerMove())
+		if (BattleModelManage->layerMove())
 		{
 			CCDelayTime* delay = CCDelayTime::create(0.5f);
 			CCDelayTime* delay2 = CCDelayTime::create(0.3f);
-			CCMoveTo* mt = CCMoveTo::create(1.2f,ccp( MAP_MINX(m_MapData) , mBattleScene->getMoveLayer()->getPositionY()));
+			CCMoveTo* mt = CCMoveTo::create(1.2f,ccp( BattleCoords->CoordsMin() , mBattleScene->getMoveLayer()->getPositionY()));
 			CCCallFuncO* cfo = CCCallFuncO::create(this,callfuncO_selector(BattleScene::LayerMoveEnd),CCInteger::create((int)StoryType::eMoveEndStory));
 			CCSequence* sqe = CCSequence::create(delay,mt,delay2,cfo,nullptr);
 			mBattleScene->getMoveLayer()->runAction(sqe);
 		}else{
 			CCDelayTime* delay = CCDelayTime::create(0.5f);
-			CCPlace* place = CCPlace::create(ccp( MAP_MINX(m_MapData)+280, mBattleScene->getMoveLayer()->getPositionY()));
+			CCPlace* place = CCPlace::create(ccp( BattleCoords->CoordsMin()+280, mBattleScene->getMoveLayer()->getPositionY()));
 			CCCallFuncO* cfo = CCCallFuncO::create(this,callfuncO_selector(BattleScene::LayerMoveEnd),CCInteger::create((int)StoryType::eMoveEndStory));
 			CCSequence* sqe = CCSequence::create(delay,place,cfo,nullptr);
 			mBattleScene->getMoveLayer()->runAction(sqe);
@@ -305,7 +311,7 @@ namespace BattleSpace
 		scheduleUpdate();																		//开启游戏主循环
 		PlayBackgroundMusic(BGM_Battle,true);
 		mGuideManage->setCurrBatchGuide(nullptr);
-		if (mManage->getStageID() == 301)
+		if (mManage->getStageIndex() == 301)
 			mGuideManage->setCurrBatchGuide("CostGuide");
 	}
 
@@ -319,7 +325,7 @@ namespace BattleSpace
 			}break;
 		case StoryType::eMoveEndStory:
 			{
-				if (BattleData->getBattleModel()->isPvEBattle()){
+				if (BattleModelManage->isPvEBattle()){
 					mCombatEffect->showVsAnimate( this );
 				}
 				else{

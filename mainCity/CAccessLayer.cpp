@@ -4,6 +4,11 @@
 #include "Resources.h"
 #include "UserDefaultData.h"
 #include "set/ExchangeCode.h"
+#include "LuckyWheel//LuckyWheelLayer.h"
+#include "common/CommonFunction.h"
+#include "sign/PopItem.h"
+#include "tools/ShowTexttip.h"
+
 
 CAccessLayer::CAccessLayer():m_ui(nullptr),m_pMask(nullptr), m_pCheck(nullptr)
 	,m_iLockIndex(0)
@@ -43,12 +48,14 @@ void CAccessLayer::onEnter()
 	BaseLayer::onEnter();
 
 	setTouchPriority(LayerManager::instance()->getPriority());
-
+	
 	if(CCUserDefault::sharedUserDefault()->getBoolForKey(ACCESS_UI_OPEN))
 	{
 		m_pCheck = (CCheckBox*)m_ui->findWidgetById("check");
 		m_pCheck->setChecked(true);
 	}
+
+	GetTcpNet->registerMsgHandler(ExchangeCodeMsg,this,CMsgHandler_selector(CAccessLayer::ProcessMsg));
 }
 
 void CAccessLayer::onExit()
@@ -56,6 +63,8 @@ void CAccessLayer::onExit()
 	BaseLayer::onExit();
 
 	CCSpriteFrameCache::sharedSpriteFrameCache()->removeSpriteFramesFromFile("skill/9062.plist");
+
+	GetTcpNet->unRegisterAllMsgHandler(this);
 }
 
 void CAccessLayer::initAccess()
@@ -83,6 +92,7 @@ void CAccessLayer::initAccess()
 		{
 			pImage->runAction(CCRepeatForever::create(CCSequence::createWithTwoActions(CCScaleTo::create(0.3f,1.1f),CCScaleTo::create(0.3f,1.0f))));
 		}
+
 	}
 
 	m_pMask = (CImageViewScale9*)m_ui->findWidgetById("mask");
@@ -219,12 +229,66 @@ void CAccessLayer::onTouchAccess( CCObject *pSender )
 		}break;
 	case AccessExchange:
 		{
+			//CExchangeCode *exchange = CExchangeCode::create();
+			//exchange->loadExchangeByType(CBCode);
+			//LayerManager::instance()->push(exchange);
+
 			CExchangeCode *exchange = CExchangeCode::create();
-			exchange->loadExchangeByType(CBCode);
+			exchange->loadExchangeByType(ExCode);
 			LayerManager::instance()->push(exchange);
+		}
+		break;
+	case AccessLuckyWheel:
+		{
+			CLuckyWheelLayer* wheel = CLuckyWheelLayer::create();
+			LayerManager::instance()->push(wheel);
+			wheel->setVisible(true);
+			//GetTcpNet->sendData(LuckyWheelMsg);
+			//GetTcpNet->sendData(LuckyWheelMsg,true);
+			GetTcpNet->sendDataType(LuckyWheelMsg);//,true
 		}
 		break;
 	default:
 		break;
+	}
+}
+
+void CAccessLayer::ProcessMsg( int type, google::protobuf::Message *msg )
+{
+
+	CardExchangeRes *res= (CardExchangeRes*)msg;
+	int  ret = res->result();
+	if (ret==1)
+	{
+		CGetPrizeRes prizers;
+		prizers.result =1;
+		for (int i = 0; i < res->prize_list_size(); i++)
+		{  
+			CPrize prize;
+			prize.read(res->prize_list(i));
+			prizers.prizeList.push_back(prize);
+		}
+
+		//弹框
+		CPopItem *popItem = CPopItem::create();
+		LayerManager::instance()->push(popItem);
+		popItem->popPrizeRes(&prizers);
+
+		//收集货币
+		collectMoneyFromPrize(prizers);
+
+	}
+	//2 兑换码已使用，3 已兑换过该奖励，4 兑换码错误
+	else if (ret==2)
+	{
+		ShowPopTextTip(GETLANGSTR(281));
+	}
+	else if (ret==3)
+	{
+		ShowPopTextTip(GETLANGSTR(282));
+	}
+	else if (ret==4)
+	{
+		ShowPopTextTip(GETLANGSTR(283));
 	}
 }

@@ -3,7 +3,7 @@
 #include "Battle/BaseRole.h"
 #include "Battle/SkillRange.h"
 #include "Battle/WarManager.h"
-#include "Battle/MapManager.h"
+#include "Battle/CoordsManage.h"
 #include "Battle/ConstNum.h"
 #include "Battle/RoleSkill.h"
 #include "Battle/BaseRoleData.h"
@@ -90,16 +90,16 @@ namespace BattleSpace
 		case AllAliveType:
 			{
 				CCObject* obj = nullptr;
-				int type	= 0;
-				int type2	= 0;
+				sRoleNature type	= sRoleNature::eNull;
+				sRoleNature type2	= sRoleNature::eNull;
 				if (arr->count() < 3)break;
 				CCARRAY_FOREACH(arr,obj)
 				{
 					BaseRole* alive = (BaseRole*)obj;
 					if (alive->getExecuteCap())continue;
-					if (!type || !type2)
+					if (type == sRoleNature::eNull || type2 == sRoleNature::eNull)
 					{
-						if (!type)
+						if (type == sRoleNature::eNull)
 						{
 							type = alive->getBaseData()->getProperty();
 							continue;
@@ -107,7 +107,7 @@ namespace BattleSpace
 						type2 = alive->getBaseData()->getProperty();
 						continue;
 					}
-					if (type&&type2)
+					if (type != sRoleNature::eNull && type2 != sRoleNature::eNull)
 					{
 						if (alive->getBaseData()->getProperty() != type&&alive->getBaseData()->getProperty()!=type2)
 						{
@@ -146,26 +146,28 @@ namespace BattleSpace
 			if (alive->getExecuteCap())continue;
 			if (exclude)
 			{
-				if (alive->getBaseData()->getProperty() == type)continue;
+				if (alive->getBaseData()->getProperty() == (sRoleNature)type)
+					continue;
 				targetArr->addObject(obj);
 			}else{
-				if (alive->getBaseData()->getProperty() != type)continue;
+				if (alive->getBaseData()->getProperty() != (sRoleNature)type)
+					continue;
 				targetArr->addObject(obj);
 			}
 		}
 
 		if (!exclude || !And)return targetArr;
-		int secondType = 0;
+		sRoleNature secondType = sRoleNature::eNull;
 		bool fail = true;
 		CCARRAY_FOREACH(targetArr,obj)
 		{
-			BaseRole* alive = (BaseRole*)obj;
-			if (!secondType)
+			BaseRole* tRole = (BaseRole*)obj;
+			if (secondType == sRoleNature::eNull)
 			{
-				secondType = alive->getBaseData()->getProperty();
+				secondType = tRole->getBaseData()->getProperty();
 				continue;
 			}
-			if (secondType&&secondType!=alive->getBaseData()->getProperty())
+			if (secondType != sRoleNature::eNull&&secondType != tRole->getBaseData()->getProperty())
 			{
 				fail = false;
 				break;

@@ -5,7 +5,7 @@
 #include "Battle/BaseRole.h"
 #include "Battle/ConstNum.h"
 #include "Battle/WarManager.h"
-#include "Battle/MapManager.h"
+#include "Battle/CoordsManage.h"
 #include <functional>					//sort 的降序排序使用
 #include "Battle/RoleObject/RoleObject.h"
 #include "Battle/BattleTools.h"
@@ -38,30 +38,30 @@ namespace BattleSpace{
 		if ( !pRole->getCurrEffect() )				//在此处判断是因为该方法被多处调用
 			return;
 		AreaCountInfo CountInfo(pVector,pRole);
-		pRole->getCurrEffect()->initArea(CountInfo);
+		pRole->getCurrEffect()->initArea(CountInfo);//增加耦合度
 		CountInfo.excludeInvalid();
 	}
 	//返回受击范围内受击武将
-	void SkillRange::initAreaTargets(BaseRole* pAlive)
+	void SkillRange::initAreaTargets(BaseRole* pRole)
 	{
-		vector<BaseRole*>* VecAlive = pAlive->getCurrSkillTargets();				//不直接使用格子去寻找是为了减少遍历的次数																
-		for (auto tGrid : pAlive->mSkillArea)								//格子是排序好的,要使用格子来进行遍历(必须,不同阵营获取目标顺序不同)
+		vector<BaseRole*> VecAlive = pRole->getCurrSkillTargets();				//不直接使用格子去寻找是为了减少遍历的次数																
+		for (auto tGrid : pRole->mSkillArea)								//格子是排序好的,要使用格子来进行遍历(必须,不同阵营获取目标顺序不同)
 		{
-			for (BaseRole* tAlive: *VecAlive)
+			for (BaseRole* tRole: VecAlive)
 			{
-				if ( pAlive->hasAliveByTargets(tAlive) || 
-					!tAlive->inStandGrid(tGrid)		||
-					!tAlive->getAliveState() )
+				if ( pRole->hasAliveByTargets(tRole) || 
+					!tRole->inStandGrid(tGrid)		||
+					!tRole->getAliveState() )
 					continue;												//受击数组已存在该武将
-				if (tAlive->getLogicState() == sLogicState::eInvincible ||
-					tAlive->getLogicState() == sLogicState::eFree		||
-					tAlive->getLogicState() == sLogicState::eUnHit	)
+				if (tRole->getLogicState() == sLogicState::eInvincible ||
+					tRole->getLogicState() == sLogicState::eFree		||
+					tRole->getLogicState() == sLogicState::eUnHit	)
 					break;
-				pAlive->mAreaTargets.push_back(tAlive);
+				pRole->mAreaTargets.push_back(tRole);
 				break;
 			}
 		}
-		pAlive->cloakingTarget();
+		pRole->cloakingTarget();
 	}
 	//返回攻击区域受击武将信息
 	void SkillRange::initAttackInfo(BaseRole* pRole)

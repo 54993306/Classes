@@ -227,7 +227,7 @@ void WorldBossEndLayer::shareFb(CCObject *pSender)
 {
 	const ShareData *data = DataCenter::sharedData()->getShareData()->getCfg(10);
 	CCString *desc = CCString::createWithFormat(data->desc.c_str(),m_rank);
-	CCString *url = CCString::createWithFormat(data->url.c_str(),BattleManage->getStageID());
+	CCString *url = CCString::createWithFormat(data->url.c_str(),BattleManage->getStageIndex());
 	FaceBookSDK::sharedInstance()->onShareToFb(desc->getCString(),url->getCString());
 }
 

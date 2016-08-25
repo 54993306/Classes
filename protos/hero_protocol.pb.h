@@ -111,17 +111,27 @@ class HeroListRequest : public ::google::protobuf::Message {
   inline ::google::protobuf::int32 mark() const;
   inline void set_mark(::google::protobuf::int32 value);
 
+  // optional int32 hero_type = 2;
+  inline bool has_hero_type() const;
+  inline void clear_hero_type();
+  static const int kHeroTypeFieldNumber = 2;
+  inline ::google::protobuf::int32 hero_type() const;
+  inline void set_hero_type(::google::protobuf::int32 value);
+
   // @@protoc_insertion_point(class_scope:protos.HeroListRequest)
  private:
   inline void set_has_mark();
   inline void clear_has_mark();
+  inline void set_has_hero_type();
+  inline void clear_has_hero_type();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
   ::google::protobuf::int32 mark_;
+  ::google::protobuf::int32 hero_type_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
 
   friend void  protobuf_AddDesc_hero_5fprotocol_2eproto();
   friend void protobuf_AssignDesc_hero_5fprotocol_2eproto();
@@ -1314,6 +1324,28 @@ inline ::google::protobuf::int32 HeroListRequest::mark() const {
 inline void HeroListRequest::set_mark(::google::protobuf::int32 value) {
   set_has_mark();
   mark_ = value;
+}
+
+// optional int32 hero_type = 2;
+inline bool HeroListRequest::has_hero_type() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void HeroListRequest::set_has_hero_type() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void HeroListRequest::clear_has_hero_type() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void HeroListRequest::clear_hero_type() {
+  hero_type_ = 0;
+  clear_has_hero_type();
+}
+inline ::google::protobuf::int32 HeroListRequest::hero_type() const {
+  return hero_type_;
+}
+inline void HeroListRequest::set_hero_type(::google::protobuf::int32 value) {
+  set_has_hero_type();
+  hero_type_ = value;
 }
 
 // -------------------------------------------------------------------

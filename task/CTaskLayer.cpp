@@ -81,7 +81,7 @@ void CTaskLayer::onEnter()
 	//m_tableView->setSizeOfCell(CCSizeMake(790,115));
 	m_tableView->setCountOfCell(0);
 	m_tableView->setBounceable(false);
-	m_tableView->setDataSourceAdapter(this,ccw_datasource_adapter_selector(CTaskLayer::tableviewDataSource));	
+	m_tableView->setDataSourceAdapter(this,ccw_datasource_adapter_selector(CTaskLayer::tableviewDataSource));
 	m_tableView->reloadData();
 
 	//m_ui->setScale(0.0f);

@@ -1,7 +1,6 @@
 ﻿#include "Battle/RoleObject/HPObject.h"
 #include "Battle/RoleObject/RoleObject.h"
 #include "Battle/WarControl.h"
-#include "model/DataCenter.h"
 #include "Battle/ConstNum.h"
 #include "Battle/BattleResult.h"
 #include "common/CGameSound.h"
@@ -9,10 +8,12 @@
 #include "Battle/CHeroSoundData.h"
 #include "Battle/BattleMessage.h"
 #include "Battle/BaseRole.h"
-namespace BattleSpace{
+#include "Battle/RoleObjectMacro.h"
+namespace BattleSpace
+{
 	HPObject::HPObject()
-		:m_Skin(nullptr),m_Background(nullptr),m_HpNumber(0),m_HpNumberMax(0),m_Percent(0)
-		,m_Alive(nullptr),m_ActObject(nullptr)
+	:m_Skin(nullptr),m_Background(nullptr),m_HpNumber(0),m_HpNumberMax(0),m_Percent(0)
+	,m_Alive(nullptr),m_ActObject(nullptr)
 	{}
 
 	HPObject::~HPObject()
@@ -163,21 +164,21 @@ namespace BattleSpace{
 	void HPObject::missEffect()
 	{
 		CCSprite*font = CCSprite::create("label/miss.png");
-		font->runAction(normalAction(CCRANDOM_0_1()*170));
-		font->setPosition(ccp(-100,0));
 		m_ActObject->addChild(font);
+		font->runAction(normalAction(maxMoveDistance(font)));
+		font->setPosition(ccp(-100,0));
 	}
 
-	void HPObject::runActionByType( int pType,CCNode* pLabel )
+	void HPObject::runActionByType( PlayHpType pType,CCNode* pLabel )
 	{
-		if (pType >=  genralCritType)
+		int tDistance = maxMoveDistance(pLabel);
+		if (pType >=  PlayHpType::genralCritType)
 		{
-			int tDistance = CCRANDOM_0_1()*170;
 			pLabel->setScale(0.1f);
 			pLabel->runAction(critAction(tDistance));
 			critBackgroundEffect(tDistance);
 		}else{
-			pLabel->runAction(normalAction(CCRANDOM_0_1()*170));
+			pLabel->runAction(normalAction(tDistance));
 		}
 	}
 
@@ -196,18 +197,20 @@ namespace BattleSpace{
 
 	void HPObject::offsByEnemy( CCNode* pLabel )
 	{
-		if (m_Alive->getEnemy())
-		{
-			pLabel->setPosition(ccp(-170,100));
-		}else{
-			pLabel->setPosition(ccp(-50,100));
-		}
+		pLabel->setPosition(ccp(-30,50));
+		//if (m_Alive->getEnemy())
+		//{
+		//	
+		//}else{
+		//	pLabel->setPosition(ccp(-50,50));
+		//}
 	}
 
 	void HPObject::gainNumberPlay( int pChangeNumber )
 	{
 		string str ="."+string(ToString(abs(pChangeNumber)));
 		CCLabelAtlas* tNumberLabel = CCLabelAtlas::create(str.c_str(),"label/green.png",31,39,46);
+		m_ActObject->addChild(tNumberLabel,1);
 		setHpNumber(m_HpNumber + abs(pChangeNumber));								//存在交替变化的清楚出现如果合击的话
 		PlayEffectSound(SFX_513);
 		if (!tNumberLabel)
@@ -216,35 +219,34 @@ namespace BattleSpace{
 			return;
 		}
 		offsByEnemy(tNumberLabel);
-		tNumberLabel->runAction(normalAction(CCRANDOM_0_1()*170));
-		m_ActObject->addChild(tNumberLabel,1);
+		tNumberLabel->runAction(normalAction(maxMoveDistance(tNumberLabel)));
 	}
 
-	void HPObject::lostNumberPlay( int pChangeNumber,int pType )
+	void HPObject::lostNumberPlay( int pChangeNumber,PlayHpType pType )
 	{
 		string str ="/"+string(ToString(abs(pChangeNumber)));
 		CCLabelAtlas* tNumberLabel = CCLabelAtlas::create(str.c_str(),"label/myred.png",31,39,46); 
+		m_ActObject->addChild(tNumberLabel,1);
 		setHpNumber(m_HpNumber - abs(pChangeNumber));	
 		if (!tNumberLabel)
 		{
 			CCLOG("[ *ERROR ] HPObject::lostNumberPlay = %d",m_Alive->getModel());
 			return;
 		}
-		runActionByType(pType,tNumberLabel);
 		offsByEnemy(tNumberLabel);
-		m_ActObject->addChild(tNumberLabel,1);
+		runActionByType(pType,tNumberLabel);
 	}
 
-	void HPObject::playChangeNumber(int pChangeNumber,int pType)
+	void HPObject::playChangeNumber(int pChangeNumber,PlayHpType pType)
 	{
 		showHp(nullptr);
 		switch (pType)
 		{
-		case typeface:
+		case PlayHpType::typeface:
 			{
 				missEffect();
 			}break;
-		case gainType:
+		case PlayHpType::gainType:
 			{
 				gainNumberPlay(pChangeNumber);
 			}break;
@@ -266,4 +268,15 @@ namespace BattleSpace{
 	{
 		this->setVisible(false);
 	}
+
+	int HPObject::maxMoveDistance( CCNode* pLabel )
+	{
+		CCSize size = CCDirector::sharedDirector()->getWinSize();
+		int tRandom = CCRANDOM_0_1()*50 + 70;
+		int tHight = pLabel->getParent()->convertToWorldSpace(pLabel->getPosition()).y;
+		if ( tHight + tRandom > size.height )
+			return size.height - tHight - 80;
+		return tRandom;
+	}
+
 }

@@ -3,7 +3,7 @@
 #include "Battle/BattleCenter.h"
 #include "Battle/BaseRole.h"
 #include "Battle/WarManager.h"
-#include "Battle/MapManager.h"
+#include "Battle/CoordsManage.h"
 #include "Battle/RoleObject/RoleObject.h"
 #include "Battle/BattleMessage.h"
 namespace BattleSpace{

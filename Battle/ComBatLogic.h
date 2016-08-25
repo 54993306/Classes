@@ -25,7 +25,6 @@ namespace BattleSpace
 	class WarControl;
 	class StoryLayer;
 	class WarManager;
-	class WarMapData;
 	class BattleMapLayer;
 	class CombatEffect;
 	class BattleRoleLayer;
@@ -72,7 +71,6 @@ namespace BattleSpace
 		BufExp* mbufExp;
 		WarAssist* mAssist;
 		BattleScene* mBattleScene;
-		WarMapData* m_MapData;
 		WarManager* mManage;
 		WarControl* mControlLayer;
 		BattleMapLayer* mMapLayer;

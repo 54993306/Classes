@@ -5,7 +5,7 @@
 #include "Battle/BattleCenter.h"
 #include "Battle/BuffManage.h"
 #include "Battle/BaseRole.h"
-#include "Battle/MapManager.h"
+#include "Battle/CoordsManage.h"
 #include "Battle/ConstNum.h"
 #include "Battle/EffectData.h"
 #include "Battle/CombatTask.h"
@@ -24,11 +24,13 @@
 #include "Battle/StateManage/PostureState.h"
 #include "Battle/StateManage/StateManager.h"
 #include "Battle/ActionNameDefine.h"
+#include "Battle/SpineDataManage.h"
+#include "Battle/Config/ConfigManage.h"
 //#include <spine/AnimationState.h>
 namespace BattleSpace
 {
 	RoleObject::RoleObject()
-		:m_MapData(nullptr),m_armatureEventData(nullptr), m_lastFrame(-1),m_Reset(false),mFirstBattle(true)
+		:m_armatureEventData(nullptr), m_lastFrame(-1),m_Reset(false),mFirstBattle(true)
 	{}
 
 	RoleObject::~RoleObject()
@@ -39,8 +41,6 @@ namespace BattleSpace
 	{
 		if (!AliveObject::init())
 			return false;
-		m_MapData = ManageCenter->getMap()->getCurrWarMap();
-		m_Manage = BattleManage;
 		return true;
 	}
 
@@ -84,7 +84,7 @@ namespace BattleSpace
 	void RoleObject::setModel(int pModel)//设置人物对应模型
 	{
 		mModel = pModel;
-		if ( m_Manage->isSpine(mModel) )
+		if ( SpineManage->isSpineModel(mModel) )
 		{
 			m_IsSpine = true;
 			initSpineModel();
@@ -92,6 +92,7 @@ namespace BattleSpace
 			m_IsSpine = false;
 			initCocosModel();
 		}
+		//m_Armature->setAnchorPoint(ccp(0.5f,0));
 		m_Armature->setPosition(ccp(0,-GRID_HEIGHT/2));					//落点在格子中心,向下偏移半个格子才是站立点,不偏移则人站格子的中心了
 		m_Body->addChild(m_Armature);
 		this->getStateManage()->initState(this);							//设置人物的初始动作为站立也可为其他						
@@ -197,10 +198,11 @@ namespace BattleSpace
 	{
 		char efName[60] = {0};
 		sprintf(efName,"%d_texiao",mModel);
-		SpData* EFdata = m_Manage->getSpineData(efName);
+		SpineData* EFdata = SpineManage->getSpineData(efName);
 		if (EFdata)
 		{
 			m_Skeleton = SkeletonAnimation::createWithData(EFdata->first);
+			//m_Skeleton->setAnchorPoint(ccp(0.5f,0));
 			m_Skeleton->setPosition(ccp(0,-GRID_HEIGHT/2));
 			m_Body->addChild(m_Skeleton,1);
 		}else{
@@ -210,10 +212,10 @@ namespace BattleSpace
 
 	void RoleObject::initSpineModel()
 	{
-		SpData* data = m_Manage->getSpineData(ToString(mModel));
+		SpineData* data = SpineManage->getSpineData(ToString(mModel));
 		if (!data)
 		{
-			data = m_Manage->getSpineData("146");
+			data = SpineManage->getSpineData("146");
 			CCLOG("[ *ERROR ]  RoleObject::setModel Spine Model=%d IS NULL",mModel); 
 		}
 		SkeletonAnimation*  Animation = SkeletonAnimation::createWithData(data->first);
@@ -236,7 +238,7 @@ namespace BattleSpace
 		CCArmature* Armature = CCArmature::create(ToString(mModel));
 		Armature->getAnimation()->setMovementEventCallFunc(this, movementEvent_selector(RoleObject::AnimationEvent));		//动作结束回调
 		m_Armature = Armature;
-		m_armatureEventData = m_Manage->getArmatureDataMgr()->getArmatureEventData(mModel);
+		m_armatureEventData = BattleConfig->getArmatureDataMgr()->getArmatureEventData(mModel);
 	}
 	//动作结束回调
 	void RoleObject::AnimationEvent(CCArmature *armature, MovementEventType movementType, const char *movementID)
@@ -418,7 +420,7 @@ namespace BattleSpace
 		do{
 			if (ActionCode != sStateCode::eWalkState&&ActionCode!=sStateCode::eHitState)
 				break;
-			int grid = m_MapData->getGridIndex(this->getPosition() - this->getoffs());
+			int grid = BattleCoords->getGridIndex(this->getPosition() - this->getoffs());
 			if (grid == mRole->getGridIndex()||grid == INVALID_GRID)break;
 			mRole->setGridIndex(grid);
 			break;
@@ -430,7 +432,7 @@ namespace BattleSpace
 	//改进方向，使用像素计算速度，而不是使用格子来计算速度。格子只能用于计算距离
 	bool RoleObject::isDistination(float pDt)
 	{
-		CCPoint pPosition = m_MapData->getPoint(mRole->getMoveGrid());
+		CCPoint pPosition = BattleCoords->getPoint(mRole->getMoveGrid());
 		CCPoint uPosition = this->getPosition() - this->getoffs();
 
 		float pLength = 0;
@@ -450,8 +452,16 @@ namespace BattleSpace
 
 	void RoleObject::moveEnd()
 	{
-		CCPoint tPosition = m_MapData->getPoint(mRole->getMoveGrid());
+		CCPoint tPosition = BattleCoords->getPoint(mRole->getMoveGrid());
 		this->setPosition(tPosition+this->getoffs());
+		if (mRole->mMoveGrids.size() > 1)
+		{
+			mRole->mMoveGrids.erase(mRole->mMoveGrids.begin());
+			mRole->setMoveGrid(mRole->mMoveGrids.at(0));
+			setMoveState(sStateCode::eWalkState);
+			return;
+		}
+		mRole->mMoveGrids.clear();
 		if (!mRole->getEnemy()&&mRole->getCallType()!=sCallType::eAutoMove)
 			this->TurnStateTo(sStateCode::eStandState);											//站立时会自动将武将方向调转回来
 		this->setSpeed(CCPointZero);
@@ -522,7 +532,7 @@ namespace BattleSpace
 	{
 		int MoveGrid = mRole->getMoveGrid();											//格子相等的时候可能存在格子大小的误差，应以点的位置来进行判断
 		if (MoveGrid == INVALID_GRID)return;
-		CCPoint p = m_MapData->getPoint(MoveGrid) + getoffs();							//目标点
+		CCPoint p = BattleCoords->getPoint(MoveGrid) + getoffs();							//目标点
 		if (firstBattle(p))
 			return ;
 		if ( mRole->singleGrid()&&mRole->getEnemy() )
@@ -576,7 +586,8 @@ namespace BattleSpace
 
 	void RoleObject::setActMoveGrid( int pGird )
 	{
-		if (!getMoveObject())return;
+		if (!getMoveObject())
+			return;
 		getMoveObject()->setgrid(pGird);
 		mRole->setMoveGrid(pGird);
 		setMoveState(sStateCode::eWalkState);
@@ -604,4 +615,19 @@ namespace BattleSpace
 		}
 		return StateMachine::TurnStateTo(pCode);
 	}
+
+	void RoleObject::setMoveByPath()
+	{
+		CCLOG(" [ %d ]------>[ %d ]",mRole->getGridIndex(),mRole->mMoveGrids.at(mRole->mMoveGrids.size()-1));
+		for (auto tGrid : mRole->mMoveGrids)
+		{
+			CCLOG("-------------------- %d",tGrid);
+		}
+		if (!getMoveObject())
+			return;
+		getMoveObject()->setgrid(mRole->mMoveGrids.at(mRole->mMoveGrids.size()-1));
+		mRole->setMoveGrid(mRole->mMoveGrids.at(0));
+		setMoveState(sStateCode::eWalkState);
+	}
+
 }

@@ -9,8 +9,11 @@
 
 const int SelectHeroScene_role[3] = {346, 146, 541};
 
-class ArmatureEventDataMgr;
-class ArmatureEventData;
+namespace BattleSpace
+{
+	class ArmatureEventDataMgr;
+	class ArmatureEventData;
+}
 
 class SelectHeroScene : public CScene,public MessageHandler, public DownloadPackageDelegate
 {
@@ -100,8 +103,8 @@ protected:
 
 	CCNode* m_pClose;
 
-	ArmatureEventDataMgr* m_armatureEventDataMgr;
-	ArmatureEventData* m_armatureEventData;
+	BattleSpace::ArmatureEventDataMgr* m_armatureEventDataMgr;
+	BattleSpace::ArmatureEventData* m_armatureEventData;
 	int m_lastFrame;
 };
 #endif // !_SELECT_HERO_SCENE_H_

@@ -70,8 +70,9 @@ void protobuf_AssignDesc_hero_5fprotocol_2eproto() {
       "hero_protocol.proto");
   GOOGLE_CHECK(file != NULL);
   HeroListRequest_descriptor_ = file->message_type(0);
-  static const int HeroListRequest_offsets_[1] = {
+  static const int HeroListRequest_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(HeroListRequest, mark_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(HeroListRequest, hero_type_),
   };
   HeroListRequest_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -360,29 +361,29 @@ void protobuf_AddDesc_hero_5fprotocol_2eproto() {
   ::protos::common::protobuf_AddDesc_common_2fhero_5fcommon_2eproto();
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
     "\n\023hero_protocol.proto\022\006protos\032\030common/he"
-    "ro_common.proto\"\037\n\017HeroListRequest\022\014\n\004ma"
-    "rk\030\001 \001(\005\"I\n\020HeroListResponse\022%\n\010heroList"
-    "\030\001 \003(\0132\023.protos.common.Hero\022\016\n\006combat\030\002 "
-    "\001(\005\"V\n\017RequestHeroInfo\022\022\n\nroleHeroId\030\001 \001"
-    "(\005\022\016\n\006heroId\030\002 \001(\005\022\017\n\007quality\030\003 \001(\005\022\016\n\006r"
-    "oleId\030\005 \001(\005\"F\n\022ChangeArmorRequest\022\022\n\nrol"
-    "eHeroId\030\001 \002(\005\022\013\n\003pos\030\002 \002(\005\022\017\n\007armorId\030\003 "
-    "\002(\005\"l\n\023ChangeArmorResponse\022\016\n\006result\030\001 \002"
-    "(\005\022!\n\004hero\030\002 \001(\0132\023.protos.common.Hero\022\"\n"
-    "\005hero2\030\003 \001(\0132\023.protos.common.Hero\" \n\016Her"
-    "oRecruitReq\022\016\n\006heroId\030\001 \002(\005\"C\n\016HeroRecru"
-    "itRes\022\016\n\006result\030\001 \002(\005\022!\n\004hero\030\002 \001(\0132\023.pr"
-    "otos.common.Hero\"A\n\016HeroExpRequest\022\016\n\006he"
-    "roId\030\001 \002(\005\022\016\n\006itemId\030\002 \002(\005\022\017\n\007itemNum\030\003 "
-    "\002(\005\"\035\n\013HeroEvolReq\022\016\n\006heroId\030\001 \002(\005\"@\n\013He"
-    "roEvolRes\022\016\n\006result\030\001 \002(\005\022!\n\004hero\030\002 \001(\0132"
-    "\023.protos.common.Hero\"\?\n\014SkillLevelUp\022\016\n\006"
-    "heroId\030\001 \002(\005\022\017\n\007skillId\030\002 \002(\005\022\016\n\006itemId\030"
-    "\003 \002(\005\"\032\n\010DoResult\022\016\n\006result\030\001 \002(\005\"T\n\014Her"
-    "oResponse\022\016\n\006result\030\001 \002(\005\022!\n\004hero\030\002 \001(\0132"
-    "\023.protos.common.Hero\022\021\n\tskillLvUp\030\003 \001(\010B"
-    "/\n\035dass.server.gameserver.protosB\014HeroPr"
-    "otocolH\001", 928);
+    "ro_common.proto\"2\n\017HeroListRequest\022\014\n\004ma"
+    "rk\030\001 \001(\005\022\021\n\thero_type\030\002 \001(\005\"I\n\020HeroListR"
+    "esponse\022%\n\010heroList\030\001 \003(\0132\023.protos.commo"
+    "n.Hero\022\016\n\006combat\030\002 \001(\005\"V\n\017RequestHeroInf"
+    "o\022\022\n\nroleHeroId\030\001 \001(\005\022\016\n\006heroId\030\002 \001(\005\022\017\n"
+    "\007quality\030\003 \001(\005\022\016\n\006roleId\030\005 \001(\005\"F\n\022Change"
+    "ArmorRequest\022\022\n\nroleHeroId\030\001 \002(\005\022\013\n\003pos\030"
+    "\002 \002(\005\022\017\n\007armorId\030\003 \002(\005\"l\n\023ChangeArmorRes"
+    "ponse\022\016\n\006result\030\001 \002(\005\022!\n\004hero\030\002 \001(\0132\023.pr"
+    "otos.common.Hero\022\"\n\005hero2\030\003 \001(\0132\023.protos"
+    ".common.Hero\" \n\016HeroRecruitReq\022\016\n\006heroId"
+    "\030\001 \002(\005\"C\n\016HeroRecruitRes\022\016\n\006result\030\001 \002(\005"
+    "\022!\n\004hero\030\002 \001(\0132\023.protos.common.Hero\"A\n\016H"
+    "eroExpRequest\022\016\n\006heroId\030\001 \002(\005\022\016\n\006itemId\030"
+    "\002 \002(\005\022\017\n\007itemNum\030\003 \002(\005\"\035\n\013HeroEvolReq\022\016\n"
+    "\006heroId\030\001 \002(\005\"@\n\013HeroEvolRes\022\016\n\006result\030\001"
+    " \002(\005\022!\n\004hero\030\002 \001(\0132\023.protos.common.Hero\""
+    "\?\n\014SkillLevelUp\022\016\n\006heroId\030\001 \002(\005\022\017\n\007skill"
+    "Id\030\002 \002(\005\022\016\n\006itemId\030\003 \002(\005\"\032\n\010DoResult\022\016\n\006"
+    "result\030\001 \002(\005\"T\n\014HeroResponse\022\016\n\006result\030\001"
+    " \002(\005\022!\n\004hero\030\002 \001(\0132\023.protos.common.Hero\022"
+    "\021\n\tskillLvUp\030\003 \001(\010B/\n\035dass.server.gamese"
+    "rver.protosB\014HeroProtocolH\001", 947);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "hero_protocol.proto", &protobuf_RegisterTypes);
   HeroListRequest::default_instance_ = new HeroListRequest();
@@ -425,6 +426,7 @@ struct StaticDescriptorInitializer_hero_5fprotocol_2eproto {
 
 #ifndef _MSC_VER
 const int HeroListRequest::kMarkFieldNumber;
+const int HeroListRequest::kHeroTypeFieldNumber;
 #endif  // !_MSC_VER
 
 HeroListRequest::HeroListRequest()
@@ -444,6 +446,7 @@ HeroListRequest::HeroListRequest(const HeroListRequest& from)
 void HeroListRequest::SharedCtor() {
   _cached_size_ = 0;
   mark_ = 0;
+  hero_type_ = 0;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -480,6 +483,7 @@ HeroListRequest* HeroListRequest::New() const {
 void HeroListRequest::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     mark_ = 0;
+    hero_type_ = 0;
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
@@ -499,6 +503,22 @@ bool HeroListRequest::MergePartialFromCodedStream(
                    ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
                  input, &mark_)));
           set_has_mark();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(16)) goto parse_hero_type;
+        break;
+      }
+
+      // optional int32 hero_type = 2;
+      case 2: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_hero_type:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &hero_type_)));
+          set_has_hero_type();
         } else {
           goto handle_uninterpreted;
         }
@@ -529,6 +549,11 @@ void HeroListRequest::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->mark(), output);
   }
 
+  // optional int32 hero_type = 2;
+  if (has_hero_type()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->hero_type(), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -540,6 +565,11 @@ void HeroListRequest::SerializeWithCachedSizes(
   // optional int32 mark = 1;
   if (has_mark()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(1, this->mark(), target);
+  }
+
+  // optional int32 hero_type = 2;
+  if (has_hero_type()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->hero_type(), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -558,6 +588,13 @@ int HeroListRequest::ByteSize() const {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::Int32Size(
           this->mark());
+    }
+
+    // optional int32 hero_type = 2;
+    if (has_hero_type()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->hero_type());
     }
 
   }
@@ -590,6 +627,9 @@ void HeroListRequest::MergeFrom(const HeroListRequest& from) {
     if (from.has_mark()) {
       set_mark(from.mark());
     }
+    if (from.has_hero_type()) {
+      set_hero_type(from.hero_type());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -614,6 +654,7 @@ bool HeroListRequest::IsInitialized() const {
 void HeroListRequest::Swap(HeroListRequest* other) {
   if (other != this) {
     std::swap(mark_, other->mark_);
+    std::swap(hero_type_, other->hero_type_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

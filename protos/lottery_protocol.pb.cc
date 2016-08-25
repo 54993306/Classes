@@ -20,6 +20,18 @@ namespace protos {
 
 namespace {
 
+const ::google::protobuf::Descriptor* LuckyWheel_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  LuckyWheel_reflection_ = NULL;
+const ::google::protobuf::Descriptor* DrawRequest_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  DrawRequest_reflection_ = NULL;
+const ::google::protobuf::Descriptor* DrawResponse_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  DrawResponse_reflection_ = NULL;
+const ::google::protobuf::Descriptor* Notice_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  Notice_reflection_ = NULL;
 const ::google::protobuf::Descriptor* LotteryData_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   LotteryData_reflection_ = NULL;
@@ -42,7 +54,74 @@ void protobuf_AssignDesc_lottery_5fprotocol_2eproto() {
     ::google::protobuf::DescriptorPool::generated_pool()->FindFileByName(
       "lottery_protocol.proto");
   GOOGLE_CHECK(file != NULL);
-  LotteryData_descriptor_ = file->message_type(0);
+  LuckyWheel_descriptor_ = file->message_type(0);
+  static const int LuckyWheel_offsets_[4] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LuckyWheel, price_1_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LuckyWheel, price_10_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LuckyWheel, prize_list_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LuckyWheel, notices_),
+  };
+  LuckyWheel_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      LuckyWheel_descriptor_,
+      LuckyWheel::default_instance_,
+      LuckyWheel_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LuckyWheel, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LuckyWheel, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(LuckyWheel));
+  DrawRequest_descriptor_ = file->message_type(1);
+  static const int DrawRequest_offsets_[1] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DrawRequest, draw_type_),
+  };
+  DrawRequest_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      DrawRequest_descriptor_,
+      DrawRequest::default_instance_,
+      DrawRequest_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DrawRequest, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DrawRequest, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(DrawRequest));
+  DrawResponse_descriptor_ = file->message_type(2);
+  static const int DrawResponse_offsets_[2] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DrawResponse, result_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DrawResponse, prize_index_),
+  };
+  DrawResponse_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      DrawResponse_descriptor_,
+      DrawResponse::default_instance_,
+      DrawResponse_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DrawResponse, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DrawResponse, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(DrawResponse));
+  Notice_descriptor_ = file->message_type(3);
+  static const int Notice_offsets_[4] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Notice, player_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Notice, prize_type_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Notice, prize_num_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Notice, prize_id_),
+  };
+  Notice_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      Notice_descriptor_,
+      Notice::default_instance_,
+      Notice_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Notice, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Notice, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(Notice));
+  LotteryData_descriptor_ = file->message_type(4);
   static const int LotteryData_offsets_[5] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LotteryData, price_1_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LotteryData, price_2_),
@@ -61,7 +140,7 @@ void protobuf_AssignDesc_lottery_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(LotteryData));
-  LotteryRequest_descriptor_ = file->message_type(1);
+  LotteryRequest_descriptor_ = file->message_type(5);
   static const int LotteryRequest_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LotteryRequest, lotttype_),
   };
@@ -76,7 +155,7 @@ void protobuf_AssignDesc_lottery_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(LotteryRequest));
-  LotteryResponse_descriptor_ = file->message_type(2);
+  LotteryResponse_descriptor_ = file->message_type(6);
   static const int LotteryResponse_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LotteryResponse, result_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LotteryResponse, prizelist_),
@@ -93,7 +172,7 @@ void protobuf_AssignDesc_lottery_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(LotteryResponse));
-  Lottery_descriptor_ = file->message_type(3);
+  Lottery_descriptor_ = file->message_type(7);
   static const int Lottery_offsets_[9] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Lottery, id_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Lottery, name_),
@@ -129,6 +208,14 @@ inline void protobuf_AssignDescriptorsOnce() {
 void protobuf_RegisterTypes(const ::std::string&) {
   protobuf_AssignDescriptorsOnce();
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    LuckyWheel_descriptor_, &LuckyWheel::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    DrawRequest_descriptor_, &DrawRequest::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    DrawResponse_descriptor_, &DrawResponse::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    Notice_descriptor_, &Notice::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     LotteryData_descriptor_, &LotteryData::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     LotteryRequest_descriptor_, &LotteryRequest::default_instance());
@@ -141,6 +228,14 @@ void protobuf_RegisterTypes(const ::std::string&) {
 }  // namespace
 
 void protobuf_ShutdownFile_lottery_5fprotocol_2eproto() {
+  delete LuckyWheel::default_instance_;
+  delete LuckyWheel_reflection_;
+  delete DrawRequest::default_instance_;
+  delete DrawRequest_reflection_;
+  delete DrawResponse::default_instance_;
+  delete DrawResponse_reflection_;
+  delete Notice::default_instance_;
+  delete Notice_reflection_;
   delete LotteryData::default_instance_;
   delete LotteryData_reflection_;
   delete LotteryRequest::default_instance_;
@@ -157,25 +252,42 @@ void protobuf_AddDesc_lottery_5fprotocol_2eproto() {
   already_here = true;
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
+  ::protos::common::protobuf_AddDesc_common_2fprize_5fcommon_2eproto();
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-    "\n\026lottery_protocol.proto\022\006protos\"v\n\013Lott"
-    "eryData\022\017\n\007price_1\030\001 \002(\005\022\017\n\007price_2\030\002 \002("
-    "\005\022\017\n\007price_3\030\003 \002(\005\022\"\n\tprizeList\030\004 \003(\0132\017."
-    "protos.Lottery\022\020\n\010freeTime\030\005 \001(\006\"\"\n\016Lott"
-    "eryRequest\022\020\n\010lottType\030\001 \002(\005\"T\n\017LotteryR"
-    "esponse\022\016\n\006result\030\001 \002(\005\022\"\n\tprizeList\030\002 \003"
-    "(\0132\017.protos.Lottery\022\r\n\005price\030\003 \001(\005\"\216\001\n\007L"
-    "ottery\022\n\n\002id\030\001 \002(\005\022\014\n\004name\030\007 \001(\t\022\017\n\007qual"
-    "ity\030\002 \002(\005\022\r\n\005thumb\030\003 \002(\005\022\014\n\004type\030\004 \001(\005\022\r"
-    "\n\005isnew\030\005 \001(\010\022\020\n\010heroType\030\006 \001(\005\022\013\n\003num\030\010"
-    " \001(\005\022\r\n\005color\030\t \001(\005B3\n\036anvin.server.game"
-    "server.protosB\017LotteryProtocolH\001", 472);
+    "\n\026lottery_protocol.proto\022\006protos\032\031common"
+    "/prize_common.proto\"z\n\nLuckyWheel\022\017\n\007pri"
+    "ce_1\030\001 \001(\005\022\020\n\010price_10\030\002 \001(\005\022(\n\nprize_li"
+    "st\030\003 \003(\0132\024.protos.common.Prize\022\037\n\007notice"
+    "s\030\004 \003(\0132\016.protos.Notice\" \n\013DrawRequest\022\021"
+    "\n\tdraw_type\030\001 \002(\005\"7\n\014DrawResponse\022\016\n\006res"
+    "ult\030\001 \002(\005\022\027\n\013prize_index\030\002 \003(\005B\002\020\001\"Q\n\006No"
+    "tice\022\016\n\006player\030\001 \001(\t\022\022\n\nprize_type\030\002 \001(\005"
+    "\022\021\n\tprize_num\030\003 \001(\005\022\020\n\010prize_id\030\004 \001(\005\"v\n"
+    "\013LotteryData\022\017\n\007price_1\030\001 \002(\005\022\017\n\007price_2"
+    "\030\002 \002(\005\022\017\n\007price_3\030\003 \002(\005\022\"\n\tprizeList\030\004 \003"
+    "(\0132\017.protos.Lottery\022\020\n\010freeTime\030\005 \001(\006\"\"\n"
+    "\016LotteryRequest\022\020\n\010lottType\030\001 \002(\005\"T\n\017Lot"
+    "teryResponse\022\016\n\006result\030\001 \002(\005\022\"\n\tprizeLis"
+    "t\030\002 \003(\0132\017.protos.Lottery\022\r\n\005price\030\003 \001(\005\""
+    "\216\001\n\007Lottery\022\n\n\002id\030\001 \002(\005\022\014\n\004name\030\007 \001(\t\022\017\n"
+    "\007quality\030\002 \001(\005\022\r\n\005thumb\030\003 \001(\005\022\014\n\004type\030\004 "
+    "\001(\005\022\r\n\005isnew\030\005 \001(\010\022\020\n\010heroType\030\006 \001(\005\022\013\n\003"
+    "num\030\010 \001(\005\022\r\n\005color\030\t \001(\005B2\n\035dass.server."
+    "gameserver.protosB\017LotteryProtocolH\001", 796);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "lottery_protocol.proto", &protobuf_RegisterTypes);
+  LuckyWheel::default_instance_ = new LuckyWheel();
+  DrawRequest::default_instance_ = new DrawRequest();
+  DrawResponse::default_instance_ = new DrawResponse();
+  Notice::default_instance_ = new Notice();
   LotteryData::default_instance_ = new LotteryData();
   LotteryRequest::default_instance_ = new LotteryRequest();
   LotteryResponse::default_instance_ = new LotteryResponse();
   Lottery::default_instance_ = new Lottery();
+  LuckyWheel::default_instance_->InitAsDefaultInstance();
+  DrawRequest::default_instance_->InitAsDefaultInstance();
+  DrawResponse::default_instance_->InitAsDefaultInstance();
+  Notice::default_instance_->InitAsDefaultInstance();
   LotteryData::default_instance_->InitAsDefaultInstance();
   LotteryRequest::default_instance_->InitAsDefaultInstance();
   LotteryResponse::default_instance_->InitAsDefaultInstance();
@@ -189,6 +301,1163 @@ struct StaticDescriptorInitializer_lottery_5fprotocol_2eproto {
     protobuf_AddDesc_lottery_5fprotocol_2eproto();
   }
 } static_descriptor_initializer_lottery_5fprotocol_2eproto_;
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int LuckyWheel::kPrice1FieldNumber;
+const int LuckyWheel::kPrice10FieldNumber;
+const int LuckyWheel::kPrizeListFieldNumber;
+const int LuckyWheel::kNoticesFieldNumber;
+#endif  // !_MSC_VER
+
+LuckyWheel::LuckyWheel()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+}
+
+void LuckyWheel::InitAsDefaultInstance() {
+}
+
+LuckyWheel::LuckyWheel(const LuckyWheel& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+}
+
+void LuckyWheel::SharedCtor() {
+  _cached_size_ = 0;
+  price_1_ = 0;
+  price_10_ = 0;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+LuckyWheel::~LuckyWheel() {
+  SharedDtor();
+}
+
+void LuckyWheel::SharedDtor() {
+  if (this != default_instance_) {
+  }
+}
+
+void LuckyWheel::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* LuckyWheel::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return LuckyWheel_descriptor_;
+}
+
+const LuckyWheel& LuckyWheel::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_lottery_5fprotocol_2eproto();
+  return *default_instance_;
+}
+
+LuckyWheel* LuckyWheel::default_instance_ = NULL;
+
+LuckyWheel* LuckyWheel::New() const {
+  return new LuckyWheel;
+}
+
+void LuckyWheel::Clear() {
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    price_1_ = 0;
+    price_10_ = 0;
+  }
+  prize_list_.Clear();
+  notices_.Clear();
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool LuckyWheel::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+  ::google::protobuf::uint32 tag;
+  while ((tag = input->ReadTag()) != 0) {
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // optional int32 price_1 = 1;
+      case 1: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &price_1_)));
+          set_has_price_1();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(16)) goto parse_price_10;
+        break;
+      }
+
+      // optional int32 price_10 = 2;
+      case 2: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_price_10:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &price_10_)));
+          set_has_price_10();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(26)) goto parse_prize_list;
+        break;
+      }
+
+      // repeated .protos.common.Prize prize_list = 3;
+      case 3: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_prize_list:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+                input, add_prize_list()));
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(26)) goto parse_prize_list;
+        if (input->ExpectTag(34)) goto parse_notices;
+        break;
+      }
+
+      // repeated .protos.Notice notices = 4;
+      case 4: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_notices:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+                input, add_notices()));
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(34)) goto parse_notices;
+        if (input->ExpectAtEnd()) return true;
+        break;
+      }
+
+      default: {
+      handle_uninterpreted:
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          return true;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+  return true;
+#undef DO_
+}
+
+void LuckyWheel::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // optional int32 price_1 = 1;
+  if (has_price_1()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->price_1(), output);
+  }
+
+  // optional int32 price_10 = 2;
+  if (has_price_10()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->price_10(), output);
+  }
+
+  // repeated .protos.common.Prize prize_list = 3;
+  for (int i = 0; i < this->prize_list_size(); i++) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      3, this->prize_list(i), output);
+  }
+
+  // repeated .protos.Notice notices = 4;
+  for (int i = 0; i < this->notices_size(); i++) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      4, this->notices(i), output);
+  }
+
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+}
+
+::google::protobuf::uint8* LuckyWheel::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // optional int32 price_1 = 1;
+  if (has_price_1()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(1, this->price_1(), target);
+  }
+
+  // optional int32 price_10 = 2;
+  if (has_price_10()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->price_10(), target);
+  }
+
+  // repeated .protos.common.Prize prize_list = 3;
+  for (int i = 0; i < this->prize_list_size(); i++) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        3, this->prize_list(i), target);
+  }
+
+  // repeated .protos.Notice notices = 4;
+  for (int i = 0; i < this->notices_size(); i++) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        4, this->notices(i), target);
+  }
+
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  return target;
+}
+
+int LuckyWheel::ByteSize() const {
+  int total_size = 0;
+
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // optional int32 price_1 = 1;
+    if (has_price_1()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->price_1());
+    }
+
+    // optional int32 price_10 = 2;
+    if (has_price_10()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->price_10());
+    }
+
+  }
+  // repeated .protos.common.Prize prize_list = 3;
+  total_size += 1 * this->prize_list_size();
+  for (int i = 0; i < this->prize_list_size(); i++) {
+    total_size +=
+      ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+        this->prize_list(i));
+  }
+
+  // repeated .protos.Notice notices = 4;
+  total_size += 1 * this->notices_size();
+  for (int i = 0; i < this->notices_size(); i++) {
+    total_size +=
+      ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+        this->notices(i));
+  }
+
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void LuckyWheel::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const LuckyWheel* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const LuckyWheel*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void LuckyWheel::MergeFrom(const LuckyWheel& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  prize_list_.MergeFrom(from.prize_list_);
+  notices_.MergeFrom(from.notices_);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_price_1()) {
+      set_price_1(from.price_1());
+    }
+    if (from.has_price_10()) {
+      set_price_10(from.price_10());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void LuckyWheel::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void LuckyWheel::CopyFrom(const LuckyWheel& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool LuckyWheel::IsInitialized() const {
+
+  return true;
+}
+
+void LuckyWheel::Swap(LuckyWheel* other) {
+  if (other != this) {
+    std::swap(price_1_, other->price_1_);
+    std::swap(price_10_, other->price_10_);
+    prize_list_.Swap(&other->prize_list_);
+    notices_.Swap(&other->notices_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata LuckyWheel::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = LuckyWheel_descriptor_;
+  metadata.reflection = LuckyWheel_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int DrawRequest::kDrawTypeFieldNumber;
+#endif  // !_MSC_VER
+
+DrawRequest::DrawRequest()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+}
+
+void DrawRequest::InitAsDefaultInstance() {
+}
+
+DrawRequest::DrawRequest(const DrawRequest& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+}
+
+void DrawRequest::SharedCtor() {
+  _cached_size_ = 0;
+  draw_type_ = 0;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+DrawRequest::~DrawRequest() {
+  SharedDtor();
+}
+
+void DrawRequest::SharedDtor() {
+  if (this != default_instance_) {
+  }
+}
+
+void DrawRequest::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* DrawRequest::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return DrawRequest_descriptor_;
+}
+
+const DrawRequest& DrawRequest::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_lottery_5fprotocol_2eproto();
+  return *default_instance_;
+}
+
+DrawRequest* DrawRequest::default_instance_ = NULL;
+
+DrawRequest* DrawRequest::New() const {
+  return new DrawRequest;
+}
+
+void DrawRequest::Clear() {
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    draw_type_ = 0;
+  }
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool DrawRequest::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+  ::google::protobuf::uint32 tag;
+  while ((tag = input->ReadTag()) != 0) {
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // required int32 draw_type = 1;
+      case 1: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &draw_type_)));
+          set_has_draw_type();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectAtEnd()) return true;
+        break;
+      }
+
+      default: {
+      handle_uninterpreted:
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          return true;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+  return true;
+#undef DO_
+}
+
+void DrawRequest::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // required int32 draw_type = 1;
+  if (has_draw_type()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->draw_type(), output);
+  }
+
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+}
+
+::google::protobuf::uint8* DrawRequest::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // required int32 draw_type = 1;
+  if (has_draw_type()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(1, this->draw_type(), target);
+  }
+
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  return target;
+}
+
+int DrawRequest::ByteSize() const {
+  int total_size = 0;
+
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // required int32 draw_type = 1;
+    if (has_draw_type()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->draw_type());
+    }
+
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void DrawRequest::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const DrawRequest* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const DrawRequest*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void DrawRequest::MergeFrom(const DrawRequest& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_draw_type()) {
+      set_draw_type(from.draw_type());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void DrawRequest::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void DrawRequest::CopyFrom(const DrawRequest& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool DrawRequest::IsInitialized() const {
+  if ((_has_bits_[0] & 0x00000001) != 0x00000001) return false;
+
+  return true;
+}
+
+void DrawRequest::Swap(DrawRequest* other) {
+  if (other != this) {
+    std::swap(draw_type_, other->draw_type_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata DrawRequest::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = DrawRequest_descriptor_;
+  metadata.reflection = DrawRequest_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int DrawResponse::kResultFieldNumber;
+const int DrawResponse::kPrizeIndexFieldNumber;
+#endif  // !_MSC_VER
+
+DrawResponse::DrawResponse()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+}
+
+void DrawResponse::InitAsDefaultInstance() {
+}
+
+DrawResponse::DrawResponse(const DrawResponse& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+}
+
+void DrawResponse::SharedCtor() {
+  _cached_size_ = 0;
+  result_ = 0;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+DrawResponse::~DrawResponse() {
+  SharedDtor();
+}
+
+void DrawResponse::SharedDtor() {
+  if (this != default_instance_) {
+  }
+}
+
+void DrawResponse::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* DrawResponse::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return DrawResponse_descriptor_;
+}
+
+const DrawResponse& DrawResponse::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_lottery_5fprotocol_2eproto();
+  return *default_instance_;
+}
+
+DrawResponse* DrawResponse::default_instance_ = NULL;
+
+DrawResponse* DrawResponse::New() const {
+  return new DrawResponse;
+}
+
+void DrawResponse::Clear() {
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    result_ = 0;
+  }
+  prize_index_.Clear();
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool DrawResponse::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+  ::google::protobuf::uint32 tag;
+  while ((tag = input->ReadTag()) != 0) {
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // required int32 result = 1;
+      case 1: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &result_)));
+          set_has_result();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(18)) goto parse_prize_index;
+        break;
+      }
+
+      // repeated int32 prize_index = 2 [packed = true];
+      case 2: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_prize_index:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPackedPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, this->mutable_prize_index())));
+        } else if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag)
+                   == ::google::protobuf::internal::WireFormatLite::
+                      WIRETYPE_VARINT) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadRepeatedPrimitiveNoInline<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 1, 18, input, this->mutable_prize_index())));
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectAtEnd()) return true;
+        break;
+      }
+
+      default: {
+      handle_uninterpreted:
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          return true;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+  return true;
+#undef DO_
+}
+
+void DrawResponse::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // required int32 result = 1;
+  if (has_result()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->result(), output);
+  }
+
+  // repeated int32 prize_index = 2 [packed = true];
+  if (this->prize_index_size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteTag(2, ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED, output);
+    output->WriteVarint32(_prize_index_cached_byte_size_);
+  }
+  for (int i = 0; i < this->prize_index_size(); i++) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32NoTag(
+      this->prize_index(i), output);
+  }
+
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+}
+
+::google::protobuf::uint8* DrawResponse::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // required int32 result = 1;
+  if (has_result()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(1, this->result(), target);
+  }
+
+  // repeated int32 prize_index = 2 [packed = true];
+  if (this->prize_index_size() > 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteTagToArray(
+      2,
+      ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED,
+      target);
+    target = ::google::protobuf::io::CodedOutputStream::WriteVarint32ToArray(
+      _prize_index_cached_byte_size_, target);
+  }
+  for (int i = 0; i < this->prize_index_size(); i++) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteInt32NoTagToArray(this->prize_index(i), target);
+  }
+
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  return target;
+}
+
+int DrawResponse::ByteSize() const {
+  int total_size = 0;
+
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // required int32 result = 1;
+    if (has_result()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->result());
+    }
+
+  }
+  // repeated int32 prize_index = 2 [packed = true];
+  {
+    int data_size = 0;
+    for (int i = 0; i < this->prize_index_size(); i++) {
+      data_size += ::google::protobuf::internal::WireFormatLite::
+        Int32Size(this->prize_index(i));
+    }
+    if (data_size > 0) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(data_size);
+    }
+    GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+    _prize_index_cached_byte_size_ = data_size;
+    GOOGLE_SAFE_CONCURRENT_WRITES_END();
+    total_size += data_size;
+  }
+
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void DrawResponse::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const DrawResponse* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const DrawResponse*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void DrawResponse::MergeFrom(const DrawResponse& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  prize_index_.MergeFrom(from.prize_index_);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_result()) {
+      set_result(from.result());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void DrawResponse::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void DrawResponse::CopyFrom(const DrawResponse& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool DrawResponse::IsInitialized() const {
+  if ((_has_bits_[0] & 0x00000001) != 0x00000001) return false;
+
+  return true;
+}
+
+void DrawResponse::Swap(DrawResponse* other) {
+  if (other != this) {
+    std::swap(result_, other->result_);
+    prize_index_.Swap(&other->prize_index_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata DrawResponse::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = DrawResponse_descriptor_;
+  metadata.reflection = DrawResponse_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int Notice::kPlayerFieldNumber;
+const int Notice::kPrizeTypeFieldNumber;
+const int Notice::kPrizeNumFieldNumber;
+const int Notice::kPrizeIdFieldNumber;
+#endif  // !_MSC_VER
+
+Notice::Notice()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+}
+
+void Notice::InitAsDefaultInstance() {
+}
+
+Notice::Notice(const Notice& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+}
+
+void Notice::SharedCtor() {
+  _cached_size_ = 0;
+  player_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  prize_type_ = 0;
+  prize_num_ = 0;
+  prize_id_ = 0;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+Notice::~Notice() {
+  SharedDtor();
+}
+
+void Notice::SharedDtor() {
+  if (player_ != &::google::protobuf::internal::kEmptyString) {
+    delete player_;
+  }
+  if (this != default_instance_) {
+  }
+}
+
+void Notice::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* Notice::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return Notice_descriptor_;
+}
+
+const Notice& Notice::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_lottery_5fprotocol_2eproto();
+  return *default_instance_;
+}
+
+Notice* Notice::default_instance_ = NULL;
+
+Notice* Notice::New() const {
+  return new Notice;
+}
+
+void Notice::Clear() {
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (has_player()) {
+      if (player_ != &::google::protobuf::internal::kEmptyString) {
+        player_->clear();
+      }
+    }
+    prize_type_ = 0;
+    prize_num_ = 0;
+    prize_id_ = 0;
+  }
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool Notice::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+  ::google::protobuf::uint32 tag;
+  while ((tag = input->ReadTag()) != 0) {
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // optional string player = 1;
+      case 1: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_player()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+            this->player().data(), this->player().length(),
+            ::google::protobuf::internal::WireFormat::PARSE);
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(16)) goto parse_prize_type;
+        break;
+      }
+
+      // optional int32 prize_type = 2;
+      case 2: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_prize_type:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &prize_type_)));
+          set_has_prize_type();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(24)) goto parse_prize_num;
+        break;
+      }
+
+      // optional int32 prize_num = 3;
+      case 3: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_prize_num:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &prize_num_)));
+          set_has_prize_num();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(32)) goto parse_prize_id;
+        break;
+      }
+
+      // optional int32 prize_id = 4;
+      case 4: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_prize_id:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &prize_id_)));
+          set_has_prize_id();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectAtEnd()) return true;
+        break;
+      }
+
+      default: {
+      handle_uninterpreted:
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          return true;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+  return true;
+#undef DO_
+}
+
+void Notice::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // optional string player = 1;
+  if (has_player()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->player().data(), this->player().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      1, this->player(), output);
+  }
+
+  // optional int32 prize_type = 2;
+  if (has_prize_type()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->prize_type(), output);
+  }
+
+  // optional int32 prize_num = 3;
+  if (has_prize_num()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(3, this->prize_num(), output);
+  }
+
+  // optional int32 prize_id = 4;
+  if (has_prize_id()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(4, this->prize_id(), output);
+  }
+
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+}
+
+::google::protobuf::uint8* Notice::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // optional string player = 1;
+  if (has_player()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->player().data(), this->player().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        1, this->player(), target);
+  }
+
+  // optional int32 prize_type = 2;
+  if (has_prize_type()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->prize_type(), target);
+  }
+
+  // optional int32 prize_num = 3;
+  if (has_prize_num()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(3, this->prize_num(), target);
+  }
+
+  // optional int32 prize_id = 4;
+  if (has_prize_id()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(4, this->prize_id(), target);
+  }
+
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  return target;
+}
+
+int Notice::ByteSize() const {
+  int total_size = 0;
+
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // optional string player = 1;
+    if (has_player()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::StringSize(
+          this->player());
+    }
+
+    // optional int32 prize_type = 2;
+    if (has_prize_type()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->prize_type());
+    }
+
+    // optional int32 prize_num = 3;
+    if (has_prize_num()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->prize_num());
+    }
+
+    // optional int32 prize_id = 4;
+    if (has_prize_id()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->prize_id());
+    }
+
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void Notice::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const Notice* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const Notice*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void Notice::MergeFrom(const Notice& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_player()) {
+      set_player(from.player());
+    }
+    if (from.has_prize_type()) {
+      set_prize_type(from.prize_type());
+    }
+    if (from.has_prize_num()) {
+      set_prize_num(from.prize_num());
+    }
+    if (from.has_prize_id()) {
+      set_prize_id(from.prize_id());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void Notice::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void Notice::CopyFrom(const Notice& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool Notice::IsInitialized() const {
+
+  return true;
+}
+
+void Notice::Swap(Notice* other) {
+  if (other != this) {
+    std::swap(player_, other->player_);
+    std::swap(prize_type_, other->prize_type_);
+    std::swap(prize_num_, other->prize_num_);
+    std::swap(prize_id_, other->prize_id_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata Notice::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = Notice_descriptor_;
+  metadata.reflection = Notice_reflection_;
+  return metadata;
+}
+
 
 // ===================================================================
 
@@ -1179,7 +2448,7 @@ bool Lottery::MergePartialFromCodedStream(
         break;
       }
 
-      // required int32 quality = 2;
+      // optional int32 quality = 2;
       case 2: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
@@ -1195,7 +2464,7 @@ bool Lottery::MergePartialFromCodedStream(
         break;
       }
 
-      // required int32 thumb = 3;
+      // optional int32 thumb = 3;
       case 3: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
@@ -1331,12 +2600,12 @@ void Lottery::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->id(), output);
   }
 
-  // required int32 quality = 2;
+  // optional int32 quality = 2;
   if (has_quality()) {
     ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->quality(), output);
   }
 
-  // required int32 thumb = 3;
+  // optional int32 thumb = 3;
   if (has_thumb()) {
     ::google::protobuf::internal::WireFormatLite::WriteInt32(3, this->thumb(), output);
   }
@@ -1388,12 +2657,12 @@ void Lottery::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(1, this->id(), target);
   }
 
-  // required int32 quality = 2;
+  // optional int32 quality = 2;
   if (has_quality()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->quality(), target);
   }
 
-  // required int32 thumb = 3;
+  // optional int32 thumb = 3;
   if (has_thumb()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(3, this->thumb(), target);
   }
@@ -1458,14 +2727,14 @@ int Lottery::ByteSize() const {
           this->name());
     }
 
-    // required int32 quality = 2;
+    // optional int32 quality = 2;
     if (has_quality()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::Int32Size(
           this->quality());
     }
 
-    // required int32 thumb = 3;
+    // optional int32 thumb = 3;
     if (has_thumb()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::Int32Size(
@@ -1580,7 +2849,7 @@ void Lottery::CopyFrom(const Lottery& from) {
 }
 
 bool Lottery::IsInitialized() const {
-  if ((_has_bits_[0] & 0x0000000d) != 0x0000000d) return false;
+  if ((_has_bits_[0] & 0x00000001) != 0x00000001) return false;
 
   return true;
 }

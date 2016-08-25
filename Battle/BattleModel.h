@@ -33,19 +33,19 @@ namespace BattleSpace
 		eBalance				= 1,//稳守突击
 		eDefense				= 2,//防守模式
 		eAttack					= 3,//攻击模式
-		
 	};
-	//后续需要拆分出一个继承体系出来
+	//后续需要拆分出一个继承体系出来					用于记录是什么样的战斗模式，和战斗模式中的通用信息。
 	class BaseRole;
-	class WarManager;
 	class BattleModel : public CCObject
 	{
 	protected:
 		BattleModel();
 	public:
 		virtual ~BattleModel();
-		static BattleModel*CreateBattleModel(sBattleType pBattleType);
+		CREATE_FUNC(BattleModel);
 		virtual bool init();
+		void clearModelData();
+	public:
 		bool isPvEBattle();
 		bool isBattleType(sBattleType pType);
 		bool moveJudge(BaseRole* pRole,int pGrid);
@@ -54,8 +54,6 @@ namespace BattleSpace
 		bool battlePause();
 		CC_SYNTHESIZE(sBattleType,mBattleType,BattleType);
 		CC_SYNTHESIZE(sPvEStrategy,mStrategyType,StrategyType);
-	private:
-		WarManager* mManage;
 	};
 };
 #endif

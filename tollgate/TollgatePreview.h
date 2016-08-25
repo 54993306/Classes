@@ -54,11 +54,18 @@ public:
 	void roleUpdate(const TMessage& tMsg);
 
 	void setIsLastStageInChapter(bool bLastStage);
+
+	CC_SYNTHESIZE(int, m_iStar, Star);
+
 protected:
 	CC_SYNTHESIZE(bool, m_bIsNormal, Normal);
 
 private:
 	void callBackForSound425();
+
+	void showCombatWithStar(CStageInfoRes &stageInfo);			//根据星星选择的战斗
+	void updateStarLimitTips( CLabel *pLabel, int iType, int iData, int iLevelStar );		//更新字符串内容
+
 private:
 	CLayout *m_ui;
 	CLayout *m_cell;
@@ -79,6 +86,12 @@ private:
 
 	MaskLayer* m_pMaskLayer;
 	bool m_bLastStage;
+	int m_iStarLevel;			//挑战星级
+	int m_iNeedHeroTypeLevel;			//英雄属性需求星级
+	int m_iNeedHeroType;					//英雄属性需求
+
+	int m_iNeedHeroNumLevel;			//英雄数量需求星级
+	int m_iNeedHeroNum;					//英雄数量需求
 };
 
 #endif

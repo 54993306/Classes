@@ -17,9 +17,6 @@
 namespace BattleSpace
 {
 	class BaseRole;
-	class RoleSkill;
-	class skEffectData;
-
 
 	bool RowUp_InBoundary(int originRow,int aimRow);
 	bool RowDown_InBoundary(int originRow,int aimRow);
@@ -49,5 +46,10 @@ namespace BattleSpace
 	bool sameRow(int pGrid1 , int pGrid2);
 
 	bool sameCol(int pGrid1 , int pGrid2);
+
+	void initGridRound(vector<int>& pVec,int pGrid);
+
+	int getRandomByGrid(int pGrid);
+	//大个子站位包含某个格子问题
 };
 #endif

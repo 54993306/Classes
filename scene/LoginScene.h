@@ -15,6 +15,16 @@
 
 class BaseLayer;
 
+//登录类型，会被记录
+enum LoginType
+{
+	LoginTypeNull					=	0,	//未选择类型
+	LoginTypeTourist				= 1,	//游客
+	LoginTypeFacebook			= 2,	//facebook
+	LoginTypeGoogle				= 3,	//google
+};
+
+
 class LoginScene: public CScene
 {
 public:

@@ -36,7 +36,6 @@ protected:
 	void onSet(CCObject* pSender);
 	void hide(CCObject* pObj);
 	void show(CCObject* pObj);
-	CCSprite* maskedSprite(CCSprite *textureSprite);
 	void imageLoadSuccessCallBack(string sTag, vector<char>* pBuffer);
 private:
 	CLayout *m_ui;

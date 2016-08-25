@@ -22,6 +22,7 @@ using namespace std;
 namespace BattleSpace
 {
 	class BuffManage;
+	class BuffData;
 	class RoleObject;
 	class MoveObject;
 	class BaseRoleData;
@@ -34,6 +35,7 @@ namespace BattleSpace
 	class BattleRoleLayer;
 	class CombatGuideManage;
 	class BattleModel;
+	enum struct PlayHpType;
 	class BaseRole:public CCObject			//定义数据的顺序结构是为了方便查看数据
 	{
 	protected:
@@ -43,7 +45,6 @@ namespace BattleSpace
 		SkillRange* mSkillRange;
 		HurtCount* mHurtCount;
 		CombatGuideManage* mGuideManage;
-		BattleModel* mBattleModel;
 		skEffectData* mSkillEffect;			//空对象代替空指针防止程序崩溃
 	public:
 		virtual void excuteLogic(float pTime);
@@ -88,12 +89,13 @@ namespace BattleSpace
 		bool swappingRule(vector<int>& pDestinations);
 		vector<BaseRole*> getAliveInArea(vector<int>& pAreas);
 		bool vectorIntersection(vector<int>& pVector,vector<int>& ptVector);
-		void moveSwappingAlives(vector<BaseRole*>& pVector,int pOffs);
+		bool moveSwappingAlives(vector<BaseRole*>& pVector,int pOffs);
 		bool callAliveJudge(vector<int>& pDestinations);
 		PROPERTY_CONSTREAD(int,mCommandGrid,CommandGrid);				//触	摸结束点
 		bool skillAreaHasTarget();
 		bool currGridHasTarget();
 		bool inMoveObjectArea(int pGrid);
+		bool intObstacleArea(int pGrid);
 	public:
 		virtual ~BaseRole();
 		virtual bool init();
@@ -116,18 +118,25 @@ namespace BattleSpace
 		void initAliveData();
 		void initAliveByFather(BaseRole*pFather);
 		void updateRole(float dt);
-		vector<BaseRole*>* getCurrSkillTargets();
+		vector<BaseRole*>& getCurrSkillTargets();
 		void roleDie();
 		bool hasOtherRole(int pGrid);
 		void byOtherKill(BaseRole* pRole);
+		void changeBoold(float pChangeNum);
+		void playBooldNum(PlayHpType pType,int pNumber);
+		void buffImpact();
+		void AddBuff(const BuffData* pData);
+		//封装一些得到服务器基础属性的方法,避免直接暴露服务器数据对象,导致耦合的层次不断的增加
 	public:
 		//public
 		CC_SYNTHESIZE(BaseRoleData*,mBaseData,BaseData);
 		CC_SYNTHESIZE(BaseRoleData*,mLogicData,LogicData);
-		std::vector<int> mStandGrids;									//多格子站位
-		std::vector<int> mSkillArea;									//存储武将当前技能区域
-		std::vector<BaseRole*> mAreaTargets;							//存储区域内目标
-		std::vector<BaseRole*> HittingAlive;							//受击目标中被击中对象				(用于做buff和受击目标死亡结算处理)
+		vector<int> mMoveGrids;											//武将移动路径
+		vector<int> mObstacle;
+		vector<int> mStandGrids;										//多格子站位
+		vector<int> mSkillArea;											//存储武将当前技能区域
+		vector<BaseRole*> mAreaTargets;									//存储区域内目标
+		vector<BaseRole*> mHittingAlive;								//受击目标中被击中对象				(用于做buff和受击目标死亡结算处理)
 		CC_SYNTHESIZE_READONLY(BuffManage*,mBuffManage,BuffManage);		//(是不是应该暴露出去呢)
 		CC_SYNTHESIZE(RoleObject*,mRoleObject,RoleObject);
 		CC_SYNTHESIZE(MoveObject*,mMoveObject,MoveObject);				//设置移动对象

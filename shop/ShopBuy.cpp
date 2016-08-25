@@ -181,7 +181,22 @@ void CShopBuy::showItemProperty(CItem *item)
 			}
 		}
 		break;
-	
+	case 5:
+		{
+			CCTexture2D *texture =  CCTextureCache::sharedTextureCache()->addImage("prop/5.png");
+			coinIcon->setTexture(texture);
+			coinIcon->setTextureRect(CCRectMake(0,0,texture->getContentSize().width,texture->getContentSize().height));
+			//检查货币数量
+			if(!CheckRolePoint(atoi(price->getString())))
+			{
+				price->setColor(RGB_RED);
+			}
+			else
+			{
+				price->setColor(RGB_WHITE);
+			}
+		}
+		break;
 	default:
 		break;
 	}
@@ -267,7 +282,7 @@ void CShopBuy::onBuy(CCObject* pSender)
 		{
 			if (DataCenter::sharedData()->getUser()->getUserData()->getRolePoints()<item->buyPrice)
 			{			
-				ShowPopTextTip(GETLANGSTR(1224));
+				ShowPopTextTip(GETLANGSTR(2046));
 				return;
 			}
 		}

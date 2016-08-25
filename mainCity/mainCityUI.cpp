@@ -34,11 +34,12 @@
 #include "common/CommonFunction.h"
 #include "tools/ShowTexttip.h"
 #include "tools/UICloneMgr.h"
+#include "Global.h"
 #include "Battle/BattleCenter.h"
-#define  FACEBOOKIMG "http://graph.facebook.com/%s/picture?width=106&height=106"
 
 #include "mail/EmailLayer.h"
 #include "CAccessLayer.h"
+
 
 bool CMainCityUI::init()
 {
@@ -126,7 +127,7 @@ void CMainCityUI::onEnter()
 		{
 			CCSprite *headBg = (CCSprite *)(headPart->findWidgetById("headbg"));
 			CCSprite *sp = CCSprite::create(fbName.c_str());
-			CCSprite* spr = maskedSprite(sp);
+			CCSprite* spr = MakeFaceBookHeadToCircle(sp);
 			spr->setPosition(headBg->getPosition());
 			headPart->removeChild(head);
 		    spr->setTag(15);
@@ -135,7 +136,7 @@ void CMainCityUI::onEnter()
 		else
 		{
 			HttpLoadImage::getInstance()->bindUiTarget(this);
-			CCString *imgUrl = CCString::createWithFormat(FACEBOOKIMG,user->getFbId().c_str());
+			CCString *imgUrl = CCString::createWithFormat(FACEBOOKIMG_106,user->getFbId().c_str());
 			HttpLoadImage::getInstance()->requestUrlImage(imgUrl->getCString(),user->getFbId().c_str());
 		}
 	}
@@ -309,7 +310,7 @@ void CMainCityUI::updateRoleProperty(const TMessage& tMsg)
 		{
 			CCSprite *headBg = (CCSprite *)(headPart->findWidgetById("headbg"));
 			CCSprite *sp = CCSprite::create(fullName.c_str());
-			CCSprite* spr = maskedSprite(sp);
+			CCSprite* spr = MakeFaceBookHeadToCircle(sp);
 			spr->setPosition(headBg->getPosition());
 			headPart->removeChild(head);
 			spr->setTag(15);
@@ -318,7 +319,7 @@ void CMainCityUI::updateRoleProperty(const TMessage& tMsg)
 		else
 		{
 			HttpLoadImage::getInstance()->bindUiTarget(this);
-			CCString *imgUrl = CCString::createWithFormat(FACEBOOKIMG,user->getFbId().c_str());
+			CCString *imgUrl = CCString::createWithFormat(FACEBOOKIMG_106,user->getFbId().c_str());
 			HttpLoadImage::getInstance()->requestUrlImage(imgUrl->getCString(),user->getFbId().c_str());
 		}
 	}
@@ -463,7 +464,7 @@ void CMainCityUI::onClickBtn(CCObject *pSender)
 				{
 					pLayer->setStory(true);
 					pLayer->ProcessMsg(ChapterList, CNetClient::getShareInstance()->getSaveMsg(ChapterList));
-					pLayer->selectChapter(BattleManage->getChapterCount(), BattleManage->getChapterIndex());
+					pLayer->selectChapter(BattleManage->getChapterCount(),BattleManage->getChapterIndex());
 					DataCenter::sharedData()->setCityActionType(CA_None);
 				}
 				else
@@ -760,7 +761,7 @@ void CMainCityUI::showNoticeTip(CGameTips * ct)
 
 void CMainCityUI::runTollgatepreviewCallBack()
 {
-	int stage = BattleManage->getStageID(); 
+	int stage = BattleManage->getStageIndex(); 
 
 	CTollgatePreview *preview = CTollgatePreview::create();
 	LayerManager::instance()->push(preview);
@@ -818,41 +819,13 @@ void CMainCityUI::imageLoadSuccessCallBack(string sTag, vector<char>* pBuffer)
 // 	clip->setStencil(stencil);	
 // 	m_ui->addChild(clip);
 	CCSprite *headBg = (CCSprite *)(headPart->findWidgetById("headbg"));
-	CCSprite *headSpr = maskedSprite(CCSprite::createWithTexture(texture));
+	CCSprite *headSpr = MakeFaceBookHeadToCircle(CCSprite::createWithTexture(texture));
 	headSpr->setTag(15);
 	headSpr->setPosition(headBg->getPosition());
 	headPart->addChild(headSpr);
 	head->removeFromParent();
 	img->release();
 }
-
-CCSprite * CMainCityUI::maskedSprite(CCSprite *textureSprite)  
-{  
-	CCSprite * maskSprite = CCSprite::create("mainCity/tencil.png");  
-	CCRenderTexture * renderTexture = CCRenderTexture::create(maskSprite->getContentSize().width, maskSprite->getContentSize().height);  
-
-	maskSprite->setPosition(ccp(maskSprite->getContentSize().width / 2, maskSprite->getContentSize().height / 2));  
-	textureSprite->setPosition(ccp(textureSprite->getContentSize().width / 2, textureSprite->getContentSize().height / 2));  
-
-	ccBlendFunc bfun1;
-	bfun1.src = GL_ONE;
-	bfun1.dst = GL_ZERO;
-	maskSprite->setBlendFunc(bfun1);  
-	ccBlendFunc bfun2;
-	bfun2.src = GL_DST_ALPHA;
-	bfun2.dst = GL_ZERO;
-	textureSprite->setBlendFunc(bfun2);  
-
-	renderTexture->begin();  
-	maskSprite->visit();  
-	textureSprite->visit();  
-	renderTexture->end();  
-
-	CCSprite * retval = CCSprite::createWithTexture(renderTexture->getSprite()->getTexture());  
-	retval->setFlipY(true);  
-
-	return retval;  
-}  
 
 void CMainCityUI::autoShowSign()
 {

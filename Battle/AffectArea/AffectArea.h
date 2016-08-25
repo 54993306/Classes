@@ -20,7 +20,8 @@
 #include "Battle/BaseRole.h"
 #include "Battle/ConstNum.h"
 #include "Battle/skEffectData.h"
-namespace BattleSpace{
+namespace BattleSpace
+{
 	enum struct sAffectType 
 	{
 		eNullArea						= 0,

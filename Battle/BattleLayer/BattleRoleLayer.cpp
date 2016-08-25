@@ -12,7 +12,7 @@
 #include "Battle/EffectObject.h"
 #include "tools/CCShake.h"
 #include "Battle/WarManager.h"
-#include "Battle/MapManager.h"
+#include "Battle/CoordsManage.h"
 #include "Battle/CombatGuideManage.h"
 #include "Battle/CombatGuideData.h"
 #include "Battle/BattleScene/BattleScene.h"
@@ -77,8 +77,6 @@ namespace BattleSpace
 		m_AliveNode = CCNode::create();
 		addChild(m_AliveNode);
 		mManage = BattleManage;
-		m_map = ManageCenter->getMap()->getCurrWarMap();
-
 		createMoveTarget();
 		createLayerColor();
 		createActObjects();
@@ -127,7 +125,7 @@ namespace BattleSpace
 			pGrid = CCRANDOM_0_1()*3+1;
 			tRole->setGridIndex(pGrid);
 		}
-		pRoleObject->countOffs(m_map->getPoint(pGrid));
+		pRoleObject->countOffs(BattleCoords->getPoint(pGrid));
 		if (tRole->getOtherCamp() && !tRole->getEnemy())
 			pRoleObject->setMoveState(sStateCode::eWalkState);
 		if(pRoleObject->getParent() == nullptr)
@@ -248,8 +246,8 @@ namespace BattleSpace
 
 	bool BattleRoleLayer::touchInAlive( int grid, const CCPoint& p )
 	{
-		vector<BaseRole*>* tHeros = mManage->inBattleHeros();
-		for (auto tHero : *tHeros)
+		vector<BaseRole*> tHeros = mManage->inBattleHeros();
+		for (auto tHero : tHeros)
 		{
 			if (tHero->getCallType()!=sCallType::eCommon || tHero->getCriAtk())
 				continue;
@@ -276,14 +274,14 @@ namespace BattleSpace
 			return true;
 		}
 		CCPoint p = this->convertToNodeSpace(pTouch->getLocation());
-		int grid = m_map->getGridIndex(p);
+		int grid = BattleCoords->getGridIndex(p);
 		return touchInAlive(grid,  pTouch->getLocation());
 	}
 
 	int BattleRoleLayer::getTouchGrid( CCTouch* pTouch )
 	{
 		CCPoint p = convertToNodeSpace(pTouch->getLocation())+m_TouchOffs;
-		return m_map->getGridIndex(p-m_MoveActObject->getoffs());								//移动目标所站的实际格子要减去偏移量
+		return BattleCoords->getGridIndex(p-m_MoveActObject->getoffs());								//移动目标所站的实际格子要减去偏移量
 	}
 
 	void BattleRoleLayer::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)

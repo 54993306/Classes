@@ -298,7 +298,7 @@ void PvpEndLayer::onExitClick(CCObject *pSender)
 
 void PvpEndLayer::shareFb(CCObject *pSender)
 {
-	int stageId = BattleManage->getStageID();
+	int stageId = BattleManage->getStageIndex();
 	const ShareData *data = DataCenter::sharedData()->getShareData()->getCfg(10);
 	CCString *desc = CCString::createWithFormat(data->desc.c_str(),m_rank);
 	CCString *url = CCString::createWithFormat(data->url.c_str(),stageId);

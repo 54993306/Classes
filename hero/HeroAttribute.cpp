@@ -27,6 +27,7 @@
 #include "common/CCRollLabelAction.h"
 #include "Battle/BattleCenter.h"
 #include "Battle/WarManager.h"
+#include "Battle/SpineDataManage.h"
 #include <spine/spine-cocos2dx.h>
 
 using namespace spine;
@@ -328,7 +329,7 @@ void CHeroAttribute::onExit()
 	vector<int>::iterator iter = m_VecMode.begin();
 	for (;iter!=m_VecMode.end();iter++)
 	{
-		if (BattleManage->isSpine(*iter))
+		if (SpineManage->isSpineModel(*iter))
 		{
 			continue;
 		}
@@ -689,7 +690,7 @@ void CHeroAttribute::showBaseInfo(CHero* hero)
 	//使用模型代替贴图
 	int m_ModeID = hero->thumb;
 
-	if (BattleManage->isSpine(m_ModeID))
+	if (SpineManage->isSpineModel(m_ModeID))
 	{ 
 		char json[60] = {0};
 		char altlas[60] = {0};

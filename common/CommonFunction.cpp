@@ -530,3 +530,28 @@ bool CheckDay( const char *str )
 
 	return false;
 }
+
+CImageView * MakeFaceBookHeadToCircle( CCSprite *pSprite )
+{
+	CCSize size = pSprite->getContentSize();
+
+	//选定被裁切内容
+	CCNode* pLayerBeClip = pSprite;
+	pLayerBeClip->setPosition(ccp( size.width/2, size.height/2 ));
+
+	//裁切
+	CCClippingNode* pClip = CCClippingNode::create();
+	pClip->setContentSize(size);
+	pClip->setAlphaThreshold(0.05f);
+	CCSprite* pStenCil = CCSprite::create("mainCity/tencil.png");
+	pStenCil->setPosition(ccp( size.width/2, size.height/2 ));
+	pClip->setStencil(pStenCil);
+	pClip->addChild(pLayerBeClip);
+
+	CImageView * retval = CImageView::createWithTexture(pSprite->getTexture());
+	retval->setOpacity(0);
+	retval->setCascadeOpacityEnabled(false);
+	retval->addChild(pClip);
+
+	return retval;
+}

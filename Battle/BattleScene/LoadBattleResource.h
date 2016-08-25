@@ -63,13 +63,10 @@ namespace BattleSpace
 		LoadResourceInfo():Loadtype(sLoadType::eNuLL),FileName(""),FilePath(""){}
 	};
 	class BaseRoleData;
-	class WarManager;
-	class LoadSpineData;
 	class LoadBattleResource : public CScene
 	{
 	public:
 		LoadBattleResource();
-		~LoadBattleResource();
 		DEFINE_SCENE_CLASS(LoadBattleResource);
 		virtual void onCreate();
 		virtual void onEnter();
@@ -77,13 +74,13 @@ namespace BattleSpace
 		virtual void onEnterTransitionDidFinish();
 		void updateTips(float fdetal);												//刷新提醒
 		void DataParse();															//总的加载数据
+		void TrapParse();
 		void ResourceDispose(float delta);											//资源加载方法
 		void setRelease(bool isrelease,int sceneType);								//设置是否释放资源并跳转到哪个场景
 		void CocosBoneThread(int ModeID);											//角色加载处理
 
 		void LoadPublic();															//加载公共资源
 		void LoadEffect();															//加载技能特效
-		void LoadTerrain();															//加载地形效果
 		void BackImage();															//背景图片处理
 		void TextureThreadCallBack(CCObject* pSender);								//图片异步加载回调
 
@@ -103,9 +100,7 @@ namespace BattleSpace
 		int									m_publicNum;						//公共资源
 		int									m_totalNum;							//得到总行数
 		CCLabelTTF*							m_tip;
-		WarManager*							m_Manage;
 	private:
-		LoadSpineData*						m_LoadSpine;						//负责加载spine数据
 		bool								m_Release;							//当前状态
 		int									m_SceneType;						//跳转到哪一个场景
 		vector<LoadResourceInfo>			m_resVec;

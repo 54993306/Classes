@@ -19,6 +19,7 @@
 #include "Battle/MoveObject.h"
 #include "Battle/ActionNameDefine.h"
 #include "model/DataCenter.h"
+#include "Battle/RoleObjectMacro.h"
 
 namespace BattleSpace{
 	AliveObject::AliveObject()
@@ -39,6 +40,10 @@ namespace BattleSpace{
 		m_HpObject = nullptr;
 		m_NameLabel = nullptr;
 		m_Body = nullptr;
+		//CC_SAFE_RELEASE(m_Armature);
+		//m_Armature = nullptr;
+		//CC_SAFE_RELEASE(m_Skeleton);
+		//m_Skeleton = nullptr;
 	}
 
 	bool AliveObject::init()
@@ -232,18 +237,18 @@ namespace BattleSpace{
 		pAnimat->setShaderEffect(m_Armature->getShaderProgram());
 	}
 
-	void AliveObject::playerNum( int num,int type )
+	void AliveObject::playerNum( PlayHpType pType,int pNumber )
 	{
-		if (type == nullType)return;
-		if (!num&&type!=typeface)
+		if (pType == PlayHpType::nullType)return;
+		if (!pNumber&&pType!=PlayHpType::typeface)
 		{
 			CCLOG(" [ Tips ] AliveObject::playerNum Num = 0!");
 			return	;
 		}
-		m_HpObject->playChangeNumber(num,type);
+		m_HpObject->playChangeNumber(pNumber,pType);
 		if (mRole->getMonsterSpecies() == sMonsterSpecies::eWorldBoss)														//boss的情况处理应该在血量条的内部,自己进行。
 			NOTIFICATION->postNotification(B_WorldBoss_HurtUpdate,CCInteger::create(m_HpObject->getHpNumber()));	
-		if (type > gainType)
+		if (pType > PlayHpType::gainType)
 			lostHpDispose();
 	}
 

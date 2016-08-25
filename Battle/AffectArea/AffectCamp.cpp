@@ -23,8 +23,8 @@ namespace BattleSpace
 
 	void AffectEnemy::initArea(AreaCountInfo& pInfo)
 	{
-		for ( auto tAlive:*pInfo.getAlive()->getCurrSkillTargets() )
-			pInfo.addGrid(tAlive->getGridIndex());
+		for ( auto tRole:pInfo.getAlive()->getCurrSkillTargets() )
+			pInfo.addGrid(tRole->getGridIndex());
 		pInfo.excludeCaptain();
 	}
 

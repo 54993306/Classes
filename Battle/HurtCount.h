@@ -15,10 +15,12 @@
  *************************************************************/
 #include "cocos2d.h"
 #include "Battle/BattleResult.h"
-namespace BattleSpace{
+namespace BattleSpace
+{
 	class BaseRole;
 	class WarManager;
 	class BattleResult;
+	enum struct PlayHpType;
 	class HurtCount : public cocos2d::CCObject
 	{
 	public:
@@ -36,8 +38,7 @@ namespace BattleSpace{
 		int  critJudge(BaseRole* AtcTarget , BaseRole* HitTarget);				//暴击判断
 		float attributeHurt(BaseRole* AtcTarget);								//属性对技能伤害影响
 		float raceDispose(BaseRole* AtcTarget , BaseRole* HitTarget);			//属性伤害计算
-		int lostType(float race,int crit);
-		void BuffHandleLogic(BaseRole* pAlive);								//对每一个效果进行BUF逻辑处理
+		PlayHpType lostType(float race,int crit);
 		int ChangeLocation(BaseRole* AtcTarget , BaseRole* HitTarget);			//改变位置效果处理
 		void addHittingAlive(BaseRole* AtcTarget , BaseRole* HitTarget);
 		void woldBossHurt(BaseRole* pAlive,float pHurt);

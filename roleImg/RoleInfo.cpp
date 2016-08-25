@@ -19,8 +19,8 @@
 #include "common/CGameSound.h"
 #include "Resources.h"
 #include "bag/bagData.h"
-
-#define  FACEBOOKIMG "http://graph.facebook.com/%s/picture?width=106&height=106"
+#include "Global.h"
+#include "common/CommonFunction.h"
 
 CRoleInfo::CRoleInfo()
 {
@@ -157,7 +157,7 @@ void CRoleInfo::setRoleInfoVal(UserData *data)
 			CImageView *sp = CImageView::create(fbName.c_str());
 			if (sp)
 			{	
-				CImageView *spr = (CImageView*)maskedSprite(sp);		
+				CImageView *spr = MakeFaceBookHeadToCircle(sp);	
 				spr->setPosition(headbg->getPosition());
 				m_ui->removeChild(headImg);
 				spr->setId("headImg");
@@ -172,7 +172,7 @@ void CRoleInfo::setRoleInfoVal(UserData *data)
 // 		else
 // 		{
 // 			HttpLoadImage::getInstance()->bindUiTarget(this);
-// 			CCString *imgUrl = CCString::createWithFormat(FACEBOOKIMG,data->getFbId().c_str());
+// 			CCString *imgUrl = CCString::createWithFormat(FACEBOOKIMG_106,data->getFbId().c_str());
 // 			HttpLoadImage::getInstance()->requestUrlImage(imgUrl->getCString(),data->getFbId().c_str());
 // 		}
 	}
@@ -212,39 +212,11 @@ void CRoleInfo::imageLoadSuccessCallBack(string sTag, vector<char>* pBuffer)
 	fclose(fp);
 
 	CImageView *headImg = (CImageView*)(m_ui->findWidgetById("headImg"));
-	CCSprite *headSpr = maskedSprite(CCSprite::createWithTexture(texture));
+	CCSprite *headSpr = MakeFaceBookHeadToCircle(CCSprite::createWithTexture(texture));
 	headImg->setTexture(headSpr->getTexture());
 	headImg->setTextureRect(CCRectMake(0,0,105,105));
 	img->release();
 }
-
-CCSprite* CRoleInfo::maskedSprite(CCSprite *textureSprite)  
-{  
-	CCSprite * maskSprite = CCSprite::create("mainCity/tencil.png");  
-	CCRenderTexture * renderTexture = CCRenderTexture::create(maskSprite->getContentSize().width, maskSprite->getContentSize().height);  
-
-	maskSprite->setPosition(ccp(maskSprite->getContentSize().width / 2, maskSprite->getContentSize().height / 2));  
-	textureSprite->setPosition(ccp(textureSprite->getContentSize().width / 2, textureSprite->getContentSize().height / 2));  
-
-	ccBlendFunc bfun1;
-	bfun1.src = GL_ONE;
-	bfun1.dst = GL_ZERO;
-	maskSprite->setBlendFunc(bfun1);  
-	ccBlendFunc bfun2;
-	bfun2.src = GL_DST_ALPHA;
-	bfun2.dst = GL_ZERO;
-	textureSprite->setBlendFunc(bfun2);  
-
-	renderTexture->begin();  
-	maskSprite->visit();  
-	textureSprite->visit();  
-	renderTexture->end();  
-
-	CImageView * retval = CImageView::createWithTexture(renderTexture->getSprite()->getTexture());  
-	retval->setFlipY(true);  
-
-	return retval;  
-}  
 
 void CRoleInfo::updateActionTime(float dt)
 {
@@ -308,7 +280,7 @@ void CRoleInfo::updateRoleProperty()
 		bool isFileExist = CCFileUtils::sharedFileUtils()->isFileExist(fullName);
 		if(isFileExist)
 		{
-			CImageView *spr = (CImageView*)maskedSprite(CCSprite::create(fullName.c_str()));
+			CImageView *spr = MakeFaceBookHeadToCircle(CCSprite::create(fullName.c_str()));
 			spr->setPosition(headbg->getPosition());
 			m_ui->removeChild(headImg);
 			spr->setId("headImg");

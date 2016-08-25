@@ -35,10 +35,11 @@ const int		C_CallHero			= 4000;				//我方英雄召唤武将
 const int		C_CallMonst			= 5000;				//敌方召唤怪物
 
 const int		C_PVEStage			= 10;
-const int		C_PVEStopGrid		= 92;			
-const int		C_OtherCaptain		= 89;
-const int		C_PVPCol			= 23;
-const int		C_PVPMINGRID		= 88;
-const int		C_PVEOtherArea		= 107;
+const int		C_PVEStopGrid		= 68;			
+const int		C_OtherCaptain		= 65;
+const int		C_PVPCol			= 17;
+const int		C_PVPMINGRID		= 64;
+const int		C_PVEOtherArea		= 83;
 
+const int		C_TrapSpace			= 1;				//地形1S触发一次效果
 #endif

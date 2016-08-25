@@ -60,3 +60,11 @@ bool inline CheckGhost(int iNeed)
 	bool bAnswer = user->getRoleFood()>=iNeed;
 	return bAnswer;
 }
+
+//检查积分
+bool inline CheckRolePoint(int iNeed)
+{
+	UserData *user = DataCenter::sharedData()->getUser()->getUserData();
+	bool bAnswer = user->getRolePoints()>=iNeed;
+	return bAnswer;
+}

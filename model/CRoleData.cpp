@@ -82,6 +82,7 @@ CHero::CHero()
 	,own(false)
 	,iColor(0)
 	,evol(false)
+	,remove(true)
 {}
 
 void CSkill::readData(const protos::common::Skill &skill)

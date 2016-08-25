@@ -8,8 +8,10 @@ using namespace BattleSpace;
 //解析可移动格子文件
 void ParseBattleGrid( int pStage,vector<int> &pMoveGrids,vector<int> &pUndefinedGrids,vector<int> &pEnterArea,vector<int> &pOtherEnter )
 {
-	pUndefinedGrids.clear();
 	pMoveGrids.clear();
+	pUndefinedGrids.clear();
+	pEnterArea.clear();
+	pOtherEnter.clear();
 	unsigned long size = 0;
 	unsigned char *buff = CCFileUtils::sharedFileUtils()->getFileData("csv/MoveGrids.json","r",&size);
 	string data ((const char*)buff,size);

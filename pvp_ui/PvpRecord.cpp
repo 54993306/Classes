@@ -150,7 +150,7 @@ void CPvpRecord::addTableCell(unsigned int uIdx, CTableViewCell* pCell)
 
 	//复仇
 	CButton *pReven = (CButton *)lay->findWidgetById("play");
-	if(pRecord.record_id() > 0 &&  pData->getName() != recordDataRight.role_name() )
+	if(pRecord.record_id() > 0 &&  pData->getRoleID() != pRecord.record_id() )
 	{
 		pReven->setTag(uIdx);
 		pReven->setOnClickListener(this, ccw_click_selector(CPvpRecord::onReven));

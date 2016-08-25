@@ -18,34 +18,25 @@
 #include "Battle/RoleObject/RoleObject.h"
 #include "Battle/BattleCenter.h"
 #include "Battle/WarManager.h"
+#include "Battle/Config/ConfigManage.h"
 namespace BattleSpace
 {
 	BattleModel::BattleModel()
-	:mBattleType(sBattleType::eNormalBattle),mStrategyType(sPvEStrategy::eNull),mManage(nullptr)
+	:mBattleType(sBattleType::eNormalBattle),mStrategyType(sPvEStrategy::eNull)
 	{}
 
 	BattleModel::~BattleModel()
 	{}
-	//该战斗方法可以进行多方位的拓展处理
-	BattleModel* BattleModel::CreateBattleModel(sBattleType pBattleType)
-	{
-		BattleModel* pModel = new BattleModel();
-		if (pModel && pModel->init())
-		{
-			pModel->setBattleType(pBattleType);
-			pModel->autorelease();
-			return pModel;
-		}else{
-			delete pModel;
-			pModel = nullptr;
-			return nullptr;
-		}
-	}
 
 	bool BattleModel::init()
 	{
-		mManage = BattleManage;
 		return true;
+	}
+
+	void BattleModel::clearModelData()
+	{
+		mBattleType = sBattleType::eNormalBattle;
+		mStrategyType = sPvEStrategy::eNull;
 	}
 
 	bool BattleModel::isBattleType( sBattleType pType )
@@ -81,7 +72,7 @@ namespace BattleSpace
 	//PVE中我方武将的自动移动策略
 	bool BattleModel::heroMove( BaseRole* pRole )
 	{
-		if ( !isPvEBattle() || pRole->getCriAtk() )
+		if ( !isPvEBattle() || pRole->getCriAtk() || pRole->getCaptain())
 			return false;
 		if (pRole->getRoleObject()->getMoveState()  != sStateCode::eNullState || !pRole->getMove())
 			return true;
@@ -96,7 +87,7 @@ namespace BattleSpace
 		vector<BaseRole*> tAreaAlives = pRole->getAliveInArea(tDestinations);
 		if (tAreaAlives.size())
 			return false;
-		if ( mManage->inUnDefineArea( tNextGrid ) || tNextGrid < C_PVEStopGrid )
+		if ( BattleConfig->inUnDefineArea( tNextGrid ) || tNextGrid < C_PVEStopGrid )
 		{
 			return false;
 		}else{
@@ -109,7 +100,7 @@ namespace BattleSpace
 	bool BattleModel::layerMove()
 	{
 		if ( isPvEBattle() )
-			return false;
+			return true;
 		return true;
 	}
 
@@ -119,5 +110,4 @@ namespace BattleSpace
 			return false;
 		return true;
 	}
-
 }

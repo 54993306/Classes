@@ -21,9 +21,6 @@ void runEffect_ShakeY(CCNode *node, float range, float runTime, int times,CCCall
 
 //设置随机种子
 void srandNum();
-#define WinSize (CCDirector::sharedDirector()->getWinSize())
-#define MAP_MINX(mapData) WinSize.width / 2 - abs(( WinSize.width - (mapData)->getWidth() ) / 2)
-#define MAP_MAXX(mapData) WinSize.width / 2 + abs(WinSize.width / 2 - (mapData)->getWidth() / 2)
 
 //滤镜功能
 static void setEnableRecursiveCascading(CCNode* node, bool enable,ccColor3B color,GLubyte alpha)
@@ -125,3 +122,6 @@ void SmartSetRectPrizeColor(CCSprite* pSprite, const CPrize* pPrize, const Prize
 
 //核对日期是否到来
 bool CheckDay( const char *str );
+
+//裁切facebook头像为圆形
+CImageView *MakeFaceBookHeadToCircle(CCSprite *pSprite);

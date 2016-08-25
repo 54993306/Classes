@@ -78,7 +78,7 @@ private:
 	void onSwitchBtn(CCObject *pSender, bool bChecked);
 
 	//是否是章节最后一个关卡
-	bool isLasStageInChapter(const CStage& stage);
+	bool isLastStageInChapter(const CStage& stage);
 	void onFaceImg(CCObject* pSender);
 	
 	//弹提示框
@@ -87,7 +87,6 @@ private:
 private:
 	CLayout *m_ui;
 	CTableView *m_pageView;
-	CCSprite* m_pWarning;
 	//章节列表
 	vector<CChapter> m_chapterList[2];
 	//关卡列表

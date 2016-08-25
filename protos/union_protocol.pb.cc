@@ -37,9 +37,10 @@ void protobuf_AssignDesc_union_5fprotocol_2eproto() {
       "union_protocol.proto");
   GOOGLE_CHECK(file != NULL);
   UnionRequest_descriptor_ = file->message_type(0);
-  static const int UnionRequest_offsets_[2] = {
+  static const int UnionRequest_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UnionRequest, stageid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UnionRequest, boss_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UnionRequest, starstar_),
   };
   UnionRequest_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -107,14 +108,15 @@ void protobuf_AddDesc_union_5fprotocol_2eproto() {
   ::protos::common::protobuf_AddDesc_common_2fhero_5fcommon_2eproto();
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
     "\n\024union_protocol.proto\022\006protos\032\030common/h"
-    "ero_common.proto\"-\n\014UnionRequest\022\017\n\007stag"
-    "eId\030\001 \001(\005\022\014\n\004boss\030\002 \001(\010\"\303\001\n\rUnionRespons"
-    "e\022\"\n\005hero1\030\001 \001(\0132\023.protos.common.Hero\022\"\n"
-    "\005hero2\030\002 \001(\0132\023.protos.common.Hero\022\"\n\005her"
-    "o3\030\003 \001(\0132\023.protos.common.Hero\022\"\n\005hero4\030\004"
-    " \001(\0132\023.protos.common.Hero\022\"\n\005hero5\030\005 \001(\013"
-    "2\023.protos.common.HeroB1\n\036anvin.server.ga"
-    "meserver.protosB\rUnionProtocolH\001", 352);
+    "ero_common.proto\"\?\n\014UnionRequest\022\017\n\007stag"
+    "eId\030\001 \001(\005\022\014\n\004boss\030\002 \001(\010\022\020\n\010starStar\030\003 \001("
+    "\005\"\303\001\n\rUnionResponse\022\"\n\005hero1\030\001 \001(\0132\023.pro"
+    "tos.common.Hero\022\"\n\005hero2\030\002 \001(\0132\023.protos."
+    "common.Hero\022\"\n\005hero3\030\003 \001(\0132\023.protos.comm"
+    "on.Hero\022\"\n\005hero4\030\004 \001(\0132\023.protos.common.H"
+    "ero\022\"\n\005hero5\030\005 \001(\0132\023.protos.common.HeroB"
+    "0\n\035dass.server.gameserver.protosB\rUnionP"
+    "rotocolH\001", 369);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "union_protocol.proto", &protobuf_RegisterTypes);
   UnionRequest::default_instance_ = new UnionRequest();
@@ -136,6 +138,7 @@ struct StaticDescriptorInitializer_union_5fprotocol_2eproto {
 #ifndef _MSC_VER
 const int UnionRequest::kStageIdFieldNumber;
 const int UnionRequest::kBossFieldNumber;
+const int UnionRequest::kStarStarFieldNumber;
 #endif  // !_MSC_VER
 
 UnionRequest::UnionRequest()
@@ -156,6 +159,7 @@ void UnionRequest::SharedCtor() {
   _cached_size_ = 0;
   stageid_ = 0;
   boss_ = false;
+  starstar_ = 0;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -193,6 +197,7 @@ void UnionRequest::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     stageid_ = 0;
     boss_ = false;
+    starstar_ = 0;
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
@@ -231,6 +236,22 @@ bool UnionRequest::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(24)) goto parse_starStar;
+        break;
+      }
+
+      // optional int32 starStar = 3;
+      case 3: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_starStar:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &starstar_)));
+          set_has_starstar();
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -263,6 +284,11 @@ void UnionRequest::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteBool(2, this->boss(), output);
   }
 
+  // optional int32 starStar = 3;
+  if (has_starstar()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(3, this->starstar(), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -279,6 +305,11 @@ void UnionRequest::SerializeWithCachedSizes(
   // optional bool boss = 2;
   if (has_boss()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(2, this->boss(), target);
+  }
+
+  // optional int32 starStar = 3;
+  if (has_starstar()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(3, this->starstar(), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -302,6 +333,13 @@ int UnionRequest::ByteSize() const {
     // optional bool boss = 2;
     if (has_boss()) {
       total_size += 1 + 1;
+    }
+
+    // optional int32 starStar = 3;
+    if (has_starstar()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->starstar());
     }
 
   }
@@ -337,6 +375,9 @@ void UnionRequest::MergeFrom(const UnionRequest& from) {
     if (from.has_boss()) {
       set_boss(from.boss());
     }
+    if (from.has_starstar()) {
+      set_starstar(from.starstar());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -362,6 +403,7 @@ void UnionRequest::Swap(UnionRequest* other) {
   if (other != this) {
     std::swap(stageid_, other->stageid_);
     std::swap(boss_, other->boss_);
+    std::swap(starstar_, other->starstar_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

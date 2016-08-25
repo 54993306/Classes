@@ -442,7 +442,7 @@ void CSelectPvpArmy::onCombat(CCObject* pSender)
 	PlayEffectSound(SFX_430);
 
 	CButton *combat= (CButton *)pSender;
-	combat->setEnabled(false);
+	//combat->setEnabled(false);
 
 	vector<int> tMondels;
 	for (auto tHero :m_union.heroList)
@@ -1251,10 +1251,10 @@ bool CSelectPvpArmy::checkShowCaptain()
 
 void CSelectPvpArmy::willToBatthle( CCObject* pObj )
 {
-	CButton *combat= (CButton *)m_ui->findWidgetById("combat");
-	combat->stopAllActions();
-	//停止所有触摸事件
- 	CCDirector::sharedDirector()->getTouchDispatcher()->removeAllDelegates();
+	//CButton *combat= (CButton *)m_ui->findWidgetById("combat");
+	//combat->stopAllActions();
+	////停止所有触摸事件
+ //	CCDirector::sharedDirector()->getTouchDispatcher()->removeAllDelegates();
 }
 
 void CSelectPvpArmy::addOppTeamCell(unsigned int uIdx, CPageViewCell * pCell)

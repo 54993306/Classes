@@ -57,6 +57,9 @@ public:
 	void  showHelpTips( const char *str , bool bShowOkOnly);
 	void showHelpTipsClick( CCObject *pSender );
 
+	//清理存档
+	static void cleanDownloadPackageInfo();
+
 private:
 	void initDownloadDir();
 	void downloadVersionByIndex();

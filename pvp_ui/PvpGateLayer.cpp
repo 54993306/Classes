@@ -8,6 +8,10 @@
 #include "netcontrol/CPlayerControl.h"
 #include "mainCity/mainScene.h"
 #include "Global.h"
+#include "SDK/GamePlatfomDefine.h"
+#include "model/DataCenter.h"
+#include "SDK/FaceBookSDK.h"
+#include "common/CommonFunction.h"
 
 CPvpGateLayer::CPvpGateLayer():
 	m_ui(nullptr), m_pCloudyTranstion(nullptr),m_fogLay(nullptr),m_fogLay1(nullptr),m_fMiddleLayer(nullptr),m_iGateLevel(0),m_iRank(0),m_iRoleRank(0)
@@ -74,6 +78,9 @@ bool CPvpGateLayer::init()
 		//过渡云
 		initCloundyTranstion();
 
+		//大红蓝按钮
+		initBaseBuild();
+
 		m_ui->setScale(1.3f);
 
 		//箭头上下
@@ -82,6 +89,9 @@ bool CPvpGateLayer::init()
 			CCMoveBy::create(0.3f, ccp(0, 10)),
 			CCMoveBy::create(0.3f, ccp(0, -10))
 			)));
+
+		CLayout *pFacebookLayer = (CLayout *)m_ui->findWidgetById("layer_facebook");
+		pFacebookLayer->setVisible(false);
 
 		return true;
 	}
@@ -131,6 +141,8 @@ void CPvpGateLayer::setGateLevel( int iRank )
 		m_iRoleRank = 6;
 	}
 
+	//m_iGateLevel = (int(CCRANDOM_0_1()*100))%3+1;
+
 	//建筑
 	initBuilding();
 }
@@ -173,11 +185,15 @@ void CPvpGateLayer::relocation( CCNode* pSender )
 void CPvpGateLayer::onEnter()
 {
 	BaseLayer::onEnter();
+
+	GetTcpNet->registerMsgHandler(PvpCityDataMsg, this, CMsgHandler_selector(CPvpGateLayer::processNetMsg));
 }
 
 void CPvpGateLayer::onExit()
 {
 	BaseLayer::onExit();
+
+	GetTcpNet->unRegisterAllMsgHandler(this);
 }
 
 void CPvpGateLayer::onClose( CCObject* pSender )
@@ -285,60 +301,69 @@ void CPvpGateLayer::hideCloundyTranstion()
 
 void CPvpGateLayer::initBuilding()
 {
-	//塔
-	{
-		SkeletonAnimation *pSkeletonAnimation = SkeletonAnimation::createWithFile("pvp/gate/zhongjian.json", "pvp/gate/zhongjian.atlas", 1);
-		pSkeletonAnimation->setPosition(ccp(DESIGN_WIDTH/2, 0));
-		pSkeletonAnimation->setAnimation(0, "stand", true);
-		m_fMiddleLayer->addChild(pSkeletonAnimation, 3);
-	}
-
-
 	//同步PVP
 	{
+		CCPoint pPosLeft[3] = {ccp(150, 50), ccp(137, 50), ccp(139, 50)};
+
 		SkeletonAnimation *pSkeletonAnimation = SkeletonAnimation::createWithFile(
 			CCString::createWithFormat("pvp/gate/zuojian_%d.json", m_iGateLevel)->getCString(), 
 			CCString::createWithFormat("pvp/gate/zuojian_%d.atlas", m_iGateLevel)->getCString(), 
-			1);
-		pSkeletonAnimation->setPosition(ccp(180, 0));
+			0.9f);
+		pSkeletonAnimation->setPosition(pPosLeft[m_iGateLevel-1]);
 		pSkeletonAnimation->setAnimation(0, "stand", true);
 		m_fMiddleLayer->addChild(pSkeletonAnimation, 1);
-
-		//按钮
-		{
-			SkeletonAnimation *pSkeletonAnimation = SkeletonAnimation::createWithFile(
-				"pvp/gate/hong_pve.json", 
-				"pvp/gate/hong_pve.atlas", 
-				1);
-			pSkeletonAnimation->setPosition(ccp(303, 351));
-			pSkeletonAnimation->setAnimation(0, "stand", true);
-			m_fMiddleLayer->addChild(pSkeletonAnimation, 2);
-		}
 	}
 
 	//异步PVP
 	{
+		CCPoint pPosRight[3] = {ccp(950, 50), ccp(970, -5), ccp(970, -10)};
+
 		SkeletonAnimation *pSkeletonAnimation = SkeletonAnimation::createWithFile(
 			CCString::createWithFormat("pvp/gate/youjian_%d.json", m_iGateLevel)->getCString(), 
 			CCString::createWithFormat("pvp/gate/youjian_%d.atlas", m_iGateLevel)->getCString(), 
-			1);
-		pSkeletonAnimation->setPosition(ccp(900, 0));
+			0.9f);
+		pSkeletonAnimation->setPosition(pPosRight[m_iGateLevel-1]);
 		pSkeletonAnimation->setAnimation(0, "stand", true);
 		m_fMiddleLayer->addChild(pSkeletonAnimation, 2);
-
-		//按钮
-		{
-			SkeletonAnimation *pSkeletonAnimation = SkeletonAnimation::createWithFile(
-				"pvp/gate/lan_pvp.json", 
-				"pvp/gate/lan_pvp.atlas", 
-				1);
-			pSkeletonAnimation->setPosition(ccp(895, 331));
-			pSkeletonAnimation->setAnimation(0, "stand", true);
-			m_fMiddleLayer->addChild(pSkeletonAnimation, 2);
-		}
 	}
 
 }
+
+
+void CPvpGateLayer::initBaseBuild()
+{
+	//按钮
+	{
+		SkeletonAnimation *pSkeletonAnimation = SkeletonAnimation::createWithFile(
+			"pvp/gate/hong_pve.json", 
+			"pvp/gate/hong_pve.atlas", 
+			0.9f);
+		pSkeletonAnimation->setPosition(ccp(263, 351));
+		pSkeletonAnimation->setAnimation(0, "stand", true);
+		m_fMiddleLayer->addChild(pSkeletonAnimation, 4);
+	}
+
+	//按钮
+	{
+		SkeletonAnimation *pSkeletonAnimation = SkeletonAnimation::createWithFile(
+			"pvp/gate/lan_pvp.json", 
+			"pvp/gate/lan_pvp.atlas", 
+			0.9f);
+		pSkeletonAnimation->setPosition(ccp(955, 311));
+		pSkeletonAnimation->setAnimation(0, "stand", true);
+		m_fMiddleLayer->addChild(pSkeletonAnimation, 4);
+	}
+
+	//塔
+	{
+		SkeletonAnimation *pSkeletonAnimation = SkeletonAnimation::createWithFile("pvp/gate/zhongjian.json", "pvp/gate/zhongjian.atlas", 0.87f);
+		pSkeletonAnimation->setPosition(ccp(DESIGN_WIDTH/2, 80));
+		pSkeletonAnimation->setAnimation(0, "stand", true);
+		m_fMiddleLayer->addChild(pSkeletonAnimation, 3);
+	}
+}
+
+
 
 void CPvpGateLayer::showBuilding()
 {
@@ -347,7 +372,7 @@ void CPvpGateLayer::showBuilding()
 		CCSequence::create(
 		CCDelayTime::create(0.5f), 
 		CCScaleTo::create(1.2f, 1.0f),
-		CCCallFunc::create(this, callfunc_selector(CPvpGateLayer::showAllDownLayer)),
+		CCCallFunc::create(this, callfunc_selector(CPvpGateLayer::showAllUILayer)),
 		nullptr
 		));
 }
@@ -414,12 +439,14 @@ bool CPvpGateLayer::ccTouchBegan( CCTouch *pTouch, CCEvent *pEvent )
 	return true;
 }
 
-void CPvpGateLayer::showAllDownLayer()
+void CPvpGateLayer::showAllUILayer()
 {
 	CLayout *pDownLayer1 = (CLayout *)m_ui->findWidgetById("down_1");
 	showUI(pDownLayer1);
 	CLayout *pDownLayer3 = (CLayout *)m_ui->findWidgetById("down_3");
 	pDownLayer3->setVisible(true);
+	CLayout *pFacebookLayer = (CLayout *)m_ui->findWidgetById("layer_facebook");
+	pFacebookLayer->setVisible(true);
 }
 
 void CPvpGateLayer::showUI( CLayout *pDownLayer )
@@ -462,7 +489,6 @@ void CPvpGateLayer::showUI( CLayout *pDownLayer )
 	if (pTitleTexture)
 	{
 		pTitle->setTexture(pTitleTexture);
-		pTitle->runAction(CCMoveBy::create(0.1f, ccp(pCupImage->isVisible()?0:50, 0)));
 	}
 	else
 	{
@@ -529,3 +555,101 @@ void CPvpGateLayer::showAsynPvp()
 	CPlayerControl::getInstance().askForPvpChallenge(false);
 }
 
+void CPvpGateLayer::initNumberOneInfo( const Opponent &pOpponent )
+{
+	//头像，名字
+	CLabel *name = (CLabel*)(m_ui->findWidgetById("name"));
+	name->setString(pOpponent.role_name().c_str());
+
+	CCSprite *headbg = (CCSprite*)(m_ui->findWidgetById("headbg"));
+	CImageView *headImg = (CImageView*)(m_ui->findWidgetById("headImg"));
+	int iThumb = pOpponent.role_thumb();
+	if (iThumb>0)
+	{
+		CCTexture2D *texture = CCTextureCache::sharedTextureCache()
+			->addImage(CCString::createWithFormat("headIcon/%d.png", iThumb)->getCString());
+		if (texture)
+		{
+			headImg->setTexture(texture);
+		}
+		headImg->setFlipY(false);
+
+	}
+	else
+	{
+		string fbName = /*CCFileUtils::sharedFileUtils()->getWritablePath()+*//*"download/fbImg/"+*/pOpponent.fb_id()+".jpg";
+		string fullName = CCFileUtils::sharedFileUtils()->fullPathForFilename(fbName.c_str());
+		bool isFileExist = CCFileUtils::sharedFileUtils()->isFileExist(fullName);
+
+		if(isFileExist)
+		{
+			CImageView *sp = CImageView::create(fbName.c_str());
+			if (sp)
+			{	
+				CCNode *pParent = headImg->getParent();
+				CImageView *spr = MakeFaceBookHeadToCircle(sp);		
+				spr->setPosition(headbg->getPosition());
+				headImg->removeFromParentAndCleanup(true);
+				spr->setId("headImg");
+				pParent->addChild(spr);
+			}
+			else
+			{
+				CCLOGERROR("%s error", fullName.c_str());
+			}
+
+		}
+		// 		else
+		// 		{
+		// 			HttpLoadImage::getInstance()->bindUiTarget(this);
+		// 			CCString *imgUrl = CCString::createWithFormat(FACEBOOKIMG_106,data->getFbId().c_str());
+		// 			HttpLoadImage::getInstance()->requestUrlImage(imgUrl->getCString(),data->getFbId().c_str());
+		// 		}
+	}
+}
+
+void CPvpGateLayer::initFacebookShareBtn( int myRank )
+{
+	//分享按钮, 只有第一名分享
+	CButton* pBtn = (CButton*)m_ui->findWidgetById("fbBtn");
+	if (myRank == 1)
+	{
+		pBtn->setVisible(true);
+		pBtn->setOnClickListener(this, ccw_click_selector(CPvpGateLayer::shareToFaceBook));
+	}
+	else
+	{
+		pBtn->setVisible(false);
+	}
+}
+
+void CPvpGateLayer::processNetMsg( int type, google::protobuf::Message *msg )
+{
+	if (type != PvpCityDataMsg)
+	{
+		return;
+	}
+
+	PvpCityData *pPvpCityData = dynamic_cast<PvpCityData *>(msg);
+	if (!pPvpCityData)
+	{
+		return;
+	}
+
+	setGateLevel(pPvpCityData->my_pve_rank());
+
+	//NOTIFICATION->postNotification("CMainCityBuild::showPvpActionToSky");
+
+#ifdef FACEBOOKSHARE
+	initNumberOneInfo(pPvpCityData->pve_champion());
+	initFacebookShareBtn(pPvpCityData->my_pve_rank());
+#endif
+}
+
+void CPvpGateLayer::shareToFaceBook( CCObject *pSender )
+{
+	const ShareData *data = DataCenter::sharedData()->getShareData()->getCfg(11);
+	CCString *strDesc = CCString::createWithFormat(data->desc.c_str(), m_iRank);
+	CCString *strUrl = CCString::createWithFormat(data->url.c_str(), m_iRank);
+	FaceBookSDK::sharedInstance()->onShareToFb(strDesc->getCString(), strUrl->getCString());
+}

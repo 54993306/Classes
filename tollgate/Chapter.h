@@ -36,6 +36,10 @@ struct CStageInfoRes
 	vector<CMonster> monstList;
 	vector<CPrize>  prizeList;
 	int action;
+	bool bHasStar;
+	StageStar pStageStar1;
+	StageStar pStageStar2;
+	StageStar pStageStar3;
 	void read(const StageInfoRes& info);
 };
 

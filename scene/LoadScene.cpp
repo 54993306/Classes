@@ -112,7 +112,7 @@ namespace BattleSpace
 		++mCurrIndex;
 		float tPercent = mCurrIndex*100.0f/(tFile->getRowNum() + 20);			//20是跑空帧
 		mProgress->setValue(tPercent);		//进度条
-		m_pZombieSprite->setPositionX(mProgress->getPositionX()+mProgress->getContentSize().width*tPercent/100-5);		//僵尸位置
+		m_pZombieSprite->setPositionX(mProgress->getPositionX()+mProgress->getContentSize().width*(tPercent>100?100.0f:tPercent)/100-5);		//僵尸位置
 		if (tPercent >= 100)
 			loadResouceEnd();
 	}

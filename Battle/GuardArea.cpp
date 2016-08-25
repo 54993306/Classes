@@ -47,7 +47,7 @@ namespace BattleSpace{
 
 	bool GuardArea::hasTarget( BaseRole* pRole,int pGrid )
 	{
-		for (auto tRole:*pRole->getCurrSkillTargets())
+		for (auto tRole:pRole->getCurrSkillTargets())
 		{
 			if (tRole->inStandGrid(pGrid))
 			{
@@ -104,8 +104,12 @@ namespace BattleSpace{
 	{
 		if (pAlive->getTouchState())
 		{
+			if (pAlive->mTouchGrids.empty())
+				return;
 			pVector.assign(pAlive->mTouchGrids.begin(),pAlive->mTouchGrids.end());
 		}else{
+			if (pAlive->mStandGrids.empty())
+				return;
 			pVector.assign(pAlive->mStandGrids.begin(),pAlive->mStandGrids.end());
 		}
 	}

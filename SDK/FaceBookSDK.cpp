@@ -187,9 +187,12 @@ extern "C"
 	 //com_sdk_THFaceBook
 	JNIEXPORT void JNICALL Java_com_sdk_THFaceBook_userinfoCallback(JNIEnv* env, jobject thiz, jstring resultText) 
 	{
+		CCLOG("Java_com_sdk_THFaceBook_userinfoCallback_1");
+
 		const char* psText = env->GetStringUTFChars(resultText, NULL);
 		if(target_userinfo && callback_userinfo)
 		{
+			CCLOG("Java_com_sdk_THFaceBook_userinfoCallback_2");
 			CCDirector::sharedDirector()->getRunningScene()->runAction(CCCallFuncO::create(target_userinfo,callback_userinfo,CCString::create(psText)));
 			//(target_userinfo->*callback_userinfo)(CCString::create(psText));
 		}

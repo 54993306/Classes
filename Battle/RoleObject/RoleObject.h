@@ -15,15 +15,15 @@
  *
  *************************************************************/
 #include "Battle/RoleObject/AliveObject.h"
-class ArmatureEventData;
 
-namespace BattleSpace{
+namespace BattleSpace
+{
 	class BaseRole;
-	class SpecialEffectInfo;
 	class EffectData;
 	class WarControl;
-	class WarMapData;
-	class WarManager;
+	class SpecialEffectInfo;
+	class ArmatureEventData;
+
 	enum struct eActionEvent
 	{
 		eBeginEvevt					=0,//攻击开始
@@ -65,6 +65,7 @@ namespace BattleSpace{
 		float getMoveTime();
 		void initMoveObject(CCNode* pMoveParent);
 		void setActMoveGrid(int pGird);
+		void setMoveByPath();
 		CC_SYNTHESIZE(bool,m_Reset,Reset);						//武将是否置空过(引导重置用)
 		inline bool getFirstBattle(){return mFirstBattle;}
 	private:
@@ -82,8 +83,6 @@ namespace BattleSpace{
 		void setSpineEffectAction();
 	private:
 		bool mFirstBattle;
-		WarMapData* m_MapData;
-		WarManager* m_Manage;
 		int m_lastFrame;
 		ArmatureEventData* m_armatureEventData;
 	};

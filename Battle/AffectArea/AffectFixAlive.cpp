@@ -24,15 +24,15 @@ namespace BattleSpace
 
 	void AffectAnyAlive::initArea(AreaCountInfo& pInfo)
 	{
-		vector<BaseRole*>* tAlives = pInfo.getAlive()->getCurrSkillTargets();
-		int tRange = min((int)tAlives->size(),pInfo.getAreaRange());		// num < val 表示武将不足	
+		vector<BaseRole*> tAlives = pInfo.getAlive()->getCurrSkillTargets();
+		int tRange = min((int)tAlives.size(),pInfo.getAreaRange());		// num < val 表示武将不足	
 		int tLoopNumberMax = 200;
 		for (int tLoopNum = 0;tLoopNum < tLoopNumberMax;tLoopNum++)
 		{
-			int tIndex = CCRANDOM_0_1() *(tAlives->size() - 1);						//随机数的范围 num > j >= 0 
-			BaseRole* tAlive = tAlives->at(tIndex);
+			int tIndex = CCRANDOM_0_1() *(tAlives.size() - 1);						//随机数的范围 num > j >= 0 
+			BaseRole* tAlive = tAlives.at(tIndex);
 			if (tAlive->getCaptain())												//随机得到几个有人的位置,不包含主帅
-				if (tAlives->size() == 1)											//只有敌方主帅一人的情况
+				if (tAlives.size() == 1)											//只有敌方主帅一人的情况
 					return;
 				else
 					continue;

@@ -19,6 +19,10 @@ public:
 	void setUnionList(vector<CUnion> unionList);
 	void setStagId(int stageId, int questId=0);
 	CC_SYNTHESIZE(int, m_WorldBoss,WordBoss);					//世界boss
+
+	CC_SYNTHESIZE( int, m_iStarLevel, StarLevel );
+	CC_SYNTHESIZE( int, m_iHeroTypeNeed, HeroTypeNeed );
+	CC_SYNTHESIZE( int, m_iLimitHeroNum, LimitHeroNum )
 protected:
 	void onClose(CCObject* pSender);
 	void onCombat(CCObject* pSender);
@@ -38,12 +42,13 @@ protected:
 	bool  findIsSelect(CHero * hero);
 
 	void showSelectRadioImg(int selIndex);
-	void onSelectHero(CCObject *pSender);
+	void onSelectHero(CCObject *pSender);																			//上阵英雄
 	CCObject* gridviewDataSource(CCObject* pConvertCell, unsigned int uIdx);
 	void processMessage(int type, google::protobuf::Message *msg);
-	void onClearHero(CCObject* pSender);
+	void onClearHero(CCObject* pSender);																				//下阵英雄
 	void updateCost();
 	void addHeroSelectCell(unsigned int uIdx, CGridViewCell* pCell);
+	void lockedTile( CCObject *pSender );
 
 private:
 	void initAction();
@@ -55,6 +60,11 @@ private:
 	void showCaptainActionCallBack();
 	bool checkShowCaptain();
 	void willToBatthle(CCObject* pObj);
+
+	void setUIWithHeroTypeNeed();		//检查是否有英雄属性需求
+
+	int heroNum();			//上阵英雄数量
+
 private:
 	CLayout *m_ui;
 	int  m_selectHero;

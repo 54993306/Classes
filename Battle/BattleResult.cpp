@@ -1,11 +1,13 @@
 #include "BattleResult.h"
 #include "model/DataCenter.h"
 #include "Battle/WarManager.h"
-namespace BattleSpace{
+#include "Battle/RoleObjectMacro.h"
+namespace BattleSpace
+{
 
-	STR_LostHp::STR_LostHp():hitType(0),hitNum(0),anger(0)
+	STR_LostHp::STR_LostHp():hitType(PlayHpType::nullType),hitNum(0),anger(0)
 	{}
-	BattleResult::BattleResult():m_alive(nullptr),m_usType(0),m_usNum(0)
+	BattleResult::BattleResult():m_alive(nullptr),m_usType(PlayHpType::nullType),m_usNum(0)
 	{}
 
 	BattleResult::~BattleResult()

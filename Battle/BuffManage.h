@@ -1,8 +1,5 @@
 ﻿#ifndef _BUFF_MANAGER_H_
 #define _BUFF_MANAGER_H_
-#include "AppUI.h"
-#include <map>
-
 /************************************************************* 
  *
  *
@@ -16,8 +13,12 @@
  *
  *
  *************************************************************/
+#include "cocos2d.h"
+#include <map>
 using namespace std;
-namespace BattleSpace{
+using namespace cocos2d;
+namespace BattleSpace
+{
 	class BaseRole;
 	class BuffData;
 	class BuffInfo;
@@ -30,14 +31,14 @@ namespace BattleSpace{
 		BuffManage();
 		virtual ~BuffManage();
 		CREATE_FUNC(BuffManage);
-		CC_SYNTHESIZE(BaseRole*,m_alive,Alive);
+		CC_SYNTHESIZE(BaseRole*,mRole,Alive);
 		void Buffclear();
 		void clearDbuf();											//清除减益buf
 		BuffInfo* getbuff(int bufID);
 		BuffInfo* getbuffbyType(int buftype);
 		void removeBuf(int id);
-		void AddBuff(BuffData& buf);							//将buff对象添加到武将身上
-		bool AddBuffLogic(BuffData& buff);						//buf替换添加逻辑
+		void AddBuff(const BuffData* pData);							//将buff对象添加到武将身上
+		bool AddBuffLogic(const BuffData* pData);						//buf替换添加逻辑
 		void upDateBuff(float dt);
 		BuffMap* getBuffMap(){return &m_BuffMap;}
 		vector<CCNode*>* getVecEffect(int buffid);					//判断是否已经存在效果数组

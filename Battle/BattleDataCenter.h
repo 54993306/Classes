@@ -25,12 +25,14 @@ namespace protos{
 	namespace common{
 		class Monster;
 		class Hero;
+		class Trap;
 	}
 }
 using namespace std;
 #define BattleData BattleSpace::BattleDataCenter::ShareBattleDataCenter()
 namespace BattleSpace
 {
+	class TrapData;
 	class HeroData;
 	class MonsterData;
 	class BaseRoleData;
@@ -49,16 +51,16 @@ namespace BattleSpace
 		const vector<MonsterData*>& getChildRoleDatas()const;
 		const vector<BaseRoleData*>& getRoleDatas()const;
 		const vector<HeroData*>& getPvPHeros() const;
+		const vector<TrapData*>& getTraps() const;
 		BaseRoleData* getChildRoleData(int pRoleID) const;
-	public:
-		BattleModel* getBattleModel();
 	private:
-		BattleModel* mBattleModel;
-	private:
+		void initRestData();
 		void initBaseRoleDataVector();
 		void initMonsterData(const protos::common::Monster* pData);
 		void initHeroData(const protos::common::Hero* pData,bool pPvPHero = false);
+		void initTrapData(const protos::common::Trap* pData);
 	private:
+		vector<TrapData*> mTrapVec;
 		vector<HeroData*> mHeroVec;
 		vector<HeroData*> mPvPHeros;
 		vector<MonsterData*>mMonsterVec;

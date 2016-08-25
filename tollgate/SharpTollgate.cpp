@@ -233,6 +233,7 @@ void CSharpTollgate::onBattle(CCObject* pSender)
 		BattleManage->setChapterCount(m_openChapter);
 
 		CTollgatePreview *preview = CTollgatePreview::create();
+		preview->setStar(stage->star);
 		preview->setIsLastStageInChapter(stage->id==m_stageList.at(m_stageList.size()-1).id&&stage->star<=0);
 		LayerManager::instance()->push(preview);
 		preview->setStage(stage->id, stage->name.c_str());

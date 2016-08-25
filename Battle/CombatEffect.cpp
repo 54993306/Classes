@@ -1,4 +1,4 @@
-﻿#include "CombatEffect.h"
+﻿#include "Battle/CombatEffect.h"
 #include "common/CommonFunction.h"
 #include "Battle/BattleLayer/BattleRoleLayer.h"
 #include "Battle/BufExp.h"
@@ -17,7 +17,7 @@
 #include "Battle/BattleScene/BattleScene.h"
 #include "Battle/BuffManage.h"
 #include "Battle/WarManager.h"
-#include "Battle/MapManager.h"
+#include "Battle/CoordsManage.h"
 #include "Battle/RoleObject/HPObject.h"
 #include "Battle/ComBatLogic.h"
 #include "Battle/CPlayerSkillData.h"
@@ -30,10 +30,13 @@
 #include "Battle/RoleSkill.h"
 #include "Battle/skEffectData.h"
 #include "Battle/BattleCenter.h"
+#include "Battle/SpineDataManage.h"
+#include "Battle/Config/ConfigManage.h"
 #include "model/DataCenter.h"
+#include "Battle/RoleObjectMacro.h"
 
-namespace BattleSpace{
-
+namespace BattleSpace
+{
 	CombatEffect::CombatEffect()
 		:m_Scene(nullptr),_armaturePlayerSkill(nullptr),_playerSkillData(nullptr),m_PlayerNum(0)
 		,mManage(nullptr)
@@ -102,7 +105,7 @@ namespace BattleSpace{
 	{
 		CCSize winSize = CCDirector::sharedDirector()->getWinSize();
 		m_Scene = scene;
-		SpData* data = mManage->getSpineData(ToString(9999));
+		SpineData* data = SpineManage->getSpineData(ToString(9999));
 		m_skeletonNode = SkeletonAnimation::createWithData(data->first);
 		m_skeletonNode->eventListener = std::bind(&CombatEffect::SpineActionEvent,this,std::placeholders::_1,std::placeholders::_2);
 		m_skeletonNode->endListener = std::bind(&CombatEffect::SpineActionEnd,this,std::placeholders::_1);
@@ -150,8 +153,8 @@ namespace BattleSpace{
 	void CombatEffect::continuousHurt()
 	{
 		float tAttackNum = CountAliveAtk();
-		vector<BaseRole*>* Vec = mManage->inBattleMonsters();
-		for (auto tRole : *Vec)
+		vector<BaseRole*> Vec = mManage->inBattleMonsters();
+		for (auto tRole : Vec)
 		{
 			RoleObject* tObject = tRole->getRoleObject();
 			if (tRole->getGridIndex() < C_BEGINGRID)
@@ -163,7 +166,7 @@ namespace BattleSpace{
 			if (lostNum <= 0)
 				lostNum = 1;
 			tRole->setHp(tRole->getHp()-lostNum);
-			tObject->playerNum(lostNum,generalType);	//受击武将播放血量变化
+			tObject->playerNum(PlayHpType::generalType,lostNum);	//受击武将播放血量变化
 		}
 	}
 	//公式：	攻击力=近战英雄攻击力总和*0.05+远程英雄攻击力总和*0.04+辅助英雄攻击力总和*0.1+肉盾英雄攻击力总和*0.08		
@@ -229,14 +232,9 @@ namespace BattleSpace{
 		BaseRole*alive = Result->getAlive();
 		RoleObject* aliveOb = alive->getRoleObject();
 		const skEffectData* efInfo = alive->getCurrEffect();									//状态性的数据	
-		EffectInfo* effectinfo = mManage->getEffData()->getEffectInfo(efInfo->getEffectID());	
-		if (!effectinfo)
-		{
-			effectinfo = mManage->getEffData()->getEffectInfo(10000021);
-			CCLOG("[ ERROR ] CombatEffect::BattleEffect EffectInfo NULL %d",efInfo->getEffectID());
-		}
-		if (Result->getusNum()&&Result->getusType())
-			aliveOb->playerNum(Result->getusNum(),Result->getusType());						//攻击武将播放血量变化(吸血类效果有时应该差时而非同步播放)
+		const EffectInfo* effectinfo = BattleConfig->getEffectInfo(efInfo->getEffectID());	
+		if (Result->getusNum()&&Result->getusType()!=PlayHpType::nullType)
+			aliveOb->playerNum(Result->getusType(),Result->getusNum());						//攻击武将播放血量变化(吸血类效果有时应该差时而非同步播放)
 		for(vector<unsigned int>::iterator iter = Result->m_HitTargets.begin();iter!=Result->m_HitTargets.end();++iter)
 		{
 			BaseRole* pAlive = Result->m_Alive_s[*iter];
@@ -249,7 +247,6 @@ namespace BattleSpace{
 			SkillEffect->setShaderEffect(aliveOb->getArmature()->getShaderProgram());
 			//       
 			EffectObject* FloorEffect = EffectObject::create(ToString(effectinfo->getFloorEf()));	//受击目标播放受击特效
-			WarMapData* map = ManageCenter->getMap()->getCurrWarMap();
 			CCPoint p = pAlive->getRoleObject()->getPosition();
 			CCPoint wp = m_Scene->getBattleRoleLayer()->convertToWorldSpace(p);
 			CCPoint mp = m_Scene->getBattleMapLayer()->convertToNodeSpace(wp);
@@ -266,7 +263,7 @@ namespace BattleSpace{
 				if (!alive->getOtherCamp())
 					NOTIFICATION->postNotification(B_ContinuousNumber);			//刷新连击处理
 			}
-			pAliveOb->playerNum(Result->m_LostHp[*iter].hitNum,Result->m_LostHp[*iter].hitType);	
+			pAliveOb->playerNum((PlayHpType)Result->m_LostHp[*iter].hitType,Result->m_LostHp[*iter].hitNum);	
 
 			if (Result->m_Repel[*iter] != pAlive->getGridIndex())
 			{
@@ -282,12 +279,7 @@ namespace BattleSpace{
 		BaseRole*tBaseRole = Result->getAlive();
 		RoleObject* tRoleObject = tBaseRole->getRoleObject();
 		const skEffectData* efInfo = tBaseRole->getCurrEffect();
-		EffectInfo* effectinfo = mManage->getEffData()->getEffectInfo(efInfo->getEffectID());
-		if (!effectinfo)
-		{
-			CCLOG("[ *ERROR ] CombatEffect::AttackNull");
-			return;
-		}
+		const EffectInfo* effectinfo = BattleConfig->getEffectInfo(efInfo->getEffectID());
 		if (!Result->m_HitTargets.size())							//未打中目标播放受击音效
 		{
 			tRoleObject->setEffectMusic(effectinfo->getfoeMusicId());
@@ -315,7 +307,6 @@ namespace BattleSpace{
 		CCNode* MoveLayer = m_Scene->getMoveLayer();
 		CCPoint p = MoveLayer->getPosition();
 		CCPoint p1 = aliveOb->getParent()->convertToWorldSpace(aliveOb->getPosition());
-		WarMapData* m_map = ManageCenter->getMap()->getCurrWarMap();
 		//敌方大技能特效
 		if (alive->getEnemy())
 		{
@@ -336,8 +327,8 @@ namespace BattleSpace{
 				offs_x = CCDirector::sharedDirector()->getWinSize().width - offs_x;
 			int move_x = p1.x-offs_x;					//目标点和显示点之间偏移量
 			int newX = p.x-move_x;						//父节点如何移动才能显示目标点
-			if( newX < MAP_MINX(m_map) )
-				newX = MAP_MINX(m_map);
+			if( newX < BattleCoords->CoordsMin() )
+				newX = BattleCoords->CoordsMin();
 			if (newX > 0)newX = 0;
 			CCMoveTo* moveTo = CCMoveTo::create(0.2f,ccp(newX,MoveLayer->getPositionY()));
 			if (mManage->getNormal())																//非普通关卡技能不移动位置

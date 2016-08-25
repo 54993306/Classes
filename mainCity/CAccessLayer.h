@@ -9,6 +9,7 @@
 
 #include "AppUI.h"
 #include "scene/layer/LayerManager.h"
+#include "protos/protocol.h"
 
 USING_NS_CC;
 
@@ -17,6 +18,7 @@ enum AccessType
 {
 	AccessTypeSign = 1,
 	AccessExchange,
+	AccessLuckyWheel,
 	AccessTypeMax,
 	
 };
@@ -41,6 +43,8 @@ private:
 	void callBackForChecActionkEnd();
 
 	void updateForScale9Mask(float dt);
+
+	void ProcessMsg(int type, google::protobuf::Message *msg);
 
 private:
 	CLayout *m_ui;

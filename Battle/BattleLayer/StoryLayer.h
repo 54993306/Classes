@@ -28,7 +28,7 @@ namespace BattleSpace{
 		CREATE_FUNC(StoryLayer);
 		virtual bool init();
 		void hideJumpBtn();
-		bool LoadFile(int storytype, StoryData* pStoryData=nullptr);
+		bool LoadFile(int storytype, const StoryData* pStoryData=nullptr);
 		void CreateStory(CCObject* ob);
 		void CreateStoryWithStoryData(CCObject* ob, StoryData* pStoryData=nullptr);
 		CC_SYNTHESIZE(bool,m_isStory,isStory);						//当前是否为剧情状态

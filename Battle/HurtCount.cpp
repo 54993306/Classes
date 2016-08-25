@@ -25,6 +25,7 @@
 #include "Battle/BuffData.h"
 #include "Battle/skEffectData.h"
 #include "Battle/BattleTools.h"
+#include "Battle/RoleObjectMacro.h"
 namespace BattleSpace
 {
 	HurtCount::HurtCount():m_Manage(nullptr){}
@@ -84,7 +85,7 @@ namespace BattleSpace
 		Result->m_Alive_s[hitID] = HitAlive;
 		Result->m_LostHp[hitID] = hitNum(AtkAlive , HitAlive);			//伤害计算(血量、怒气值)
 		Result->m_CurrHp[hitID] = HitAlive->getHp();					//相对于传入伤害的血量
-		if (Result->m_LostHp[hitID].hitType != typeface)				//不是显示字体类型就可以判断击退
+		if (Result->m_LostHp[hitID].hitType != PlayHpType::typeface)				//不是显示字体类型就可以判断击退
 			Result->m_Repel[hitID] = ChangeLocation(AtkAlive,HitAlive);	//击退效果(直接改变武将逻辑值)
 		else
 			Result->m_Repel[hitID] = HitAlive->getGridIndex();
@@ -101,7 +102,7 @@ namespace BattleSpace
 		}else{
 			if(hitJudge(AtcTarget,HitTarget))
 			{
-				vec.hitType = typeface;
+				vec.hitType = PlayHpType::typeface;
 			}else{
 				vec = lostCount(AtcTarget,HitTarget);	
 				addHittingAlive(AtcTarget,HitTarget);
@@ -112,18 +113,18 @@ namespace BattleSpace
 
 	void HurtCount::addHittingAlive( BaseRole* AtcTarget , BaseRole* HitTarget )
 	{
-		if (AtcTarget->HittingAlive.size())
+		if (AtcTarget->mHittingAlive.size())
 		{
-			for (auto i : AtcTarget->HittingAlive)
+			for (auto i : AtcTarget->mHittingAlive)
 			{
 				if (i->getAliveID() == HitTarget->getAliveID())
 					return;	
 			}
-			AtcTarget->HittingAlive.push_back(HitTarget);
+			AtcTarget->mHittingAlive.push_back(HitTarget);
 		}else{
-			AtcTarget->HittingAlive.push_back(HitTarget);
+			AtcTarget->mHittingAlive.push_back(HitTarget);
 		}
-		VectorUnique(AtcTarget->HittingAlive);
+		VectorUnique(AtcTarget->mHittingAlive);
 	}
 
 	void HurtCount::woldBossHurt( BaseRole* pAlive,float pHurt )
@@ -176,7 +177,7 @@ namespace BattleSpace
 		float base_hp = CCRANDOM_0_1()*(hp_max-hp_min) + hp_min;		//浮动后的血量
 		//属性影响类型*属性影响频率*浮动值+真实伤害
 		addNum = base_hp + hurt;
-		str.hitType = gainType;											//加血只显示一种字体
+		str.hitType = PlayHpType::gainType;											//加血只显示一种字体
 		str.hitNum = HitTarget->getRenew()*effect->getDamageRate();		
 		if (HitTarget->getCallType() != sCallType::eUNAddHP)				//不可被加血类型武将
 			HitTarget->setHp(HitTarget->getHp() + str.hitNum);			//血量实际变化的位置
@@ -203,26 +204,26 @@ namespace BattleSpace
 		return 1;
 	}
 
-	int HurtCount::lostType(float race,int crit)
+	PlayHpType HurtCount::lostType(float race,int crit)
 	{
 		if (crit == 2)
 		{
 			if (race == 1)
 			{
-				return genralCritType;
+				return PlayHpType::genralCritType;
 			}else{
 				if (race > 1)
-					return addCritType;
-				return cutCritType;
+					return PlayHpType::addCritType;
+				return PlayHpType::cutCritType;
 			}
 		}else{
 			if (race == 1)
 			{
-				return generalType;
+				return PlayHpType::generalType;
 			}else{
 				if (race > 1)
-					return addType;
-				return cutType;
+					return PlayHpType::addType;
+				return PlayHpType::cutType;
 			}
 		}
 	}
@@ -238,31 +239,31 @@ namespace BattleSpace
 			{		
 				tRole->setHp(tRole->getHp() + effect->getImpactRate()*tLostHp*0.01f);
 				Result->setusNum(effect->getImpactRate()*tLostHp*0.01f);																
-				Result->setusType(gainType);
+				Result->setusType(PlayHpType::gainType);
 			}break;
 		case eEffectCountType::eBoom:			//自爆型效果
 			{
 				Result->setusNum(- effect->getImpactRate());											//爆炸中用于计算自身伤害的血量
-				Result->setusType(generalType);
+				Result->setusType(PlayHpType::generalType);
 				tRole->setHp(tRole->getHp() - effect->getImpactRate());
 			}break;
 		case eEffectCountType::eRateBlood:	//扣自己最大血量百分比型吸血技能,可加减血互换
 			{
 				tRole->setHp(tRole->getHp() - effect->getImpactNumber()*0.01f*tRole->getMaxHp()+effect->getImpactRate()*tLostHp*0.01f);		
 				Result->setusNum(effect->getImpactRate()*tLostHp*0.01f- effect->getImpactNumber()*0.01f*tRole->getMaxHp());																
-				Result->setusType(generalType);
+				Result->setusType(PlayHpType::generalType);
 			}break;
 		case eEffectCountType::eNumberBoold:
 			{
 				tRole->setHp(tRole->getHp() - effect->getImpactNumber()+effect->getImpactRate()*tLostHp*0.01f);	//扣自己数值血量型吸血技能,可加减血互换
 				Result->setusNum(effect->getImpactRate()*tLostHp*0.01f-effect->getImpactNumber());																
-				Result->setusType(generalType);
+				Result->setusType(PlayHpType::generalType);
 			}break;
 		case eEffectCountType::eCurrBooldRate:
 			{
 				tRole->setHp(tRole->getHp() - effect->getImpactNumber()*0.01f*tRole->getHp());		
 				Result->setusNum(effect->getImpactRate()*tLostHp*0.01f-effect->getImpactNumber()*0.01f*tRole->getMaxHp());																
-				Result->setusType(generalType);
+				Result->setusType(PlayHpType::generalType);
 			}break;
 		}
 	}
@@ -310,52 +311,11 @@ namespace BattleSpace
 			}break;
 		}
 	}
-	//只能计算最后一个效果添加在武将身上的buff
-	void HurtCount::BuffHandleLogic(BaseRole* pAlive)
-	{
-#if BATTLE_TEST
-		//return ;
-#endif
-		const skEffectData* tKillEffect = pAlive->getCurrEffect();
-		BuffManage* AtcbufManege = pAlive->getBuffManage();
-		for (auto tAlive : pAlive->HittingAlive)
-		{
-			if (tAlive->getHp()<=0 || !tAlive->getAliveState())
-				continue;
-			vector<BuffData*>::const_iterator tItre = tKillEffect->getBuffVector().begin();
-			for (;tItre != tKillEffect->getBuffVector().end();++tItre)
-			{
-				BuffData* buff = *tItre;
-				int ranNum = CCRANDOM_0_1()*100;
-				if (ranNum > buff->getTriggerRate()/*true*/)//每个buf都需要进行添加判断
-				{
-					//CCLOG("[ TIPS ]Buff Add Fail [BuffID= %d, userRate= %d, ranNum=%d]",buff.buffId,buff.useRate,ranNum);
-					continue;		
-				}
-				if (buff->getBuffTarget() == usTargetType)					//自己
-				{
-					//CCLOG("\nAtcTargetID = %d ,AddBuff ID: %d",AtcTarget->getAliveID(),buff.buffId);
-					if (buff->getTargetType()&&buff->getTargetType()!=pAlive->getBaseData()->getProperty())//判断buf的限定种族
-						continue;
-					AtcbufManege->AddBuff(*buff);
-				}else if (buff->getBuffTarget() == hitTargetType && tAlive)				//受击目标
-				{
-					BuffManage* HitbufManege = tAlive->getBuffManage();
-					if (buff->getTargetType()&&buff->getTargetType()!=tAlive->getBaseData()->getProperty())
-						continue;
-					//CCLOG("\nHitTargetID = %d ,AddBuff ID: %d",HitTarget->getAliveID(),buff.buffId);
-					HitbufManege->AddBuff(*buff);
-				}else{
-					CCLOG("[ ERROR ] buff.target can find bufid:%d ,aliveid:%d",buff->getBuffID(),pAlive->getAliveID());
-				}
-			}
-		}
-	}
 	//属性克制
 	float HurtCount::raceDispose(BaseRole* AtcTarget , BaseRole* HitTarget)
 	{
 		return 1;
-		sProperty hitType = (sProperty)HitTarget->getBaseData()->getProperty();
+		sRoleNature hitType = (sRoleNature)HitTarget->getBaseData()->getProperty();
 		return AtcTarget->getBaseData()->judgeAttribute(hitType);
 	}
 };

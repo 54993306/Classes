@@ -184,7 +184,7 @@ void LayerManager::updatePriority()
 		--index;
 	}
 }
-
+////////////////////////////////////////////////////////////////////////////////until
 void LayerManager::closeAll()
 {
 	do 

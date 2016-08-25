@@ -13,11 +13,15 @@
  *************************************************************/
 #include "Battle/BattleCenter.h"
 #include "Battle/WarManager.h"
-#include "Battle/MapManager.h"
-#include "Battle/Landform/TerrainManager.h"
+#include "Battle/CoordsManage.h"
+#include "Battle/Landform/TrapManage.h"
 #include "Battle/CHeroSoundData.h"
 #include "Battle/CombatGuideManage.h"
 #include "Battle/CHeroSoundData.h"
+#include "Battle/SpineDataManage.h"
+#include "Battle/Config/ConfigManage.h"
+#include "Battle/Landform/AreaManage.h"
+#include "Battle/BattleModel.h"
 
 namespace BattleSpace
 {
@@ -25,11 +29,10 @@ namespace BattleSpace
 
 	BattleCenter::ManageSingletonDestory BattleCenter::mDestory;
 
-	BattleCenter::BattleCenter():mMapManage(nullptr),mWarManage(nullptr),mTerrainManage(nullptr),
-	mGuideManage(nullptr),mRoleConfigData(nullptr)
-	{
-
-	}
+	BattleCenter::BattleCenter():mMapManage(nullptr),mWarManage(nullptr),mTrapManage(nullptr),
+	mGuideManage(nullptr),mRoleConfigData(nullptr),mSpineDataManage(nullptr),mConfigManage(nullptr),
+	mAreaManage(nullptr),mBattleModel(nullptr)
+	{}
 
 	BattleCenter::~BattleCenter()
 	{
@@ -51,13 +54,37 @@ namespace BattleSpace
 		mMapManage = nullptr;
 		CC_SAFE_RELEASE(mRoleConfigData);
 		mRoleConfigData = nullptr;
-		CC_SAFE_RELEASE(mTerrainManage);
-		mTerrainManage = nullptr;
+		CC_SAFE_RELEASE(mTrapManage);
+		mTrapManage = nullptr;
 		CC_SAFE_RELEASE(mGuideManage);
 		mGuideManage = nullptr;
+		CC_SAFE_RELEASE(mSpineDataManage);
+		mSpineDataManage = nullptr;
+		CC_SAFE_RELEASE(mConfigManage);
+		mConfigManage = nullptr;
+		CC_SAFE_RELEASE(mBattleModel);
+		mBattleModel = nullptr;
 	}
 
-	WarManager* BattleCenter::getWar()
+	void BattleCenter::clearBattleData()
+	{
+		if (mGuideManage)
+			mGuideManage->clearGuideData(true);
+		if (mWarManage)
+			mWarManage->BattleDataClear();
+		if (mSpineDataManage)
+			mSpineDataManage->ReleaseSpineData();
+		if (mTrapManage)
+			mTrapManage->clear();
+		if (mMapManage)
+			mMapManage->clearCoords();
+		if (mConfigManage)
+			mConfigManage->clearBattleConfig();
+		if (mBattleModel)
+			mBattleModel->clearModelData();
+	}
+
+	WarManager* BattleCenter::getWarManage()
 	{
 		if (mWarManage == nullptr)
 		{
@@ -67,21 +94,21 @@ namespace BattleSpace
 		return mWarManage;
 	}
 
-	TerrainManager* BattleCenter::getTer()
+	TrapManage* BattleCenter::getTrapManage()
 	{
-		if (mTerrainManage == nullptr)
+		if (mTrapManage == nullptr)
 		{
-			mTerrainManage = TerrainManager::create();
-			mTerrainManage->retain();
+			mTrapManage = TrapManage::create();
+			mTrapManage->retain();
 		}
-		return mTerrainManage;
+		return mTrapManage;
 	}
-
-	MapManager* BattleCenter::getMap()
+	//角色数据管理中心更合适
+	CoordsManage* BattleCenter::getCoordsManage()
 	{
 		if (mMapManage == nullptr)
 		{
-			mMapManage = MapManager::create();
+			mMapManage = CoordsManage::create();
 			mMapManage->retain();
 		}
 		return mMapManage;
@@ -105,6 +132,46 @@ namespace BattleSpace
 			mRoleConfigData->retain();
 		}
 		return mRoleConfigData;
+	}
+
+	SpineDataManage* BattleCenter::getSpineManage()
+	{
+		if (mSpineDataManage == nullptr)
+		{
+			mSpineDataManage = SpineDataManage::create();
+			mSpineDataManage->retain();
+		}
+		return mSpineDataManage;
+	}
+
+	ConfigManage* BattleCenter::getConfigManage()
+	{
+		if (mConfigManage == nullptr)
+		{
+			mConfigManage = ConfigManage::create();
+			mConfigManage->retain();
+		}
+		return mConfigManage;
+	}
+
+	AreaManage* BattleCenter::getAreaManage()
+	{
+		if (mAreaManage == nullptr)
+		{
+			mAreaManage = AreaManage::create();
+			mAreaManage->retain();
+		}
+		return mAreaManage;
+	}
+
+	BattleModel* BattleCenter::getBattleModel()
+	{
+		if (mBattleModel == nullptr)
+		{
+			mBattleModel = BattleModel::create();
+			mBattleModel->retain();
+		}
+		return mBattleModel;
 	}
 
 }

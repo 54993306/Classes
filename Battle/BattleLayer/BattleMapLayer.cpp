@@ -12,7 +12,7 @@
 #include "Battle/EffectObject.h"
 #include "tools/CCShake.h"
 #include "Battle/WarManager.h"
-#include "Battle/MapManager.h"
+#include "Battle/CoordsManage.h"
 #include "Battle/MapEffect.h"
 #include "Battle/ParseFileData.h"
 #include "tools/ShowTexttip.h"
@@ -22,6 +22,7 @@
 #include "Battle/skEffectData.h"
 #include "Battle/BattleDataCenter.h"
 #include "Battle/BattleModel.h"
+#include "Battle/Config/ConfigManage.h"
 namespace BattleSpace{
 
 #define AddMoveImg		"lv.png"
@@ -110,21 +111,19 @@ namespace BattleSpace{
 
 	void BattleMapLayer::createBackImage()
 	{
-		WarMapData* map = ManageCenter->getMap()->getCurrWarMap();
-		if (!map) return;
 #if BATTLE_TEST
-		for(int i = 0; i < C_GRID_ROW * C_GRID_COL;++i)
+		for(int tGrid = 0; tGrid < C_GRID_ROW * C_GRID_COL;++tGrid)
 #else
-		for(int i = C_BEGINGRID; i < C_GRID_ROW * C_GRID_COL;++i)
+		for(int tGrid = C_BEGINGRID; tGrid < C_GRID_ROW * C_GRID_COL;++tGrid)
 #endif
 		{
-			const CCPoint p = map->getPoint(i);		//画战场格子
+			const CCPoint p = BattleCoords->getPoint(tGrid);		//画战场格子
 #if BATTLE_TEST	
-			CCLabelTTF* floorID = CCLabelTTF::create(ToString(i),"SimHei",50);
+			CCLabelTTF* floorID = CCLabelTTF::create(ToString(tGrid),"SimHei",50);
 			floorID->setPosition(ccp(p.x,p.y));
 			m_GridIndex->addChild(floorID);
-			int rowID = i%C_GRID_ROW;
-			int colID = i/C_GRID_ROW;
+			int rowID = tGrid%C_GRID_ROW;
+			int colID = tGrid/C_GRID_ROW;
 			CCLabelTTF* row = CCLabelTTF::create(CCString::createWithFormat("row=%d", rowID)->getCString(),"SimHei",15);
 			row->setPosition(ccp(p.x-30,p.y+38));
 			row->setColor(ccc3(0,0,255));
@@ -135,11 +134,11 @@ namespace BattleSpace{
 			m_GridIndex->addChild(col);
 #endif
 			CCSprite* sp = CCSprite::createWithSpriteFrameName(CutMoveImg);
-			sp->setTag(i+map_Bg);
+			sp->setTag(tGrid+map_Bg);
 			sp->setPosition(ccp(p.x,p.y));
 			sp->setVisible(false);	
 			m_DisPlayArea->addChild(sp);	
-			if (i==C_CAPTAINGRID)
+			if (tGrid==C_CAPTAINGRID)
 			{
 				CCSprite* _sp = CCSprite::createWithSpriteFrameName(MaxBgImg);
 				_sp->setPosition(ccp(p.x,p.y));
@@ -160,8 +159,7 @@ namespace BattleSpace{
 	void BattleMapLayer::OpenGuide( int gird )
 	{
 		m_DisPlayArea->getChildByTag(map_guide)->setVisible(true);
-		WarMapData* map = ManageCenter->getMap()->getCurrWarMap();
-		m_DisPlayArea->getChildByTag(map_guide)->setPosition(map->getPoint(gird));
+		m_DisPlayArea->getChildByTag(map_guide)->setPosition(BattleCoords->getPoint(gird));
 	}
 
 	void BattleMapLayer::CancelGuide() { m_DisPlayArea->getChildByTag(map_guide)->setVisible(false); }
@@ -206,9 +204,9 @@ namespace BattleSpace{
 
 	void BattleMapLayer::DrawMoveArea()
 	{
-		for (auto tGrid : *mManage->getMoveVec())
+		for (auto tGrid : BattleConfig->getMoveVec())
 		{
-			if (BattleData->getBattleModel()->isPvEBattle() && tGrid < C_PVPMINGRID)
+			if (BattleModelManage->isPvEBattle() && tGrid < C_PVPMINGRID)
 				continue;
 			showFloor(tGrid);
 		}
@@ -216,17 +214,17 @@ namespace BattleSpace{
 
 	void BattleMapLayer::drawEnterArea()
 	{
-		for (auto tGrid : *mManage->getEnterVec())
+		for (auto tGrid : BattleConfig->getEnterVec())
 			showFloor(tGrid);
 	}
 
 	void BattleMapLayer::showFloor( int tGrid )
 	{
-		if (tGrid < C_GRID_ROW+C_BEGINGRID || mManage->inUnDefineArea(tGrid))
+		if (tGrid < C_GRID_ROW+C_BEGINGRID || BattleConfig->inUnDefineArea(tGrid))
 			return;
 		CCSprite* tFloor = (CCSprite*)m_DisPlayArea->getChildByTag(tGrid+map_Bg);
 		if (!tFloor)return;
-		if (mManage->inAddCostArea(tGrid))
+		if (BattleConfig->inAddCostArea(tGrid))
 		{
 			tFloor->setDisplayFrame(CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(AddMoveImg));
 		}else{
@@ -418,13 +416,13 @@ namespace BattleSpace{
 			yellow,
 			cancel,
 		};
-		for (auto i : *mManage->getMoveVec())
+		for (auto tGrid : BattleConfig->getMoveVec())
 		{
-			CCSprite* sp = (CCSprite*)m_DisPlayArea->getChildByTag(i+map_Bg);
+			CCSprite* sp = (CCSprite*)m_DisPlayArea->getChildByTag(tGrid+map_Bg);
 			if (!sp)continue;
 			sp->stopAllActions();
 			sp->setVisible(false);
-			if (mManage->inAddCostArea(i))
+			if (BattleConfig->inAddCostArea(tGrid))
 			{
 				sp->setDisplayFrame(CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(AddMoveImg));
 				sp->setVisible(type == green);

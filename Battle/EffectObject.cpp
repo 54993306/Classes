@@ -50,7 +50,7 @@ namespace BattleSpace{
 		if (m_skewing)
 		{
 			//修改这个类，不要以m_model为索引，同样的特效可能有不同的效果,特效位置,特效循环次数,音效次数,音效开始播放时间等
-			SpecialEffectInfo* spefdata = AnimationManager::sharedAction()->getSpcialEffectData()->getspEff(atoi(m_model.c_str())); 
+			SpecialEffectInfo* spefdata = AnimationManager::sharedAction()->getSpcialEffectData()->getSpecialEffect(atoi(m_model.c_str())); 
 			if (spefdata)
 			{
 				m_effect->setPosition(ccp(spefdata->getp_x(),spefdata->getp_y()));

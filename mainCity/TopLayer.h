@@ -22,6 +22,8 @@ public:
 	void show(CCObject* pObj);
 	void hide(CCObject* pObj);
 
+	bool ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent);
+
 protected: 
 	void hideBtn(CCNode *pSender);
 	void hideLabel(CCNode *node);

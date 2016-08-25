@@ -16,12 +16,13 @@
  *
  *************************************************************/
 //每一个掉血数据，参数为掉血类型和掉血数值
-namespace BattleSpace{
-
+namespace BattleSpace
+{
+	enum struct PlayHpType;
 	struct STR_LostHp
 	{
 		STR_LostHp();
-		int hitType;
+		PlayHpType hitType;
 		int hitNum;			//计算可以为浮点,最后转化为整型伤害
 		int anger;
 	};
@@ -42,7 +43,7 @@ namespace BattleSpace{
 		map<unsigned int,unsigned int> m_AddBuf;
 		map<unsigned int,unsigned int> m_DelBuf;
 		CC_SYNTHESIZE(BaseRole*,m_alive,Alive);
-		CC_SYNTHESIZE(int,m_usType,usType);								//攻击目标血量变化类型
+		CC_SYNTHESIZE(PlayHpType,m_usType,usType);								//攻击目标血量变化类型
 		CC_SYNTHESIZE(int,m_usNum,usNum);								//攻击目标血量变化
 	protected:
 	};

@@ -1,15 +1,22 @@
 ﻿#ifndef EFFECTLOAD_H_
 #define EFFECTLOAD_H_
+/************************************************************* 
+ *
+ *
+ *		Data : 2016.8.17
+ *	
+ *		Name : 
+ *
+ *		Author : Lin_Xiancheng
+ *
+ *		Description : [10/16/2014 xc_lin] 效果信息管理
+ *
+ *
+ *************************************************************/
 #include "AppUI.h"
 #include "Battle/BattleConfigMacro.h"
 namespace BattleSpace
 {
-	/************************************************************************/
-	/*         
-	效果信息管理
-	//  [10/16/2014 xc_lin]
-	*/
-	/************************************************************************/
 	class EffectInfo : public CCObject
 	{
 	public:
@@ -25,25 +32,20 @@ namespace BattleSpace
 		CC_SYNTHESIZE(int,FloorEf,FloorEf);				//地板特效ID 
 		CC_SYNTHESIZE(int,isblack,isblack);				//是否需要黑屏
 		CC_SYNTHESIZE(int,isShake,isShake);				//是否震屏
-		CCArray* getEffIdList();
-	private:
-
+		void initEffectList(vector<int>& pVec) const;
 	};
-
-	typedef map<unsigned int,EffectInfo*> WarEffect;	
 
 	class EffectData : public CCObject
 	{
 	public:
+		EffectData();
 		~EffectData();
 		virtual bool init();
 		CREATE_FUNC(EffectData);
-		EffectInfo* getEffectInfo(int EffectID);
-		CCArray* getEffs();
+		const EffectInfo* getEffectInfo(int EffectID) const;
 	protected:
-		WarEffect warEffect;
-	private:
-
+		map<int,EffectInfo*> warEffect;
+		EffectInfo* mNullEffect;
 	};
 
 
@@ -61,25 +63,21 @@ namespace BattleSpace
 		CC_SYNTHESIZE(float,Acp_y,Acp_y);
 		CC_SYNTHESIZE(float,scale,scale);
 		CC_SYNTHESIZE(float,speed,speed);
-	private:
-
 	};
-
-
-	typedef map<unsigned int , SpecialEffectInfo*> SpEff;
 
 	class SpecialEffectData : public CCObject
 	{
 	public:
+		SpecialEffectData();
 		~SpecialEffectData();
 		virtual bool init();
 		CREATE_FUNC(SpecialEffectData);
-		SpecialEffectInfo* getspEff(int spId);
-		int getSpcialEfectId(int spid);
+		SpecialEffectInfo* getSpecialEffect(int spId);
 		bool JudgeSpcialEffect(int id);
-		CCArray* getspEffs();
 	protected:
-		SpEff spEff;
+		map<int , SpecialEffectInfo*> mEffectMap;
+	private:
+		SpecialEffectInfo* mNullInfo;
 
 	};
 
@@ -106,14 +104,16 @@ namespace BattleSpace
 	class BuffConfig : public CCObject
 	{
 	public: 
+		BuffConfig();
 		~BuffConfig();
 		virtual bool init ();
 		CREATE_FUNC(BuffConfig);
 		void ClearData();
 		void AddBuffEffect(BuffEffect* info);
-		BuffEffect* getBuffEffect(int bufftype,bool Dbuf);			//根据buff类型得到相应的buff特效
+		const BuffEffect* getBuffEffect(int bufftype,bool Dbuf) const;			//根据buff类型得到相应的buff特效
 	private:
 		JsonEffectMap m_JsonEffectMap;
+		BuffEffect* mNullEffect;
 	};
 
 	/************************************************************* 
@@ -167,19 +167,17 @@ namespace BattleSpace
 	class StoryData : public CCObject
 	{
 	public:
-		StoryData();
 		~StoryData();
 		virtual bool init();
 		CREATE_FUNC(StoryData);
 		void initStoryData(int stageid);
 		void LoadFile(const char* FileName,int type);
-		vector<StoryStep*>* getStory(StoryType storytype);
-		map<StoryType,vector<StoryStep*>>* getStoryMap();
+		const vector<StoryStep*>* getStory(StoryType storytype) const;
+		const map<StoryType,vector<StoryStep*>>& getStoryMap() const;
 	private:
 		map<StoryType,vector<StoryStep*>> m_MapStoryData;
 		map<int,vector<TypeAndStoryID>> m_MapConfig;
 		vector<int> m_SpineData;
-		//vector
 	};
 };
 #endif

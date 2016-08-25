@@ -144,13 +144,9 @@ bool AppDelegate::applicationDidFinishLaunching()
 
 	CSceneManager::sharedSceneManager()->runScene(GETSCENE(LogoScene));
 
-
-
-
-
 	//平台相关初始化
 	GamePlatformMgr->InitPlatForm();
-	
+
     return true;
 }
 
@@ -177,7 +173,6 @@ void AppDelegate::applicationWillEnterForeground() {
 		NOTIFICATION->postNotification(TIME_IN_BACKGROUND, CCInteger::create(m_iMsecInBackground));
 		m_iMsecInBackground = 0;
 	}
-	
 	
 	GameSound->enterForeground();
 }

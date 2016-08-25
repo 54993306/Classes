@@ -180,7 +180,7 @@ namespace BattleSpace{
 		float speed = 0.1f;								//默认帧率
 		if (m_spefdata->JudgeSpcialEffect(atoi(name)))
 		{
-			SpecialEffectInfo* spefdata = m_spefdata->getspEff(atoi(name));
+			SpecialEffectInfo* spefdata = m_spefdata->getSpecialEffect(atoi(name));
 			if (spefdata)
 			{
 				speed = spefdata->getspeed();									

@@ -7,7 +7,7 @@
  *
  *		Author : Lin_Xiancheng
  *
- *		Description : 
+ *		Description : 回答格子是否能移动的问题给出具体的移动路径
  *
  *
 *************************************************************/
@@ -20,19 +20,20 @@ using namespace std;
 namespace BattleSpace
 {
 	class AStar;
+	class BaseRole;
 	class AreaManage : public CCObject
 	{
 	public:
 		AreaManage();
-		virtual bool init();
 		virtual ~AreaManage();
+		virtual bool init();
 		CREATE_FUNC(AreaManage);
-		//管理一个障碍列表，当有武将的操作时，更新障碍列表
-
+	public:
+		bool roleThrough(BaseRole* pRole,int pGrid);
+		void initRoleObstacle(BaseRole* pRole);
+		void initRoleMovePath(BaseRole* pRole,int pGrid);
 	private:
 		AStar *mAStar;
-		vector<int> mVecObstacle;
-
 	};
 };
 #endif

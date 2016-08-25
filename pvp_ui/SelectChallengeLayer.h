@@ -71,7 +71,6 @@ private:
 	void showChallenge( CCObject *pSender );
 	void hideChanllenge( CCObject *pSender );
 	void imageLoadSuccessCallBack(string sTag, vector<char>* pBuffer);
-	CImageView * maskedSprite(CCSprite *textureSprite);
 private:
 	CLayout* m_ui;
 	CLayout* m_pPanel[3];

@@ -431,14 +431,30 @@ void CWShopLayer::addCell(CGridPageViewCell* pCell, unsigned int uIdx)
 		}
 		break;
 	case 4:
-	case 5:
 		{
-			CCTexture2D *texture =  CCTextureCache::sharedTextureCache()->addImage(CCString::createWithFormat("prop/%d.png", item.moneyType==4?2:5)->getCString());
+			CCTexture2D *texture =  CCTextureCache::sharedTextureCache()->addImage("prop/2.png");
 			coinIcon->setTexture(texture);
 			coinIcon->setTextureRect(CCRectMake(0,0,texture->getContentSize().width,texture->getContentSize().height));
 
 			//检查货币数量
 			if(!CheckGhost(atoi(price->getString())))
+			{
+				price->setColor(RGB_RED);
+			}
+			else
+			{
+				price->setColor(RGB_WHITE);
+			}
+		}
+		break;
+	case 5:
+		{
+			CCTexture2D *texture =  CCTextureCache::sharedTextureCache()->addImage("prop/5.png");
+			coinIcon->setTexture(texture);
+			coinIcon->setTextureRect(CCRectMake(0,0,texture->getContentSize().width,texture->getContentSize().height));
+
+			//检查货币数量
+			if(!CheckRolePoint(atoi(price->getString())))
 			{
 				price->setColor(RGB_RED);
 			}

@@ -419,6 +419,8 @@ void CDownloadPackage::changeStoryPicture( CCSprite* pSprite )
 	if(m_iStoryIndex >= m_iStoryMax)
 	{
 		m_iStoryIndex = 0;
+		unschedule(schedule_selector(CDownloadPackage::updateForChangePic));
+		return;
 	}
 
 	//没有找到图片，返回不操作
@@ -437,5 +439,12 @@ void CDownloadPackage::changeStoryPicture( CCSprite* pSprite )
 	pTranstionSprite->setScale(pSprite->getScale());
 	pSprite->getParent()->addChild(pTranstionSprite, pSprite->getZOrder()+1);
 	pTranstionSprite->runAction(CCSequence::createWithTwoActions(CCFadeOut::create(0.6f), CCRemoveSelf::create()));
+}
+
+void CDownloadPackage::cleanDownloadPackageInfo()
+{
+	CCUserDefault::sharedUserDefault()->setIntegerForKey(PACKAGE_DOWNLOAD_INDEX, 0);
+	CCUserDefault::sharedUserDefault()->setIntegerForKey(PACKAGE_DOWNLOAD_MAX, 0);
+	CCUserDefault::sharedUserDefault()->flush();
 }
 

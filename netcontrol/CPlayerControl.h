@@ -36,10 +36,10 @@ public:
 	
 	void sendEnterStageForBoss(int hero1,int hero2, int hero3, int hero4, int hero5); //进入世界BOSS关卡
 	void sendPvEBattleInfo(int pRoleID,bool pAiState,vector<int>& pHeroID, bool bReven=false);
-	void sendEnterStage(int stageId,int hero1,int hero2, int hero3, int hero4, int hero5=0, int fid=0, int questId=0); //进入关卡 , //选择参战的好友ID, //选择参战的好友英雄ID
+	void sendEnterStage(int stageId,int hero1,int hero2, int hero3, int hero4, int hero5=0, int fid=0, int questId=0, int iStageStar=0); //进入关卡 , //选择参战的好友ID, //选择参战的好友英雄ID
 	void sendStageInfo(int stageId); //获取关卡预览信息(64)
 	/*0 全部， 1 出战英雄， 2 未出战, 3 可驻守  4 可招募*/
-	void sendHeroList(int mask,int unionId=0,int roleId=0); //请求获取玩家英雄列表
+	void sendHeroList(int mask,int unionId=0,int roleId=0, int iHeroType=0); //请求获取玩家英雄列表	iHeroType( 1火2水3木)
 	void SendLotteryType(int type);
 	void sendBattleFinish(int reason, bool res,int roundNum);
 	void sendWorldBossFinish(int hurt,int checkNum,vector<int>&vec);
@@ -50,7 +50,7 @@ public:
 	void sendGetHeroInfo(int roleHeroId,int heroId,int roleId=0,int quality=0); //角色英雄ID 英雄ID
 	void sendRecruitHero(int heroId);// 招募英雄
 
-	void sendUnion(int stageId=0, int questId=0, bool bBoss=false ); //设置出战队伍 (14)
+	void sendUnion(int stageId=0, int questId=0, bool bBoss=false, int iStarLevel=0 ); //设置出战队伍 (14)
 
 	void sendRoleBag(int type, bool  equip=false, int roleHeroId=0, int pos=0); //获取背包道具(0 全部道具， 1 装备， 2 符文，3 灵魂)，equip:是否包括已穿戴到英雄身上的装备(强化装备时需要显示已穿戴的装备)
 	//强化装备

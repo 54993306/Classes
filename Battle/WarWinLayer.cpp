@@ -216,9 +216,19 @@ void WarWinLayer::processBattleFinish(int type, google::protobuf::Message *msg)
 		node->runAction(cs);
 	}
 
+	int iNumStar = res->star();
 	//星星效果
-	genStar(res->star());
-
+	genStar(iNumStar);
+	if (iNumStar<=0)
+	{
+		//光圈下移
+		CImageView *pLight = (CImageView *)m_ui->findWidgetById("light");
+		CImageView *pLightText = (CImageView *)m_ui->findWidgetById("finish_level");
+		pLight->setPositionY(pLight->getPositionY()-50);
+		pLightText->setPositionY(pLightText->getPositionY()-50);
+	}
+	
+	
 	//英雄队伍
 	//出战英雄数量
 	int heroListSize = res->herolist_size();

@@ -34,7 +34,7 @@ namespace BattleSpace
 		Ditection_Left,		//左
 		Ditection_Right,	//右		(武将默认朝向、怪物朝向)
 	};
-
+	enum struct PlayHpType;
 	class AliveObject : public CCNode										//用于显示的武将信息
 	{
 	public:
@@ -48,7 +48,7 @@ namespace BattleSpace
 		void HpChange_Event();
 		void PlayAnimat_Event(string sData);
 		void initAliveTypeIcon();
-		void playerNum(int num,int type);
+		void playerNum(PlayHpType pType,int pNumber);
 		void initTypeIconPath( char* pPath );
 		void lostHpDispose();
 		void showThis();

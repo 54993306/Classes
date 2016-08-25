@@ -20,7 +20,7 @@
 #include "Battle/CaptainSkill.h"
 #include "Battle/Strategy/PvEStrategy.h"
 #include "Battle/MoveObject.h"
-
+#include "Battle/Config/ConfigManage.h"
 #include "Battle/BattleCenter.h"
 #include "Battle/WarManager.h"
 namespace BattleSpace
@@ -71,11 +71,9 @@ namespace BattleSpace
 
 	void TotalStrategy::initCrossArea()
 	{
-		vector<int>* tCostArea = mManage->getAddcostVec();
-		vector<int>* tMoveArea = mManage->getMoveVec();
-		for (auto tMoveGrid : *tMoveArea)
+		for (auto tMoveGrid : BattleConfig->getMoveVec())
 		{
-			for (auto tCostGrid : *tCostArea)
+			for (auto tCostGrid : BattleConfig->getAddcostVec())
 			{
 				if (tMoveGrid == tCostGrid)
 					mCrossArea.push_back(tMoveGrid);
@@ -157,9 +155,9 @@ namespace BattleSpace
 	void TotalStrategy::interceptInfo()
 	{
 		mManage->updateAlive();
-		vector<BaseRole*>* tMonsterVec = mManage->inBattleMonsters(true);
-		vector<BaseRole*>::reverse_iterator iter = tMonsterVec->rbegin();
-		for (;iter != tMonsterVec->rend();iter++)
+		vector<BaseRole*> tMonsterVec = mManage->inBattleMonsters(true);
+		vector<BaseRole*>::reverse_iterator iter = tMonsterVec.rbegin();
+		for (;iter != tMonsterVec.rend();iter++)
 		{
 			if ((*iter)->getGridIndex() < eGuardGrid || frontHasHero(*iter) )
 				continue;
@@ -286,8 +284,8 @@ namespace BattleSpace
 	bool TotalStrategy::hasHeroMove( int pGrid )
 	{
 		if (pGrid == INVALID_GRID)return true;
-		vector<BaseRole*>* tHeroVec = mManage->inBattleHeros();
-		for (auto tHero : *tHeroVec)
+		vector<BaseRole*> tHeroVec = mManage->inBattleHeros();
+		for (auto tHero : tHeroVec)
 		{
 			if (tHero->getCaptain())
 				continue;
@@ -299,9 +297,9 @@ namespace BattleSpace
 	//找到空闲武将，视情况而定，可能找不到
 	BaseRole* TotalStrategy::findFreeHero()
 	{
-		vector<BaseRole*>* tHeroVec = mManage->inBattleHeros(true);
+		vector<BaseRole*> tHeroVec = mManage->inBattleHeros(true);
 		vector<int> tLines;
-		for (auto tHero : * tHeroVec)
+		for (auto tHero : tHeroVec)
 		{
 			if (tHero->getCaptain()		|| 
 				tHero->getCommandGrid()	||
@@ -375,8 +373,8 @@ namespace BattleSpace
 
 	bool TotalStrategy::frontHasHero( BaseRole* pMonster )
 	{
-		vector<BaseRole*>*tVecHero = mManage->inBattleHeros();
-		for (auto tHero : *tVecHero)
+		vector<BaseRole*>tVecHero = mManage->inBattleHeros();
+		for (auto tHero : tVecHero)
 		{
 			if (tHero->getCaptain() || tHero->getFatherID())
 				continue;
@@ -393,9 +391,9 @@ namespace BattleSpace
 
 	bool TotalStrategy::frontHasMonster( BaseRole* pHero )
 	{
-		vector<BaseRole*>* tMonsterVec = mManage->inBattleMonsters(true);
-		vector<BaseRole*>::reverse_iterator iter = tMonsterVec->rbegin();			//反向遍历,从位置最大的开始
-		for(;iter != tMonsterVec->rend();iter++)
+		vector<BaseRole*> tMonsterVec = mManage->inBattleMonsters(true);
+		vector<BaseRole*>::reverse_iterator iter = tMonsterVec.rbegin();			//反向遍历,从位置最大的开始
+		for(;iter != tMonsterVec.rend();iter++)
 		{
 			if ((*iter)->getGridIndex() < eGuardGrid)
 				continue;
@@ -424,8 +422,8 @@ namespace BattleSpace
 	//空闲武将
 	BaseRole* TotalStrategy::unTargetHero()
 	{
-		vector<BaseRole*>* tHeros = mManage->inBattleHeros(true);
-		for (auto tHero : *tHeros)
+		vector<BaseRole*> tHeros = mManage->inBattleHeros(true);
+		for (auto tHero : tHeros)
 		{
 			if (tHero->getHasTarget()		|| 
 				tHero->getAIState()			||
@@ -441,8 +439,8 @@ namespace BattleSpace
 	//非空闲武将
 	BaseRole* TotalStrategy::hasTargetHero()
 	{
-		vector<BaseRole*>* tHeros = mManage->inBattleHeros(true);
-		for (auto tHero : *tHeros)
+		vector<BaseRole*> tHeros = mManage->inBattleHeros(true);
+		for (auto tHero : tHeros)
 		{
 			if (tHero->getCaptain() || 
 				tHero == mSkillRole || 
@@ -464,9 +462,9 @@ namespace BattleSpace
 		//找到一个离我最近的敌人跑过去攻击它。
 		BaseRole* tHero = unTargetHero();											//包括了前方没有怪物的武将
 		if ( !tHero ) return;
-		vector<BaseRole*>* tMonsterVec = mManage->inBattleMonsters(true);
-		vector<BaseRole*>::reverse_iterator iter = tMonsterVec->rbegin();			//反向遍历,从位置最大的开始
-		for(;iter != tMonsterVec->rend();iter++)
+		vector<BaseRole*> tMonsterVec = mManage->inBattleMonsters(true);
+		vector<BaseRole*>::reverse_iterator iter = tMonsterVec.rbegin();			//反向遍历,从位置最大的开始
+		for(;iter != tMonsterVec.rend();iter++)
 		{
 			if ((*iter)->getGridIndex() < eGuardGrid)
 				continue;
@@ -525,8 +523,8 @@ namespace BattleSpace
 	bool TotalStrategy::unCrossHeros( vector<int>& pGrids,BaseRole* pSelf /*=nullptr*/ )
 	{
 		if (pGrids.empty())return false;
-		vector<BaseRole*>* tHeros = mManage->inBattleHeros(true);
-		for (auto tHero : *tHeros)
+		vector<BaseRole*> tHeros = mManage->inBattleHeros(true);
+		for (auto tHero : tHeros)
 		{
 			if (tHero->getCaptain()		|| 
 				tHero == pSelf			|| 
@@ -545,8 +543,8 @@ namespace BattleSpace
 	//怪物是否超过了所有的武将需要马上拦截
 	BaseRole* TotalStrategy::urgencyMove()
 	{
-		vector<BaseRole*>* tHeros = mManage->inBattleHeros(true);
-		for (auto tHero : *tHeros)
+		vector<BaseRole*> tHeros = mManage->inBattleHeros(true);
+		for (auto tHero : tHeros)
 		{
 			if ( tHero->getCaptain()			||
 				 tHero->getFatherID()		||
@@ -570,8 +568,8 @@ namespace BattleSpace
 
 	bool TotalStrategy::urgencyJudge()
 	{
-		vector<BaseRole*>* tHeros = mManage->inBattleHeros(true);
-		for (auto tHero : *tHeros)
+		vector<BaseRole*> tHeros = mManage->inBattleHeros(true);
+		for (auto tHero : tHeros)
 		{
 			if ( tHero->getCaptain()	|| tHero->getFatherID())
 				continue;

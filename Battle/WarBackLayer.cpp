@@ -117,7 +117,7 @@ namespace BattleSpace
 			this->setVisible(false);
 
 			//如果是在引导,重启游戏
-			if( !BattleManage->getStageID())
+			if( !BattleManage->getStageIndex())
 			{
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 				CJniHelper::getInstance()->restartGame();
@@ -134,7 +134,7 @@ namespace BattleSpace
 			}
 
 			//如果是pvp结算
-			if( BattleData->getBattleModel()->isPvEBattle() )
+			if( BattleModelManage->isPvEBattle() )
 			{
 				NOTIFICATION->postNotification(MsgBattleOver);
 				return;
@@ -143,7 +143,7 @@ namespace BattleSpace
 			//其他类型结算
 			BattleScene* Wscene = (BattleScene*)this->getParent();
 			CScene* scene = GETSCENE(LoadBattleResource);
-			if (BattleManage->getStageID())
+			if (BattleManage->getStageIndex())
 			{
 				((LoadBattleResource*)scene)->setRelease(true,SkipcityScene);
 				CPlayerControl::getInstance().sendBattleFinish(2,false,0);

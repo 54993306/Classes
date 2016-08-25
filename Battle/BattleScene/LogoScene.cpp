@@ -17,6 +17,7 @@
 #include "Battle/BattleMacro.h"
 
 using namespace CocosDenshion;
+using namespace BattleSpace;
 LogoScene::LogoScene():m_XmlLayer(nullptr),m_ModeIndex(0),m_PauseAction(""),m_Body(nullptr),m_InputScale(nullptr)
 	,m_InputModeId(nullptr),m_InputAction(nullptr),m_ActionIndex(0),m_RunAction(true),m_armatureEventDataMgr(nullptr)
 	,m_lastFrame(0),m_ActionKey(""),m_Armature(nullptr),m_ModeID(0),m_InputMap(nullptr)

@@ -23,7 +23,7 @@
 #include "Battle/BattleLayer/BattleMapLayer.h"
 #include "common/CommonFunction.h"
 #include "model/DataCenter.h"
-#include "Battle/MapManager.h"
+#include "Battle/CoordsManage.h"
 #include "Battle/BattleMessage.h"
 #include "model/CWholeBodyShowData.h"
 #include "Battle/BattleTools.h"
@@ -609,7 +609,7 @@ namespace BattleSpace
 	void WarAssist::bigBossCallback_1()
 	{
 		//非引导界面才做 ， 引导界面，不缩放,
-		if(mManage->getStageID())
+		if(mManage->getStageIndex())
 		{
 			float fDelay = fixMoveLayBorder(190);	//(1138/2)/3
 			m_ui->runAction(
@@ -628,7 +628,7 @@ namespace BattleSpace
 	{
 		//0
 		//非引导界面缩放，引导界面，不缩放
-		if(mManage->getStageID())
+		if(mManage->getStageIndex())
 		{
 			float fDelay =  moveLayScaleStart(0.75f, 0.5f);
 
@@ -668,7 +668,7 @@ namespace BattleSpace
 	{
 		//2
 		//拖屏幕,普通关卡才会拖屏幕到最左边//精英。引导关卡,不滑
-		if(mManage->getNormal() && mManage->getStageID())
+		if(mManage->getNormal() && mManage->getStageIndex())
 		{
 			//地图移动
 			float fDelay = moveLayMoveTo(ccp(0, 0));
@@ -704,7 +704,7 @@ namespace BattleSpace
 	void WarAssist::bigBossCallback4()
 	{
 		//4名字称号, 非引导
-		if(m_bIsBigBoss && mManage->getStageID())
+		if(m_bIsBigBoss && mManage->getStageIndex())
 		{
 			float fDelay = addInfoPanel();
 			m_ui->runAction(
@@ -723,7 +723,7 @@ namespace BattleSpace
 	{
 		//5地图缩放至87%
 		//非引导才有
-		if( mManage->getStageID() )
+		if( mManage->getStageIndex() )
 		{
 			float fDealyB = addWhiteLight();
 
@@ -747,7 +747,7 @@ namespace BattleSpace
 
 		//6.地图缩放至100%+震动
 		//非引导才有
-		if( mManage->getStageID() )
+		if( mManage->getStageIndex() )
 		{
 			//战斗
 			float fDelayC = addFightText();
@@ -775,7 +775,7 @@ namespace BattleSpace
 	{
 		//7
 		//精英关卡置回右边
-		if( !mManage->getNormal() && BattleManage->getStageID())
+		if( !mManage->getNormal() && BattleManage->getStageIndex())
 		{
 			float fDelay = fixMoveLayBorder(0);
 			m_ui->runAction(

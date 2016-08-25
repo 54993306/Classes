@@ -75,6 +75,8 @@ public:
 
 	void resetPosToTower( CCObject *pSender );
 
+	void showPvpActionToSky(CCObject* pObj);
+
 public:
 	void onTimeWaitCityAction(CCNode* pSender);
 	void moveFrontByPos(CCPoint pos);
@@ -170,4 +172,5 @@ private:
 	int m_iIndexForShow;
 	bool m_bTouchLock;
 	int m_iBgLayerMaxLeftBasePos;
+	float		m_fUiActionTime;				//上天时用
 };

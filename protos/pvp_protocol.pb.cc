@@ -20,6 +20,9 @@ namespace protos {
 
 namespace {
 
+const ::google::protobuf::Descriptor* PvpCityData_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  PvpCityData_reflection_ = NULL;
 const ::google::protobuf::Descriptor* PvpTeamData_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   PvpTeamData_reflection_ = NULL;
@@ -78,7 +81,25 @@ void protobuf_AssignDesc_pvp_5fprotocol_2eproto() {
     ::google::protobuf::DescriptorPool::generated_pool()->FindFileByName(
       "pvp_protocol.proto");
   GOOGLE_CHECK(file != NULL);
-  PvpTeamData_descriptor_ = file->message_type(0);
+  PvpCityData_descriptor_ = file->message_type(0);
+  static const int PvpCityData_offsets_[4] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PvpCityData, my_pve_rank_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PvpCityData, my_pvp_rank_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PvpCityData, pve_champion_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PvpCityData, pvp_champion_),
+  };
+  PvpCityData_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      PvpCityData_descriptor_,
+      PvpCityData::default_instance_,
+      PvpCityData_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PvpCityData, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PvpCityData, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(PvpCityData));
+  PvpTeamData_descriptor_ = file->message_type(1);
   static const int PvpTeamData_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PvpTeamData, status_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PvpTeamData, team_),
@@ -94,7 +115,7 @@ void protobuf_AssignDesc_pvp_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(PvpTeamData));
-  PvpDataReq_descriptor_ = file->message_type(1);
+  PvpDataReq_descriptor_ = file->message_type(2);
   static const int PvpDataReq_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PvpDataReq, refresh_),
   };
@@ -109,7 +130,7 @@ void protobuf_AssignDesc_pvp_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(PvpDataReq));
-  PvpDataRes_descriptor_ = file->message_type(2);
+  PvpDataRes_descriptor_ = file->message_type(3);
   static const int PvpDataRes_offsets_[5] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PvpDataRes, max_time_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PvpDataRes, now_time_),
@@ -128,7 +149,7 @@ void protobuf_AssignDesc_pvp_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(PvpDataRes));
-  PvpPrizeList_descriptor_ = file->message_type(3);
+  PvpPrizeList_descriptor_ = file->message_type(4);
   static const int PvpPrizeList_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PvpPrizeList, prize_list_),
   };
@@ -143,7 +164,7 @@ void protobuf_AssignDesc_pvp_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(PvpPrizeList));
-  OppTeamReq_descriptor_ = file->message_type(4);
+  OppTeamReq_descriptor_ = file->message_type(5);
   static const int OppTeamReq_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OppTeamReq, role_id_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OppTeamReq, is_robot_),
@@ -159,7 +180,7 @@ void protobuf_AssignDesc_pvp_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(OppTeamReq));
-  OppTeamRes_descriptor_ = file->message_type(5);
+  OppTeamRes_descriptor_ = file->message_type(6);
   static const int OppTeamRes_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OppTeamRes, result_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OppTeamRes, captin_skill_id_),
@@ -177,7 +198,7 @@ void protobuf_AssignDesc_pvp_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(OppTeamRes));
-  StartPvpReq_descriptor_ = file->message_type(6);
+  StartPvpReq_descriptor_ = file->message_type(7);
   static const int StartPvpReq_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(StartPvpReq, opp_id_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(StartPvpReq, is_robot_),
@@ -195,7 +216,7 @@ void protobuf_AssignDesc_pvp_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(StartPvpReq));
-  StartPvpRes_descriptor_ = file->message_type(7);
+  StartPvpRes_descriptor_ = file->message_type(8);
   static const int StartPvpRes_offsets_[5] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(StartPvpRes, result_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(StartPvpRes, status_),
@@ -214,7 +235,7 @@ void protobuf_AssignDesc_pvp_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(StartPvpRes));
-  PvpOverReq_descriptor_ = file->message_type(8);
+  PvpOverReq_descriptor_ = file->message_type(9);
   static const int PvpOverReq_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PvpOverReq, battle_result_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PvpOverReq, battle_time_),
@@ -232,7 +253,7 @@ void protobuf_AssignDesc_pvp_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(PvpOverReq));
-  PvpOverRes_descriptor_ = file->message_type(9);
+  PvpOverRes_descriptor_ = file->message_type(10);
   static const int PvpOverRes_offsets_[6] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PvpOverRes, result_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PvpOverRes, org_points_),
@@ -252,7 +273,7 @@ void protobuf_AssignDesc_pvp_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(PvpOverRes));
-  PvpRecordRes_descriptor_ = file->message_type(10);
+  PvpRecordRes_descriptor_ = file->message_type(11);
   static const int PvpRecordRes_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PvpRecordRes, record_list_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PvpRecordRes, reven_time_),
@@ -268,7 +289,7 @@ void protobuf_AssignDesc_pvp_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(PvpRecordRes));
-  Record_descriptor_ = file->message_type(11);
+  Record_descriptor_ = file->message_type(12);
   static const int Record_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Record, record_id_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Record, battle_time_),
@@ -286,7 +307,7 @@ void protobuf_AssignDesc_pvp_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Record));
-  RecordData_descriptor_ = file->message_type(12);
+  RecordData_descriptor_ = file->message_type(13);
   static const int RecordData_offsets_[6] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(RecordData, role_thumb_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(RecordData, role_name_),
@@ -306,7 +327,7 @@ void protobuf_AssignDesc_pvp_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(RecordData));
-  Member_descriptor_ = file->message_type(13);
+  Member_descriptor_ = file->message_type(14);
   static const int Member_offsets_[5] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Member, hero_id_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Member, captin_),
@@ -325,7 +346,7 @@ void protobuf_AssignDesc_pvp_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Member));
-  Opponent_descriptor_ = file->message_type(14);
+  Opponent_descriptor_ = file->message_type(15);
   static const int Opponent_offsets_[10] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Opponent, role_id_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Opponent, role_name_),
@@ -349,7 +370,7 @@ void protobuf_AssignDesc_pvp_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Opponent));
-  PvpPrize_descriptor_ = file->message_type(15);
+  PvpPrize_descriptor_ = file->message_type(16);
   static const int PvpPrize_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PvpPrize, rank_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PvpPrize, points_),
@@ -378,6 +399,8 @@ inline void protobuf_AssignDescriptorsOnce() {
 
 void protobuf_RegisterTypes(const ::std::string&) {
   protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    PvpCityData_descriptor_, &PvpCityData::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     PvpTeamData_descriptor_, &PvpTeamData::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
@@ -415,6 +438,8 @@ void protobuf_RegisterTypes(const ::std::string&) {
 }  // namespace
 
 void protobuf_ShutdownFile_pvp_5fprotocol_2eproto() {
+  delete PvpCityData::default_instance_;
+  delete PvpCityData_reflection_;
   delete PvpTeamData::default_instance_;
   delete PvpTeamData_reflection_;
   delete PvpDataReq::default_instance_;
@@ -461,51 +486,56 @@ void protobuf_AddDesc_pvp_5fprotocol_2eproto() {
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
     "\n\022pvp_protocol.proto\022\006protos\032\031common/pri"
     "ze_common.proto\032\030common/hero_common.prot"
-    "o\032\033common/monster_common.proto\";\n\013PvpTea"
-    "mData\022\016\n\006status\030\001 \002(\005\022\034\n\004team\030\002 \003(\0132\016.pr"
-    "otos.Member\"\035\n\nPvpDataReq\022\017\n\007refresh\030\001 \002"
-    "(\010\"\207\001\n\nPvpDataRes\022\020\n\010max_time\030\001 \001(\005\022\020\n\010n"
-    "ow_time\030\002 \001(\005\022#\n\topponents\030\003 \003(\0132\020.proto"
-    "s.Opponent\022\037\n\005prize\030\004 \001(\0132\020.protos.PvpPr"
-    "ize\022\017\n\007cd_time\030\005 \001(\005\"4\n\014PvpPrizeList\022$\n\n"
-    "prize_list\030\001 \003(\0132\020.protos.PvpPrize\"/\n\nOp"
-    "pTeamReq\022\017\n\007role_id\030\001 \002(\005\022\020\n\010is_robot\030\002 "
-    "\002(\010\"r\n\nOppTeamRes\022\016\n\006result\030\001 \002(\005\022\027\n\017cap"
-    "tin_skill_id\030\002 \002(\005\022&\n\thero_list\030\003 \003(\0132\023."
-    "protos.common.Hero\022\023\n\013team_combat\030\004 \001(\005\""
-    "W\n\013StartPvpReq\022\016\n\006opp_id\030\001 \002(\005\022\020\n\010is_rob"
-    "ot\030\002 \002(\010\022\027\n\013battle_hero\030\003 \003(\005B\002\020\001\022\r\n\005rev"
-    "en\030\004 \001(\010\"\253\001\n\013StartPvpRes\022\016\n\006result\030\005 \002(\010"
-    "\022\016\n\006status\030\001 \001(\005\022&\n\topponents\030\002 \003(\0132\023.pr"
-    "otos.common.Hero\022&\n\thero_list\030\003 \003(\0132\023.pr"
-    "otos.common.Hero\022,\n\014call_monster\030\004 \003(\0132\026"
-    ".protos.common.Monster\"Z\n\nPvpOverReq\022\025\n\r"
-    "battle_result\030\001 \002(\010\022\023\n\013battle_time\030\002 \001(\005"
-    "\022\017\n\007blood_1\030\003 \001(\005\022\017\n\007blood_2\030\004 \001(\005\"\214\001\n\nP"
-    "vpOverRes\022\016\n\006result\030\001 \002(\005\022\022\n\norg_points\030"
-    "\002 \001(\005\022\022\n\nadd_points\030\003 \001(\021\022\020\n\010pvp_coin\030\004 "
-    "\001(\005\022#\n\tnext_rank\030\005 \001(\0132\020.protos.Opponent"
-    "\022\017\n\007my_rank\030\006 \001(\005\"G\n\014PvpRecordRes\022#\n\013rec"
-    "ord_list\030\001 \003(\0132\016.protos.Record\022\022\n\nreven_"
-    "time\030\002 \001(\005\"z\n\006Record\022\021\n\trecord_id\030\001 \001(\005\022"
-    "\023\n\013battle_time\030\002 \001(\005\022#\n\007player1\030\003 \001(\0132\022."
-    "protos.RecordData\022#\n\007player2\030\004 \001(\0132\022.pro"
-    "tos.RecordData\"\210\001\n\nRecordData\022\022\n\nrole_th"
-    "umb\030\001 \001(\005\022\021\n\trole_name\030\002 \001(\t\022\022\n\nrole_lev"
-    "el\030\003 \001(\005\022\014\n\004rank\030\004 \001(\021\022\"\n\005teams\030\005 \003(\0132\023."
-    "protos.common.Hero\022\r\n\005fb_id\030\006 \001(\t\"V\n\006Mem"
-    "ber\022\017\n\007hero_id\030\001 \002(\005\022\016\n\006captin\030\002 \002(\010\022\r\n\005"
-    "pos_x\030\003 \001(\005\022\r\n\005pos_y\030\004 \001(\005\022\r\n\005index\030\005 \001("
-    "\005\"\266\001\n\010Opponent\022\017\n\007role_id\030\001 \002(\005\022\021\n\trole_"
-    "name\030\002 \001(\t\022\022\n\nrole_thumb\030\006 \001(\005\022\017\n\007role_l"
-    "v\030\003 \001(\005\022\016\n\006points\030\004 \001(\005\022\016\n\006combat\030\005 \001(\005\022"
-    "\022\n\nhero_thumb\030\007 \001(\005\022\020\n\010is_robot\030\010 \001(\010\022\r\n"
-    "\005fb_id\030\t \001(\t\022\014\n\004rank\030\n \001(\005\"N\n\010PvpPrize\022\014"
-    "\n\004rank\030\001 \001(\005\022\016\n\006points\030\002 \001(\005\022$\n\006prizes\030\003"
-    " \003(\0132\024.protos.common.PrizeB.\n\035dass.serve"
-    "r.gameserver.protosB\013PvpProtocolH\001", 1794);
+    "o\032\033common/monster_common.proto\"\207\001\n\013PvpCi"
+    "tyData\022\023\n\013my_pve_rank\030\001 \001(\005\022\023\n\013my_pvp_ra"
+    "nk\030\002 \001(\005\022&\n\014pve_champion\030\003 \001(\0132\020.protos."
+    "Opponent\022&\n\014pvp_champion\030\004 \001(\0132\020.protos."
+    "Opponent\";\n\013PvpTeamData\022\016\n\006status\030\001 \002(\005\022"
+    "\034\n\004team\030\002 \003(\0132\016.protos.Member\"\035\n\nPvpData"
+    "Req\022\017\n\007refresh\030\001 \002(\010\"\207\001\n\nPvpDataRes\022\020\n\010m"
+    "ax_time\030\001 \001(\005\022\020\n\010now_time\030\002 \001(\005\022#\n\toppon"
+    "ents\030\003 \003(\0132\020.protos.Opponent\022\037\n\005prize\030\004 "
+    "\001(\0132\020.protos.PvpPrize\022\017\n\007cd_time\030\005 \001(\005\"4"
+    "\n\014PvpPrizeList\022$\n\nprize_list\030\001 \003(\0132\020.pro"
+    "tos.PvpPrize\"/\n\nOppTeamReq\022\017\n\007role_id\030\001 "
+    "\002(\005\022\020\n\010is_robot\030\002 \002(\010\"r\n\nOppTeamRes\022\016\n\006r"
+    "esult\030\001 \002(\005\022\027\n\017captin_skill_id\030\002 \002(\005\022&\n\t"
+    "hero_list\030\003 \003(\0132\023.protos.common.Hero\022\023\n\013"
+    "team_combat\030\004 \001(\005\"W\n\013StartPvpReq\022\016\n\006opp_"
+    "id\030\001 \002(\005\022\020\n\010is_robot\030\002 \002(\010\022\027\n\013battle_her"
+    "o\030\003 \003(\005B\002\020\001\022\r\n\005reven\030\004 \001(\010\"\253\001\n\013StartPvpR"
+    "es\022\016\n\006result\030\005 \002(\010\022\016\n\006status\030\001 \001(\005\022&\n\top"
+    "ponents\030\002 \003(\0132\023.protos.common.Hero\022&\n\the"
+    "ro_list\030\003 \003(\0132\023.protos.common.Hero\022,\n\014ca"
+    "ll_monster\030\004 \003(\0132\026.protos.common.Monster"
+    "\"Z\n\nPvpOverReq\022\025\n\rbattle_result\030\001 \002(\010\022\023\n"
+    "\013battle_time\030\002 \001(\005\022\017\n\007blood_1\030\003 \001(\005\022\017\n\007b"
+    "lood_2\030\004 \001(\005\"\214\001\n\nPvpOverRes\022\016\n\006result\030\001 "
+    "\002(\005\022\022\n\norg_points\030\002 \001(\005\022\022\n\nadd_points\030\003 "
+    "\001(\021\022\020\n\010pvp_coin\030\004 \001(\005\022#\n\tnext_rank\030\005 \001(\013"
+    "2\020.protos.Opponent\022\017\n\007my_rank\030\006 \001(\005\"G\n\014P"
+    "vpRecordRes\022#\n\013record_list\030\001 \003(\0132\016.proto"
+    "s.Record\022\022\n\nreven_time\030\002 \001(\005\"z\n\006Record\022\021"
+    "\n\trecord_id\030\001 \001(\005\022\023\n\013battle_time\030\002 \001(\005\022#"
+    "\n\007player1\030\003 \001(\0132\022.protos.RecordData\022#\n\007p"
+    "layer2\030\004 \001(\0132\022.protos.RecordData\"\210\001\n\nRec"
+    "ordData\022\022\n\nrole_thumb\030\001 \001(\005\022\021\n\trole_name"
+    "\030\002 \001(\t\022\022\n\nrole_level\030\003 \001(\005\022\014\n\004rank\030\004 \001(\021"
+    "\022\"\n\005teams\030\005 \003(\0132\023.protos.common.Hero\022\r\n\005"
+    "fb_id\030\006 \001(\t\"V\n\006Member\022\017\n\007hero_id\030\001 \002(\005\022\016"
+    "\n\006captin\030\002 \002(\010\022\r\n\005pos_x\030\003 \001(\005\022\r\n\005pos_y\030\004"
+    " \001(\005\022\r\n\005index\030\005 \001(\005\"\266\001\n\010Opponent\022\017\n\007role"
+    "_id\030\001 \002(\005\022\021\n\trole_name\030\002 \001(\t\022\022\n\nrole_thu"
+    "mb\030\006 \001(\005\022\017\n\007role_lv\030\003 \001(\005\022\016\n\006points\030\004 \001("
+    "\005\022\016\n\006combat\030\005 \001(\005\022\022\n\nhero_thumb\030\007 \001(\005\022\020\n"
+    "\010is_robot\030\010 \001(\010\022\r\n\005fb_id\030\t \001(\t\022\014\n\004rank\030\n"
+    " \001(\005\"N\n\010PvpPrize\022\014\n\004rank\030\001 \001(\005\022\016\n\006points"
+    "\030\002 \001(\005\022$\n\006prizes\030\003 \003(\0132\024.protos.common.P"
+    "rizeB.\n\035dass.server.gameserver.protosB\013P"
+    "vpProtocolH\001", 1932);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "pvp_protocol.proto", &protobuf_RegisterTypes);
+  PvpCityData::default_instance_ = new PvpCityData();
   PvpTeamData::default_instance_ = new PvpTeamData();
   PvpDataReq::default_instance_ = new PvpDataReq();
   PvpDataRes::default_instance_ = new PvpDataRes();
@@ -522,6 +552,7 @@ void protobuf_AddDesc_pvp_5fprotocol_2eproto() {
   Member::default_instance_ = new Member();
   Opponent::default_instance_ = new Opponent();
   PvpPrize::default_instance_ = new PvpPrize();
+  PvpCityData::default_instance_->InitAsDefaultInstance();
   PvpTeamData::default_instance_->InitAsDefaultInstance();
   PvpDataReq::default_instance_->InitAsDefaultInstance();
   PvpDataRes::default_instance_->InitAsDefaultInstance();
@@ -547,6 +578,350 @@ struct StaticDescriptorInitializer_pvp_5fprotocol_2eproto {
     protobuf_AddDesc_pvp_5fprotocol_2eproto();
   }
 } static_descriptor_initializer_pvp_5fprotocol_2eproto_;
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int PvpCityData::kMyPveRankFieldNumber;
+const int PvpCityData::kMyPvpRankFieldNumber;
+const int PvpCityData::kPveChampionFieldNumber;
+const int PvpCityData::kPvpChampionFieldNumber;
+#endif  // !_MSC_VER
+
+PvpCityData::PvpCityData()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+}
+
+void PvpCityData::InitAsDefaultInstance() {
+  pve_champion_ = const_cast< ::protos::Opponent*>(&::protos::Opponent::default_instance());
+  pvp_champion_ = const_cast< ::protos::Opponent*>(&::protos::Opponent::default_instance());
+}
+
+PvpCityData::PvpCityData(const PvpCityData& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+}
+
+void PvpCityData::SharedCtor() {
+  _cached_size_ = 0;
+  my_pve_rank_ = 0;
+  my_pvp_rank_ = 0;
+  pve_champion_ = NULL;
+  pvp_champion_ = NULL;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+PvpCityData::~PvpCityData() {
+  SharedDtor();
+}
+
+void PvpCityData::SharedDtor() {
+  if (this != default_instance_) {
+    delete pve_champion_;
+    delete pvp_champion_;
+  }
+}
+
+void PvpCityData::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* PvpCityData::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return PvpCityData_descriptor_;
+}
+
+const PvpCityData& PvpCityData::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_pvp_5fprotocol_2eproto();
+  return *default_instance_;
+}
+
+PvpCityData* PvpCityData::default_instance_ = NULL;
+
+PvpCityData* PvpCityData::New() const {
+  return new PvpCityData;
+}
+
+void PvpCityData::Clear() {
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    my_pve_rank_ = 0;
+    my_pvp_rank_ = 0;
+    if (has_pve_champion()) {
+      if (pve_champion_ != NULL) pve_champion_->::protos::Opponent::Clear();
+    }
+    if (has_pvp_champion()) {
+      if (pvp_champion_ != NULL) pvp_champion_->::protos::Opponent::Clear();
+    }
+  }
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool PvpCityData::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+  ::google::protobuf::uint32 tag;
+  while ((tag = input->ReadTag()) != 0) {
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // optional int32 my_pve_rank = 1;
+      case 1: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &my_pve_rank_)));
+          set_has_my_pve_rank();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(16)) goto parse_my_pvp_rank;
+        break;
+      }
+
+      // optional int32 my_pvp_rank = 2;
+      case 2: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_my_pvp_rank:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &my_pvp_rank_)));
+          set_has_my_pvp_rank();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(26)) goto parse_pve_champion;
+        break;
+      }
+
+      // optional .protos.Opponent pve_champion = 3;
+      case 3: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_pve_champion:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+               input, mutable_pve_champion()));
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(34)) goto parse_pvp_champion;
+        break;
+      }
+
+      // optional .protos.Opponent pvp_champion = 4;
+      case 4: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_pvp_champion:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+               input, mutable_pvp_champion()));
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectAtEnd()) return true;
+        break;
+      }
+
+      default: {
+      handle_uninterpreted:
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          return true;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+  return true;
+#undef DO_
+}
+
+void PvpCityData::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // optional int32 my_pve_rank = 1;
+  if (has_my_pve_rank()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->my_pve_rank(), output);
+  }
+
+  // optional int32 my_pvp_rank = 2;
+  if (has_my_pvp_rank()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->my_pvp_rank(), output);
+  }
+
+  // optional .protos.Opponent pve_champion = 3;
+  if (has_pve_champion()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      3, this->pve_champion(), output);
+  }
+
+  // optional .protos.Opponent pvp_champion = 4;
+  if (has_pvp_champion()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      4, this->pvp_champion(), output);
+  }
+
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+}
+
+::google::protobuf::uint8* PvpCityData::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // optional int32 my_pve_rank = 1;
+  if (has_my_pve_rank()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(1, this->my_pve_rank(), target);
+  }
+
+  // optional int32 my_pvp_rank = 2;
+  if (has_my_pvp_rank()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->my_pvp_rank(), target);
+  }
+
+  // optional .protos.Opponent pve_champion = 3;
+  if (has_pve_champion()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        3, this->pve_champion(), target);
+  }
+
+  // optional .protos.Opponent pvp_champion = 4;
+  if (has_pvp_champion()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        4, this->pvp_champion(), target);
+  }
+
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  return target;
+}
+
+int PvpCityData::ByteSize() const {
+  int total_size = 0;
+
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // optional int32 my_pve_rank = 1;
+    if (has_my_pve_rank()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->my_pve_rank());
+    }
+
+    // optional int32 my_pvp_rank = 2;
+    if (has_my_pvp_rank()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->my_pvp_rank());
+    }
+
+    // optional .protos.Opponent pve_champion = 3;
+    if (has_pve_champion()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+          this->pve_champion());
+    }
+
+    // optional .protos.Opponent pvp_champion = 4;
+    if (has_pvp_champion()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+          this->pvp_champion());
+    }
+
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void PvpCityData::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const PvpCityData* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const PvpCityData*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void PvpCityData::MergeFrom(const PvpCityData& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_my_pve_rank()) {
+      set_my_pve_rank(from.my_pve_rank());
+    }
+    if (from.has_my_pvp_rank()) {
+      set_my_pvp_rank(from.my_pvp_rank());
+    }
+    if (from.has_pve_champion()) {
+      mutable_pve_champion()->::protos::Opponent::MergeFrom(from.pve_champion());
+    }
+    if (from.has_pvp_champion()) {
+      mutable_pvp_champion()->::protos::Opponent::MergeFrom(from.pvp_champion());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void PvpCityData::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void PvpCityData::CopyFrom(const PvpCityData& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool PvpCityData::IsInitialized() const {
+
+  if (has_pve_champion()) {
+    if (!this->pve_champion().IsInitialized()) return false;
+  }
+  if (has_pvp_champion()) {
+    if (!this->pvp_champion().IsInitialized()) return false;
+  }
+  return true;
+}
+
+void PvpCityData::Swap(PvpCityData* other) {
+  if (other != this) {
+    std::swap(my_pve_rank_, other->my_pve_rank_);
+    std::swap(my_pvp_rank_, other->my_pvp_rank_);
+    std::swap(pve_champion_, other->pve_champion_);
+    std::swap(pvp_champion_, other->pvp_champion_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata PvpCityData::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = PvpCityData_descriptor_;
+  metadata.reflection = PvpCityData_reflection_;
+  return metadata;
+}
+
 
 // ===================================================================
 

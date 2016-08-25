@@ -70,12 +70,12 @@ bool CMainCityBuild::init()
 
 void CMainCityBuild::onEnter()
 {	
+	BaseLayer::onEnter();
+
 	CCSize deviceSize = CCDirector::sharedDirector()->getWinSizeInPixels();
 
 	m_minX = WINSIZE.width/2;
 	m_maxX = 2616-WINSIZE.width/2;
-
-	BaseLayer::onEnter();
 
  	this->scheduleUpdate();
 
@@ -96,6 +96,7 @@ void CMainCityBuild::onEnter()
 	NOTIFICATION->addObserver(this, callfuncO_selector(CMainCityBuild::hide), HIDE_MAIN_SCENE, nullptr);
 	
 	NOTIFICATION->addObserver(this, callfuncO_selector(CMainCityBuild::backFromPvp), "CMainCityBuild::backFromPvp", nullptr);
+	NOTIFICATION->addObserver(this, callfuncO_selector(CMainCityBuild::showPvpActionToSky), "CMainCityBuild::showPvpActionToSky", nullptr);
 
 	PlayBackgroundMusic(BGM_MainCity,true);
 
@@ -1447,20 +1448,13 @@ void CMainCityBuild::showPvp()
 	{
 		CPvpGateLayer *pLayer = pScene->addPvpGateLayer();
 		int iLevel = CMainCityControl::getInstance()->getCityDataById(Btn_Tower).level;
-		pLayer->setGateLevel(iLevel);
+		AskForPvpGateData();
 	}
 
-	m_ui->runAction(CCSequence::create(
-		CCDelayTime::create(fTime),
-		CCCallFunc::create(this, callfunc_selector(CMainCityBuild::showPvpCallbackForResetAnchorPoint)),
-		CCSpawn::create(
-			CCShake::create(0.3f, 8),
-			CCMoveTo::create(0.3f, ccp(VCENTER.x, VCENTER.y)),
-			CCScaleTo::create(0.3f, 2.3f),
-			CCSequence::createWithTwoActions(CCDelayTime::create(0.15f), CCCallFunc::create(this, callfunc_selector(CMainCityBuild::showPvpCallBack))),
-			nullptr
-		),
-		nullptr));
+
+	//等待pvpGate 收到数据然后notification回来播动作
+	m_fUiActionTime = fTime;
+	showPvpActionToSky(nullptr);
 }
 
 
@@ -1555,9 +1549,24 @@ void CMainCityBuild::autoToPvp()
 	{
 		CPvpGateLayer *pLayer = pScene->addPvpGateLayer();
 		int iLevel = CMainCityControl::getInstance()->getCityDataById(Btn_Tower).level;
-		pLayer->setGateLevel(iLevel);
+		AskForPvpGateData();
 		pLayer->showAsynPvp();
 	}
 
 	showPvpCallBack();
+}
+
+void CMainCityBuild::showPvpActionToSky( CCObject* pObj )
+{
+	m_ui->runAction(CCSequence::create(
+		CCDelayTime::create(m_fUiActionTime),
+		CCCallFunc::create(this, callfunc_selector(CMainCityBuild::showPvpCallbackForResetAnchorPoint)),
+		CCSpawn::create(
+		CCShake::create(0.3f, 8),
+		CCMoveTo::create(0.3f, ccp(VCENTER.x, VCENTER.y)),
+		CCScaleTo::create(0.3f, 2.3f),
+		CCSequence::createWithTwoActions(CCDelayTime::create(0.15f), CCCallFunc::create(this, callfunc_selector(CMainCityBuild::showPvpCallBack))),
+		nullptr
+		),
+		nullptr));
 }

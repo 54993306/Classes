@@ -107,20 +107,30 @@ class UnionRequest : public ::google::protobuf::Message {
   inline bool boss() const;
   inline void set_boss(bool value);
 
+  // optional int32 starStar = 3;
+  inline bool has_starstar() const;
+  inline void clear_starstar();
+  static const int kStarStarFieldNumber = 3;
+  inline ::google::protobuf::int32 starstar() const;
+  inline void set_starstar(::google::protobuf::int32 value);
+
   // @@protoc_insertion_point(class_scope:protos.UnionRequest)
  private:
   inline void set_has_stageid();
   inline void clear_has_stageid();
   inline void set_has_boss();
   inline void clear_has_boss();
+  inline void set_has_starstar();
+  inline void clear_has_starstar();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
   ::google::protobuf::int32 stageid_;
   bool boss_;
+  ::google::protobuf::int32 starstar_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
 
   friend void  protobuf_AddDesc_union_5fprotocol_2eproto();
   friend void protobuf_AssignDesc_union_5fprotocol_2eproto();
@@ -310,6 +320,28 @@ inline bool UnionRequest::boss() const {
 inline void UnionRequest::set_boss(bool value) {
   set_has_boss();
   boss_ = value;
+}
+
+// optional int32 starStar = 3;
+inline bool UnionRequest::has_starstar() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void UnionRequest::set_has_starstar() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void UnionRequest::clear_has_starstar() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void UnionRequest::clear_starstar() {
+  starstar_ = 0;
+  clear_has_starstar();
+}
+inline ::google::protobuf::int32 UnionRequest::starstar() const {
+  return starstar_;
+}
+inline void UnionRequest::set_starstar(::google::protobuf::int32 value) {
+  set_has_starstar();
+  starstar_ = value;
 }
 
 // -------------------------------------------------------------------

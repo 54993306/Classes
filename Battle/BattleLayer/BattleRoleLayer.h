@@ -18,15 +18,14 @@
  *************************************************************/
 #include "AppUI.h"
 #include "scene/layer/LayerManager.h"
-namespace BattleSpace{
+namespace BattleSpace
+{
 	class RoleObject;
 	class AliveObject;
 	class BaseRole;
 	class EffectObject;
 	class WarManager;
-	class WarMapData;
 	class MoveObject;
-
 	enum CreateType
 	{
 		DefaultCreat = 0,
@@ -87,7 +86,6 @@ namespace BattleSpace{
 		BaseRole*		m_TouchAlive;		//被触摸的武将id
 		RoleObject*		m_MoveActObject;		//拖拽移动对象
 		WarManager*		mManage;
-		WarMapData*		m_map;
 		CCPoint			m_TouchOffs;		//触摸偏移
 		int				m_grid;				//记录移动对象的格子位置
 		bool			m_TouchAliveBtn;	//是否是按钮传递的触摸

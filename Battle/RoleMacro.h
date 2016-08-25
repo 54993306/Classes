@@ -1,21 +1,48 @@
 /************************************************************* 
- *
- *
- *		Data : 2016.6.2
- *	
- *		Name : 
- *
- *		Author : Lin_Xiancheng
- *
- *		Description : 
- *
- *
- *************************************************************/
+*
+*
+*		Data : 2016.6.2
+*	
+*		Name : 
+*
+*		Author : Lin_Xiancheng
+*
+*		Description : 
+*
+*
+*************************************************************/
 #ifndef __BATTLEROLEMACRO__
 #define __BATTLEROLEMACRO__
 namespace BattleSpace
 {
 #define bNotification CCNotificationCenter::sharedNotificationCenter()
+
+	enum struct sMoveType				//武将行走类型
+	{
+		eNull						= 0,
+		eWalk						= 1,//普通行走
+		eBurrow						= 2,//钻地移动
+		eFight						= 3,//飞行移动
+	};
+
+	enum struct sStandType
+	{
+		eNull						= 0,
+		eGround						= 1,//当前位置在地面
+		eUnderground				= 2,//当前位置在地下
+		eSky						= 3,//当前位置在天空
+		eWater						= 4,//当前位置在水面
+	};
+
+	enum struct sRoleCamp
+	{
+		eNULL						= 0,//初始化值
+		eHeroRole					= 1,//英雄类角色
+		eMonsterRole				= 2,//怪物类角色
+		eRivalRole					= 3,//对手类角色
+		eChildRole					= 4,//召唤类角色
+		eNeutrality					= 5,//中立类角色
+	};
 
 	enum struct sCallType				//定义武将召唤类型类型,不同类型武将处理不同
 	{
@@ -45,8 +72,9 @@ namespace BattleSpace
 		eFree						= 4,//游离状态(可移动,不可攻击不可受击)
 	};
 
-	enum sProperty
+	enum struct sRoleNature
 	{
+		eNull						= 0,//默认初值
 		eFire						= 1,//火属性武将
 		eWater						= 2,//水属性武将
 		eWood						= 3,//木属性武将

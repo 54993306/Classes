@@ -6,7 +6,7 @@
 #include "Battle/BattleCenter.h"
 #include "Battle/BaseRole.h"
 #include "Battle/WarManager.h"
-#include "Battle/MapManager.h"
+#include "Battle/CoordsManage.h"
 #include "tools/ShowTexttip.h"
 #include "Battle/ConstNum.h"
 #include "cctk/scenemanager.h"
@@ -272,7 +272,7 @@ namespace BattleSpace
 	{
 		for (int i=0;i<4;i++)
 		{
-			CCPoint p = ManageCenter->getMap()->getCurrWarMap()->getPoint(i);
+			CCPoint p = BattleCoords->getPoint(i);
 			EffectObject* ef = EffectObject::create("10030",sPlayType::eRepeat);
 			ef->setTag(CL_TipsEffect1+i);
 			ef->setPosition(ccp(100,p.y));
@@ -301,7 +301,7 @@ namespace BattleSpace
 		tAutoPlay->setOnTouchBeganListener(this,ccw_touchbegan_selector(WarControl::onTouchBegin));
 		tAutoPlay->setOnClickListener(this,ccw_click_selector(WarControl::OnClick));
 		m_ControLayer->addChild(tAutoPlay);
-		if (BattleData->getBattleModel()->isPvEBattle())
+		if (BattleModelManage->isPvEBattle())
 		{
 			m_ControLayer->findWidgetById("layer_up_boss")->setVisible(false);
 			m_ControLayer->findWidgetById("layer_up_normal")->setVisible(false);
@@ -326,7 +326,6 @@ namespace BattleSpace
 			m_ControLayer->findWidgetById("layer_up_boss")->setVisible(false);
 			m_ControLayer->findWidgetById("layer_up_normal")->setVisible(true);
 			m_ControLayer->findWidgetById("layer_up_pvp")->setVisible(false);
-			m_ControLayer->findWidgetById("layer_time")->setVisible(false);
 			initNormalAbove();
 			return;
 		}
@@ -359,6 +358,24 @@ namespace BattleSpace
 
 	void WarControl::initNormalAbove()
 	{
+		//时间layer
+		CLayout *pTimeUILayer = (CLayout *)m_ControLayer->findWidgetById("layer_time");
+		int iCountDownTime = mManage->getStageTimeCountDown();
+		bool isShowCountDown = iCountDownTime > 0;
+		
+		//倒计时
+		if ( isShowCountDown )
+		{
+			m_iGameTimeCount = iCountDownTime;			//服务器传回时间
+			m_bCountDown = true;
+			pTimeUILayer->setVisible(true);		//显示时间layer
+			pTimeUILayer->setPosition( pTimeUILayer->getPosition() + ccp(410, -37) );		//位置调整
+		}
+		else
+		{
+			pTimeUILayer->setVisible(false);
+		}
+
 		CCheckBox* bt_speed = (CCheckBox*)m_ControLayer->getChildByTag(CL_AddSpeedBtn);						//加速按钮
 		bt_speed->setOnTouchBeganListener(this,ccw_touchbegan_selector(WarControl::onTouchBegin));
 		bt_speed->setOnClickListener(this,ccw_click_selector(WarControl::OnClick));
@@ -522,7 +539,7 @@ namespace BattleSpace
 		btn->setOnTouchBeganListener(this,ccw_touchbegan_selector(WarControl::AliveButtonBeginClick));
 		btn->setOnLongClickListener(this,ccw_longclick_selector(WarControl::AliveButtonLongClick));
 		btn->getSelectedImage()->setScale(0.95f);
-		if (BattleData->getBattleModel()->isPvEBattle() && pRole->getCaptain())
+		if (BattleModelManage->isPvEBattle() && pRole->getCaptain())
 		{
 			btn->setEnabled(false);
 			btn->setVisible(false);
@@ -641,10 +658,10 @@ namespace BattleSpace
 			initAliveButton(MoveLaout,tHero);
 		}
 	}
-	//cost变化数字
+	//cost变化数字,每一帧的时间都是有误差的,极端的情况容易出现变化的数字
 	void WarControl::updateCostSpeed(float dt)
 	{
-		int tSpeed = mManage->getCostSpeed() / dt;
+		int tSpeed = mManage->getCostSpeed() * 60;
 		m_pCostChange->setString(CCString::createWithFormat("%d", abs(tSpeed))->getCString());
 		if(m_pCostChange->getColor().g == 0)
 		{
@@ -725,7 +742,7 @@ namespace BattleSpace
 	//call role log in battlefield
 	void WarControl::CallRoleEntranceBattle(BaseRole*pRole)
 	{
-		BaseRole* tRole = mManage->getAlive(pRole->getFatherID());
+		BaseRole* tRole = mManage->getRole(pRole->getFatherID());
 		CCNode* MoveLaout = getMoveLayout(tRole->getUiLayout()-CL_BtnLayout1);
 		CButton* btn = (CButton*)MoveLaout->getChildByTag(CL_Btn);
 		initButtonBackImage(btn,tRole->getCallAliveNum());
@@ -775,7 +792,7 @@ namespace BattleSpace
 			return;
 		if (tRole->getFatherID())
 		{
-			BaseRole* tFather = mManage->getAlive(tRole->getFatherID());
+			BaseRole* tFather = mManage->getRole(tRole->getFatherID());
 			if (!tFather || tFather->getCallType() == sCallType::eBoxHaveRole)
 				return;
 			CallRoleEntranceBattle(tRole);
@@ -955,10 +972,10 @@ namespace BattleSpace
 	void WarControl::showMonsterTips(CCObject* ob)
 	{
 		vector<int>Vec;
-		for (auto alive: *mManage->inBattleMonsters())
+		for (auto tRole: mManage->inBattleMonsters())
 		{
-			if (alive->getGridIndex() < 52)continue;			//不再预警标记显示范围内
-			Vec.push_back(alive->getGridIndex() % C_GRID_ROW);
+			if (tRole->getGridIndex() < 52)continue;			//不再预警标记显示范围内
+			Vec.push_back(tRole->getGridIndex() % C_GRID_ROW);
 		}
 		VectorUnique(Vec);
 		for (auto i:Vec)
@@ -976,10 +993,10 @@ namespace BattleSpace
 		BaseRole* tRole = (BaseRole*)ob;
 		if (tRole->getEnemy())
 			return;
-		if (tRole->getBaseData()->getProperty() == sProperty::eFire)
+		if (tRole->getBaseData()->getProperty() == sRoleNature::eFire)
 		{
 			m_LayerColor->setColor(ccc3(206,17,0));
-		}else if (tRole->getBaseData()->getProperty() == sProperty::eWater)
+		}else if (tRole->getBaseData()->getProperty() == sRoleNature::eWater)
 		{
 			m_LayerColor->setColor(ccc3(30,69,218));
 		}else{

@@ -26,6 +26,9 @@ const ::google::protobuf::internal::GeneratedMessageReflection*
 const ::google::protobuf::Descriptor* StageInfoRes_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   StageInfoRes_reflection_ = NULL;
+const ::google::protobuf::Descriptor* StageStar_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  StageStar_reflection_ = NULL;
 const ::google::protobuf::Descriptor* ChapterRequest_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   ChapterRequest_reflection_ = NULL;
@@ -97,10 +100,13 @@ void protobuf_AssignDesc_stage_5fprotocol_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(StageInfoReq));
   StageInfoRes_descriptor_ = file->message_type(1);
-  static const int StageInfoRes_offsets_[3] = {
+  static const int StageInfoRes_offsets_[6] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(StageInfoRes, action_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(StageInfoRes, monsterlist_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(StageInfoRes, itemlist_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(StageInfoRes, star1_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(StageInfoRes, star2_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(StageInfoRes, star3_),
   };
   StageInfoRes_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -113,7 +119,24 @@ void protobuf_AssignDesc_stage_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(StageInfoRes));
-  ChapterRequest_descriptor_ = file->message_type(2);
+  StageStar_descriptor_ = file->message_type(2);
+  static const int StageStar_offsets_[3] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(StageStar, open_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(StageStar, type_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(StageStar, param_),
+  };
+  StageStar_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      StageStar_descriptor_,
+      StageStar::default_instance_,
+      StageStar_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(StageStar, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(StageStar, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(StageStar));
+  ChapterRequest_descriptor_ = file->message_type(3);
   static const int ChapterRequest_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ChapterRequest, type_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ChapterRequest, chapter_),
@@ -129,7 +152,7 @@ void protobuf_AssignDesc_stage_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(ChapterRequest));
-  ChapterResponse_descriptor_ = file->message_type(3);
+  ChapterResponse_descriptor_ = file->message_type(4);
   static const int ChapterResponse_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ChapterResponse, chapterlist_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ChapterResponse, nowchapter_),
@@ -146,7 +169,7 @@ void protobuf_AssignDesc_stage_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(ChapterResponse));
-  StageListRequest_descriptor_ = file->message_type(4);
+  StageListRequest_descriptor_ = file->message_type(5);
   static const int StageListRequest_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(StageListRequest, chapter_),
   };
@@ -161,7 +184,7 @@ void protobuf_AssignDesc_stage_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(StageListRequest));
-  StageListResponse_descriptor_ = file->message_type(5);
+  StageListResponse_descriptor_ = file->message_type(6);
   static const int StageListResponse_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(StageListResponse, stagelist_),
   };
@@ -176,8 +199,8 @@ void protobuf_AssignDesc_stage_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(StageListResponse));
-  BattleRequest_descriptor_ = file->message_type(6);
-  static const int BattleRequest_offsets_[7] = {
+  BattleRequest_descriptor_ = file->message_type(7);
+  static const int BattleRequest_offsets_[8] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BattleRequest, stageid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BattleRequest, hero1_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BattleRequest, hero2_),
@@ -185,6 +208,7 @@ void protobuf_AssignDesc_stage_5fprotocol_2eproto() {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BattleRequest, hero4_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BattleRequest, hero5_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BattleRequest, fid_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BattleRequest, stagestar_),
   };
   BattleRequest_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -197,7 +221,7 @@ void protobuf_AssignDesc_stage_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(BattleRequest));
-  BattleResponse_descriptor_ = file->message_type(7);
+  BattleResponse_descriptor_ = file->message_type(8);
   static const int BattleResponse_offsets_[8] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BattleResponse, stageid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BattleResponse, batch_),
@@ -219,7 +243,7 @@ void protobuf_AssignDesc_stage_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(BattleResponse));
-  AmbushRequest_descriptor_ = file->message_type(8);
+  AmbushRequest_descriptor_ = file->message_type(9);
   static const int AmbushRequest_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(AmbushRequest, batch_),
   };
@@ -234,7 +258,7 @@ void protobuf_AssignDesc_stage_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(AmbushRequest));
-  BattleFinish_descriptor_ = file->message_type(9);
+  BattleFinish_descriptor_ = file->message_type(10);
   static const int BattleFinish_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BattleFinish, reason_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BattleFinish, ispass_),
@@ -251,7 +275,7 @@ void protobuf_AssignDesc_stage_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(BattleFinish));
-  BattleFinishRep_descriptor_ = file->message_type(10);
+  BattleFinishRep_descriptor_ = file->message_type(11);
   static const int BattleFinishRep_offsets_[7] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BattleFinishRep, win_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BattleFinishRep, star_),
@@ -272,7 +296,7 @@ void protobuf_AssignDesc_stage_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(BattleFinishRep));
-  StageContinueRes_descriptor_ = file->message_type(11);
+  StageContinueRes_descriptor_ = file->message_type(12);
   static const int StageContinueRes_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(StageContinueRes, result_),
   };
@@ -287,7 +311,7 @@ void protobuf_AssignDesc_stage_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(StageContinueRes));
-  GetPrizeReq_descriptor_ = file->message_type(12);
+  GetPrizeReq_descriptor_ = file->message_type(13);
   static const int GetPrizeReq_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetPrizeReq, prizetype_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetPrizeReq, id_),
@@ -303,7 +327,7 @@ void protobuf_AssignDesc_stage_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(GetPrizeReq));
-  GetPrizeRes_descriptor_ = file->message_type(13);
+  GetPrizeRes_descriptor_ = file->message_type(14);
   static const int GetPrizeRes_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetPrizeRes, result_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetPrizeRes, prizes_),
@@ -319,7 +343,7 @@ void protobuf_AssignDesc_stage_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(GetPrizeRes));
-  Chapter_descriptor_ = file->message_type(14);
+  Chapter_descriptor_ = file->message_type(15);
   static const int Chapter_offsets_[6] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Chapter, id_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Chapter, name_),
@@ -339,7 +363,7 @@ void protobuf_AssignDesc_stage_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Chapter));
-  StageInfo_descriptor_ = file->message_type(15);
+  StageInfo_descriptor_ = file->message_type(16);
   static const int StageInfo_offsets_[9] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(StageInfo, id_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(StageInfo, name_),
@@ -362,7 +386,7 @@ void protobuf_AssignDesc_stage_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(StageInfo));
-  FieldEff_descriptor_ = file->message_type(16);
+  FieldEff_descriptor_ = file->message_type(17);
   static const int FieldEff_offsets_[9] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FieldEff, id_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FieldEff, type_),
@@ -402,6 +426,8 @@ void protobuf_RegisterTypes(const ::std::string&) {
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     StageInfoRes_descriptor_, &StageInfoRes::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    StageStar_descriptor_, &StageStar::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     ChapterRequest_descriptor_, &ChapterRequest::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     ChapterResponse_descriptor_, &ChapterResponse::default_instance());
@@ -440,6 +466,8 @@ void protobuf_ShutdownFile_stage_5fprotocol_2eproto() {
   delete StageInfoReq_reflection_;
   delete StageInfoRes::default_instance_;
   delete StageInfoRes_reflection_;
+  delete StageStar::default_instance_;
+  delete StageStar_reflection_;
   delete ChapterRequest::default_instance_;
   delete ChapterRequest_reflection_;
   delete ChapterResponse::default_instance_;
@@ -487,52 +515,57 @@ void protobuf_AddDesc_stage_5fprotocol_2eproto() {
     "ero_common.proto\032\033common/monster_common."
     "proto\032\030common/trap_common.proto\032\031common/"
     "prize_common.proto\"\037\n\014StageInfoReq\022\017\n\007st"
-    "ageId\030\001 \002(\005\"s\n\014StageInfoRes\022\016\n\006action\030\001 "
-    "\001(\005\022+\n\013monsterList\030\002 \003(\0132\026.protos.common"
-    ".Monster\022&\n\010itemList\030\003 \003(\0132\024.protos.comm"
-    "on.Prize\"/\n\016ChapterRequest\022\014\n\004type\030\001 \002(\005"
-    "\022\017\n\007chapter\030\002 \001(\005\"q\n\017ChapterResponse\022$\n\013"
-    "chapterList\030\001 \003(\0132\017.protos.Chapter\022\022\n\nno"
-    "wChapter\030\002 \001(\005\022$\n\tstageList\030\003 \003(\0132\021.prot"
-    "os.StageInfo\"#\n\020StageListRequest\022\017\n\007chap"
-    "ter\030\001 \002(\005\"9\n\021StageListResponse\022$\n\tstageL"
-    "ist\030\001 \003(\0132\021.protos.StageInfo\"x\n\rBattleRe"
+    "ageId\030\001 \002(\005\"\331\001\n\014StageInfoRes\022\016\n\006action\030\001"
+    " \001(\005\022+\n\013monsterList\030\002 \003(\0132\026.protos.commo"
+    "n.Monster\022&\n\010itemList\030\003 \003(\0132\024.protos.com"
+    "mon.Prize\022 \n\005star1\030\005 \001(\0132\021.protos.StageS"
+    "tar\022 \n\005star2\030\006 \001(\0132\021.protos.StageStar\022 \n"
+    "\005star3\030\007 \001(\0132\021.protos.StageStar\"6\n\tStage"
+    "Star\022\014\n\004open\030\001 \001(\010\022\014\n\004type\030\002 \001(\005\022\r\n\005para"
+    "m\030\003 \001(\005\"/\n\016ChapterRequest\022\014\n\004type\030\001 \002(\005\022"
+    "\017\n\007chapter\030\002 \001(\005\"q\n\017ChapterResponse\022$\n\013c"
+    "hapterList\030\001 \003(\0132\017.protos.Chapter\022\022\n\nnow"
+    "Chapter\030\002 \001(\005\022$\n\tstageList\030\003 \003(\0132\021.proto"
+    "s.StageInfo\"#\n\020StageListRequest\022\017\n\007chapt"
+    "er\030\001 \002(\005\"9\n\021StageListResponse\022$\n\tstageLi"
+    "st\030\001 \003(\0132\021.protos.StageInfo\"\213\001\n\rBattleRe"
     "quest\022\017\n\007stageId\030\001 \001(\005\022\r\n\005hero1\030\002 \001(\005\022\r\n"
     "\005hero2\030\003 \001(\005\022\r\n\005hero3\030\004 \001(\005\022\r\n\005hero4\030\005 \001"
-    "(\005\022\r\n\005hero5\030\006 \001(\005\022\013\n\003fid\030\007 \001(\005\"\354\001\n\016Battl"
-    "eResponse\022\017\n\007stageId\030\001 \002(\005\022\r\n\005batch\030\002 \002("
-    "\005\022%\n\010heroList\030\003 \003(\0132\023.protos.common.Hero"
-    "\022+\n\013monsterList\030\004 \003(\0132\026.protos.common.Mo"
-    "nster\022%\n\010trapList\030\005 \003(\0132\023.protos.common."
-    "Trap\022\037\n\005field\030\n \001(\0132\020.protos.FieldEff\022\017\n"
-    "\007maxTime\030\013 \001(\005\022\r\n\005param\030\014 \001(\005\"\036\n\rAmbushR"
-    "equest\022\r\n\005batch\030\001 \002(\005\"=\n\014BattleFinish\022\016\n"
-    "\006reason\030\001 \002(\005\022\016\n\006ispass\030\002 \001(\010\022\r\n\005blood\030\003"
-    " \001(\005\"\253\001\n\017BattleFinishRep\022\013\n\003win\030\001 \002(\010\022\014\n"
-    "\004star\030\002 \001(\005\022\014\n\004coin\030\003 \001(\005\022\r\n\005fcoin\030\005 \001(\005"
-    "\022%\n\010heroList\030\004 \003(\0132\023.protos.common.Hero\022"
-    "&\n\010itemList\030\006 \003(\0132\024.protos.common.Prize\022"
-    "\021\n\tmobieShop\030\007 \001(\010\"\"\n\020StageContinueRes\022\016"
-    "\n\006result\030\001 \002(\005\",\n\013GetPrizeReq\022\021\n\tprizeTy"
-    "pe\030\001 \002(\005\022\n\n\002id\030\002 \002(\005\"C\n\013GetPrizeRes\022\016\n\006r"
-    "esult\030\001 \002(\010\022$\n\006prizes\030\002 \003(\0132\024.protos.com"
-    "mon.Prize\"c\n\007Chapter\022\n\n\002id\030\001 \002(\005\022\014\n\004name"
-    "\030\002 \001(\t\022\016\n\006isOpen\030\003 \001(\010\022\014\n\004star\030\004 \001(\005\022\021\n\t"
-    "totalStar\030\005 \001(\005\022\r\n\005prize\030\006 \001(\005\"\224\001\n\tStage"
-    "Info\022\n\n\002id\030\001 \002(\005\022\014\n\004name\030\002 \001(\t\022\017\n\007inLeve"
-    "l\030\003 \001(\005\022\016\n\006isOpen\030\004 \001(\010\022\014\n\004star\030\005 \001(\005\022\016\n"
-    "\006action\030\006 \001(\005\022\016\n\006isMain\030\007 \001(\010\022\r\n\005prize\030\010"
-    " \001(\005\022\017\n\007friends\030\t \003(\t\"\253\001\n\010FieldEff\022\n\n\002id"
-    "\030\001 \002(\005\022\014\n\004type\030\002 \002(\005\022\014\n\004name\030\003 \001(\t\022\020\n\010in"
-    "terval\030\004 \002(\005\022\r\n\005limit\030\005 \002(\005\022\016\n\006param1\030\006 "
-    "\001(\005\022\016\n\006param2\030\007 \001(\005\022\'\n\007monster\030\010 \001(\0132\026.p"
-    "rotos.common.Monster\022\r\n\005batch\030\t \001(\005B0\n\035d"
-    "ass.server.gameserver.protosB\rStageProto"
-    "colH\001", 1805);
+    "(\005\022\r\n\005hero5\030\006 \001(\005\022\013\n\003fid\030\007 \001(\005\022\021\n\tstageS"
+    "tar\030\010 \001(\005\"\354\001\n\016BattleResponse\022\017\n\007stageId\030"
+    "\001 \002(\005\022\r\n\005batch\030\002 \002(\005\022%\n\010heroList\030\003 \003(\0132\023"
+    ".protos.common.Hero\022+\n\013monsterList\030\004 \003(\013"
+    "2\026.protos.common.Monster\022%\n\010trapList\030\005 \003"
+    "(\0132\023.protos.common.Trap\022\037\n\005field\030\n \001(\0132\020"
+    ".protos.FieldEff\022\017\n\007maxTime\030\013 \001(\005\022\r\n\005par"
+    "am\030\014 \001(\005\"\036\n\rAmbushRequest\022\r\n\005batch\030\001 \002(\005"
+    "\"=\n\014BattleFinish\022\016\n\006reason\030\001 \002(\005\022\016\n\006ispa"
+    "ss\030\002 \001(\010\022\r\n\005blood\030\003 \001(\005\"\253\001\n\017BattleFinish"
+    "Rep\022\013\n\003win\030\001 \002(\010\022\014\n\004star\030\002 \001(\005\022\014\n\004coin\030\003"
+    " \001(\005\022\r\n\005fcoin\030\005 \001(\005\022%\n\010heroList\030\004 \003(\0132\023."
+    "protos.common.Hero\022&\n\010itemList\030\006 \003(\0132\024.p"
+    "rotos.common.Prize\022\021\n\tmobieShop\030\007 \001(\010\"\"\n"
+    "\020StageContinueRes\022\016\n\006result\030\001 \002(\005\",\n\013Get"
+    "PrizeReq\022\021\n\tprizeType\030\001 \002(\005\022\n\n\002id\030\002 \002(\005\""
+    "C\n\013GetPrizeRes\022\016\n\006result\030\001 \002(\010\022$\n\006prizes"
+    "\030\002 \003(\0132\024.protos.common.Prize\"c\n\007Chapter\022"
+    "\n\n\002id\030\001 \002(\005\022\014\n\004name\030\002 \001(\t\022\016\n\006isOpen\030\003 \001("
+    "\010\022\014\n\004star\030\004 \001(\005\022\021\n\ttotalStar\030\005 \001(\005\022\r\n\005pr"
+    "ize\030\006 \001(\005\"\224\001\n\tStageInfo\022\n\n\002id\030\001 \002(\005\022\014\n\004n"
+    "ame\030\002 \001(\t\022\017\n\007inLevel\030\003 \001(\005\022\016\n\006isOpen\030\004 \001"
+    "(\010\022\014\n\004star\030\005 \001(\005\022\016\n\006action\030\006 \001(\005\022\016\n\006isMa"
+    "in\030\007 \001(\010\022\r\n\005prize\030\010 \001(\005\022\017\n\007friends\030\t \003(\t"
+    "\"\253\001\n\010FieldEff\022\n\n\002id\030\001 \002(\005\022\014\n\004type\030\002 \002(\005\022"
+    "\014\n\004name\030\003 \001(\t\022\020\n\010interval\030\004 \002(\005\022\r\n\005limit"
+    "\030\005 \002(\005\022\016\n\006param1\030\006 \001(\005\022\016\n\006param2\030\007 \001(\005\022\'"
+    "\n\007monster\030\010 \001(\0132\026.protos.common.Monster\022"
+    "\r\n\005batch\030\t \001(\005B0\n\035dass.server.gameserver"
+    ".protosB\rStageProtocolH\001", 1984);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "stage_protocol.proto", &protobuf_RegisterTypes);
   StageInfoReq::default_instance_ = new StageInfoReq();
   StageInfoRes::default_instance_ = new StageInfoRes();
+  StageStar::default_instance_ = new StageStar();
   ChapterRequest::default_instance_ = new ChapterRequest();
   ChapterResponse::default_instance_ = new ChapterResponse();
   StageListRequest::default_instance_ = new StageListRequest();
@@ -550,6 +583,7 @@ void protobuf_AddDesc_stage_5fprotocol_2eproto() {
   FieldEff::default_instance_ = new FieldEff();
   StageInfoReq::default_instance_->InitAsDefaultInstance();
   StageInfoRes::default_instance_->InitAsDefaultInstance();
+  StageStar::default_instance_->InitAsDefaultInstance();
   ChapterRequest::default_instance_->InitAsDefaultInstance();
   ChapterResponse::default_instance_->InitAsDefaultInstance();
   StageListRequest::default_instance_->InitAsDefaultInstance();
@@ -790,6 +824,9 @@ void StageInfoReq::Swap(StageInfoReq* other) {
 const int StageInfoRes::kActionFieldNumber;
 const int StageInfoRes::kMonsterListFieldNumber;
 const int StageInfoRes::kItemListFieldNumber;
+const int StageInfoRes::kStar1FieldNumber;
+const int StageInfoRes::kStar2FieldNumber;
+const int StageInfoRes::kStar3FieldNumber;
 #endif  // !_MSC_VER
 
 StageInfoRes::StageInfoRes()
@@ -798,6 +835,9 @@ StageInfoRes::StageInfoRes()
 }
 
 void StageInfoRes::InitAsDefaultInstance() {
+  star1_ = const_cast< ::protos::StageStar*>(&::protos::StageStar::default_instance());
+  star2_ = const_cast< ::protos::StageStar*>(&::protos::StageStar::default_instance());
+  star3_ = const_cast< ::protos::StageStar*>(&::protos::StageStar::default_instance());
 }
 
 StageInfoRes::StageInfoRes(const StageInfoRes& from)
@@ -809,6 +849,9 @@ StageInfoRes::StageInfoRes(const StageInfoRes& from)
 void StageInfoRes::SharedCtor() {
   _cached_size_ = 0;
   action_ = 0;
+  star1_ = NULL;
+  star2_ = NULL;
+  star3_ = NULL;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -818,6 +861,9 @@ StageInfoRes::~StageInfoRes() {
 
 void StageInfoRes::SharedDtor() {
   if (this != default_instance_) {
+    delete star1_;
+    delete star2_;
+    delete star3_;
   }
 }
 
@@ -845,6 +891,15 @@ StageInfoRes* StageInfoRes::New() const {
 void StageInfoRes::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     action_ = 0;
+    if (has_star1()) {
+      if (star1_ != NULL) star1_->::protos::StageStar::Clear();
+    }
+    if (has_star2()) {
+      if (star2_ != NULL) star2_->::protos::StageStar::Clear();
+    }
+    if (has_star3()) {
+      if (star3_ != NULL) star3_->::protos::StageStar::Clear();
+    }
   }
   monsterlist_.Clear();
   itemlist_.Clear();
@@ -899,6 +954,48 @@ bool StageInfoRes::MergePartialFromCodedStream(
           goto handle_uninterpreted;
         }
         if (input->ExpectTag(26)) goto parse_itemList;
+        if (input->ExpectTag(42)) goto parse_star1;
+        break;
+      }
+
+      // optional .protos.StageStar star1 = 5;
+      case 5: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_star1:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+               input, mutable_star1()));
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(50)) goto parse_star2;
+        break;
+      }
+
+      // optional .protos.StageStar star2 = 6;
+      case 6: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_star2:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+               input, mutable_star2()));
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(58)) goto parse_star3;
+        break;
+      }
+
+      // optional .protos.StageStar star3 = 7;
+      case 7: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_star3:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+               input, mutable_star3()));
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -938,6 +1035,24 @@ void StageInfoRes::SerializeWithCachedSizes(
       3, this->itemlist(i), output);
   }
 
+  // optional .protos.StageStar star1 = 5;
+  if (has_star1()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      5, this->star1(), output);
+  }
+
+  // optional .protos.StageStar star2 = 6;
+  if (has_star2()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      6, this->star2(), output);
+  }
+
+  // optional .protos.StageStar star3 = 7;
+  if (has_star3()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      7, this->star3(), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -965,6 +1080,27 @@ void StageInfoRes::SerializeWithCachedSizes(
         3, this->itemlist(i), target);
   }
 
+  // optional .protos.StageStar star1 = 5;
+  if (has_star1()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        5, this->star1(), target);
+  }
+
+  // optional .protos.StageStar star2 = 6;
+  if (has_star2()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        6, this->star2(), target);
+  }
+
+  // optional .protos.StageStar star3 = 7;
+  if (has_star3()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        7, this->star3(), target);
+  }
+
   if (!unknown_fields().empty()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
@@ -981,6 +1117,27 @@ int StageInfoRes::ByteSize() const {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::Int32Size(
           this->action());
+    }
+
+    // optional .protos.StageStar star1 = 5;
+    if (has_star1()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+          this->star1());
+    }
+
+    // optional .protos.StageStar star2 = 6;
+    if (has_star2()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+          this->star2());
+    }
+
+    // optional .protos.StageStar star3 = 7;
+    if (has_star3()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+          this->star3());
     }
 
   }
@@ -1031,6 +1188,15 @@ void StageInfoRes::MergeFrom(const StageInfoRes& from) {
     if (from.has_action()) {
       set_action(from.action());
     }
+    if (from.has_star1()) {
+      mutable_star1()->::protos::StageStar::MergeFrom(from.star1());
+    }
+    if (from.has_star2()) {
+      mutable_star2()->::protos::StageStar::MergeFrom(from.star2());
+    }
+    if (from.has_star3()) {
+      mutable_star3()->::protos::StageStar::MergeFrom(from.star3());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -1060,6 +1226,9 @@ void StageInfoRes::Swap(StageInfoRes* other) {
     std::swap(action_, other->action_);
     monsterlist_.Swap(&other->monsterlist_);
     itemlist_.Swap(&other->itemlist_);
+    std::swap(star1_, other->star1_);
+    std::swap(star2_, other->star2_);
+    std::swap(star3_, other->star3_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);
@@ -1071,6 +1240,292 @@ void StageInfoRes::Swap(StageInfoRes* other) {
   ::google::protobuf::Metadata metadata;
   metadata.descriptor = StageInfoRes_descriptor_;
   metadata.reflection = StageInfoRes_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int StageStar::kOpenFieldNumber;
+const int StageStar::kTypeFieldNumber;
+const int StageStar::kParamFieldNumber;
+#endif  // !_MSC_VER
+
+StageStar::StageStar()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+}
+
+void StageStar::InitAsDefaultInstance() {
+}
+
+StageStar::StageStar(const StageStar& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+}
+
+void StageStar::SharedCtor() {
+  _cached_size_ = 0;
+  open_ = false;
+  type_ = 0;
+  param_ = 0;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+StageStar::~StageStar() {
+  SharedDtor();
+}
+
+void StageStar::SharedDtor() {
+  if (this != default_instance_) {
+  }
+}
+
+void StageStar::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* StageStar::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return StageStar_descriptor_;
+}
+
+const StageStar& StageStar::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_stage_5fprotocol_2eproto();
+  return *default_instance_;
+}
+
+StageStar* StageStar::default_instance_ = NULL;
+
+StageStar* StageStar::New() const {
+  return new StageStar;
+}
+
+void StageStar::Clear() {
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    open_ = false;
+    type_ = 0;
+    param_ = 0;
+  }
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool StageStar::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+  ::google::protobuf::uint32 tag;
+  while ((tag = input->ReadTag()) != 0) {
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // optional bool open = 1;
+      case 1: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
+                 input, &open_)));
+          set_has_open();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(16)) goto parse_type;
+        break;
+      }
+
+      // optional int32 type = 2;
+      case 2: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_type:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &type_)));
+          set_has_type();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(24)) goto parse_param;
+        break;
+      }
+
+      // optional int32 param = 3;
+      case 3: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_param:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &param_)));
+          set_has_param();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectAtEnd()) return true;
+        break;
+      }
+
+      default: {
+      handle_uninterpreted:
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          return true;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+  return true;
+#undef DO_
+}
+
+void StageStar::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // optional bool open = 1;
+  if (has_open()) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(1, this->open(), output);
+  }
+
+  // optional int32 type = 2;
+  if (has_type()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->type(), output);
+  }
+
+  // optional int32 param = 3;
+  if (has_param()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(3, this->param(), output);
+  }
+
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+}
+
+::google::protobuf::uint8* StageStar::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // optional bool open = 1;
+  if (has_open()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(1, this->open(), target);
+  }
+
+  // optional int32 type = 2;
+  if (has_type()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->type(), target);
+  }
+
+  // optional int32 param = 3;
+  if (has_param()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(3, this->param(), target);
+  }
+
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  return target;
+}
+
+int StageStar::ByteSize() const {
+  int total_size = 0;
+
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // optional bool open = 1;
+    if (has_open()) {
+      total_size += 1 + 1;
+    }
+
+    // optional int32 type = 2;
+    if (has_type()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->type());
+    }
+
+    // optional int32 param = 3;
+    if (has_param()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->param());
+    }
+
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void StageStar::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const StageStar* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const StageStar*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void StageStar::MergeFrom(const StageStar& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_open()) {
+      set_open(from.open());
+    }
+    if (from.has_type()) {
+      set_type(from.type());
+    }
+    if (from.has_param()) {
+      set_param(from.param());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void StageStar::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void StageStar::CopyFrom(const StageStar& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool StageStar::IsInitialized() const {
+
+  return true;
+}
+
+void StageStar::Swap(StageStar* other) {
+  if (other != this) {
+    std::swap(open_, other->open_);
+    std::swap(type_, other->type_);
+    std::swap(param_, other->param_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata StageStar::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = StageStar_descriptor_;
+  metadata.reflection = StageStar_reflection_;
   return metadata;
 }
 
@@ -2044,6 +2499,7 @@ const int BattleRequest::kHero3FieldNumber;
 const int BattleRequest::kHero4FieldNumber;
 const int BattleRequest::kHero5FieldNumber;
 const int BattleRequest::kFidFieldNumber;
+const int BattleRequest::kStageStarFieldNumber;
 #endif  // !_MSC_VER
 
 BattleRequest::BattleRequest()
@@ -2069,6 +2525,7 @@ void BattleRequest::SharedCtor() {
   hero4_ = 0;
   hero5_ = 0;
   fid_ = 0;
+  stagestar_ = 0;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -2111,6 +2568,7 @@ void BattleRequest::Clear() {
     hero4_ = 0;
     hero5_ = 0;
     fid_ = 0;
+    stagestar_ = 0;
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
@@ -2229,6 +2687,22 @@ bool BattleRequest::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(64)) goto parse_stageStar;
+        break;
+      }
+
+      // optional int32 stageStar = 8;
+      case 8: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_stageStar:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &stagestar_)));
+          set_has_stagestar();
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -2286,6 +2760,11 @@ void BattleRequest::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt32(7, this->fid(), output);
   }
 
+  // optional int32 stageStar = 8;
+  if (has_stagestar()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(8, this->stagestar(), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -2327,6 +2806,11 @@ void BattleRequest::SerializeWithCachedSizes(
   // optional int32 fid = 7;
   if (has_fid()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(7, this->fid(), target);
+  }
+
+  // optional int32 stageStar = 8;
+  if (has_stagestar()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(8, this->stagestar(), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -2389,6 +2873,13 @@ int BattleRequest::ByteSize() const {
           this->fid());
     }
 
+    // optional int32 stageStar = 8;
+    if (has_stagestar()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->stagestar());
+    }
+
   }
   if (!unknown_fields().empty()) {
     total_size +=
@@ -2437,6 +2928,9 @@ void BattleRequest::MergeFrom(const BattleRequest& from) {
     if (from.has_fid()) {
       set_fid(from.fid());
     }
+    if (from.has_stagestar()) {
+      set_stagestar(from.stagestar());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -2467,6 +2961,7 @@ void BattleRequest::Swap(BattleRequest* other) {
     std::swap(hero4_, other->hero4_);
     std::swap(hero5_, other->hero5_);
     std::swap(fid_, other->fid_);
+    std::swap(stagestar_, other->stagestar_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

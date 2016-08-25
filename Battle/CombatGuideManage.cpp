@@ -375,7 +375,7 @@ namespace BattleSpace{
 	{
 		if (!FilePath)
 		{
-			if (!BattleManage->getStageID())
+			if (!BattleManage->getStageIndex())
 			{
 				char path[60] = {0};
 				sprintf(path,"%d_%d",0,BattleManage->getCurrBatch()+1);										//覆盖高亮区域的图片

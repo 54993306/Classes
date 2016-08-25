@@ -91,6 +91,7 @@ void CBagLayer::onEnter()
 	m_pageView->setDataSourceAdapter(this,ccw_datasource_adapter_selector(CBagLayer::gridviewDataSource));
 	m_pageView->reloadData();
 	
+
 	CButton* btn;
 	btn = (CButton *)m_ui->getChildByTag(4);
 	btn->setOnClickListener(this, ccw_click_selector(CBagLayer::onClickBtn));
@@ -294,7 +295,7 @@ void CBagLayer::onSetFilter(const TMessage& tMsg)
 }
 
 CCObject* CBagLayer::gridviewDataSource(CCObject* pConvertCell, unsigned int uIdx)
-{ 
+{
 	CGridViewCell* pCell = (CGridViewCell*)pConvertCell;
 	CLayout *clone = UICloneMgr::cloneLayout(m_cell);
 	if(!pCell)

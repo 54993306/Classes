@@ -8,7 +8,9 @@
 #include "common/CGameSound.h"
 #include "Battle/EffectData.h"
 #include "Battle/BattleMessage.h"
+#include "Battle/SpineDataManage.h"
 #include "common/CGameSound.h"
+#include "Battle/Config/ConfigManage.h"
 
 namespace BattleSpace{
 	StoryLayer::StoryLayer()
@@ -59,7 +61,7 @@ namespace BattleSpace{
 		}
 	}
 
-	bool StoryLayer::LoadFile(int storytype, StoryData* pStoryData)
+	bool StoryLayer::LoadFile(int storytype, const StoryData* pStoryData)
 	{
 		mapAddZero();
 		if(!pStoryData)
@@ -68,9 +70,9 @@ namespace BattleSpace{
 			if (!BattleManage->getFirstStage())		//第一次打关卡才出现关卡剧情
 				return false;
 #endif	
-			pStoryData = BattleManage->getStoryData();
+			pStoryData = BattleConfig->getStoryData();
 		}
-		vector<StoryStep*>* vec = pStoryData->getStory(StoryType(storytype));
+		const vector<StoryStep*>* vec = pStoryData->getStory(StoryType(storytype));
 		if (! vec) return false;
 		m_VecStep.assign(vec->begin(),vec->end());			//清空并复制
 		m_StoryStep = m_VecStep.at(m_index);
@@ -330,7 +332,7 @@ namespace BattleSpace{
 				return (SkeletonAnimation*)m_ui->getChildByTag(leftImg_tag);
 			}
 		}else{
-			SpData* data = BattleManage->getSpineData(ToString(m_StoryStep->getRoleID()));
+			SpineData* data = SpineManage->getSpineData(ToString(m_StoryStep->getRoleID()));
 			if (!data)
 			{
 				CCLOG("[ *ERROR ] StoryLayer::storyrole roleId=%d",m_StoryStep->getRoleID());

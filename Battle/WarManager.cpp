@@ -1,4 +1,4 @@
-﻿#include "WarManager.h"
+﻿#include "Battle/WarManager.h"
 #include "Battle/BattleCenter.h"
 #include "common/CommonFunction.h"
 #include "Battle/BuffManage.h"
@@ -13,12 +13,11 @@
 #include "tollgate/Chapter.h"
 #include "Battle/RoleObject/RoleObject.h"
 #include "Battle/CaptainSkill.h"
-#include "Battle/Landform/TerrainManager.h"
+#include "Battle/Landform/TrapManage.h"
 #include "Battle/MoveRule.h"
-#include "Battle/MapManager.h"
+#include "Battle/CoordsManage.h"
 #include "Battle/ComBatLogic.h"
 #include "Battle/ArmatureEventDataMgr.h"
-#include "Battle/ParseFileData.h"
 #include "Battle/BattleTools.h"
 /**************************************/
 #include "Battle/BattleDataCenter.h"
@@ -33,15 +32,11 @@
 namespace BattleSpace
 {
 	WarManager::WarManager()
-		:m_efdata(nullptr),m_armatureEventDataMgr(nullptr),mMaxCost(0),mCurrBatch(0)
-		,mStageID(-1),mBatch(0),m_iLastStageId(0),m_StageType(0),mLogicState(false)
+		:mMaxCost(0),mCurrBatch(0),mCaptainSkill(nullptr),mBattleOver(false),mFirstStage(true)
+		,mStageID(-1),mBatch(0),m_iLastStageId(0),m_StageType(0),mLogicState(false),m_iStageTimeCountDown(0)
 		,m_bNormal(true),m_ChapterCount(0),m_ChapterIndex(0), m_BossModel(false),mCostSpeed(0)
 		,m_VerifyNum(0),m_BossHurtCount(0),mBossHurtPe(0),m_iWorldBossRank(0),mCurrCost(0)
-		,mBattleOver(false),mFirstStage(true),mStoryData(nullptr),mBuffData(nullptr)
-		,mCaptainSkill(nullptr)
-	{
-		parseSpineModelFile(m_SpineID);
-	}
+	{}
 
 	void WarManager::BattleDataClear()
 	{
@@ -49,10 +44,11 @@ namespace BattleSpace
 		{
 			CC_SAFE_RELEASE(tRole.second);
 		}
+		setWorldBoss(false);
+		setWorldBossRank(0);
 		mBattleRole.clear();
 		mBatch = 0;
 		mCurrBatch = 0;
-		//mStageID = -1;
 		mBattleHeros.clear();
 		mBattleMonsters.clear();
 		mFirstStage = true;
@@ -62,36 +58,11 @@ namespace BattleSpace
 		mCostSpeed = 0;
 		mMaxCost = 0;
 		mLogicState = false;
-		ReleaseSpineData();
 		m_VecBossHurt.clear();
 		mBattleRoles.clear();
-		mMoveArea.clear();
-		mCostArea.clear();
-		mEnterArea.clear();
-		mOtherEnter.clear();
-		mUndefinedArea.clear();
-		BattleData->releaseRoleData();
-		CC_SAFE_RELEASE(m_efdata);
-		m_efdata = nullptr;
-		CC_SAFE_RELEASE(mBuffData);
-		mBuffData = nullptr;
-		CC_SAFE_RELEASE(mStoryData);
-		mStoryData = nullptr;
-		CC_SAFE_RELEASE(m_armatureEventDataMgr);
-		m_armatureEventDataMgr = nullptr;
+		BattleData->releaseRoleData();				//关于配置文件的部分也应该单独管理,做一个独立的管理器
 		CC_SAFE_RELEASE(mCaptainSkill);
 		mCaptainSkill = nullptr;
-	}
-
-	void WarManager::ReleaseSpineData()
-	{
-		for (auto tPair:mSpineData)
-		{
-			spSkeletonData_dispose(tPair.second.first);
-			spAtlas_dispose(tPair.second.second);
-			CCLOG("LoadSpineData::ReleaseData Release %s",tPair.first.c_str());
-		}
-		mSpineData.clear();
 	}
 	//初始化验证伤害值(服务器约定值),多个地方记录造成伤害防止被修改内存
 	void WarManager::setWorldBoss(bool model)
@@ -115,7 +86,7 @@ namespace BattleSpace
 		{
 			pRole->setAliveID(pRole->getAliveID()+mBattleRole.size());
 		}else{
-			BaseRole* tRole = getAlive( pRole->getAliveID() );
+			BaseRole* tRole = getRole( pRole->getAliveID() );
 			if( tRole )
 			{
 				CCLOG("[ **ERROR ]WarManager::addAlive has exists AliveModel:%d",pRole->getModel());
@@ -126,18 +97,10 @@ namespace BattleSpace
 		mBattleRole[pRole->getAliveID()] = pRole;
 	}
 
-	BaseRole* WarManager::getAlive(unsigned int aliveID)
+	BaseRole* WarManager::getRole(unsigned int pRoleID)
 	{
-		RolesMap::iterator iter = mBattleRole.find(aliveID);
+		RolesMap::iterator iter = mBattleRole.find(pRoleID);
 		if( iter != mBattleRole.end() ) return iter->second;
-		return nullptr;
-	}
-
-	SpData* WarManager::getSpineData( std::string Name )
-	{
-		MapSkeletonData::iterator iter = mSpineData.find(Name);
-		if (iter != mSpineData.end())
-			return &iter->second;
 		return nullptr;
 	}
 
@@ -148,14 +111,6 @@ namespace BattleSpace
 
 	void WarManager::initData()
 	{
-		m_efdata = EffectData::create();									//创建这些对象都需要读取文件，最好是整个战斗过程中只创建一次
-		m_efdata->retain();
-		mBuffData = BuffConfig::create();
-		mBuffData->retain();
-		mStoryData = StoryData::create();
-		mStoryData->retain();
-		m_armatureEventDataMgr = ArmatureEventDataMgr::create();
-		m_armatureEventDataMgr->retain();
 		mCaptainSkill = CaptainSkill::create();
 		mCaptainSkill->retain();
 		initHeroData();
@@ -174,7 +129,7 @@ namespace BattleSpace
 			tRole->setEnemy(false);
 			tRole->initAliveData();
 			mMaxCost += tRole->getCostMax();
-			if (BattleData->getBattleModel()->isPvEBattle())
+			if (BattleModelManage->isPvEBattle())
 			{
 				if (!tRole->getCaptain())
 					mCurrCost += tRole->getBaseData()->getExpendCost();
@@ -185,7 +140,7 @@ namespace BattleSpace
 			addBattleRole(tRole);
 		}
 
-		if (BattleData->getBattleModel()->isPvEBattle())
+		if (BattleModelManage->isPvEBattle())
 		{
 			const vector<HeroData*>tVector = BattleData->getPvPHeros();
 			for (int tIndex = 0 ;tIndex<tVector.size(); tIndex++)
@@ -322,25 +277,25 @@ namespace BattleSpace
 		VectorUnique(pRoles);
 	}
 
-	vector<BaseRole*>* WarManager::inBattleMonsters(bool pSort /*=false*/)
+	vector<BaseRole*>& WarManager::inBattleMonsters(bool pSort /*=false*/)
 	{
 		if (pSort)
 			VectorUnique(mBattleMonsters);
-		return &mBattleMonsters;
+		return mBattleMonsters;
 	}
 
-	vector<BaseRole*>* WarManager::inBattleHeros(bool pSort /*=false*/)
+	vector<BaseRole*>& WarManager::inBattleHeros(bool pSort /*=false*/)
 	{
 		if (pSort)
 			VectorUnique(mBattleHeros);
-		return &mBattleHeros;
+		return mBattleHeros;
 	}
 
-	vector<BaseRole*>* WarManager::inBattleRoles( bool pSort /*= false*/ )
+	vector<BaseRole*>& WarManager::inBattleRoles( bool pSort /*= false*/ )
 	{
 		if (pSort)
 			VectorUnique(mBattleRoles);
-		return &mBattleRoles;
+		return mBattleRoles;
 	}
 
 	BaseRole* WarManager::getAliveByGrid(int pGrid)
@@ -381,26 +336,11 @@ namespace BattleSpace
 		return true;
 	}
 
-	ArmatureEventDataMgr* WarManager::getArmatureDataMgr() 
-	{ 
-		return m_armatureEventDataMgr; 
-	}
-	const RolesMap* WarManager::getRolesMap() 
+	const RolesMap* WarManager::getRolesMap() const
 	{ 
 		return &mBattleRole; 
 	}
-	EffectData* WarManager::getEffData() 
-	{ 
-		return m_efdata; 
-	}
-	BuffConfig* WarManager::getBuffData()
-	{
-		return mBuffData;
-	}
-	StoryData* WarManager::getStoryData()
-	{
-		return mStoryData;
-	}
+
 	//每帧刷新一次武将信息,武将上下阵，死亡时，进入战斗区域时，有效角色数组需要刷新
 	void WarManager::updateAlive()
 	{
@@ -437,144 +377,26 @@ namespace BattleSpace
 	{
 		srandNum();
 		BattleDataClear();
-		ManageCenter->getMap()->clearMap();
+		BattleCoords->clearCoords();
 	}
 
 	void WarManager::initCommonData()
 	{
 		initData();
-		ReleaseSpineData();													//应该有更好的管理方法
-		ParseBattleGrid(mStageID,mMoveArea,mUndefinedArea,mEnterArea,mOtherEnter);		//解析的数据使用单一的对象进行管理(重构方向)
-		ParseAddCostGrid(mStageID,mCostArea);
 		mBattleOver = false;
-		mStoryData->initStoryData(mStageID);
-
 		CScene* scene = GETSCENE(LoadBattleResource);						//接收数据完成，跳转Load界面
 		LayerManager::instance()->closeAll();
 		CSceneManager::sharedSceneManager()->replaceScene(scene);
 	}
 
-	int WarManager::getCurrRandomGrid( int grid,bool hasAlive /*= false*/ )
-	{
-		int row = grid % C_GRID_ROW;
-		int col = grid / C_GRID_ROW;
-
-		CCArray* arr = CCArray::create();
-		if ((row+1)<C_GRID_ROW)
-			arr->addObject(CCInteger::create(col * C_GRID_ROW + row+1));
-		if ((row-1)>=0)
-			arr->addObject(CCInteger::create(col * C_GRID_ROW + row-1));
-		if ((col+1)<C_GRID_COL)
-		{
-			arr->addObject(CCInteger::create((col+1) * C_GRID_ROW + row));
-			if ((row+1)<C_GRID_ROW)
-				arr->addObject(CCInteger::create((col+1) * C_GRID_ROW + row+1));
-			if ((row-1)>=0)
-				arr->addObject(CCInteger::create((col+1) * C_GRID_ROW + row-1));
-		}	
-		if ((col-1)>=0)
-		{
-			arr->addObject(CCInteger::create((col-1) * C_GRID_ROW + row));
-			if ((row+1)<C_GRID_ROW)
-				arr->addObject(CCInteger::create((col-1) * C_GRID_ROW + row+1));
-			if ((row-1)>=0)
-				arr->addObject(CCInteger::create((col-1) * C_GRID_ROW + row-1));
-		}
-		int pGrid = grid;
-		do{
-			pGrid = ((CCInteger*)arr->randomObject())->getValue();
-			if (pGrid >= C_CAPTAINGRID)
-				continue;
-			if ( hasAlive && !getAliveByGrid(pGrid))
-			{
-				CCArray* arr = getHeros(true);
-				CCObject* obj = nullptr;
-				bool pMoveGrid = false;
-				CCARRAY_FOREACH(arr,obj)
-				{
-					BaseRole* alive = (BaseRole*)obj;
-					if (alive->getMoveGrid() == pGrid)								//且无人将要过去
-						pMoveGrid = true;
-				}
-				if (pMoveGrid)
-					continue;
-			}
-			return pGrid;
-		} while (true);
-		return pGrid;
-	}
-
-	void WarManager::initRoleSkillInfo( int pEffectID,BaseRole* pRole )
-	{
-		EffectInfo* tInfo = m_efdata->getEffectInfo(pEffectID);
-		if (tInfo)
-		{
-			pRole->SkillActionAndEffect(tInfo->getActionID(),tInfo->getusEft());
-		}else{
-			pRole->SkillActionAndEffect(5,0);
-			CCLOG("[ *ERROR ] WarManager::initRoleSkillInfo %d",pEffectID);
-		}
-	}
-
-	bool WarManager::isSpine( int pModeID )
-	{
-		vector<int>::iterator tSpine = m_SpineID.end();
-		if (std::find(m_SpineID.begin(),tSpine,pModeID) != tSpine)
-			return true;
-		return false;
-	}
-	//关于区域类的管理可以抽象成一个单独的对象来进行处理
-	bool WarManager::inAddCostArea( int pGrid )
-	{
-		if (pGrid == INVALID_GRID)
-			return true;
-		vector<int>::iterator tEnditer = mCostArea.end();
-		if (std::find(mCostArea.begin(),tEnditer,pGrid) != tEnditer)
-			return true;
-		return false;
-	}
-
-	bool WarManager::inMoveArea( int pGrid )
-	{
-		if (inUnDefineArea(pGrid))
-			return false;
-		vector<int>::iterator tEnditer = mMoveArea.end();
-		if (std::find(mMoveArea.begin(),tEnditer,pGrid) != tEnditer)
-			return true;						//点不在可移动范围内
-		return false;
-	}
-	//召唤区域和移动区域的关系问题，可以召唤的过去，但是不能再更换位置，或是出来后不能再回去
-	bool WarManager::inEnterArea( int pGrid )
-	{
-		if (inUnDefineArea(pGrid))
-			return false;
-		vector<int>::iterator tEnterIter = mEnterArea.end();
-		if (std::find(mEnterArea.begin(),tEnterIter,pGrid) != tEnterIter)
-			return true;
-		return false;
-	}
-
-	bool WarManager::inOtherEnter( int pGrid )
-	{
-		if (inUnDefineArea(pGrid))
-			return false;
-		vector<int>::iterator tEnterIter = mOtherEnter.end();
-		if (std::find(mOtherEnter.begin(),tEnterIter,pGrid) != tEnterIter)
-			return true;
-		return false;
-	}
-
-	bool WarManager::inUnDefineArea( int pGrid )
-	{
-		vector<int>::iterator tUnDefine = mUndefinedArea.end();
-		if (std::find(mUndefinedArea.begin(),tUnDefine,pGrid) != tUnDefine)
-			return true;						//点在未定义区域内
-		return false;
-	}
-
 	void WarManager::costUpdate( float delta )
 	{
-		mCostSpeed += delta;
+		if (BattleModelManage->isPvEBattle())
+		{
+			mCostSpeed += delta * 5;
+		}else{
+			mCostSpeed += delta;
+		}
 		if ( mCurrCost < mMaxCost )	//放必杀技时cost不发生改变
 		{
 #if BATTLE_TEST

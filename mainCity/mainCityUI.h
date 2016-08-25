@@ -91,7 +91,6 @@ public:
 	void showNoticeTip(CGameTips * ct);
 	void setShowHeadPart(bool isSHow);
 	void showHead(const TMessage& tMsg);
-	CCSprite * maskedSprite(CCSprite *textureSprite);
 	void exchangeMsg(int type, google::protobuf::Message *msg);
 };
 

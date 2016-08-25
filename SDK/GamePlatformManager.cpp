@@ -7,7 +7,7 @@
 
 #include "GamePlatformManager.h"
 #include "scene/layer/LoginLayerDefault.h"
-#include "scene/layer/LoginLayerFaceBook.h"
+#include "scene/layer/LoginLayerMix.h"
 #include "jni/CJniHelper.h"
 #include "vip/CPaySelect.h"
 #include "vip/CPayList.h"
@@ -103,7 +103,7 @@ void GamePlatformManager::InitPlatForm()
 
 BaseLayer *GamePlatformManager::getLoginLayer()
 {
-	//return LoginLayeFaceBook::create();
+	//return LoginLayerMix::create();
 
 	//平台登录相关
 	switch (G_PLATFORM_TARGET)
@@ -117,7 +117,7 @@ BaseLayer *GamePlatformManager::getLoginLayer()
 	case G_PLATFORM_APP_STORE:
 	case G_PLATFORM_FACEBOOK:
 		{
-			return LoginLayeFaceBook::create();
+			return LoginLayerMix::create();
 		}break;
 	//case G_PLATFORM_UC:
 	//	{
@@ -201,6 +201,11 @@ void GamePlatformManager::ShowPayUI()
 
 	switch (G_PLATFORM_TARGET)
 	{
+	case G_PLATFORM_UNKNOWN:
+		{
+			CPaySelect *paySel = CPaySelect::create();
+			LayerManager::instance()->push(paySel);
+		}break;
 	case G_PLATFORM_UC:
 		{
 			ShowPopTextTip(GETLANGSTR(2015));

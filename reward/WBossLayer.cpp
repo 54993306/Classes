@@ -19,6 +19,7 @@
 #include "Battle/EffectData.h"
 #include "Battle/ActionNameDefine.h"
 #include "Global.h"
+#include "Battle/SpineDataManage.h"
 #include "Battle/BattleCenter.h"
 using namespace BattleSpace;
 bool WBossSortWarPrize(const Prize& data1, const Prize& data2)
@@ -759,7 +760,7 @@ void CWBossLayer::updateBossTexture()
 	//使用模型代替贴图
 	int m_ModeID = m_pBoss.thumb;
 	
-	if (BattleManage->isSpine(m_ModeID))
+	if (SpineManage->isSpineModel(m_ModeID))
 	{ 
 		char json[60] = {0};
 		char altlas[60] = {0};

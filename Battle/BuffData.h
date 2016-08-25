@@ -22,9 +22,11 @@ namespace protos{
 		class Buff;
 	}
 }
-namespace BattleSpace{
-	//用于对服务器数据做转换和接收
-	class BuffData  : public cocos2d::CCObject
+
+//用于对服务器数据做转换和接收
+namespace BattleSpace
+{
+	class BuffData  : public CCObject
 	{
 	public:
 		virtual ~BuffData(){};
@@ -43,16 +45,16 @@ namespace BattleSpace{
 		void readData(const protos::common::Buff* buff);
 	protected:
 		BuffData();										//详细参见datadefine Bufinfo		
-		void initData(BuffData& pData);
+		void initData(const BuffData* pData);
 	};
 	//战斗中实际使用到的buff结构,buff是可以具备很多逻辑的,但是现在buff的逻辑都放在buff管理器里面去写了。应该是接口的方式抽象出来写才对
 	class BuffInfo : public BuffData
 	{
 	private:
-		BuffInfo(BuffData& pData);
+		BuffInfo(const BuffData* pData);
 	public:
 		virtual ~BuffInfo(){};
-		static BuffInfo* create(BuffData& pData);
+		static BuffInfo* create(const BuffData* pData);
 	public:
 		CC_PROPERTY(float,m_ExTime,ExTime);					//执行时间
 		CC_SYNTHESIZE(bool,m_Excute,Excute);				//是否为持续性Buf

@@ -25,16 +25,16 @@ namespace BattleSpace
 
 	void AffectLowesHp::initArea(AreaCountInfo& pInfo)
 	{
-		vector<BaseRole*>* tAlives = pInfo.getAlive()->getCurrSkillTargets();
-		SortRoleHp(*tAlives);
-		if (pInfo.getAreaRange() >= tAlives->size())
+		vector<BaseRole*> tAlives = pInfo.getAlive()->getCurrSkillTargets();
+		SortRoleHp(tAlives);
+		if (pInfo.getAreaRange() >= tAlives.size())
 		{
-			for(auto i:*tAlives)
-				pInfo.addGrid(i->getGridIndex());
+			for(auto tRole:tAlives)
+				pInfo.addGrid(tRole->getGridIndex());
 		}else{
-			for (auto i:*tAlives)
+			for (auto tRole:tAlives)
 			{
-				pInfo.addGrid(i->getGridIndex());
+				pInfo.addGrid(tRole->getGridIndex());
 				if (pInfo.getVector().size() >= pInfo.getAreaRange())
 					break;
 			}

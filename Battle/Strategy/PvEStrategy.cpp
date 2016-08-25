@@ -26,14 +26,14 @@
 #include "Battle/RoleSkill.h"
 #include "Battle/RoleObject/RoleObject.h"
 #include "Battle/MoveObject.h"
-
+#include "Battle/Config/ConfigManage.h"
 #include "Battle/BattleCenter.h"
 #include "Battle/WarManager.h"
 #include "Battle/ConstNum.h"
 
 namespace BattleSpace
 {
-	PvEStrategy::PvEStrategy():mPvEBattle(false),mBattleModel(nullptr),mExcuteStrategy(false),mAutoData(nullptr)
+	PvEStrategy::PvEStrategy():mPvEBattle(false),mExcuteStrategy(false),mAutoData(nullptr)
 		,mTotal(nullptr),mCurrCost(0),mMaxCost(0),mCostSpeed(0),mManage(nullptr),mSkillRole(nullptr)
 	{}
 
@@ -46,8 +46,7 @@ namespace BattleSpace
 	bool PvEStrategy::init()
 	{
 		mManage = BattleManage;
-		mBattleModel = BattleData->getBattleModel();
-		mPvEBattle = mBattleModel->isPvEBattle();
+		mPvEBattle = BattleModelManage->isPvEBattle();
 		mManage->initOtherCamp(mOtherRoles);
 		mAutoData = AutoData::create();
 		mAutoData->retain();
@@ -65,27 +64,20 @@ namespace BattleSpace
 		for (auto tRole : mOtherRoles)
 		{
 			mMaxCost += tRole->getCostMax();
-			mCostSpeed += tRole->getAddCost();
-			if (tRole->getCaptain())
-				mCurrCost += tRole->getInitCost();
 		}
-
+		mCurrCost = 0;					//对方的初始cost值为0
 	}
 	//第一步首先做战场的局势判断，提取武将需要关注的局势信息
 	void PvEStrategy::updatePvEStrategy()
 	{
 		if ( !mPvEBattle )
 			return;
-		//CCLOG("PvEStrategy CurrCost = %f,CostSpeed = %f",mCurrCost,mCostSpeed);
 		mExcuteStrategy = true;
 		mManage->updateAlive();
-		mHeros = *mManage->inBattleHeros(true);
-		mAliveOthers = *mManage->inBattleMonsters(true);
+		mHeros = mManage->inBattleHeros(true);
+		mAliveOthers = mManage->inBattleMonsters(true);
 		interceptInfo();
 		initCallHero();
-#if BATTLE_TEST
-		//mBattleModel->setStrategyType(sPvEStrategy::eDefense);
-#endif
 	}
 
 	void PvEStrategy::loopPvEBattle(float dt)
@@ -94,10 +86,7 @@ namespace BattleSpace
 			return;
 		if (mCurrCost < mMaxCost)
 		{
-			mCurrCost += (mCostSpeed * dt + dt);
-#if BATTLE_TEST
-			//mCurrCost += 100;
-#endif
+			mCurrCost += dt * 5;				//统一PVE双方cost恢复速度
 			if (mCurrCost >= mMaxCost)
 				mCurrCost = mMaxCost;
 		}
@@ -110,7 +99,10 @@ namespace BattleSpace
 
 	void PvEStrategy::excuteStrategy()
 	{
-		switch (mBattleModel->getStrategyType())
+#if BATTLE_TEST
+		return ;
+#endif
+		switch (BattleModelManage->getStrategyType())
 		{
 		case BattleSpace::sPvEStrategy::eBalance:
 		case BattleSpace::sPvEStrategy::eDefense:
@@ -131,10 +123,7 @@ namespace BattleSpace
 					}else{
 						playSkill();
 					}
-#if BATTLE_TEST
-					//return ;
-#endif
-					if (mBattleModel->getStrategyType() == sPvEStrategy::eBalance)
+					if (BattleModelManage->getStrategyType() == sPvEStrategy::eBalance)
 						freeOtherMove();							//主动寻敌策略(不能干等)武将不会追出警戒列
 				}
 			}break;
@@ -236,9 +225,9 @@ namespace BattleSpace
 
 	void PvEStrategy::setSummonGrid( BaseRole* pRole,int pGrid )
 	{
-		if (!mManage->inOtherEnter(pGrid) || pRole->hasOtherRole(pGrid))
+		if (!BattleConfig->inOtherEnter(pGrid) || pRole->hasOtherRole(pGrid))
 		{
-			for (auto tGrid : *mManage->getOtherEnter())
+			for (auto tGrid : BattleConfig->getOtherEnter())
 			{
 				if (sameRow(pGrid,tGrid) && !pRole->hasOtherRole(tGrid))
 				{
@@ -351,9 +340,9 @@ namespace BattleSpace
 	void PvEStrategy::callOtherRole()
 	{
 		vector<BaseRole*>::reverse_iterator iter = mHeros.rbegin();			//反向遍历,从位置最大的开始
-		for (auto tEnterGrid : *mManage->getOtherEnter())
+		for (auto tEnterGrid : BattleConfig->getOtherEnter())
 		{
-			if (mBattleModel->getStrategyType() == sPvEStrategy::eBalance && !hasSameRowByOther(tEnterGrid))			//类似的这种判断可以放到类本身中去进行，跟判断是否为PVE的战斗是一样的方式
+			if (BattleModelManage->getStrategyType() == sPvEStrategy::eBalance && !hasSameRowByOther(tEnterGrid))			//类似的这种判断可以放到类本身中去进行，跟判断是否为PVE的战斗是一样的方式
 			{
 				mAutoData->setInterceptGrid(tEnterGrid);					//找出能让多格子武将包含一个点的所有的格子（先逐个找，然后再找规律）
 				excuteCallRole();
@@ -424,7 +413,7 @@ namespace BattleSpace
 	void PvEStrategy::moveUnTargetRole(BaseRole* tOther)
 	{
 
-		switch (mBattleModel->getStrategyType())
+		switch (BattleModelManage->getStrategyType())
 		{
 		case BattleSpace::sPvEStrategy::eBalance:
 			{
@@ -477,7 +466,7 @@ namespace BattleSpace
 
 	void PvEStrategy::otherEnterMaxGrid( BaseRole* pOther )
 	{
-		for (auto tGrid : *mManage->getOtherEnter())
+		for (auto tGrid : BattleConfig->getOtherEnter())
 		{
 			if ( pOther->hasOtherRole(tGrid) || hasSameRowByOther(tGrid))
 				continue;
@@ -485,7 +474,7 @@ namespace BattleSpace
 			excuteCallRole();
 			return;
 		}
-		for (auto tGrid : *mManage->getOtherEnter())				//优先找不站人的，都站人了找能站得下去的
+		for (auto tGrid : BattleConfig->getOtherEnter())				//优先找不站人的，都站人了找能站得下去的
 		{
 			if ( pOther->hasOtherRole(tGrid))
 				continue;

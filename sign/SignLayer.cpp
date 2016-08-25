@@ -28,6 +28,7 @@
 
 #include <spine/spine-cocos2dx.h>
 
+#include "LuckyWheel/LuckyWheelLayer.h"
 
 using namespace spine;
 using namespace BattleSpace;
@@ -87,7 +88,7 @@ bool CSignLayer::init()
 		pClip->setPosition(pImageRect->getPosition());
 		pImageRect->getParent()->addChild(pClip, pImageRect->getZOrder()+1);
 		m_pClip = pClip;
-
+		
 		//展示区图片
 		m_show_info_scroll = (CScrollView*)m_ui->findWidgetById("scroll_info");
 		m_show_info_scroll->setDirection(eScrollViewDirectionVertical);
@@ -485,6 +486,7 @@ void CSignLayer::ProcessMsg(int type, google::protobuf::Message *msg)
 						sign.prize.num *= 2;
 					}
 					CPopItem *popItem = CPopItem::create();
+					
 					popItem->signPrize(&sign.prize);
 					popItem->setDescVisiable(true);
 					LayerManager::instance()->push(popItem);

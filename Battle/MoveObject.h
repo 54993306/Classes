@@ -15,7 +15,8 @@
  *
 *************************************************************/
 #include "cocos2d.h"
-namespace BattleSpace{
+namespace BattleSpace
+{
 	class BaseRole;
 	class MoveObject : public cocos2d::CCNode
 	{

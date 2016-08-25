@@ -12,8 +12,8 @@
 #include "common/RollLabel.h"
 #include "guide/GuideManager.h"
 #include "Battle/WarManager.h"
-#include "Battle/MapManager.h"
-#include "Battle/Landform/TerrainManager.h"
+#include "Battle/CoordsManage.h"
+#include "Battle/Landform/TrapManage.h"
 #include "Battle/ComBatLogic.h"
 #include "Battle/ConstNum.h"
 #include "mainCity/mainScene.h"
@@ -102,7 +102,7 @@ void CPlayerControl::sendRoleBag(int type, bool equip/*=false*/, int roleHeroId/
 	delete req;
 }
 
-void CPlayerControl::sendHeroList(int mask,int unionId,int roleId) //请求获取玩家英雄列表
+void CPlayerControl::sendHeroList(int mask, int unionId, int roleId, int iHeroType/*=0*/) //请求获取玩家英雄列表
 {
 	HeroListRequest *req = new HeroListRequest;
 	req->set_mark(mask);
@@ -114,6 +114,7 @@ void CPlayerControl::sendHeroList(int mask,int unionId,int roleId) //请求获�
 // 	{
 // 		req->set_roleid(roleId);
 // 	}
+	req->set_hero_type(iHeroType);
 	GetTcpNet->sendData(req,HeroListMsg,true);
 	delete req;
 }
@@ -208,7 +209,7 @@ void CPlayerControl::showBullet(float delt)
 }
 
 //进入关卡
-void CPlayerControl::sendEnterStage(int stageId,int hero1,int hero2, int hero3, int hero4, int hero5/*=0*/, int fid/*=0*/, int questId/*=0*/)
+void CPlayerControl::sendEnterStage(int stageId,int hero1,int hero2, int hero3, int hero4, int hero5/*=0*/, int fid/*=0*/, int questId/*=0*/, int iStageStar/*=0*/)
 {
 	BattleRequest *batReq = new BattleRequest;
 	batReq->set_stageid(stageId);
@@ -218,6 +219,7 @@ void CPlayerControl::sendEnterStage(int stageId,int hero1,int hero2, int hero3, 
 	batReq->set_hero4(hero4);
 	batReq->set_hero5(hero5);
 	batReq->set_fid(fid);
+	batReq->set_stagestar(iStageStar);
 	GetTcpNet->sendData(batReq,EnterStage);
 	delete batReq;
 }
@@ -328,7 +330,7 @@ void CPlayerControl::sendGetHeroInfo(int roleHeroId,int heroId,int roleId,int qu
 	delete req;
 }
 
-void CPlayerControl::sendUnion(int stageId/*=0*/, int questId/*=0*/, bool bBoss/*=false*/)
+void CPlayerControl::sendUnion(int stageId/*=0*/, int questId/*=0*/, bool bBoss/*=false*/, int iStarLevel/*=0*/)
 {
 	UnionRequest *req = new UnionRequest;
 	if(stageId>0)
@@ -336,6 +338,7 @@ void CPlayerControl::sendUnion(int stageId/*=0*/, int questId/*=0*/, bool bBoss/
 		req->set_stageid(stageId);
 	}
 	req->set_boss(bBoss);
+	req->set_starstar(iStarLevel);
 	GetTcpNet->sendData(req,UnionRes,true);
 	delete req;
 }
