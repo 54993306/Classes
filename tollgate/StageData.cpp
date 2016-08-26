@@ -83,3 +83,9 @@ const StageWidget* CStageData::getWidgetByStage(int chapter, int index)
 	return nullptr;
 }
 
+void CStageData::reload()
+{
+	m_stageMap.clear();
+	parseXml("csv/stage.xml");
+}
+

@@ -47,7 +47,7 @@ namespace BattleSpace
 		{
 			TrapObject* tTrapObject = TrapObject::createTrapObject(tPair.second);
 			const CCPoint& p = BattleCoords->getPoint(tPair.second->getGridIndex());
-			tTrapObject->setPosition(ccpAdd(p,ccp(0,-GRID_HEIGHT/2)));
+			tTrapObject->setPosition(p);
 			mTrapObjects->addChild(tTrapObject);
 		}
 	}

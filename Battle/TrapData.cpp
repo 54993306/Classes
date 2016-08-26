@@ -37,9 +37,9 @@ namespace BattleSpace
 		this->setRotatione(pTrap->batch());
 		mTrapBuff->readData(&pTrap->buff());
 #if BATTLE_TEST
-		this->setTrapType(sTrapType::eObstacle);
-		if (this->getPosition() == 106)
-			this->setPosition(107);
+		//this->setTrapType(sTrapType::eObstacle);
+		//if (this->getPosition() == 106)
+			//this->setPosition(107);
 		//this->setTrapModel(11000);
 		//this->setRotatione(90);
 #endif

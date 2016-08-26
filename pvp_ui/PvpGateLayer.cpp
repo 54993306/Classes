@@ -303,7 +303,7 @@ void CPvpGateLayer::initBuilding()
 {
 	//同步PVP
 	{
-		CCPoint pPosLeft[3] = {ccp(150, 50), ccp(137, 50), ccp(139, 50)};
+		CCPoint pPosLeft[3] = {ccp(150, 35), ccp(147, 35), ccp(149, 35)};
 
 		SkeletonAnimation *pSkeletonAnimation = SkeletonAnimation::createWithFile(
 			CCString::createWithFormat("pvp/gate/zuojian_%d.json", m_iGateLevel)->getCString(), 
@@ -316,7 +316,7 @@ void CPvpGateLayer::initBuilding()
 
 	//异步PVP
 	{
-		CCPoint pPosRight[3] = {ccp(950, 50), ccp(970, -5), ccp(970, -10)};
+		CCPoint pPosRight[3] = {ccp(970, 50), ccp(990, -5), ccp(990, -10)};
 
 		SkeletonAnimation *pSkeletonAnimation = SkeletonAnimation::createWithFile(
 			CCString::createWithFormat("pvp/gate/youjian_%d.json", m_iGateLevel)->getCString(), 
@@ -338,7 +338,7 @@ void CPvpGateLayer::initBaseBuild()
 			"pvp/gate/hong_pve.json", 
 			"pvp/gate/hong_pve.atlas", 
 			0.9f);
-		pSkeletonAnimation->setPosition(ccp(263, 351));
+		pSkeletonAnimation->setPosition(ccp(253, 351));
 		pSkeletonAnimation->setAnimation(0, "stand", true);
 		m_fMiddleLayer->addChild(pSkeletonAnimation, 4);
 	}
@@ -349,7 +349,7 @@ void CPvpGateLayer::initBaseBuild()
 			"pvp/gate/lan_pvp.json", 
 			"pvp/gate/lan_pvp.atlas", 
 			0.9f);
-		pSkeletonAnimation->setPosition(ccp(955, 311));
+		pSkeletonAnimation->setPosition(ccp(985, 321));
 		pSkeletonAnimation->setAnimation(0, "stand", true);
 		m_fMiddleLayer->addChild(pSkeletonAnimation, 4);
 	}

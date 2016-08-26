@@ -26,7 +26,7 @@ public:
 	void parseXml(const char* xml);
 	const vector<StageWidget>* getStageWidgets(int chapter);
 	const StageWidget* getWidgetByStage(int chapter, int index);
-protected:
+	void reload();
 private:
 	typedef map<int,vector<StageWidget>> StageMap;
 	StageMap m_stageMap;

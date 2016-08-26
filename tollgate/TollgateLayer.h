@@ -17,6 +17,8 @@ enum TollgateTouchDir
 	TollgateTouchDirRight
 };
 
+#define TEST_FOR_DESIGN 1
+
 class CTollgateLayer: public BaseLayer, public HttpLoadImageDelegate
 {
 public:
@@ -39,6 +41,8 @@ public:
 	CC_SYNTHESIZE(bool, m_bExitWithNoHardChapter, ExitWithNoHardChapter);
 	void setLastChapter(int chapter);
 	void imageLoadSuccessCallBack(string sTag, vector<char>* pBuffer);//好友头像下载回调
+
+	void updateForReloadFile(float dt);
 
 private:
 	//关闭

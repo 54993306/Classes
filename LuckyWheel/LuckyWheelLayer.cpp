@@ -27,12 +27,16 @@ CLuckyWheelLayer::CLuckyWheelLayer(void):
 	m_minPos(0),
 	m_maxPos(0),
 	m_showNoticeLabNum(0),
-	m_isRotateAction(false)
+	m_isRotateAction(false),
+	m_lightNum(0),
+	m_iPrizeAngle(0),
+	m_changelight(0),
+	m_randomAng(0),
+	m_startRotateTime(0),
+	m_isSlow(false),
+	m_isUpdateItemList(true)
 {
-	m_lightNum = 0;
-	m_iPrizeAngle =0;
-	m_changelight = 0;
-	m_randomAng = 0;
+
 }
 
 CLuckyWheelLayer::~CLuckyWheelLayer(void)
@@ -62,6 +66,13 @@ bool CLuckyWheelLayer::init()
 void CLuckyWheelLayer::onEnter()
 {
 	BaseLayer::onEnter();
+
+	//人物动画
+	SkeletonAnimation* ani = SkeletonAnimation::createWithFile("luckyWheel/qiuqiannv.json","luckyWheel/qiuqiannv.atlas",1);
+	ani->setPosition(ccp(200,10));
+	ani->setAnimation(0,"stand",true);
+	m_ui->addChild(ani,-10);
+
 	m_closeBtn = (CButton*)m_ui->findWidgetById("closeBtn");
 	m_closeBtn->setPosition(VLEFT+50 ,VTOP-50);
 	m_closeBtn->getSelectedImage()->setScale(1.1f);
@@ -83,10 +94,13 @@ void CLuckyWheelLayer::onEnter()
 	m_prizeItemTag->setPosition(m_pointer->getPosition());
 	m_prizeItemTag->setVisible(false);
 
+	CButton* updateItemList = (CButton* )m_ui->findWidgetById("updateItemList");
+	updateItemList->setOnClickListener(this,ccw_click_selector(CLuckyWheelLayer::onUpdateItemListClick));
+
 	GetTcpNet->registerMsgHandler(LuckyWheelMsg,this,CMsgHandler_selector(CLuckyWheelLayer::ProcessMsg));
 	GetTcpNet->registerMsgHandler(DrawRequestMsg,this,CMsgHandler_selector(CLuckyWheelLayer::ProcessMsg));
 	srand(time(NULL));
-	
+
 	initNoticeLabelShow();
 	this->schedule(schedule_selector(CLuckyWheelLayer::updateNoticeLabelShowSchedule),1.5f,-1,1);
 	this->schedule(schedule_selector(CLuckyWheelLayer::updateLightActionEffect),0.05f,-1,0);
@@ -160,7 +174,7 @@ void CLuckyWheelLayer::ProcessMsg(int type, google::protobuf::Message* msg)
 						}
 					}
 					m_prizeIndex[0] = lotter->prize_index(0);
-
+					CCLOG("prize_index_is_%d",m_prizeIndex[0]);
 					showOnceRotate();
 					updateLotteryItem();
 
@@ -173,7 +187,7 @@ void CLuckyWheelLayer::ProcessMsg(int type, google::protobuf::Message* msg)
 					for (int i = 0; i < lotter->prize_index_size();i++)
 					{
 						int index = lotter->prize_index(i);
-						CCLOG("index_%d",index);
+						CCLOG("prize_index_is_%d",index);
 						m_prizeIndex[i] = index;
 
 						for (int i = 1; i <= m_prizeList.size(); i++)
@@ -310,6 +324,11 @@ void CLuckyWheelLayer::onClose(CCObject* obj)
 	LayerManager::instance()->pop();
 	LayerManager::instance()->pop();
 }
+void CLuckyWheelLayer::onUpdateItemListClick(CCObject* pSender)
+{
+	m_isUpdateItemList = true;
+	updateLotteryItem();
+}
 
 void CLuckyWheelLayer::onWheelBtnOnceClick(CCObject* obj)
 {
@@ -322,6 +341,10 @@ void CLuckyWheelLayer::onWheelBtnOnceClick(CCObject* obj)
 		return;
 	}else
 	{
+		//if (m_onceNeedGold == 0)
+		//{
+		//	m_onceNeedGold = 100;
+		//}
 		m_lotteryType = onceLottery;
 		//发送请求
 		DrawRequest* req = new DrawRequest;
@@ -406,14 +429,23 @@ void CLuckyWheelLayer::followAngle()
 void CLuckyWheelLayer::showOnceRotate()
 {
 	//显示一次抽奖动画
-	CCLOG("%d", m_prizeIndex[0]);
+	CCLOG("showOnceRotate");
 
 	m_isRotateAction = true;
+	m_startRotateTime = 0;
+	m_isSlow = false;
 
 	int recordAngle = m_iRotateAngle + m_randomAng;
 	m_randomAng = -15 + rand()%35;
-	m_iRotateAngle = 36* (m_prizeIndex[0] -1);
 
+	for (int i = 0;i< m_pItemListNum;i++)
+	{
+		if (m_prizeIndex[0] == m_itemRandomIndex[i])
+		{
+			m_iRotateAngle = 36* (i);
+		}
+	}
+	
 	m_pointer->runAction(CCSequence::create(
 		CCEaseExponentialIn::create(CCRotateBy::create(2.0f,360)),
 		CCRotateBy::create(4,360* 20+ 360- recordAngle),
@@ -428,7 +460,13 @@ void CLuckyWheelLayer::showTenRotate()
 
 	int recordAngle = m_iRotateAngle + m_randomAng;
 	m_randomAng = -15 + rand()%35;
-	m_iRotateAngle = 36* (m_prizeIndex[m_recordTime] -1);
+	for (int i =0; i<m_pItemListNum;i++)
+	{
+		if (m_prizeIndex[m_recordTime] == m_itemRandomIndex[i])
+		{
+			m_iRotateAngle = 36* (i);
+		}
+	}
 
 	++m_recordTime;
 	m_pointer->runAction(CCSequence::create(
@@ -447,28 +485,39 @@ void CLuckyWheelLayer::callBackForTenActionGoing()
 	//image->setRotation(m_iRotateAngle);
 	//m_ui->addChild(image,-1,99);
 	//CCLOG("%d",image->getTag());
-	for (int i = 1; i <= m_pItemListNum; i++)
-	{
-		if (i == m_prizeIndex[m_recordTime -1])
-		{
-			CCString* str = CCString::createWithFormat("prize_%d",i);
-			CImageView* showPrize = (CImageView* )m_ui->findWidgetById(str->getCString());
-			showPrize->setVisible(true);
-		}
-	}
 
-	int recordAngle = m_iRotateAngle + m_randomAng;
-	m_randomAng = -15 + rand()%35;
-	m_iRotateAngle = 36* (m_prizeIndex[m_recordTime] -1);
-	
 	m_prizeItemTag->setVisible(true);
-	m_prizeItemTag->setRotation(recordAngle);
+	m_prizeItemTag->setRotation(m_iRotateAngle);
 	m_prizeItemTag->runAction(CCSequence::create(
 		CCBlink::create(0.5,3),
 		CCHide::create(),
 		//CCCallFunc::create(this,callfunc_selector(CLuckyWheelLayer::callBackForShowGainPrize)),
 		nullptr));
 
+	for (int i = 0; i < m_pItemListNum; i++)
+	{
+		if (m_prizeIndex[m_recordTime -1] == m_itemRandomIndex[i])
+		{
+			CCString* str = CCString::createWithFormat("prize_%d",i+1);
+			CImageView* showPrize = (CImageView* )m_ui->findWidgetById(str->getCString());
+			showPrize->runAction(CCSequence::create(
+				CCHide::create(),
+				CCDelayTime::create(0.5f),
+				CCShow::create(),
+				nullptr));
+			break;
+		}
+	}
+	int recordAngle = m_iRotateAngle + m_randomAng;
+	m_randomAng = -15 + rand()%35;
+	for (int i =0; i<m_pItemListNum;i++)
+	{
+		if (m_prizeIndex[m_recordTime] == m_itemRandomIndex[i])
+		{
+			m_iRotateAngle = 36* (i);
+			break;
+		}
+	}
 	++m_recordTime;
 	if (m_recordTime < 10)
 	{
@@ -487,6 +536,7 @@ void CLuckyWheelLayer::callBackForTenActionGoing()
 void CLuckyWheelLayer::callBackForActionEnd()
 {
 	//显示黄标闪烁
+	CCLOG("callBackForActionEnd");
 
 	m_prizeItemTag->setRotation(m_iRotateAngle);
 	m_prizeItemTag->setVisible(true);
@@ -496,7 +546,7 @@ void CLuckyWheelLayer::callBackForActionEnd()
 		initUILightOffEffect();
 
 		m_prizeItemTag->runAction(CCSequence::create(
-			CCBlink::create(1.0,5),
+			CCBlink::create(2,5),
 			CCHide::create(),
 			CCCallFunc::create(this,callfunc_selector(CLuckyWheelLayer::callBackForShowGainPrize)),
 			nullptr));
@@ -509,8 +559,24 @@ void CLuckyWheelLayer::callBackForActionEnd()
 		m_prizeItemTag->runAction(CCSequence::create(
 			CCBlink::create(0.5,3),
 			CCHide::create(),
+			CCDelayTime::create(0.5f),
 			CCCallFunc::create(this,callfunc_selector(CLuckyWheelLayer::callBackForShowGainPrize)),
 			nullptr));
+
+		for (int i = 0; i < m_pItemListNum; i++)
+		{
+			if (m_prizeIndex[m_recordTime -1] == m_itemRandomIndex[i])
+			{
+				CCString* str = CCString::createWithFormat("prize_%d",i+1);
+				CImageView* showPrize = (CImageView* )m_ui->findWidgetById(str->getCString());
+				showPrize->runAction(CCSequence::create(
+					CCHide::create(),
+					CCDelayTime::create(0.5f),
+					CCShow::create(),
+					nullptr));
+				break;
+			}
+		}
 	}
 }
 void CLuckyWheelLayer::callBackForShowGainPrize()
@@ -578,6 +644,7 @@ void CLuckyWheelLayer::callBackForShowGainPrize()
 			LayerManager::instance()->push(popItem);
 			popItem->popPrizeRes(&prizes);
 
+			m_prizeItemTag->setVisible(false);
 			for (int i = 1; i <= m_pItemListNum; i++)
 			{
 				CCString* str = CCString::createWithFormat("prize_%d",i);
@@ -594,6 +661,9 @@ void CLuckyWheelLayer::callBackForShowGainPrize()
 
 			updateUserData();
 		}
+		//发送更新数据
+		GetTcpNet->sendDataType(LuckyWheelMsg);//,true
+		GetTcpNet->registerMsgHandler(LuckyWheelMsg,this,CMsgHandler_selector(CLuckyWheelLayer::ProcessMsg));
 	}
 }
 
@@ -623,11 +693,37 @@ void CLuckyWheelLayer::updateLightActionEffect(float delta)
 
 	if (m_isRotateAction)
 	{
-		followAngle();
-		
-		m_prizeItemTag->setVisible(true);
-		m_prizeItemTag->setRotation(m_iPrizeAngle);
-
+		//抽奖一次动画实现
+		if (m_lotteryType == onceLottery)
+		{
+			++m_startRotateTime;
+			if (m_startRotateTime >= 30 )
+			{
+				if (!m_isSlow)
+				{
+					m_prizeItemTag->setVisible(true);
+					m_iPrizeAngle += 36;
+					m_prizeItemTag->setRotation(m_iPrizeAngle);
+					if (m_startRotateTime >= 100 && ((int )(m_prizeItemTag->getRotation()))%360 - 15 <= ((int )(m_pointer->getRotation()))%360 && 
+						((int )(m_prizeItemTag->getRotation()))%360 + 15 >= ((int )(m_pointer->getRotation()))%360)
+					{
+						m_isSlow = true;
+					}
+				}
+				else
+				{
+					followAngle();
+					m_prizeItemTag->setVisible(true);
+					m_prizeItemTag->setRotation(m_iPrizeAngle);
+				}
+			}else
+			{
+				followAngle();
+				m_prizeItemTag->setVisible(true);
+				m_prizeItemTag->setRotation(m_iPrizeAngle);
+			}
+		}
+		//抽奖灯光闪烁效果
 		for (int i = 1; i<= 10; i++ )
 		{
 			CCString* str = CCString::createWithFormat("light_%d",i);
@@ -645,7 +741,6 @@ void CLuckyWheelLayer::updateLightActionEffect(float delta)
 			else if(light_on->getTexture() == spTextture3)
 				light_on->setTexture(spTextture1);
 		}
-
 		maskWheel->setRotation(0);
 		if (maskWheel->isVisible())
 			maskWheel->setVisible(false);
@@ -656,11 +751,11 @@ void CLuckyWheelLayer::updateLightActionEffect(float delta)
 			maskPoint->setVisible(false);
 		else
 			maskPoint->setVisible(true);
-
 	}else
 	{
-		m_prizeItemTag->setVisible(false);
-
+		//m_prizeItemTag->setVisible(false);
+		
+		//不抽奖时特效
 		if (m_changelight >= 10)
 		{
 			m_changelight = 0;
@@ -670,7 +765,6 @@ void CLuckyWheelLayer::updateLightActionEffect(float delta)
 				CImageView* light_on = (CImageView* )m_ui->findWidgetById(str_on->getCString());
 				CCString* str_off= CCString::createWithFormat("light_%d_Copy",i);
 				CImageView* light_off = (CImageView* )m_ui->findWidgetById(str_off->getCString());
-
 
 				if (light_off->isVisible())
 				{
@@ -682,13 +776,11 @@ void CLuckyWheelLayer::updateLightActionEffect(float delta)
 					light_off->setVisible(true);
 				}
 			}
-
 			if (maskWheel->isVisible())
 			{
 				maskWheel->setVisible(false);
 				maskWheel->setRotation(0);
-			}
-			else
+			}else
 			{
 				maskWheel->setVisible(true);
 				maskWheel->setRotation(90);
@@ -703,34 +795,77 @@ void CLuckyWheelLayer::updateLightActionEffect(float delta)
 
 }
 
+void CLuckyWheelLayer::randomItemArray()
+{
+	if (!m_isUpdateItemList)
+		return;
+
+	//随机1-10之间的十个数的顺序
+	for (int i = 0;i< m_pItemListNum;i++)
+	{
+		m_itemRandomIndex[i] = i+1;
+	}
+	random_shuffle(m_itemRandomIndex,m_itemRandomIndex+m_pItemListNum);
+	m_isUpdateItemList  = false;
+
+	//for (int i = 0 ;i< m_pItemListNum ;i++)
+	//{
+	//	int random = rand()%10 + 1;
+	//	if (i == 0)
+	//	{
+	//		m_itemRandomIndex[i] = random;
+	//	}else
+	//	{
+	//		for (int index =0; index< i ;index++)
+	//		{
+	//			if ()
+	//			{
+	//			}
+	//		}
+	//		m_itemRandomIndex[i] = random;
+	//	}
+	//}
+}
 void CLuckyWheelLayer::updateLotteryItem()
 {
 	//更新转盘Item的显示
-	CCLOG("updateLotteryItem");
+	CCLOG("updateLotteryItem,_ onceNeedGold = %d",m_onceNeedGold);
 
 	CLabel* onceNeedGold = (CLabel*)m_ui->findWidgetById("onceNeedGold");
-	onceNeedGold->setString(ToString(m_onceNeedGold));
 	CLabel* onceNeedGold_0 = (CLabel*)m_ui->findWidgetById("onceNeedGold_0");
-	if (m_onceNeedGold == 0)
+	if (m_onceNeedGold != 0)
+	{
+		onceNeedGold->setVisible(true);
+		onceNeedGold->setString(ToString(m_onceNeedGold));
+		onceNeedGold_0->setVisible(false);
+		CImageView* redPoint = (CImageView* )m_ui->findWidgetById("redPoint");
+		redPoint->setVisible(false);
+	}else
 	{
 		onceNeedGold->setVisible(false);
 		onceNeedGold_0->setVisible(true);
-	}else
-	{
-		onceNeedGold->setVisible(true);
-		onceNeedGold_0->setVisible(false);
+		CImageView* redPoint = (CImageView* )m_ui->findWidgetById("redPoint");
+		redPoint->setVisible(true);
 	}
+
 	CLabel* tenNeedGold = (CLabel* )m_ui->findWidgetById("tenNeedGold");
 	tenNeedGold->setString(ToString(m_tenNeedGold));
 
+	//随机一个数组的值
+	randomItemArray();
+	for (int i = 0; i < 10; i++)
+	{
+		CCLOG("prize_index_%d_in_prizeList_index_is_%d",i+1,m_itemRandomIndex[i]);
+	}
 	for (int i = 0 ; i < m_prizeList.size();i++)
 	{
-		CPrize& iPrize = m_prizeList.at(i);
+		CPrize& iPrize = m_prizeList.at(m_itemRandomIndex[i] -1);
 
 		CCString* str = CCString::createWithFormat("Item%d",i+1);
 		CLayout* item = (CLayout* )m_ui->findWidgetById(str->getCString());
-
+		//道具背景
 		CImageView* pImage = (CImageView* )item->getChildByTag(1);
+		pImage->removeAllChildren();
 		pImage->setTouchEnabled(true);
 		pImage->setEnabled(true);
 		pImage->setUserData(&m_prizeList.at(i));
@@ -739,18 +874,21 @@ void CLuckyWheelLayer::updateLotteryItem()
 		CCSprite* spItem = nullptr;
 		if(iPrize.thumb >= 0)
 		{
-			CImageView* mask = (CImageView* )item->getChildByTag(2);
-			SmartSetRectPrizeColor(mask, &iPrize);
+			//道具框
+			CImageView* frame = (CImageView* )item->getChildByTag(2);
+			
+			frame->removeAllChildren();
+			SmartSetRectPrizeColor(frame, &iPrize);
 			spItem = CCSprite::create(GetImageName(iPrize.type,iPrize.color,iPrize.thumb).c_str());
 			if (!spItem)
 			{
 				spItem = CCSprite::create("headImg/101.png");
 				CCLOG("CLuckyWheelLayer::updateLotteryItem error load image %d",iPrize.thumb);
 			}
-			spItem->setPosition(ccp(mask->getContentSize().width/2, mask->getContentSize().height/2));
-			mask->addChild(spItem, -1,1);
+			spItem->setPosition(ccp(frame->getContentSize().width/2, frame->getContentSize().height/2));
+			frame->addChild(spItem, -1,1);
 			spItem->setScale(0.9f);
-
+			//添加数量
 			CCLabelAtlas* itemNum = CCLabelAtlas::create("","label/no_02.png",9,15,46);
 			itemNum->setAnchorPoint(ccp(1.0f,0.0f));
 			itemNum->setPosition(ccp(85,5));
@@ -769,7 +907,7 @@ void CLuckyWheelLayer::updateLotteryItem()
 			if (iPrize.quality > 0)
 			{
 				CLayout* pStar = SmartGetStarLayout(&iPrize);
-				mask->addChild(pStar,20,3);
+				frame->addChild(pStar,20,3);
 			}
 		}
 

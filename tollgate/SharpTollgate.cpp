@@ -18,6 +18,8 @@
 #include "TollgatePreview.h"
 #include "Battle/BattleCenter.h"
 #include "Battle/AnimationManager.h"
+#include "mainCity/mainScene.h"
+
 
 using namespace BattleSpace;
 
@@ -142,7 +144,7 @@ void CSharpTollgate::addTableCell(unsigned int uIdx, CTableViewCell * pCell)
 					CButton *btn =  CButton::create(widget->normalImage.c_str());
 					btn->setScaleX(widget->scaleX);
 					btn->setScaleY(widget->scaleY);
-					btn->setPosition(ccp(btn->boundingBox().size.width/2, 80/*btn->boundingBox().size.height*/));  
+					btn->setPosition(ccp(100, 80/*btn->boundingBox().size.height*/));  
 					btn->setAnchorPoint(ccp(0.5, 0.0));
 					btn->setUserData(&m_stageList.at(uIdx));
 					btn->setOnClickListener(this,ccw_click_selector(CSharpTollgate::onBattle));
@@ -170,17 +172,13 @@ void CSharpTollgate::addTableCell(unsigned int uIdx, CTableViewCell * pCell)
 				image->setShaderProgram(ShaderDataMgr->getShaderByType(ShaderStone));
 			}
 			image->setAnchorPoint(ccp(0.5f,0));
+
 			pCell->addChild(image);
 		}
 	}
 	pCell->setVisible(false);
 	pCell->setScale(1.15f);
 	pCell->runAction(CCSequence::create(CCDelayTime::create(0.1f+0.15f*uIdx),CCShow::create(),CCScaleTo::create(0.05f,1.0f),CCCallFuncN::create(this,callfuncN_selector(CSharpTollgate::heroCall)),nullptr));
-
-	if (uIdx==3)
-	{
-		pCell->setPositionX(pCell->getPositionX()+30);
-	}
 }
 
 void CSharpTollgate::heroCall(CCNode* pNode)
@@ -202,7 +200,7 @@ void CSharpTollgate::setStageList(const vector<CStage>& stageList, int chapter, 
 	m_tableView->reloadData();
 
 	CTableViewCell *cell = m_tableView->cellAtIndex(3);
-	cell->setPositionX(cell->getPositionX()+65);
+	cell->setPositionX(cell->getPositionX()+115);
 
 	CImageView *name = (CImageView*)(m_ui->findWidgetById("name"));
 	CCTexture2D *texture = CCTextureCache::sharedTextureCache()->addImage(CCString::createWithFormat("tollgate/chapter_%d.png",chapter)->getCString());

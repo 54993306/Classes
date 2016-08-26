@@ -15,9 +15,8 @@
 #include "Battle/WarManager.h"
 #include "Battle/CoordsManage.h"
 #include "Battle/Landform/TrapManage.h"
-#include "Battle/CHeroSoundData.h"
+#include "Battle/RoleConfig.h"
 #include "Battle/CombatGuideManage.h"
-#include "Battle/CHeroSoundData.h"
 #include "Battle/SpineDataManage.h"
 #include "Battle/Config/ConfigManage.h"
 #include "Battle/Landform/AreaManage.h"
@@ -124,11 +123,11 @@ namespace BattleSpace
 		return mGuideManage;
 	}
 	//每个武将的解析数据应该是跟武将模型绑定在一起的
-	CRroleData* BattleCenter::getRoleConfig()
+	RoleConfig* BattleCenter::getRoleConfig()
 	{
 		if (mRoleConfigData == nullptr)
 		{
-			mRoleConfigData = CRroleData::create();
+			mRoleConfigData = RoleConfig::create();
 			mRoleConfigData->retain();
 		}
 		return mRoleConfigData;

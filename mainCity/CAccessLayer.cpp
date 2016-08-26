@@ -5,6 +5,7 @@
 #include "UserDefaultData.h"
 #include "set/ExchangeCode.h"
 #include "LuckyWheel//LuckyWheelLayer.h"
+//#include "activity/PairCardsActivity.h"
 #include "common/CommonFunction.h"
 #include "sign/PopItem.h"
 #include "tools/ShowTexttip.h"
@@ -77,10 +78,6 @@ void CAccessLayer::initAccess()
 	CImageViewScale9* pMaskTouch = (CImageViewScale9*)m_ui->findWidgetById("mask_touch");
 	pMaskTouch->setTouchEnabled(true);
 	int count = AccessTypeMax;
-	if (CMultLanguage::getInstance()->getLangType()==2)
-	{
-		count =2;
-	}
 	for(unsigned int i=AccessTypeSign; i<count; i++)
 	{
 		CButton* pImage = (CButton*)m_ui->getChildByTag(i);
@@ -248,6 +245,14 @@ void CAccessLayer::onTouchAccess( CCObject *pSender )
 			GetTcpNet->sendDataType(LuckyWheelMsg);//,true
 		}
 		break;
+	//case AccessPairCards:
+	//	{
+	//		PairCardsActivityLayer* pair = PairCardsActivityLayer::create();
+	//		LayerManager::instance()->push(pair);
+	//		pair->setVisible(true);
+	//	}
+	//	
+	//	break;
 	default:
 		break;
 	}

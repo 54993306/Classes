@@ -22,7 +22,7 @@
 #include "common/ShaderDataHelper.h"
 #include "common/CGameSound.h"
 #include "Resources.h"
-#include "Battle/CHeroSoundData.h"
+#include "Battle/RoleConfig.h"
 #include "Battle/BattleMessage.h"
 #include "Battle/MoveObject.h"
 #include "Battle/BaseRole.h"

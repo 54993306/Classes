@@ -13,7 +13,7 @@
 #include "Battle/BaseRoleData.h"
 #include "common/CGameSound.h"
 #include "common/ShaderDataHelper.h"
-#include "Battle/CHeroSoundData.h"
+#include "Battle/RoleConfig.h"
 #include "Battle/BuffManage.h"
 #include "Battle/BattleMessage.h"
 #include "Battle/MoveObject.h"

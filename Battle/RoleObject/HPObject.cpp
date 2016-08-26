@@ -5,7 +5,7 @@
 #include "Battle/BattleResult.h"
 #include "common/CGameSound.h"
 #include "common/ShaderDataHelper.h"
-#include "Battle/CHeroSoundData.h"
+#include "Battle/RoleConfig.h"
 #include "Battle/BattleMessage.h"
 #include "Battle/BaseRole.h"
 #include "Battle/RoleObjectMacro.h"

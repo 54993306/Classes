@@ -73,7 +73,6 @@ namespace BattleSpace
 		char path[60] = {0};
 		sprintf(path,"Trap/%d.png",mData->getTrapModel());
 		CCSprite* tTrapImage = CCSprite::create(path);
-		tTrapImage->setAnchorPoint(ccp(0.5f,0));
 		tTrapImage->setRotation(mData->getRotation());
 		mTrapNode = tTrapImage;
 		this->addChild(mTrapNode);

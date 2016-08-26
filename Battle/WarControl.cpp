@@ -25,7 +25,7 @@
 #include "Battle/CombatGuideManage.h"
 #include "Battle/CombatGuideData.h"
 #include "common/CGameSound.h"
-#include "Battle/CHeroSoundData.h"
+#include "Battle/RoleConfig.h"
 #include "common/CCRollLabelAction.h"
 #include "tools/UICloneMgr.h"
 #include "Battle/BattleTools.h"

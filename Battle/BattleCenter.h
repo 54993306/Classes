@@ -31,7 +31,7 @@ namespace BattleSpace
 {
 	class WarManager;
 	class CoordsManage;
-	class CRroleData;
+	class RoleConfig;
 	class TrapManage;
 	class CombatGuideManage;
 	class SpineDataManage;
@@ -45,14 +45,14 @@ namespace BattleSpace
 		CoordsManage* getCoordsManage();					//1 没有定义宏
 		WarManager* getWarManage();
 		TrapManage* getTrapManage();
-		CRroleData* getRoleConfig();				//2属于配置的部分
-		CombatGuideManage* getCombatGuideMg();		//3
+		RoleConfig* getRoleConfig();					//2属于配置的部分
+		CombatGuideManage* getCombatGuideMg();				//3
 		SpineDataManage* getSpineManage();
 		ConfigManage* getConfigManage();
 		AreaManage* getAreaManage();
 		BattleModel* getBattleModel();
 	protected:
-		CRroleData *mRoleConfigData;
+		RoleConfig *mRoleConfigData;
 		WarManager *mWarManage;
 		CoordsManage *mMapManage;
 		TrapManage *mTrapManage;

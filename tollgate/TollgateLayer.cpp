@@ -23,8 +23,9 @@
 #include "common/CSpecialProgress.h"
 #include "SharpTollgate.h"
 #include "Global.h"
-#include "GamePlatfomDefine.h"
+#include "SDK/GamePlatfomDefine.h"
 #include "Global.h"
+#include "mainCity/mainScene.h"
 
 CTollgateLayer::CTollgateLayer():m_selectChapterIndex(0),m_isStory(true),m_iCurrentTouchDir(TollgateTouchDirNull)
 	,m_iLastNormlChapter(-1), m_iLastSpecialChapter(-1),m_bTouchLock(false),m_iPreChapterIndex(1),m_iCurrentPrizeType(1)
@@ -131,6 +132,12 @@ void CTollgateLayer::onEnter()
 	}
 	NOTIFICATION->postNotification(HIDE_TOP_LAYER);
 	HttpLoadImage::getInstance()->bindUiTarget(this);
+
+#if CC_PLATFORM_WIN32==CC_TARGET_PLATFORM
+#if TEST_FOR_DESIGN == 1
+	schedule(schedule_selector(CTollgateLayer::updateForReloadFile), 1.0f);
+#endif
+#endif
 }
 
 
@@ -354,8 +361,15 @@ void CTollgateLayer::addCell(unsigned int uIdx, CPageViewCell * pCell)
 					if (widget.widgetId.find("hero")!=string::npos)
 					{
 						btn->setId(widget.widgetId.c_str());
-						pNode->setAnchorPoint(ccp(0.5,0.0));
-						pNode->setPositionY(pNode->getPositionY()-pNode->getContentSize().height/2);
+						if (m_chapterList[m_isStory][m_selectChapterIndex-1].id < 9)
+						{
+							pNode->setAnchorPoint(ccp(0.5,0.0));
+							pNode->setPositionY(pNode->getPositionY()-pNode->getContentSize().height/2);
+						}
+						else
+						{
+							ResetAnchorPointAndKeepSamePos(pNode, ccp(0.5f, 0.0f));
+						}
 
 						//人物会动
 						CCScaleTo *tobig = CCScaleTo::create(0.55f,1.0*widget.scaleX,1.0*widget.scaleY);
@@ -1345,4 +1359,9 @@ void CTollgateLayer::showTips( CCNode *pNode, const std::string sInfo )
 	pTips->setPosition(pPos);
 	pTips->setScale(0.95f/pNode->getScale());
 	pNode->addChild(pTips, 999);
+}
+
+void CTollgateLayer::updateForReloadFile( float dt )
+{
+	DataCenter::sharedData()->getStageData()->reload();
 }

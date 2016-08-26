@@ -20,7 +20,6 @@
 #include "Battle/RoleObjectMacro.h"
 #include "Battle/Landform/ObstacleTrap.h"
 #include "Battle/Landform/NatureTrap.h"
-//#include "Battle/BuffData.h"
 namespace BattleSpace
 {
 	BattleTrap::BattleTrap(const TrapData* pData):mActivate(false),mTriggerSpace(C_TrapSpace)
@@ -98,7 +97,7 @@ namespace BattleSpace
 			{
 				mTriggerSpace = C_TrapSpace;
 #if BATTLE_TEST
-				mTriggerSpace = 0.2f;
+				//mTriggerSpace = 0.2f;
 #endif
 				mExcute = true;
 			}
