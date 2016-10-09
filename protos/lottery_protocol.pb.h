@@ -34,6 +34,11 @@ void  protobuf_AddDesc_lottery_5fprotocol_2eproto();
 void protobuf_AssignDesc_lottery_5fprotocol_2eproto();
 void protobuf_ShutdownFile_lottery_5fprotocol_2eproto();
 
+class CardListReq;
+class CardListRes;
+class DrawCardStart;
+class GetCardReq;
+class GetCardRes;
 class LuckyWheel;
 class DrawRequest;
 class DrawResponse;
@@ -44,6 +49,494 @@ class LotteryResponse;
 class Lottery;
 
 // ===================================================================
+
+class CardListReq : public ::google::protobuf::Message {
+ public:
+  CardListReq();
+  virtual ~CardListReq();
+
+  CardListReq(const CardListReq& from);
+
+  inline CardListReq& operator=(const CardListReq& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const CardListReq& default_instance();
+
+  void Swap(CardListReq* other);
+
+  // implements Message ----------------------------------------------
+
+  CardListReq* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const CardListReq& from);
+  void MergeFrom(const CardListReq& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // optional bool result = 1;
+  inline bool has_result() const;
+  inline void clear_result();
+  static const int kResultFieldNumber = 1;
+  inline bool result() const;
+  inline void set_result(bool value);
+
+  // @@protoc_insertion_point(class_scope:protos.CardListReq)
+ private:
+  inline void set_has_result();
+  inline void clear_has_result();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  bool result_;
+
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+
+  friend void  protobuf_AddDesc_lottery_5fprotocol_2eproto();
+  friend void protobuf_AssignDesc_lottery_5fprotocol_2eproto();
+  friend void protobuf_ShutdownFile_lottery_5fprotocol_2eproto();
+
+  void InitAsDefaultInstance();
+  static CardListReq* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class CardListRes : public ::google::protobuf::Message {
+ public:
+  CardListRes();
+  virtual ~CardListRes();
+
+  CardListRes(const CardListRes& from);
+
+  inline CardListRes& operator=(const CardListRes& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const CardListRes& default_instance();
+
+  void Swap(CardListRes* other);
+
+  // implements Message ----------------------------------------------
+
+  CardListRes* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const CardListRes& from);
+  void MergeFrom(const CardListRes& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // repeated .protos.common.Prize card_list = 1;
+  inline int card_list_size() const;
+  inline void clear_card_list();
+  static const int kCardListFieldNumber = 1;
+  inline const ::protos::common::Prize& card_list(int index) const;
+  inline ::protos::common::Prize* mutable_card_list(int index);
+  inline ::protos::common::Prize* add_card_list();
+  inline const ::google::protobuf::RepeatedPtrField< ::protos::common::Prize >&
+      card_list() const;
+  inline ::google::protobuf::RepeatedPtrField< ::protos::common::Prize >*
+      mutable_card_list();
+
+  // optional bool is_free = 2;
+  inline bool has_is_free() const;
+  inline void clear_is_free();
+  static const int kIsFreeFieldNumber = 2;
+  inline bool is_free() const;
+  inline void set_is_free(bool value);
+
+  // optional int32 price_1 = 3;
+  inline bool has_price_1() const;
+  inline void clear_price_1();
+  static const int kPrice1FieldNumber = 3;
+  inline ::google::protobuf::int32 price_1() const;
+  inline void set_price_1(::google::protobuf::int32 value);
+
+  // optional int32 price_2 = 4;
+  inline bool has_price_2() const;
+  inline void clear_price_2();
+  static const int kPrice2FieldNumber = 4;
+  inline ::google::protobuf::int32 price_2() const;
+  inline void set_price_2(::google::protobuf::int32 value);
+
+  // optional int32 draw_time = 5;
+  inline bool has_draw_time() const;
+  inline void clear_draw_time();
+  static const int kDrawTimeFieldNumber = 5;
+  inline ::google::protobuf::int32 draw_time() const;
+  inline void set_draw_time(::google::protobuf::int32 value);
+
+  // optional int32 ex_time = 6;
+  inline bool has_ex_time() const;
+  inline void clear_ex_time();
+  static const int kExTimeFieldNumber = 6;
+  inline ::google::protobuf::int32 ex_time() const;
+  inline void set_ex_time(::google::protobuf::int32 value);
+
+  // repeated .protos.Notice notices = 7;
+  inline int notices_size() const;
+  inline void clear_notices();
+  static const int kNoticesFieldNumber = 7;
+  inline const ::protos::Notice& notices(int index) const;
+  inline ::protos::Notice* mutable_notices(int index);
+  inline ::protos::Notice* add_notices();
+  inline const ::google::protobuf::RepeatedPtrField< ::protos::Notice >&
+      notices() const;
+  inline ::google::protobuf::RepeatedPtrField< ::protos::Notice >*
+      mutable_notices();
+
+  // @@protoc_insertion_point(class_scope:protos.CardListRes)
+ private:
+  inline void set_has_is_free();
+  inline void clear_has_is_free();
+  inline void set_has_price_1();
+  inline void clear_has_price_1();
+  inline void set_has_price_2();
+  inline void clear_has_price_2();
+  inline void set_has_draw_time();
+  inline void clear_has_draw_time();
+  inline void set_has_ex_time();
+  inline void clear_has_ex_time();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::RepeatedPtrField< ::protos::common::Prize > card_list_;
+  bool is_free_;
+  ::google::protobuf::int32 price_1_;
+  ::google::protobuf::int32 price_2_;
+  ::google::protobuf::int32 draw_time_;
+  ::google::protobuf::RepeatedPtrField< ::protos::Notice > notices_;
+  ::google::protobuf::int32 ex_time_;
+
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(7 + 31) / 32];
+
+  friend void  protobuf_AddDesc_lottery_5fprotocol_2eproto();
+  friend void protobuf_AssignDesc_lottery_5fprotocol_2eproto();
+  friend void protobuf_ShutdownFile_lottery_5fprotocol_2eproto();
+
+  void InitAsDefaultInstance();
+  static CardListRes* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class DrawCardStart : public ::google::protobuf::Message {
+ public:
+  DrawCardStart();
+  virtual ~DrawCardStart();
+
+  DrawCardStart(const DrawCardStart& from);
+
+  inline DrawCardStart& operator=(const DrawCardStart& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const DrawCardStart& default_instance();
+
+  void Swap(DrawCardStart* other);
+
+  // implements Message ----------------------------------------------
+
+  DrawCardStart* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const DrawCardStart& from);
+  void MergeFrom(const DrawCardStart& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required int32 result = 1;
+  inline bool has_result() const;
+  inline void clear_result();
+  static const int kResultFieldNumber = 1;
+  inline ::google::protobuf::int32 result() const;
+  inline void set_result(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:protos.DrawCardStart)
+ private:
+  inline void set_has_result();
+  inline void clear_has_result();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::int32 result_;
+
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+
+  friend void  protobuf_AddDesc_lottery_5fprotocol_2eproto();
+  friend void protobuf_AssignDesc_lottery_5fprotocol_2eproto();
+  friend void protobuf_ShutdownFile_lottery_5fprotocol_2eproto();
+
+  void InitAsDefaultInstance();
+  static DrawCardStart* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class GetCardReq : public ::google::protobuf::Message {
+ public:
+  GetCardReq();
+  virtual ~GetCardReq();
+
+  GetCardReq(const GetCardReq& from);
+
+  inline GetCardReq& operator=(const GetCardReq& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const GetCardReq& default_instance();
+
+  void Swap(GetCardReq* other);
+
+  // implements Message ----------------------------------------------
+
+  GetCardReq* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const GetCardReq& from);
+  void MergeFrom(const GetCardReq& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required int32 card_pos = 1;
+  inline bool has_card_pos() const;
+  inline void clear_card_pos();
+  static const int kCardPosFieldNumber = 1;
+  inline ::google::protobuf::int32 card_pos() const;
+  inline void set_card_pos(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:protos.GetCardReq)
+ private:
+  inline void set_has_card_pos();
+  inline void clear_has_card_pos();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::int32 card_pos_;
+
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+
+  friend void  protobuf_AddDesc_lottery_5fprotocol_2eproto();
+  friend void protobuf_AssignDesc_lottery_5fprotocol_2eproto();
+  friend void protobuf_ShutdownFile_lottery_5fprotocol_2eproto();
+
+  void InitAsDefaultInstance();
+  static GetCardReq* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class GetCardRes : public ::google::protobuf::Message {
+ public:
+  GetCardRes();
+  virtual ~GetCardRes();
+
+  GetCardRes(const GetCardRes& from);
+
+  inline GetCardRes& operator=(const GetCardRes& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const GetCardRes& default_instance();
+
+  void Swap(GetCardRes* other);
+
+  // implements Message ----------------------------------------------
+
+  GetCardRes* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const GetCardRes& from);
+  void MergeFrom(const GetCardRes& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // optional int32 result = 1;
+  inline bool has_result() const;
+  inline void clear_result();
+  static const int kResultFieldNumber = 1;
+  inline ::google::protobuf::int32 result() const;
+  inline void set_result(::google::protobuf::int32 value);
+
+  // optional .protos.common.Prize card = 2;
+  inline bool has_card() const;
+  inline void clear_card();
+  static const int kCardFieldNumber = 2;
+  inline const ::protos::common::Prize& card() const;
+  inline ::protos::common::Prize* mutable_card();
+  inline ::protos::common::Prize* release_card();
+  inline void set_allocated_card(::protos::common::Prize* card);
+
+  // @@protoc_insertion_point(class_scope:protos.GetCardRes)
+ private:
+  inline void set_has_result();
+  inline void clear_has_result();
+  inline void set_has_card();
+  inline void clear_has_card();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::protos::common::Prize* card_;
+  ::google::protobuf::int32 result_;
+
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+
+  friend void  protobuf_AddDesc_lottery_5fprotocol_2eproto();
+  friend void protobuf_AssignDesc_lottery_5fprotocol_2eproto();
+  friend void protobuf_ShutdownFile_lottery_5fprotocol_2eproto();
+
+  void InitAsDefaultInstance();
+  static GetCardRes* default_instance_;
+};
+// -------------------------------------------------------------------
 
 class LuckyWheel : public ::google::protobuf::Message {
  public:
@@ -939,6 +1432,312 @@ class Lottery : public ::google::protobuf::Message {
 
 
 // ===================================================================
+
+// CardListReq
+
+// optional bool result = 1;
+inline bool CardListReq::has_result() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void CardListReq::set_has_result() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void CardListReq::clear_has_result() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void CardListReq::clear_result() {
+  result_ = false;
+  clear_has_result();
+}
+inline bool CardListReq::result() const {
+  return result_;
+}
+inline void CardListReq::set_result(bool value) {
+  set_has_result();
+  result_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// CardListRes
+
+// repeated .protos.common.Prize card_list = 1;
+inline int CardListRes::card_list_size() const {
+  return card_list_.size();
+}
+inline void CardListRes::clear_card_list() {
+  card_list_.Clear();
+}
+inline const ::protos::common::Prize& CardListRes::card_list(int index) const {
+  return card_list_.Get(index);
+}
+inline ::protos::common::Prize* CardListRes::mutable_card_list(int index) {
+  return card_list_.Mutable(index);
+}
+inline ::protos::common::Prize* CardListRes::add_card_list() {
+  return card_list_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::protos::common::Prize >&
+CardListRes::card_list() const {
+  return card_list_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::protos::common::Prize >*
+CardListRes::mutable_card_list() {
+  return &card_list_;
+}
+
+// optional bool is_free = 2;
+inline bool CardListRes::has_is_free() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void CardListRes::set_has_is_free() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void CardListRes::clear_has_is_free() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void CardListRes::clear_is_free() {
+  is_free_ = false;
+  clear_has_is_free();
+}
+inline bool CardListRes::is_free() const {
+  return is_free_;
+}
+inline void CardListRes::set_is_free(bool value) {
+  set_has_is_free();
+  is_free_ = value;
+}
+
+// optional int32 price_1 = 3;
+inline bool CardListRes::has_price_1() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void CardListRes::set_has_price_1() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void CardListRes::clear_has_price_1() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void CardListRes::clear_price_1() {
+  price_1_ = 0;
+  clear_has_price_1();
+}
+inline ::google::protobuf::int32 CardListRes::price_1() const {
+  return price_1_;
+}
+inline void CardListRes::set_price_1(::google::protobuf::int32 value) {
+  set_has_price_1();
+  price_1_ = value;
+}
+
+// optional int32 price_2 = 4;
+inline bool CardListRes::has_price_2() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void CardListRes::set_has_price_2() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void CardListRes::clear_has_price_2() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void CardListRes::clear_price_2() {
+  price_2_ = 0;
+  clear_has_price_2();
+}
+inline ::google::protobuf::int32 CardListRes::price_2() const {
+  return price_2_;
+}
+inline void CardListRes::set_price_2(::google::protobuf::int32 value) {
+  set_has_price_2();
+  price_2_ = value;
+}
+
+// optional int32 draw_time = 5;
+inline bool CardListRes::has_draw_time() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void CardListRes::set_has_draw_time() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void CardListRes::clear_has_draw_time() {
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline void CardListRes::clear_draw_time() {
+  draw_time_ = 0;
+  clear_has_draw_time();
+}
+inline ::google::protobuf::int32 CardListRes::draw_time() const {
+  return draw_time_;
+}
+inline void CardListRes::set_draw_time(::google::protobuf::int32 value) {
+  set_has_draw_time();
+  draw_time_ = value;
+}
+
+// optional int32 ex_time = 6;
+inline bool CardListRes::has_ex_time() const {
+  return (_has_bits_[0] & 0x00000020u) != 0;
+}
+inline void CardListRes::set_has_ex_time() {
+  _has_bits_[0] |= 0x00000020u;
+}
+inline void CardListRes::clear_has_ex_time() {
+  _has_bits_[0] &= ~0x00000020u;
+}
+inline void CardListRes::clear_ex_time() {
+  ex_time_ = 0;
+  clear_has_ex_time();
+}
+inline ::google::protobuf::int32 CardListRes::ex_time() const {
+  return ex_time_;
+}
+inline void CardListRes::set_ex_time(::google::protobuf::int32 value) {
+  set_has_ex_time();
+  ex_time_ = value;
+}
+
+// repeated .protos.Notice notices = 7;
+inline int CardListRes::notices_size() const {
+  return notices_.size();
+}
+inline void CardListRes::clear_notices() {
+  notices_.Clear();
+}
+inline const ::protos::Notice& CardListRes::notices(int index) const {
+  return notices_.Get(index);
+}
+inline ::protos::Notice* CardListRes::mutable_notices(int index) {
+  return notices_.Mutable(index);
+}
+inline ::protos::Notice* CardListRes::add_notices() {
+  return notices_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::protos::Notice >&
+CardListRes::notices() const {
+  return notices_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::protos::Notice >*
+CardListRes::mutable_notices() {
+  return &notices_;
+}
+
+// -------------------------------------------------------------------
+
+// DrawCardStart
+
+// required int32 result = 1;
+inline bool DrawCardStart::has_result() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void DrawCardStart::set_has_result() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void DrawCardStart::clear_has_result() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void DrawCardStart::clear_result() {
+  result_ = 0;
+  clear_has_result();
+}
+inline ::google::protobuf::int32 DrawCardStart::result() const {
+  return result_;
+}
+inline void DrawCardStart::set_result(::google::protobuf::int32 value) {
+  set_has_result();
+  result_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// GetCardReq
+
+// required int32 card_pos = 1;
+inline bool GetCardReq::has_card_pos() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void GetCardReq::set_has_card_pos() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void GetCardReq::clear_has_card_pos() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void GetCardReq::clear_card_pos() {
+  card_pos_ = 0;
+  clear_has_card_pos();
+}
+inline ::google::protobuf::int32 GetCardReq::card_pos() const {
+  return card_pos_;
+}
+inline void GetCardReq::set_card_pos(::google::protobuf::int32 value) {
+  set_has_card_pos();
+  card_pos_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// GetCardRes
+
+// optional int32 result = 1;
+inline bool GetCardRes::has_result() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void GetCardRes::set_has_result() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void GetCardRes::clear_has_result() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void GetCardRes::clear_result() {
+  result_ = 0;
+  clear_has_result();
+}
+inline ::google::protobuf::int32 GetCardRes::result() const {
+  return result_;
+}
+inline void GetCardRes::set_result(::google::protobuf::int32 value) {
+  set_has_result();
+  result_ = value;
+}
+
+// optional .protos.common.Prize card = 2;
+inline bool GetCardRes::has_card() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void GetCardRes::set_has_card() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void GetCardRes::clear_has_card() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void GetCardRes::clear_card() {
+  if (card_ != NULL) card_->::protos::common::Prize::Clear();
+  clear_has_card();
+}
+inline const ::protos::common::Prize& GetCardRes::card() const {
+  return card_ != NULL ? *card_ : *default_instance_->card_;
+}
+inline ::protos::common::Prize* GetCardRes::mutable_card() {
+  set_has_card();
+  if (card_ == NULL) card_ = new ::protos::common::Prize;
+  return card_;
+}
+inline ::protos::common::Prize* GetCardRes::release_card() {
+  clear_has_card();
+  ::protos::common::Prize* temp = card_;
+  card_ = NULL;
+  return temp;
+}
+inline void GetCardRes::set_allocated_card(::protos::common::Prize* card) {
+  delete card_;
+  card_ = card;
+  if (card) {
+    set_has_card();
+  } else {
+    clear_has_card();
+  }
+}
+
+// -------------------------------------------------------------------
 
 // LuckyWheel
 

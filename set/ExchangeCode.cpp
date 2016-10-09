@@ -140,6 +140,8 @@ void CExchangeCode::onExit()
 {
 	BaseLayer::onExit();
 	NOTIFICATION->postNotification(SET_LAYER_SHOW);
+	//解绑网络回调处理
+	GetTcpNet->unRegisterAllMsgHandler(this);
 }
 
 

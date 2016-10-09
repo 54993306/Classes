@@ -57,6 +57,8 @@ public:
 
 	CC_SYNTHESIZE(int, m_iStar, Star);
 
+	static int m_iSavedStar;
+
 protected:
 	CC_SYNTHESIZE(bool, m_bIsNormal, Normal);
 

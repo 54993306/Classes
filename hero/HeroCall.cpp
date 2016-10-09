@@ -276,10 +276,17 @@ void CHeroCall::onRecvTask(CCObject* pSender)
 	}
 	else if (evol->stageId ==4)
 	{
-		CShopLayer *shpLayer = CShopLayer::create();
-		shpLayer->setShopType(1);
-		LayerManager::instance()->push(shpLayer);
-		CMainCityControl::getInstance()->sendShopRequest(1);
+		if(evol->open)
+		{
+			CShopLayer *shpLayer = CShopLayer::create();
+			shpLayer->setShopType(1);
+			LayerManager::instance()->push(shpLayer);
+			CMainCityControl::getInstance()->sendShopRequest(1);
+		}
+		else
+		{
+			ShowPopTextTip(GETLANGSTR(191));
+		}
 	}
 	//>100 关卡
 	else if(evol->stageId > 100)

@@ -12,6 +12,7 @@
 #include "task/TaskControl.h"
 #include "SDK/GamePlatfomDefine.h"
 #include "scene/LoginScene.h"
+#include "jni/CJniHelper.h"
 
 //根据typeName反射对象
 google::protobuf::Message* createMessage(const std::string& type_name)
@@ -73,7 +74,7 @@ void CNetClient::onCreate()
 
 void CNetClient::onConnected()
 {
-	printf("net connected finish");
+	CCLOG("net connected finish");
 	CCLOG("connected\n");
 	if (m_isReconnet&&m_reConnectType==ReconnEnd)
 	{
@@ -121,10 +122,14 @@ void CNetClient::onConnected()
 
 void CNetClient::onDisconnected()
 {
-	printf("ondisconnected\n");
+	CCLOG("ondisconnected\n");
 
+	CCLOG("m_isCloseConn-%s", m_isCloseConn?"true":"false");
+	CCLOG("m_reConnectType!=ReconnNo-%s", m_reConnectType!=ReconnNo?"true":"false");
 	if (m_reConnectType!=ReconnNo&&!m_isCloseConn&&CSceneManager::sharedSceneManager()->getRunningScene()&&CSceneManager::sharedSceneManager()->getRunningScene()->getClassName()!="LoginScene")
 	{
+		CCLOG("m_isReconnet = true;");
+		CCLOG("m_reConnectType = ReconnBegin;");
 		m_isReconnet = true;
 		m_reConnectType = ReconnBegin;
 	}
@@ -137,7 +142,7 @@ void CNetClient::onConnectError() { printf("on ConnectError\n"); }
 ///当连接超时时调用
 void CNetClient::onConnectTimeout()
 {
-	printf("on connect time out\n");
+	CCLOG("on connect time out\n");
 	if (m_isReconnet&&m_reConnectType==ReconnEnd)
 	{
 		m_reConnectType = ReconnBegin;
@@ -301,12 +306,24 @@ void CNetClient::update(float delta)
 		write(stream);
 		delete protocol;
 		m_interalTime = 0.0;
+		CCLOG("send heart");
+		CCLOG("m_isReconnet-%s         m_reConnectType-%d ", m_isReconnet?"true":"false", m_reConnectType);
 	}
-	if (m_isReconnet&&m_reConnectType==ReconnBegin)
+
+	bool bNetWork = CJniHelper::getInstance()->checkNetWork();
+	if (bNetWork)
 	{
-		m_reConnectType=ReconnEnd;
-		connect();
+		if (m_isReconnet&&m_reConnectType==ReconnBegin)
+		{
+			bool bAnswer = connect();
+			if (bAnswer)
+			{
+				m_reConnectType=ReconnEnd;
+			}
+			CCLOG("connect()-%s", bAnswer?"true":"false");
+		}
 	}
+	
 }
 
 void CNetClient::sendData(google::protobuf::Message *msg,int type, bool isSave/*=false*/)

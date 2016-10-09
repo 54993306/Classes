@@ -57,7 +57,7 @@ const std::string RES_PATH_WITH_LANG[(int)AppLanguageType::AppLangMax] =
 #endif
 
 //更新开启
-#define VERSION_UPDATE 0
+#define VERSION_UPDATE 1
 
 //跳过网关服务器开起,直接连入游戏服务器
 #define DIRECT_CONNECT_GAMESERVER 0

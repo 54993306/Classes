@@ -416,11 +416,11 @@ void CDownloadPackage::changeStoryPicture( CCSprite* pSprite )
 	pNewTexture = CCTextureCache::sharedTextureCache()->addImage(CCString::createWithFormat("warScene/LoadImage/story/%d.jpg", m_iStoryIndex)->getCString());
 	m_iStoryIndex++;
 
-	if(m_iStoryIndex >= m_iStoryMax)
+	if(m_iStoryIndex > m_iStoryMax)
 	{
 		m_iStoryIndex = 0;
-		unschedule(schedule_selector(CDownloadPackage::updateForChangePic));
-		return;
+		//unschedule(schedule_selector(CDownloadPackage::updateForChangePic));
+		//return;
 	}
 
 	//没有找到图片，返回不操作

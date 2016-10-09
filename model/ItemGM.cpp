@@ -61,6 +61,7 @@ void ItemGM::parseItem()
 		cfg->itemDesc1 = file->get(i,3);
 		cfg->skillName = file->get(i,4);
 		cfg->skillDesc = file->get(i,5);
+		cfg->iItemType = atoi(file->get(i,6));
 		m_cfg[id] = cfg;
 	}
 	FileUtils::sharedFileUtils()->releaseFile(CSV_ROOT("itemDesc.csv"));

@@ -117,10 +117,17 @@ enum protoTag
 	ValidateBillingMsg			= 107,//验证订单
 	PvpAsyncBattle				= 108,//异步PVP
 	PvpOverReqMsg				= 109,//异步PVP结算
-	PvpRecordResMsg			= 110,//异步PVP记录
-	PvpCityDataMsg			= 112,//PVP主城数据
-	LuckyWheelMsg				=113,//获取转盘信息
-	DrawRequestMsg				=114,//抽奖请求
+	PvpRecordResMsg				= 110,//异步PVP记录
+	VerifyReceiptMsg			= 111,//支付验证
+	PvpCityDataMsg				= 112,//PVP主城数据
+	LuckyWheelMsg				= 113,//获取转盘信息
+	DrawRequestMsg				= 114,//抽奖请求
+	AtlasRequestMsg				= 115,//获取图鉴信息
+	AtlasPrizeReqMsg			= 116,//领取图鉴奖励
+	OnlinePrizeMsg				= 117,//在线礼包请求
+	CardListMsg			= 118,//请求卡牌列表
+	CardResMsg			= 119,//返回抽卡结果
+	CardStartMsg		= 120,//开始抽卡游戏
 	GameTipMsg					= 1000,
 	Reconnect					= 1001,//断线重连
 	ServerListMsg				= 1111,//版本号+服务器列表
@@ -234,11 +241,17 @@ static ProtoDefine protoDef[] =
 	{ValidateBillingMsg, "protos.ValidateRes"},				//验证订单
 	{PvpAsyncBattle,"protos.StartPvpRes"},					//PvE数据返回
 	{PvpOverReqMsg,"protos.PvpOverRes"},					//Pvp结算
-	{PvpRecordResMsg,"protos.PvpRecordRes"},					//异步Pvp战斗记录
-	{111,""},
+	{PvpRecordResMsg,"protos.PvpRecordRes"},				//异步Pvp战斗记录
+	{VerifyReceiptMsg, "protos.VerifyRes"},			//支付验证
 	{PvpCityDataMsg,"protos.PvpCityData"},					//pvp天空场景数据
 	{LuckyWheelMsg,"protos.LuckyWheel"},					//获取转盘信息
 	{DrawRequestMsg,"protos.DrawResponse"},					//抽奖请求
+	{AtlasRequestMsg,"protos.AtlasResponse"},				//获取图鉴信息
+	{AtlasPrizeReqMsg,"protos.AtlasPrizeRes"},				//领取图鉴奖励
+	{OnlinePrizeMsg,"protos.OnlinePrize"},					//抽奖请求
+	{CardListMsg,"protos.CardListRes"},			//请求卡牌列表
+	{CardResMsg,"protos.GetCardRes"},			//返回抽卡结果
+	{CardStartMsg,"protos.DrawCardStart"}	,	//开始抽卡游戏
 	{GameTipMsg,"protos.GameTips"},
 	{Reconnect,"protos.ReconnectResponse"},					//断线重连
 	{ServerListMsg,"protos.ServerList"}						//请求服务器列表

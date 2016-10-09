@@ -54,6 +54,8 @@ public:
 	void updateStarRank(CHero* hero);
 	void showSkillTip(bool hasSkill);
 
+	void setHeroSkillBgVisiable(CCObject *pObj);
+
 protected:
 	void onSelectHero(CCObject *pSender);
 	void onSelectItem(CCObject *pSender);

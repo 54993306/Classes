@@ -28,6 +28,8 @@ public:
 	void showVerifyCode(const char* str);
 	void setPayItem(int iTag, int price);
 
+	void onPaySuccess();
+
 private:
 	void hideErrorCode();
 	void updateClock(float dt);

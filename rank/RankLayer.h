@@ -35,12 +35,14 @@ protected:
 	void addMyRank(CRankData *data);
 	void imageLoadSuccessCallBack(string sTag, vector<char>* pBuffer);
 	void addPvpRank(CLayout* pCell, CRankData * data);
+	void addTowerRank(CLayout* pCell, CRankData* data);
 private:
 	CLayout *m_ui;
 	CTableView *m_tableView;
 	CLayout *m_cell;
 	CLayout *m_cell1;
 	CLayout *m_cell2;
+	CLayout* m_cell3;
 	CLayout *m_heroLay;
 	CCSize m_tableSize;
 	bool m_bArchive;

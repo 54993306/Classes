@@ -26,6 +26,9 @@ public:
 	//关卡完成
 	void onLevelComplete( string sLevelName, string sDifficulty, int iTimeToComplete, int iPlayerState );
 
+	//ais支付完成
+	void onAisPayComplete( string sProductId, int iPrice );
+
 private:
 	void updateForUiThread(float dt);
 

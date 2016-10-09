@@ -37,6 +37,7 @@
 #include "SDK/GamePlatfomDefine.h"
 #include "ApplicationDefine.h"
 #include "SDK/GoogleLoginSDK.h"
+#include "SDK/GooglePaySDK.h"
 
 using namespace BattleSpace;
 
@@ -417,6 +418,9 @@ void LoginLayerMix::onExit()
 
 void LoginLayerMix::callBackInGame()
 {
+	//开始请求处理问题订单
+	GooglePaySDK::getInstance()->startConsumeTroublePurchaes();
+	
 	switch (m_iCurrentType)
 	{
 	case LoginResponseMsg://首次登陆，进引导
@@ -483,7 +487,7 @@ void LoginLayerMix::faceBookUserInfoCallback(CCObject *object)
 			m_FaceBookAccount=jsValue["name"].asCString();
 			m_FaceBookUserID =jsValue["id"].asCString();
 			CCUserDefault::sharedUserDefault()->setStringForKey(FACEBOOK_ID,m_FaceBookUserID);
-
+			CCUserDefault::sharedUserDefault()->flush();
 			CCLOG("save FACEBOOK_ID %s", m_FaceBookUserID.c_str());
 
 			//跳转到游戏层
@@ -506,7 +510,7 @@ void LoginLayerMix::googleUserInfoCallback( CCObject *object )
 	if(strResult!=nullptr)
 	{
 		Json::Value jsValue;
-		CCLog("onFaceBookUserInfoGet:%s",strResult->getCString());
+		CCLog("onGoogleUserInfoGet:%s",strResult->getCString());
 		if(Json::Reader().parse(strResult->getCString(),jsValue))
 		{
 			string sAccount = jsValue["name"].asCString();
@@ -515,7 +519,7 @@ void LoginLayerMix::googleUserInfoCallback( CCObject *object )
 			CCUserDefault::sharedUserDefault()->setStringForKey(GOOGLE_PASSWORD, sPassword);
 			CCUserDefault::sharedUserDefault()->flush();
 			CCLOG("save google username %s", sAccount.c_str());
-
+			CCLOG("save google username %s", sPassword.c_str());
 			//跳转到游戏层
 			switchLayer();
 		}
@@ -970,6 +974,7 @@ void LoginLayerMix::onEnterGame( CCObject *pObj )
 			//点击按钮才连接游戏服务器
 			onFacebookLogin();
 		}
+		break;
 	case LoginTypeGoogle:
 		{
 			//点击按钮才连接游戏服务器
@@ -1168,6 +1173,8 @@ void LoginLayerMix::onGoogleLogin()
 		//初始默认本地的游客账号和密码
 		string sAccount = CCUserDefault::sharedUserDefault()->getStringForKey( GOOGLE_USER_NAME, "" );
 		string sPassword = CCUserDefault::sharedUserDefault()->getStringForKey( GOOGLE_PASSWORD, "" );
+		CCLOG("save google username %s", sAccount.c_str());
+		CCLOG("save google password %s", sPassword.c_str());
 
 		CNetClient::getShareInstance()->sendLogin( sAccount, sPassword, "", false, 0,  "", G_PLATFORM_TARGET);
 		DataCenter::sharedData()->getUser()->getUserData()->setIsFBLogin(false);

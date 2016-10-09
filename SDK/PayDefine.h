@@ -8,7 +8,8 @@ enum struct GAME_PRODUCT
 	BUY_100,						//¹ºÂò100ÒõÑôÖé
 	BUY_300,						//¹ºÂò300ÒõÑôÖé
 	BUY_500,						//¹ºÂò500ÒõÑôÖé
-	BUY_1000						//¹ºÂò1000ÒõÑôÖé
+	BUY_1000,						//¹ºÂò1000ÒõÑôÖé
+	BUY_3000						//¹ºÂò3000ÒõÑôÖé
 };
 
 //´íÎóµÄÖ§¸¶ID

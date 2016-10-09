@@ -125,3 +125,7 @@ bool CheckDay( const char *str );
 
 //裁切facebook头像为圆形
 CImageView *MakeFaceBookHeadToCircle(CCSprite *pSprite);
+
+
+//重置锚点并且保持位置
+void ResetAnchorPointAndKeepSamePos( CCNode *pNode, CCPoint anchorpoint );

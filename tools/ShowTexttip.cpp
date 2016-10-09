@@ -151,7 +151,24 @@ CPopTip* ShowPopTextTip(const char* str,const ccColor3B& color, bool isAutoClose
 	}
 	return pop;
 }
+void ShowPopTextTipandTitle(const char * str, const ccColor3B& color /* = ccWHITE */, bool isAutoClose /* = true */)
+{
+	CPopTip* pop = CPopTip::create();
+	pop->setVisible(true);
+	pop->addContentTip(str);
+	pop->setTouchEnabled(true);
+	pop->setIsTouchOutClose(true);
+	pop->hideBtn();
 
+	LayerManager::instance()->push(pop,true);
+	if (isAutoClose)
+	{
+		CCDelayTime* delay = CCDelayTime::create(1.5f);
+		CCScaleTo* smal = CCScaleTo::create(0.2f,0.0f);
+		CCSequence* seque = CCSequence::create(delay,smal,CCCallFuncO::create(pop,callfuncO_selector(CPopTip::onClose),nullptr),nullptr);
+		pop->runActionWithUi(seque);
+	}
+}
 void ShowConfirmTextTip(const char* str, CCObject *pSender, SEL_ClickHandler pHandler, const ccColor3B& color /*=ccWHITE*/)
 {
 // 	CPopTip *pop = CPopTip::create("tips/bg.png");

@@ -26,6 +26,8 @@
 
 using namespace BattleSpace;
 
+int CTollgatePreview::m_iSavedStar = 0;
+
 CTollgatePreview::CTollgatePreview():
 	m_stageId(0),m_tableView(nullptr)
 	,m_questId(0)
@@ -42,7 +44,7 @@ CTollgatePreview::CTollgatePreview():
 	,m_iNeedHeroNum(5)
 	,m_iNeedHeroNumLevel(-1)
 {
-
+	m_iSavedStar = 0;
 }
 
 bool CTollgatePreview::init()
@@ -466,6 +468,7 @@ void CTollgatePreview::onCombatEffectCallBack()
 	selArmy->setLimitHeroNum(m_iNeedHeroNum);
  	LayerManager::instance()->push(selArmy);
 	CPlayerControl::getInstance().sendUnion( m_stageId, m_questId, false, m_iStarLevel );
+	m_iSavedStar = m_iStarLevel;
 	selArmy->setStagId(m_stageId, m_questId);
 	m_pBody->runAction(CCRepeatForever::create(CCSequence::createWithTwoActions(CCScaleTo::create(0.6f, 1.04f), CCScaleTo::create(0.6f, 1.0f))));
 }

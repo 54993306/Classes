@@ -55,6 +55,8 @@ public:
 
 	//只显示确定按钮
 	void showConfirmOnly();
+	//不显示按钮
+	void hideBtn();
 	CCNode *getConfirmButton();
 
 protected:

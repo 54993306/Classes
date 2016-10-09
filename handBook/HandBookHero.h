@@ -10,13 +10,6 @@
 #include "scene/layer/LayerManager.h"
 #include "net/CNetClient.h"
 
-//请求英雄图鉴
-void inline AskForHandBookHero()
-{
-	GetTcpNet->sendDataType(BossPrizesMsg);
-}
-
-
 class CHandBookHeroLayer: public BaseLayer
 {
 public:
@@ -32,9 +25,27 @@ public:
 	//网络回调
 	void processNetMsg(int type, google::protobuf::Message *msg);
 
+
 private:
-	CLayout				*m_ui;
-	CLayout				*m_pCell;
-	CLayout				*m_pScroll;
-	
+	void updateUI( );
+
+	CCObject* tableviewDataSource(CCObject* pConvertCell, unsigned int uIdx);
+	void addTableCell(unsigned int uIdx, CTableViewCell * pCell);
+	void initListCellIcon( AtlasIns *pAtlasIns, CCPoint startPos, int iGapX, CTableViewCell * pCell );
+	void initCellIconByData( AData *pAData, CLayout *pCell );
+
+	void onClickBlank( CCObject *pSender );
+	void onClickScoreIcon( CCObject *pSender );
+	//弹进阶
+	void onShowRankUp( CCObject *pSender );
+	//获得途径
+	void onShowWhereGet( CCObject *pSender );
+
+private:
+	CLayout												*m_ui;
+	CLayout												*m_pCell;
+	CLayout												*m_pCellBlank;
+	CTableView											*m_pTableView;
+	int														m_iSelectIndex;
+	AtlasResponse										m_AtlasResponse;
 };

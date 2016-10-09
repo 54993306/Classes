@@ -126,6 +126,9 @@ void UserData::read(const protos::common::Role& role)
 	{
 		m_bGoogleBilling = role.goolebilling();
 	}
+	
+	m_iOnlinePrizeTime = role.prizetime();
+
 // 	this->m_thumb = 0;
 // 	this->m_fbId = "677158805720606";
 }
@@ -135,4 +138,5 @@ UserData::UserData()
 	,m_coin(0),m_exp(0),m_nextExp(0),m_roleAction(0),m_mapId(0),m_roleGold(0),m_roleName("")
 	,m_actionLimit(0),m_interval(0),m_vip(0),m_combat(0),m_thumb(0),m_inviteFriend(0)
 	,m_isFBLogin(false),m_mobileShop(false),m_bFirstLogin(false),m_roleMoney(0),m_rolePoints(0),m_bGoogleBilling(false),m_roleNation(0)
+	,m_iOnlinePrizeTime(-1)
 {}

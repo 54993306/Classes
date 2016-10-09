@@ -19,7 +19,8 @@ enum AccessType
 	AccessTypeSign = 1,
 	AccessExchange,
 	AccessLuckyWheel,
-	//AccessPairCards,
+	AccessPairCards,
+	AccessTower,
 	AccessTypeMax,
 	
 };

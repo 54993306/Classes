@@ -9,15 +9,8 @@
 #include "AppUI.h"
 #include "scene/layer/LayerManager.h"
 #include "net/CNetClient.h"
+#include "HandBookControl.h"
 
-enum HandBookTabType
-{
-	HandBookTabNull = -1,				//null
-	HandBookTabHero,						//英雄
-	HandBookTabMonster,					//怪物
-	HandBookTabEquip,						//装备
-	HandBookTabMax					
-};
 
 class CHandBookHeroLayer;
 class CHandBookMonsterLayer;

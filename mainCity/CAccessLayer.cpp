@@ -4,8 +4,10 @@
 #include "Resources.h"
 #include "UserDefaultData.h"
 #include "set/ExchangeCode.h"
-#include "LuckyWheel//LuckyWheelLayer.h"
-//#include "activity/PairCardsActivity.h"
+#include "LuckyActive//LuckyWheelLayer.h"
+#include "LuckyActive/PairCardsActivity.h"
+#include "Tower/TowerLayer.h"
+
 #include "common/CommonFunction.h"
 #include "sign/PopItem.h"
 #include "tools/ShowTexttip.h"
@@ -142,7 +144,6 @@ void CAccessLayer::hideAccess()
 	m_iAimHeight = 0;
 }
 
-
 void CAccessLayer::onCheck( CCObject *pSender, bool bChecked )
 {
 	m_pCheck->setEnabled(false);
@@ -239,20 +240,26 @@ void CAccessLayer::onTouchAccess( CCObject *pSender )
 		{
 			CLuckyWheelLayer* wheel = CLuckyWheelLayer::create();
 			LayerManager::instance()->push(wheel);
-			wheel->setVisible(true);
-			//GetTcpNet->sendData(LuckyWheelMsg);
-			//GetTcpNet->sendData(LuckyWheelMsg,true);
 			GetTcpNet->sendDataType(LuckyWheelMsg);//,true
 		}
 		break;
-	//case AccessPairCards:
-	//	{
-	//		PairCardsActivityLayer* pair = PairCardsActivityLayer::create();
-	//		LayerManager::instance()->push(pair);
-	//		pair->setVisible(true);
-	//	}
-	//	
-	//	break;
+	case AccessPairCards:
+		{
+			PairCardsActivityLayer* pair = PairCardsActivityLayer::create();
+			LayerManager::instance()->push(pair);
+
+			//发送请求
+			CardListReq* req = new CardListReq;
+			req->set_result(false);
+			GetTcpNet->sendData(req,CardListMsg);
+		}
+		break;
+	case AccessTower:
+		{
+			CTowerLayer* tower = CTowerLayer::create();
+			LayerManager::instance()->push(tower);
+		}
+		break;
 	default:
 		break;
 	}

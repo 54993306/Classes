@@ -33,10 +33,12 @@ enum Btn_Type
 	
 };
 
+class CTimeGift;
+
 class CMainCityUI: public BaseLayer, public HttpLoadImageDelegate
 {
 public:
-	CMainCityUI():m_bShowChapterFlag(false){};
+	CMainCityUI():m_bShowChapterFlag(false),m_pTimeGift(nullptr){};
 	virtual bool init();
 	CREATE_LAYER(CMainCityUI);
 
@@ -82,7 +84,7 @@ private:
 
 	bool m_bShowChapterFlag;
 	map<int,CCity> m_cityMap;
-
+	CTimeGift			*m_pTimeGift;
 public:
 	void onTimeWaitCityAction(CCNode* pSender);
 	void updateOpenState(CityData *cityData);

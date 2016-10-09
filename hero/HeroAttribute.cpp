@@ -216,6 +216,9 @@ void CHeroAttribute::onEnter()
 	rightbtn->runAction(CCRepeatForever::create(CCSequence::createWithTwoActions(fade1,fade2)));
 
 
+	//隐藏特殊背景
+	setHeroSkillBgVisiable(CCBool::create(false));
+
 	//book
 	CCheckBox* pBook = (CCheckBox*)(m_ui->findWidgetById("book"));
 	pBook->setOnCheckListener(this,ccw_check_selector(CHeroAttribute::showHeroBook));
@@ -231,6 +234,9 @@ void CHeroAttribute::onEnter()
 
 	this->setVisible(true);
 	NOTIFICATION->postNotification(HIDE_TOP_LAYER);
+
+	NOTIFICATION->addObserver(this, callfuncO_selector(CHeroAttribute::setHeroSkillBgVisiable), "CHeroAttribute::setHeroSkillBgVisiable", nullptr);
+
 }
 
 void CHeroAttribute::onlongClickEnd(CCObject* pSender, CCTouch* pTouch, float fDuration)
@@ -590,6 +596,16 @@ void CHeroAttribute::showArmor(CHero* hero)
 		//添加
 		CCSprite* pAdd = (CCSprite*)(m_ui->findWidgetById(CCString::createWithFormat("add%d", i+1)->getCString()));
 		pAdd->setVisible(true);
+		//武器贴图修改
+		if ( i==0 )
+		{
+			const HeroInfoData *data = DataCenter::sharedData()->getHeroInfo()->getCfg(hero->thumb);
+			CCTexture2D *pTexture = CCTextureCache::sharedTextureCache()->addImage(CCString::createWithFormat("common/box_weapon%d.png", data->iType2)->getCString());
+			if (pTexture)
+			{
+				pAdd->setTexture(pTexture);
+			}
+		}
 
 		//锁
 		CImageView* pLock = (CImageView*)(m_ui->findWidgetById(CCString::createWithFormat("_lock%d", i+1)->getCString()));
@@ -1244,4 +1260,11 @@ void CHeroAttribute::showSkillTip(bool hasSkill)
 {
 	CCNode *skillPoint = (CCNode*)(m_ui->findWidgetById("skillPoint"));
 	skillPoint->setVisible(hasSkill);
+}
+
+void CHeroAttribute::setHeroSkillBgVisiable( CCObject *pObj )
+{
+	CCBool *pBool = dynamic_cast<CCBool *>(pObj);
+	CCNode *pSkillBg = (CCNode*)(m_ui->findWidgetById("skill_bg"));
+	pSkillBg->setVisible(pBool->getValue());
 }

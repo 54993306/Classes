@@ -30,8 +30,15 @@ public:
     void onExit();
 
 	void signPrize(CPrize *prize);
+	void callbackforsignPrizeEffectOne(CCNode* node);
+	void callbackforsignPrizeEffectTwo(CCNode* node);
+
 	void popItemList(const vector<CItem>& itemList);
 	void popPrizeRes(CGetPrizeRes *prizeRes);
+	void popPrizeResTwoLine(CGetPrizeRes* prizeRes);//双行显示奖励列表
+	void callbackforShowTwoLinePrize(CCNode* node);
+	void runEffectShake();
+
 	void setBtnHandler( CCObject *pSender, SEL_ClickHandler pHandler);
 	void setDescVisiable(bool isVisible);
 
@@ -60,6 +67,8 @@ private:
 	int m_iIndexForFindNewHero;
 	CCObject* m_pTargetCallBack;
 	PopItemCallBack m_pTargetFun;
+
+	int m_indexprizeRes;
 };
 
 #endif

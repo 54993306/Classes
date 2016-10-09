@@ -10,6 +10,7 @@ struct ItemData
 	string itemDesc1;
 	string skillName;
 	string skillDesc;
+	int iItemType;
 };
 
 

@@ -8,6 +8,8 @@
 #include "jni/CJniHelper.h"
 #include "netcontrol/CPlayerControl.h"
 #include "common/ShaderDataHelper.h"
+#include "SDK/GameEventMonitor.h"
+
 #define BUY_NUM 5
 
 CVipPay::CVipPay():m_ui(nullptr),m_pTelInput(nullptr),m_pCodeInput(nullptr),m_iCardId(0),m_bStep1Success(false),m_iTimeRemain(0),m_buyMoney(0),m_payStep(1),m_iTag(0)
@@ -175,6 +177,9 @@ void CVipPay::onCancel( CCObject * pSender )
 
 void CVipPay::onGetSecurityCode( CCObject * pSender )
 {
+	////测试计费跟踪
+	//onPaySuccess();
+
 	hideErrorCode();
 	m_sTelNumber = m_pTelInput->getString();
 	if(m_sTelNumber.compare("")==0)
@@ -359,4 +364,11 @@ void CVipPay::setPayItem(int iTag, int price)
 	{
 		pLayShow->setVisible(true);
 	}
+}
+
+void CVipPay::onPaySuccess()
+{
+	CCLOG("CVipPay::onPaySuccess");
+	CCString *pStrProduct = CCString::createWithFormat("yyy x %d", m_buyMoney);
+	GameEventMonitor::getInstance()->onAisPayComplete(pStrProduct->m_sString, m_buyMoney);
 }

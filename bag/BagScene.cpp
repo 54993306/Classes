@@ -15,7 +15,9 @@
 #include "common/CGameSound.h"
 #include "Resources.h"
 #include "mainCity/PanelTips.h"
+#include <spine/spine-cocos2dx.h>
 
+using namespace spine;
 
 //品质高优先/等级大优先/绑定英雄优先
 bool SortBagItem(const CItem* pItem1, const CItem* pItem2)
@@ -338,6 +340,19 @@ CCObject* CBagLayer::gridviewDataSource(CCObject* pConvertCell, unsigned int uId
 					prop = getItemSprite(item);
 					prop->setPosition(ccp(btn->getContentSize().width/2,btn->getContentSize().height/2));
 					btn->addChild(prop);
+
+					if (m_selectType == Equipment_Type)
+					{
+						//光效
+						if (item->iStar>1 && item->iStar<=5)
+						{
+							SkeletonAnimation *pSkeletonAnimation = SkeletonAnimation::createWithFile("common/itemEffect.json", "common/itemEffect.atlas", 1);
+							pSkeletonAnimation->setPosition(ccp(btn->getContentSize().width/2, btn->getContentSize().height/2));
+							pSkeletonAnimation->setAnimation(0, CCString::createWithFormat("stand%d", item->iStar-1)->getCString(), true);
+							btn->addChild(pSkeletonAnimation);
+						}
+					}
+
 				}
 			}
 			break;

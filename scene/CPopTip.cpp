@@ -162,7 +162,8 @@ bool CPopTip::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
 		//点击背景框外
 		else if (m_isOutClose)
 		{
-			this->removeFromParent();
+			//this->removeFromParent();
+			onClose(nullptr);
 			res = true;
 		}
 	}
@@ -260,6 +261,17 @@ void CPopTip::showConfirmOnly()
 
 	pTextConfirm->setPosition((pTextConfirm->getPosition()+pTextCancel->getPosition())/2);
 
+}
+void CPopTip::hideBtn()
+{
+	CButton* pConfirm = (CButton*)m_ui->findWidgetById("confirm");
+	CButton* pCancel = (CButton*)m_ui->findWidgetById("cancel");
+	CLabel* pTextConfirm = (CLabel*)m_ui->findWidgetById("text_confirm");
+	CLabel* pTextCancel = (CLabel*)m_ui->findWidgetById("text_cancel");
+	pConfirm->setVisible(false);
+	pCancel->setVisible(false);
+	pTextConfirm->setVisible(false);
+	pTextCancel->setVisible(false);
 }
 
 void CPopTip::onClose( CCObject * pSender )

@@ -132,7 +132,7 @@ void CHandBookPanel::updateShowArea()
 				m_pHeroLayer->setTouchPriority(LayerManager::instance()->getPriority()-1);
 				pLayer->addChild(m_pHeroLayer);
 				m_pHeroLayer->setPosition(pLayer->convertToNodeSpace(m_pHeroLayer->getPosition()));
-				AskForHandBookHero();
+				AskForHandBook(m_iType);
 			}
 			else
 			{
@@ -148,7 +148,7 @@ void CHandBookPanel::updateShowArea()
 				m_pMonsterLayer->setTouchPriority(LayerManager::instance()->getPriority()-1);
 				pLayer->addChild(m_pMonsterLayer);
 				m_pMonsterLayer->setPosition(pLayer->convertToNodeSpace(m_pMonsterLayer->getPosition()));
-				AskForHandBookMonster();
+				AskForHandBook(m_iType);
 			}
 			m_pMonsterLayer->setVisible(true);
 		}
@@ -161,7 +161,7 @@ void CHandBookPanel::updateShowArea()
 				m_pEquipLayer->setTouchPriority(LayerManager::instance()->getPriority()-1);
 				pLayer->addChild(m_pEquipLayer);
 				m_pEquipLayer->setPosition(pLayer->convertToNodeSpace(m_pEquipLayer->getPosition()));
-				AskForHandBookEquip();
+				AskForHandBook(m_iType);
 			}
 			m_pEquipLayer->setVisible(true);
 		}

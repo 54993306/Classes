@@ -1,5 +1,7 @@
 ﻿
 #include "netbean.h"
+#include "cocos2d.h"
+USING_NS_CC;
 
 ///构造函数，初始化默认值
 CNetBean::CNetBean():
@@ -33,12 +35,15 @@ bool CNetBean::connect()
 	}
 	//validate value
 	if(this->m_nnAddress == "" || this->m_nnPort == 0) {
+		CCLOG("if(this->m_nnAddress == "" || this->m_nnPort == 0)");
 		return false;
 	}
 	if(!m_Sock.Create()) {
+		CCLOG("if(!m_Sock.Create())");
 		return false;
 	}
 	if(!m_Sock.Connect(this->m_nnAddress.c_str(), this->m_nnPort,m_isIp)) {
+		CCLOG("if(!m_Sock.Connect(this->m_nnAddress.c_str(), this->m_nnPort,m_isIp))");
 		return false;
 	}
 	//set the connecting status
@@ -250,6 +255,7 @@ void CNetBean::drive()
 	else if (this->m_nConnectStatus == EConnecting) {
 		//check connected status of unblock socket
 		int nRet = this->m_Sock.IsConnected();	
+		CCLOG("m_Sock.IsConnected()-%d", nRet);
 		if (nRet == 1) {
 			//set the connecting status
 			this->m_nConnectStatus = EConnected;

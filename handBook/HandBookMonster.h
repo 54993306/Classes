@@ -10,13 +10,6 @@
 #include "scene/layer/LayerManager.h"
 #include "net/CNetClient.h"
 
-//请求英雄图鉴
-void inline AskForHandBookMonster()
-{
-	//GetTcpNet->sendDataType(BossPrizesMsg);
-}
-
-
 class CHandBookMonsterLayer: public BaseLayer
 {
 public:

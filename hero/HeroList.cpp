@@ -364,6 +364,16 @@ void CHeroList::addArmorForCell( CGridViewCell* pCell, CLayout* pLayout, CHero* 
 		//添加
 		CCSprite* pAdd = (CCSprite*)(pLayout->findWidgetById(CCString::createWithFormat("add%d", i+1)->getCString()));
 		pAdd->setVisible(true);
+		//武器贴图修改
+		if ( i==0 )
+		{
+			const HeroInfoData *data = DataCenter::sharedData()->getHeroInfo()->getCfg(pHero->thumb);
+			CCTexture2D *pTexture = CCTextureCache::sharedTextureCache()->addImage(CCString::createWithFormat("common/box_weapon%d.png", data->iType2)->getCString());
+			if (pTexture)
+			{
+				pAdd->setTexture(pTexture);
+			}
+		}
 
 		//锁
 		CImageView* pLock = (CImageView*)(pLayout->findWidgetById(CCString::createWithFormat("_lock%d", i+1)->getCString()));
@@ -619,7 +629,8 @@ void CHeroList::showNewHeroEffect(CHero *hero)
 	HeroLotteryData data;
 	data.heroType = hero->roletype;
 	data.thumb = hero->thumb;
-	data.quality = hero->iColor;
+	//data.quality = hero->iColor;
+	data.iColor = hero->iColor;
 	m_pNewHeroEffect->showNewHeroEffect(&data);
 }
 

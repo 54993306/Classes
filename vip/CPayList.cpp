@@ -77,7 +77,7 @@ void CPayList::initUI()
 			m_priceVec.push_back(300);
 			m_priceVec.push_back(500);
 			m_priceVec.push_back(1000);
-			m_priceVec.push_back(3000);
+			//m_priceVec.push_back(3000);
 		}break;
 	case PayListTypeApple:
 		{
@@ -172,7 +172,7 @@ void CPayList::updateForBuyForGoogle( float dt )
 {
 	if(m_iIndexFlag != -1)
 	{
-		GooglePaySDK::getInstance()->pay(G_PAY, (GAME_PRODUCT)(m_iIndexFlag), m_iIndexFlag);
+		GooglePaySDK::getInstance()->pay(G_PAY, (GAME_PRODUCT)(m_iIndexFlag-1), m_iIndexFlag);
 		m_iIndexFlag = -1;
 	}
 }

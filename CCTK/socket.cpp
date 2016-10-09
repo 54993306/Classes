@@ -5,6 +5,8 @@
 功能描述: 套接字功能封装类的定义，采用select无阻塞模型
 ******************************************************************************/
 #include "socket.h"
+#include "cocos2d.h"
+USING_NS_CC;
 
 ///缺省构造函数
 CSocket::CSocket()
@@ -321,12 +323,14 @@ int CSocket::IsConnected()
 			socklen_t len = sizeof (error);
 			if (getsockopt(m_Socket, SOL_SOCKET, SO_ERROR, &error, &len) < 0)
 			{
+				CCLOG("(getsockopt(m_Socket, SOL_SOCKET, SO_ERROR, &error, &len) < 0)");
 				return -1;
 			}
 			//LINUX ECONNREFUSED 111
 			//UNIX ECONNREFUSED 61
 			if(error == ECONNREFUSED)
 			{
+				CCLOG("error == ECONNREFUSED");
 				return -1;
 			}
 			return 1;

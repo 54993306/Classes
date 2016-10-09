@@ -300,6 +300,8 @@ void CHeroControl::onHeroInfo(CHero *hero,int showType)
 		m_expLayer->setVisible(false);
 	}
 
+	NOTIFICATION->postNotification("CHeroAttribute::setHeroSkillBgVisiable", CCBool::create(false));
+
 	switch (showType)
 	{
 

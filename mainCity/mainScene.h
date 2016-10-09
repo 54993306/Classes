@@ -12,23 +12,6 @@
 class CMainCityBuild;
 class CPvpGateLayer;
 
-//重置锚点并且保持位置
-void inline ResetAnchorPointAndKeepSamePos( CCNode *pNode, CCPoint anchorpoint )
-{
-	//重置锚点
-	int iWidth = pNode->getContentSize().width*pNode->getScaleX();
-	int iHeight = pNode->getContentSize().height*pNode->getScaleY();
-	CCPoint oldAnchor = pNode->getAnchorPoint();
-
-	CCPoint offPos = ccp(
-		(anchorpoint.x-oldAnchor.x)*iWidth, 
-		(anchorpoint.y-oldAnchor.y)*iHeight);
-
-	CCPoint newPos = pNode->getPosition() + offPos;
-	pNode->setPosition(newPos);
-	pNode->setAnchorPoint(anchorpoint);
-}
-
 class CMainScene:public CScene
 {
 public:

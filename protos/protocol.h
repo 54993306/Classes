@@ -36,6 +36,7 @@
 #include "rank_protocol.pb.h"
 #include "boss_protocol.pb.h"
 #include "pvp_protocol.pb.h"
+#include "atlas_protocol.pb.h"
 
 using namespace protos;
 using namespace protos::common;

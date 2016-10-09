@@ -56,9 +56,11 @@ void ShowTexttip(CCNode * content,									//显示的提示节点
 				 float offsetx = 0.0f,								//飞行偏移量,相对于当前点的位置
 				 float offsety = 200.0f);
 
-void showScrollTip(const char* str, CCNode * _parent = NULL);                        
+void showScrollTip(const char* str, CCNode * _parent = NULL);                  
 
 CPopTip* ShowPopTextTip(const char* str,const ccColor3B& color =ccWHITE, bool isAutoClose = true);
+void ShowPopTextTipandTitle(const char * str, const ccColor3B& color = ccWHITE, bool isAutoClose = false);//无确定按钮-含标题
+
 void ShowConfirmTextTip(const char* str, CCObject *pSender, SEL_ClickHandler pHandler, const ccColor3B& color =ccWHITE);
 void showItemTip(const CItem *item);
 #endif

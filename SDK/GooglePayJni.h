@@ -7,7 +7,7 @@ extern "C"
 
 	//发送支付请求到android层
 	//1.str-商品ID 2.标记tag
-	void c_pay(int iMsg, const char *str, int iTag);
+	void c_pay(int iMsg, const char *str, int iTag, int iPrice);
 
 	//请求消耗掉订单
 	void c_concume_purchase(int iMsg, const char *str);

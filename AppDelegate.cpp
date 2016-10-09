@@ -33,6 +33,7 @@
 #include "CFileScaner.h"
 #include "SDK/GooglePaySDK.h"
 #include "SDK/GamePlatformManager.h"
+#include "SDK/GameEventMonitor.h"
 
 USING_NS_CC;
 using namespace CocosDenshion;
@@ -62,6 +63,7 @@ AppDelegate::~AppDelegate()
 	CJniHelper::destroy();
 	GooglePaySDK::destroy();
 	GamePlatformManager::destroy();
+	GameEventMonitor::destroy();
 }
 
 bool AppDelegate::applicationDidFinishLaunching() 

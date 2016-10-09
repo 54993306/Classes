@@ -555,3 +555,19 @@ CImageView * MakeFaceBookHeadToCircle( CCSprite *pSprite )
 
 	return retval;
 }
+
+void ResetAnchorPointAndKeepSamePos( CCNode *pNode, CCPoint anchorpoint )
+{
+	//ÖØÖÃÃªµã
+	int iWidth = pNode->getContentSize().width*pNode->getScaleX();
+	int iHeight = pNode->getContentSize().height*pNode->getScaleY();
+	CCPoint oldAnchor = pNode->getAnchorPoint();
+
+	CCPoint offPos = ccp(
+		(anchorpoint.x-oldAnchor.x)*iWidth, 
+		(anchorpoint.y-oldAnchor.y)*iHeight);
+
+	CCPoint newPos = pNode->getPosition() + offPos;
+	pNode->setPosition(newPos);
+	pNode->setAnchorPoint(anchorpoint);
+}

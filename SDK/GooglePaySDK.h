@@ -11,7 +11,7 @@ using namespace std;
 struct GooglePayProduct
 {
 	string		sProductID;			//产品ID
-	float			fPrice;					//价格
+	int			iPrice;					//价格
 	int			iNum;					//购买数量
 };
 

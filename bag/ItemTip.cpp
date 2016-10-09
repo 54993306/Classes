@@ -237,6 +237,20 @@ void CItemTip::showItemProperty(CItem *pItem)
 		img->setTag(1);
 		pEquipByHero->addChild(img);
 	}
+
+	//类型
+	CLabel *pItemType = (CLabel*)m_ui->findWidgetById("item_type");
+	pItemType->setVisible(false);
+
+	if (pItemData->iItemType >= 1)
+	{
+		if (pItemData && pItemType)
+		{	
+			pItemType->setString(GETLANGSTR(2061+pItemData->iItemType));
+			pItemType->setVisible(true);
+		}
+	}
+
 }
 
 void CItemTip::onResolve(CCObject* pSender)

@@ -39,7 +39,9 @@
 
 #include "mail/EmailLayer.h"
 #include "CAccessLayer.h"
+#include "handBook/HandBookPanel.h"
 
+#include "mainCity/TimeGift.h"
 
 bool CMainCityUI::init()
 {
@@ -231,6 +233,20 @@ void CMainCityUI::onEnter()
 // 	CCSprite *headBg = (CCSprite *)(headPart->findWidgetById("headbg"));
 // 	sp->setPosition(headBg->getPosition());
 // 	headPart->addChild(sp);
+
+	//在线礼包
+	int iNexTime = user->getOnlinePrizeTime();
+	if (iNexTime!=-1)
+	{
+		if (m_pTimeGift==nullptr)
+		{
+			m_pTimeGift = CTimeGift::create();
+			m_pTimeGift->setTouchPriority(-3);
+			this->addChild(m_pTimeGift, 2);
+		}
+		m_pTimeGift->setTime(iNexTime);
+	}
+
 }
 
 void CMainCityUI::onVip(CCObject *pSender)
@@ -559,6 +575,9 @@ void CMainCityUI::onClickBtn(CCObject *pSender)
 			CCSprite *frdPoint = (CCSprite*)(m_ui->findWidgetById("friendPoint"));
 			frdPoint->setVisible(false);
 			
+			//CHandBookPanel* pLayer = CHandBookPanel::create();
+			//LayerManager::instance()->push(pLayer);
+
 		}
 		break;
 	default:

@@ -38,6 +38,8 @@ class RechargeReq;
 class RechargeRes;
 class ValidateBilling;
 class ValidateRes;
+class VerifyReceipt;
+class VerifyRes;
 class VipInfoRes;
 class VipPrivReq;
 class VipShopRes;
@@ -523,6 +525,185 @@ class ValidateRes : public ::google::protobuf::Message {
 
   void InitAsDefaultInstance();
   static ValidateRes* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class VerifyReceipt : public ::google::protobuf::Message {
+ public:
+  VerifyReceipt();
+  virtual ~VerifyReceipt();
+
+  VerifyReceipt(const VerifyReceipt& from);
+
+  inline VerifyReceipt& operator=(const VerifyReceipt& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const VerifyReceipt& default_instance();
+
+  void Swap(VerifyReceipt* other);
+
+  // implements Message ----------------------------------------------
+
+  VerifyReceipt* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const VerifyReceipt& from);
+  void MergeFrom(const VerifyReceipt& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required string receiptData = 1;
+  inline bool has_receiptdata() const;
+  inline void clear_receiptdata();
+  static const int kReceiptDataFieldNumber = 1;
+  inline const ::std::string& receiptdata() const;
+  inline void set_receiptdata(const ::std::string& value);
+  inline void set_receiptdata(const char* value);
+  inline void set_receiptdata(const char* value, size_t size);
+  inline ::std::string* mutable_receiptdata();
+  inline ::std::string* release_receiptdata();
+  inline void set_allocated_receiptdata(::std::string* receiptdata);
+
+  // @@protoc_insertion_point(class_scope:protos.VerifyReceipt)
+ private:
+  inline void set_has_receiptdata();
+  inline void clear_has_receiptdata();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::std::string* receiptdata_;
+
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+
+  friend void  protobuf_AddDesc_vip_5fprotocol_2eproto();
+  friend void protobuf_AssignDesc_vip_5fprotocol_2eproto();
+  friend void protobuf_ShutdownFile_vip_5fprotocol_2eproto();
+
+  void InitAsDefaultInstance();
+  static VerifyReceipt* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class VerifyRes : public ::google::protobuf::Message {
+ public:
+  VerifyRes();
+  virtual ~VerifyRes();
+
+  VerifyRes(const VerifyRes& from);
+
+  inline VerifyRes& operator=(const VerifyRes& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const VerifyRes& default_instance();
+
+  void Swap(VerifyRes* other);
+
+  // implements Message ----------------------------------------------
+
+  VerifyRes* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const VerifyRes& from);
+  void MergeFrom(const VerifyRes& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required bool result = 1;
+  inline bool has_result() const;
+  inline void clear_result();
+  static const int kResultFieldNumber = 1;
+  inline bool result() const;
+  inline void set_result(bool value);
+
+  // optional int32 money = 2;
+  inline bool has_money() const;
+  inline void clear_money();
+  static const int kMoneyFieldNumber = 2;
+  inline ::google::protobuf::int32 money() const;
+  inline void set_money(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:protos.VerifyRes)
+ private:
+  inline void set_has_result();
+  inline void clear_has_result();
+  inline void set_has_money();
+  inline void clear_has_money();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  bool result_;
+  ::google::protobuf::int32 money_;
+
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+
+  friend void  protobuf_AddDesc_vip_5fprotocol_2eproto();
+  friend void protobuf_AssignDesc_vip_5fprotocol_2eproto();
+  friend void protobuf_ShutdownFile_vip_5fprotocol_2eproto();
+
+  void InitAsDefaultInstance();
+  static VerifyRes* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -2015,6 +2196,128 @@ inline ::google::protobuf::int32 ValidateRes::money() const {
   return money_;
 }
 inline void ValidateRes::set_money(::google::protobuf::int32 value) {
+  set_has_money();
+  money_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// VerifyReceipt
+
+// required string receiptData = 1;
+inline bool VerifyReceipt::has_receiptdata() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void VerifyReceipt::set_has_receiptdata() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void VerifyReceipt::clear_has_receiptdata() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void VerifyReceipt::clear_receiptdata() {
+  if (receiptdata_ != &::google::protobuf::internal::kEmptyString) {
+    receiptdata_->clear();
+  }
+  clear_has_receiptdata();
+}
+inline const ::std::string& VerifyReceipt::receiptdata() const {
+  return *receiptdata_;
+}
+inline void VerifyReceipt::set_receiptdata(const ::std::string& value) {
+  set_has_receiptdata();
+  if (receiptdata_ == &::google::protobuf::internal::kEmptyString) {
+    receiptdata_ = new ::std::string;
+  }
+  receiptdata_->assign(value);
+}
+inline void VerifyReceipt::set_receiptdata(const char* value) {
+  set_has_receiptdata();
+  if (receiptdata_ == &::google::protobuf::internal::kEmptyString) {
+    receiptdata_ = new ::std::string;
+  }
+  receiptdata_->assign(value);
+}
+inline void VerifyReceipt::set_receiptdata(const char* value, size_t size) {
+  set_has_receiptdata();
+  if (receiptdata_ == &::google::protobuf::internal::kEmptyString) {
+    receiptdata_ = new ::std::string;
+  }
+  receiptdata_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* VerifyReceipt::mutable_receiptdata() {
+  set_has_receiptdata();
+  if (receiptdata_ == &::google::protobuf::internal::kEmptyString) {
+    receiptdata_ = new ::std::string;
+  }
+  return receiptdata_;
+}
+inline ::std::string* VerifyReceipt::release_receiptdata() {
+  clear_has_receiptdata();
+  if (receiptdata_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = receiptdata_;
+    receiptdata_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+inline void VerifyReceipt::set_allocated_receiptdata(::std::string* receiptdata) {
+  if (receiptdata_ != &::google::protobuf::internal::kEmptyString) {
+    delete receiptdata_;
+  }
+  if (receiptdata) {
+    set_has_receiptdata();
+    receiptdata_ = receiptdata;
+  } else {
+    clear_has_receiptdata();
+    receiptdata_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  }
+}
+
+// -------------------------------------------------------------------
+
+// VerifyRes
+
+// required bool result = 1;
+inline bool VerifyRes::has_result() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void VerifyRes::set_has_result() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void VerifyRes::clear_has_result() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void VerifyRes::clear_result() {
+  result_ = false;
+  clear_has_result();
+}
+inline bool VerifyRes::result() const {
+  return result_;
+}
+inline void VerifyRes::set_result(bool value) {
+  set_has_result();
+  result_ = value;
+}
+
+// optional int32 money = 2;
+inline bool VerifyRes::has_money() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void VerifyRes::set_has_money() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void VerifyRes::clear_has_money() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void VerifyRes::clear_money() {
+  money_ = 0;
+  clear_has_money();
+}
+inline ::google::protobuf::int32 VerifyRes::money() const {
+  return money_;
+}
+inline void VerifyRes::set_money(::google::protobuf::int32 value) {
   set_has_money();
   money_ = value;
 }

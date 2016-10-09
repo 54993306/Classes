@@ -32,6 +32,12 @@ const ::google::protobuf::internal::GeneratedMessageReflection*
 const ::google::protobuf::Descriptor* ValidateRes_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   ValidateRes_reflection_ = NULL;
+const ::google::protobuf::Descriptor* VerifyReceipt_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  VerifyReceipt_reflection_ = NULL;
+const ::google::protobuf::Descriptor* VerifyRes_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  VerifyRes_reflection_ = NULL;
 const ::google::protobuf::Descriptor* VipInfoRes_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   VipInfoRes_reflection_ = NULL;
@@ -134,7 +140,38 @@ void protobuf_AssignDesc_vip_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(ValidateRes));
-  VipInfoRes_descriptor_ = file->message_type(4);
+  VerifyReceipt_descriptor_ = file->message_type(4);
+  static const int VerifyReceipt_offsets_[1] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(VerifyReceipt, receiptdata_),
+  };
+  VerifyReceipt_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      VerifyReceipt_descriptor_,
+      VerifyReceipt::default_instance_,
+      VerifyReceipt_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(VerifyReceipt, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(VerifyReceipt, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(VerifyReceipt));
+  VerifyRes_descriptor_ = file->message_type(5);
+  static const int VerifyRes_offsets_[2] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(VerifyRes, result_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(VerifyRes, money_),
+  };
+  VerifyRes_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      VerifyRes_descriptor_,
+      VerifyRes::default_instance_,
+      VerifyRes_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(VerifyRes, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(VerifyRes, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(VerifyRes));
+  VipInfoRes_descriptor_ = file->message_type(6);
   static const int VipInfoRes_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(VipInfoRes, level_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(VipInfoRes, exp_),
@@ -152,7 +189,7 @@ void protobuf_AssignDesc_vip_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(VipInfoRes));
-  VipPrivReq_descriptor_ = file->message_type(5);
+  VipPrivReq_descriptor_ = file->message_type(7);
   static const int VipPrivReq_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(VipPrivReq, level_),
   };
@@ -167,7 +204,7 @@ void protobuf_AssignDesc_vip_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(VipPrivReq));
-  VipShopRes_descriptor_ = file->message_type(6);
+  VipShopRes_descriptor_ = file->message_type(8);
   static const int VipShopRes_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(VipShopRes, carlist_),
   };
@@ -182,7 +219,7 @@ void protobuf_AssignDesc_vip_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(VipShopRes));
-  BuyCardReq_descriptor_ = file->message_type(7);
+  BuyCardReq_descriptor_ = file->message_type(9);
   static const int BuyCardReq_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BuyCardReq, cardid_),
   };
@@ -197,7 +234,7 @@ void protobuf_AssignDesc_vip_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(BuyCardReq));
-  BuyCardRes_descriptor_ = file->message_type(8);
+  BuyCardRes_descriptor_ = file->message_type(10);
   static const int BuyCardRes_offsets_[5] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BuyCardRes, result_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BuyCardRes, rolegold_),
@@ -216,7 +253,7 @@ void protobuf_AssignDesc_vip_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(BuyCardRes));
-  VipData_descriptor_ = file->message_type(9);
+  VipData_descriptor_ = file->message_type(11);
   static const int VipData_offsets_[6] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(VipData, level_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(VipData, target_),
@@ -236,7 +273,7 @@ void protobuf_AssignDesc_vip_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(VipData));
-  GoldCard_descriptor_ = file->message_type(10);
+  GoldCard_descriptor_ = file->message_type(12);
   static const int GoldCard_offsets_[6] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GoldCard, id_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GoldCard, name_),
@@ -277,6 +314,10 @@ void protobuf_RegisterTypes(const ::std::string&) {
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     ValidateRes_descriptor_, &ValidateRes::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    VerifyReceipt_descriptor_, &VerifyReceipt::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    VerifyRes_descriptor_, &VerifyRes::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     VipInfoRes_descriptor_, &VipInfoRes::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     VipPrivReq_descriptor_, &VipPrivReq::default_instance());
@@ -303,6 +344,10 @@ void protobuf_ShutdownFile_vip_5fprotocol_2eproto() {
   delete ValidateBilling_reflection_;
   delete ValidateRes::default_instance_;
   delete ValidateRes_reflection_;
+  delete VerifyReceipt::default_instance_;
+  delete VerifyReceipt_reflection_;
+  delete VerifyRes::default_instance_;
+  delete VerifyRes_reflection_;
   delete VipInfoRes::default_instance_;
   delete VipInfoRes_reflection_;
   delete VipPrivReq::default_instance_;
@@ -336,28 +381,32 @@ void protobuf_AddDesc_vip_5fprotocol_2eproto() {
     "ney\030\003 \001(\005\022\014\n\004desc\030\004 \001(\t\"L\n\017ValidateBilli"
     "ng\022\033\n\023inapp_purchase_data\030\001 \002(\t\022\034\n\024inapp"
     "_data_signature\030\002 \002(\t\",\n\013ValidateRes\022\016\n\006"
-    "result\030\001 \002(\010\022\r\n\005money\030\002 \001(\005\"X\n\nVipInfoRe"
-    "s\022\r\n\005level\030\001 \001(\005\022\013\n\003exp\030\002 \001(\005\022\017\n\007nextExp"
-    "\030\003 \001(\005\022\035\n\004data\030\004 \001(\0132\017.protos.VipData\"\033\n"
-    "\nVipPrivReq\022\r\n\005level\030\001 \002(\005\"/\n\nVipShopRes"
-    "\022!\n\007carList\030\001 \003(\0132\020.protos.GoldCard\"\034\n\nB"
-    "uyCardReq\022\016\n\006cardId\030\001 \001(\005\"a\n\nBuyCardRes\022"
-    "\016\n\006result\030\001 \002(\005\022\020\n\010roleGold\030\002 \001(\005\022\020\n\010vip"
-    "Level\030\003 \001(\005\022\016\n\006vipExp\030\004 \001(\005\022\017\n\007nextExp\030\005"
-    " \001(\005\"\212\001\n\007VipData\022\r\n\005level\030\001 \001(\005\022\016\n\006targe"
-    "t\030\002 \001(\005\022\021\n\tbuyAction\030\003 \001(\005\022\017\n\007buyCoin\030\004 "
-    "\001(\005\022\023\n\013actionLimit\030\005 \001(\005\022\'\n\tprizeList\030\006 "
-    "\003(\0132\024.protos.common.Prize\"c\n\010GoldCard\022\n\n"
-    "\002id\030\001 \002(\005\022\014\n\004name\030\002 \001(\t\022\r\n\005price\030\003 \001(\005\022\021"
-    "\n\trecommend\030\004 \001(\010\022\r\n\005canBy\030\005 \001(\010\022\014\n\004note"
-    "\030\006 \001(\tB.\n\035dass.server.gameserver.protosB"
-    "\013VipProtocolH\001", 974);
+    "result\030\001 \002(\010\022\r\n\005money\030\002 \001(\005\"$\n\rVerifyRec"
+    "eipt\022\023\n\013receiptData\030\001 \002(\t\"*\n\tVerifyRes\022\016"
+    "\n\006result\030\001 \002(\010\022\r\n\005money\030\002 \001(\005\"X\n\nVipInfo"
+    "Res\022\r\n\005level\030\001 \001(\005\022\013\n\003exp\030\002 \001(\005\022\017\n\007nextE"
+    "xp\030\003 \001(\005\022\035\n\004data\030\004 \001(\0132\017.protos.VipData\""
+    "\033\n\nVipPrivReq\022\r\n\005level\030\001 \002(\005\"/\n\nVipShopR"
+    "es\022!\n\007carList\030\001 \003(\0132\020.protos.GoldCard\"\034\n"
+    "\nBuyCardReq\022\016\n\006cardId\030\001 \001(\005\"a\n\nBuyCardRe"
+    "s\022\016\n\006result\030\001 \002(\005\022\020\n\010roleGold\030\002 \001(\005\022\020\n\010v"
+    "ipLevel\030\003 \001(\005\022\016\n\006vipExp\030\004 \001(\005\022\017\n\007nextExp"
+    "\030\005 \001(\005\"\212\001\n\007VipData\022\r\n\005level\030\001 \001(\005\022\016\n\006tar"
+    "get\030\002 \001(\005\022\021\n\tbuyAction\030\003 \001(\005\022\017\n\007buyCoin\030"
+    "\004 \001(\005\022\023\n\013actionLimit\030\005 \001(\005\022\'\n\tprizeList\030"
+    "\006 \003(\0132\024.protos.common.Prize\"c\n\010GoldCard\022"
+    "\n\n\002id\030\001 \002(\005\022\014\n\004name\030\002 \001(\t\022\r\n\005price\030\003 \001(\005"
+    "\022\021\n\trecommend\030\004 \001(\010\022\r\n\005canBy\030\005 \001(\010\022\014\n\004no"
+    "te\030\006 \001(\tB.\n\035dass.server.gameserver.proto"
+    "sB\013VipProtocolH\001", 1056);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "vip_protocol.proto", &protobuf_RegisterTypes);
   RechargeReq::default_instance_ = new RechargeReq();
   RechargeRes::default_instance_ = new RechargeRes();
   ValidateBilling::default_instance_ = new ValidateBilling();
   ValidateRes::default_instance_ = new ValidateRes();
+  VerifyReceipt::default_instance_ = new VerifyReceipt();
+  VerifyRes::default_instance_ = new VerifyRes();
   VipInfoRes::default_instance_ = new VipInfoRes();
   VipPrivReq::default_instance_ = new VipPrivReq();
   VipShopRes::default_instance_ = new VipShopRes();
@@ -369,6 +418,8 @@ void protobuf_AddDesc_vip_5fprotocol_2eproto() {
   RechargeRes::default_instance_->InitAsDefaultInstance();
   ValidateBilling::default_instance_->InitAsDefaultInstance();
   ValidateRes::default_instance_->InitAsDefaultInstance();
+  VerifyReceipt::default_instance_->InitAsDefaultInstance();
+  VerifyRes::default_instance_->InitAsDefaultInstance();
   VipInfoRes::default_instance_->InitAsDefaultInstance();
   VipPrivReq::default_instance_->InitAsDefaultInstance();
   VipShopRes::default_instance_->InitAsDefaultInstance();
@@ -1791,6 +1842,479 @@ void ValidateRes::Swap(ValidateRes* other) {
   ::google::protobuf::Metadata metadata;
   metadata.descriptor = ValidateRes_descriptor_;
   metadata.reflection = ValidateRes_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int VerifyReceipt::kReceiptDataFieldNumber;
+#endif  // !_MSC_VER
+
+VerifyReceipt::VerifyReceipt()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+}
+
+void VerifyReceipt::InitAsDefaultInstance() {
+}
+
+VerifyReceipt::VerifyReceipt(const VerifyReceipt& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+}
+
+void VerifyReceipt::SharedCtor() {
+  _cached_size_ = 0;
+  receiptdata_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+VerifyReceipt::~VerifyReceipt() {
+  SharedDtor();
+}
+
+void VerifyReceipt::SharedDtor() {
+  if (receiptdata_ != &::google::protobuf::internal::kEmptyString) {
+    delete receiptdata_;
+  }
+  if (this != default_instance_) {
+  }
+}
+
+void VerifyReceipt::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* VerifyReceipt::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return VerifyReceipt_descriptor_;
+}
+
+const VerifyReceipt& VerifyReceipt::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_vip_5fprotocol_2eproto();
+  return *default_instance_;
+}
+
+VerifyReceipt* VerifyReceipt::default_instance_ = NULL;
+
+VerifyReceipt* VerifyReceipt::New() const {
+  return new VerifyReceipt;
+}
+
+void VerifyReceipt::Clear() {
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (has_receiptdata()) {
+      if (receiptdata_ != &::google::protobuf::internal::kEmptyString) {
+        receiptdata_->clear();
+      }
+    }
+  }
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool VerifyReceipt::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+  ::google::protobuf::uint32 tag;
+  while ((tag = input->ReadTag()) != 0) {
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // required string receiptData = 1;
+      case 1: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_receiptdata()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+            this->receiptdata().data(), this->receiptdata().length(),
+            ::google::protobuf::internal::WireFormat::PARSE);
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectAtEnd()) return true;
+        break;
+      }
+
+      default: {
+      handle_uninterpreted:
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          return true;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+  return true;
+#undef DO_
+}
+
+void VerifyReceipt::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // required string receiptData = 1;
+  if (has_receiptdata()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->receiptdata().data(), this->receiptdata().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      1, this->receiptdata(), output);
+  }
+
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+}
+
+::google::protobuf::uint8* VerifyReceipt::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // required string receiptData = 1;
+  if (has_receiptdata()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->receiptdata().data(), this->receiptdata().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        1, this->receiptdata(), target);
+  }
+
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  return target;
+}
+
+int VerifyReceipt::ByteSize() const {
+  int total_size = 0;
+
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // required string receiptData = 1;
+    if (has_receiptdata()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::StringSize(
+          this->receiptdata());
+    }
+
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void VerifyReceipt::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const VerifyReceipt* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const VerifyReceipt*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void VerifyReceipt::MergeFrom(const VerifyReceipt& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_receiptdata()) {
+      set_receiptdata(from.receiptdata());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void VerifyReceipt::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void VerifyReceipt::CopyFrom(const VerifyReceipt& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool VerifyReceipt::IsInitialized() const {
+  if ((_has_bits_[0] & 0x00000001) != 0x00000001) return false;
+
+  return true;
+}
+
+void VerifyReceipt::Swap(VerifyReceipt* other) {
+  if (other != this) {
+    std::swap(receiptdata_, other->receiptdata_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata VerifyReceipt::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = VerifyReceipt_descriptor_;
+  metadata.reflection = VerifyReceipt_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int VerifyRes::kResultFieldNumber;
+const int VerifyRes::kMoneyFieldNumber;
+#endif  // !_MSC_VER
+
+VerifyRes::VerifyRes()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+}
+
+void VerifyRes::InitAsDefaultInstance() {
+}
+
+VerifyRes::VerifyRes(const VerifyRes& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+}
+
+void VerifyRes::SharedCtor() {
+  _cached_size_ = 0;
+  result_ = false;
+  money_ = 0;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+VerifyRes::~VerifyRes() {
+  SharedDtor();
+}
+
+void VerifyRes::SharedDtor() {
+  if (this != default_instance_) {
+  }
+}
+
+void VerifyRes::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* VerifyRes::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return VerifyRes_descriptor_;
+}
+
+const VerifyRes& VerifyRes::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_vip_5fprotocol_2eproto();
+  return *default_instance_;
+}
+
+VerifyRes* VerifyRes::default_instance_ = NULL;
+
+VerifyRes* VerifyRes::New() const {
+  return new VerifyRes;
+}
+
+void VerifyRes::Clear() {
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    result_ = false;
+    money_ = 0;
+  }
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool VerifyRes::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+  ::google::protobuf::uint32 tag;
+  while ((tag = input->ReadTag()) != 0) {
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // required bool result = 1;
+      case 1: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
+                 input, &result_)));
+          set_has_result();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(16)) goto parse_money;
+        break;
+      }
+
+      // optional int32 money = 2;
+      case 2: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_money:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &money_)));
+          set_has_money();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectAtEnd()) return true;
+        break;
+      }
+
+      default: {
+      handle_uninterpreted:
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          return true;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+  return true;
+#undef DO_
+}
+
+void VerifyRes::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // required bool result = 1;
+  if (has_result()) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(1, this->result(), output);
+  }
+
+  // optional int32 money = 2;
+  if (has_money()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->money(), output);
+  }
+
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+}
+
+::google::protobuf::uint8* VerifyRes::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // required bool result = 1;
+  if (has_result()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(1, this->result(), target);
+  }
+
+  // optional int32 money = 2;
+  if (has_money()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->money(), target);
+  }
+
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  return target;
+}
+
+int VerifyRes::ByteSize() const {
+  int total_size = 0;
+
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // required bool result = 1;
+    if (has_result()) {
+      total_size += 1 + 1;
+    }
+
+    // optional int32 money = 2;
+    if (has_money()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->money());
+    }
+
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void VerifyRes::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const VerifyRes* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const VerifyRes*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void VerifyRes::MergeFrom(const VerifyRes& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_result()) {
+      set_result(from.result());
+    }
+    if (from.has_money()) {
+      set_money(from.money());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void VerifyRes::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void VerifyRes::CopyFrom(const VerifyRes& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool VerifyRes::IsInitialized() const {
+  if ((_has_bits_[0] & 0x00000001) != 0x00000001) return false;
+
+  return true;
+}
+
+void VerifyRes::Swap(VerifyRes* other) {
+  if (other != this) {
+    std::swap(result_, other->result_);
+    std::swap(money_, other->money_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata VerifyRes::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = VerifyRes_descriptor_;
+  metadata.reflection = VerifyRes_reflection_;
   return metadata;
 }
 

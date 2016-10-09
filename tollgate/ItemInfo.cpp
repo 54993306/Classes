@@ -83,6 +83,20 @@ void CItemInfo::setInfo(CItem *info)
 	head->setPosition(ccp(headbg->getContentSize().width/2, headbg->getContentSize().height/2));
 	headbg->addChild(head);
 	//NodeFillParent(head);
+
+	//类型
+	CLabel *pType = (CLabel*)m_ui->findWidgetById("item_type");
+	pType->setVisible(false);
+
+	if (info->itemType==1)
+	{
+		if (itemData && pType)
+		{	
+			pType->setString(GETLANGSTR(2061+itemData->iItemType));
+			pType->setVisible(true);
+		}
+	}
+
 }
 
 void CItemInfo::setInfo( CPrize *pPrize )
@@ -130,6 +144,20 @@ void CItemInfo::setInfo( CPrize *pPrize )
 	head->setPosition(ccp(headbg->getContentSize().width/2, headbg->getContentSize().height/2));
 	headbg->addChild(head);
 	//NodeFillParent(head);
+
+	//类型
+	CLabel *pType = (CLabel*)m_ui->findWidgetById("item_type");
+	pType->setVisible(false);
+
+	if (pPrize->type==1)
+	{
+		if (itemData && pType)
+		{	
+			pType->setString(GETLANGSTR(2061+itemData->iItemType));
+			pType->setVisible(true);
+		}
+	}
+
 }
 
 

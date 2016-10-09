@@ -59,7 +59,7 @@ std::string GooglePaySDK::getPublicRsaKey()
 void GooglePaySDK::pay( int iMsg, GAME_PRODUCT productId, int iTag )
 {
 #if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
-	c_pay(iMsg, GOOGLE_PRODUCT[(int)productId].sProductID.c_str(), iTag);
+	c_pay(iMsg, GOOGLE_PRODUCT[(int)productId].sProductID.c_str(), iTag, GOOGLE_PRODUCT[(int)productId].iPrice);
 #endif
 }
 

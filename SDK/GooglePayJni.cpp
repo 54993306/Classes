@@ -54,9 +54,9 @@ extern "C"
 	}
 
 	//请求支付
-	void c_pay( int iMsg, const char *str , int iTag)
+	void c_pay( int iMsg, const char *str , int iTag, int iPrice)
 	{
-		c_handlMsg( iMsg, str, iTag, 0);
+		c_handlMsg( iMsg, str, iTag, iPrice);
 	}
 
 	//请求消耗掉订单

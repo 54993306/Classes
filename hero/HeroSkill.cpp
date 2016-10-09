@@ -17,7 +17,7 @@
 #include "tollgate/ItemInfo.h"
 using namespace BattleSpace;
 
-CHeroSkill::CHeroSkill():m_skillIndex(0),m_selectItem(nullptr),m_offsetX1(0),m_offsetX2(0),m_pItemInfo(nullptr)
+CHeroSkill::CHeroSkill():m_skillIndex(0),m_selectItem(nullptr),m_offsetX1(0),m_offsetX2(0),m_pItemInfo(nullptr),m_ui_special(nullptr)
 {
 
 }
@@ -131,6 +131,10 @@ void CHeroSkill::onClickSkill(CCObject* pSender)
 void CHeroSkill::showSkill(CHero* hero, int type)
 {
  	m_hero = hero;
+
+	//如果是五星英雄
+	showSpeciaBtn(m_hero->iColor==5);
+
 	if (this->isVisible())
 	{
 		GetTcpNet->registerMsgHandler(RoleBag,this,CMsgHandler_selector(CHeroSkill::processMsg));
@@ -615,5 +619,98 @@ void CHeroSkill::showSkillType()
 	default:
 		break;
 	}
+}
+
+void CHeroSkill::showSpeciaBtn( bool bVisiable )
+{
+	CImageView *pBtn = (CImageView *)m_ui->findWidgetById("special_btn");
+	if (bVisiable)
+	{
+		pBtn->setVisible(true);
+		pBtn->setTouchEnabled(true);
+		pBtn->setOnClickListener(this, ccw_click_selector(CHeroSkill::onSpecialBtnClick));
+	}
+	else
+	{
+		pBtn->setVisible(false);
+	}
+
+	showSpeciaPage(false);
+}
+
+
+void CHeroSkill::onSpecialBtnClick( CCObject *pObj )
+{
+	if (m_ui->isVisible())
+	{
+		showSpeciaPage(true);
+	}
+	else
+	{
+		showSpeciaPage(false);
+	}
+}
+
+void CHeroSkill::showSpeciaPage( bool bVisiable )
+{
+	//切换到进阶界面
+	if (!m_ui)
+	{
+		m_ui = LoadComponent("Heroskill.xaml");  //
+		m_ui->setPosition(VCENTER);
+		this->addChild(m_ui);
+	}
+	m_ui->setVisible(!bVisiable);
+
+	if (!m_ui_special)
+	{
+		m_ui_special = LoadComponent("HeroskillEvolve.xaml");  //
+		m_ui_special->setPosition(VCENTER);
+		this->addChild(m_ui_special);
+
+		//切回按钮
+		CImageView *pBtn = (CImageView *)m_ui_special->findWidgetById("special_btn");
+		pBtn->setTouchEnabled(true);
+		pBtn->setOnClickListener(this, ccw_click_selector(CHeroSkill::onSpecialBtnClick));
+
+		//五个技能图标事件
+		for (int i=0; i<5; i++)
+		{
+			CImageView *pImageView = (CImageView *)m_ui_special->findWidgetById(CCString::createWithFormat("itembg_%d", i+1)->getCString());
+			pImageView->setTexture(CCTextureCache::sharedTextureCache()->addImage("skillIcon/123456.png"));
+			pImageView->setTouchEnabled(true);
+			pImageView->setTag(i+1);
+			pImageView->setOnClickListener(this, ccw_click_selector(CHeroSkill::showSpecialInfo));
+			pImageView->setShaderProgram(ShaderDataMgr->getShaderByType(ShaderStone));
+		}
+
+
+		//默认选择第一个
+		showSpecialInfo((CImageView *)m_ui_special->findWidgetById("itembg_1"));
+
+	}
+	m_ui_special->setVisible(bVisiable);
+
+	NOTIFICATION->postNotification("CHeroAttribute::setHeroSkillBgVisiable", CCBool::create(bVisiable));
+}
+
+void CHeroSkill::showSpecialInfo( CCObject *pSender )
+{
+	//TODO
+	CCNode *pNode = (CCNode *)pSender;
+	int iTag = pNode->getTag();
+
+	const SkillCfg *pCfg = DataCenter::sharedData()->getSkill()->getCfg(10+iTag);
+	if (pCfg)
+	{
+		CLabel *pName = (CLabel *)m_ui_special->findWidgetById("name");
+		pName->setString(pCfg->name.c_str());
+		CLabel *pDesc = (CLabel *)m_ui_special->findWidgetById("desc");
+		pDesc->setString(pCfg->desc.c_str());
+	}
+
+	//光标
+	CImageView* pSelectRect = (CImageView *)m_ui_special->findWidgetById("selectImg");
+	pSelectRect->setPosition(pNode->getPosition()+ccp(38, -10));
 }
 

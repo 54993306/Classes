@@ -22,6 +22,9 @@
 #include "Resources.h"
 #include "mainCity/PanelTips.h"
 #include "Global.h"
+#include "UserDefaultData.h"
+#include "scene/LoginScene.h"
+
 
 CFriendLayer::~CFriendLayer()
 {
@@ -142,6 +145,7 @@ void CFriendLayer::onEnter()
 	CLabel *num = (CLabel*)(inviteLay->findWidgetById("num"));
 	num->setString(CCString::createWithFormat("%d/%d",user->getInviteFriend(),100)->getCString());
 
+	FaceBookSDK::sharedInstance()->setCallbackForUserInfo(this, callfuncO_selector(CFriendLayer::onFaceBookUserInfo));
 	GetTcpNet->registerMsgHandler(AccountBinMsg,this,CMsgHandler_selector(CFriendLayer::accountBinRes));
 	bool isFbLogin = DataCenter::sharedData()->getUser()->getUserData()->getIsFBLogin();
 
@@ -286,15 +290,50 @@ void CFriendLayer::onClose(CCObject* pSender)
 void CFriendLayer::onInviteFriend(CCObject* pSender)
 {
 	bool isFbLogin = DataCenter::sharedData()->getUser()->getUserData()->getIsFBLogin();
-// 	if (!isFbLogin)
-// 	{
-// 		FaceBookSDK::sharedInstance()->openAuthor();
-// 		FaceBookSDK::sharedInstance()->setCallbackForUserInfo(this,callfuncO_selector(CFriendLayer::onFaceBookUserInfo));
-// 	}
-// 	else
+
+	//验证登录
+
+	LoginType typeLogin = (LoginType)(CCUserDefault::sharedUserDefault()->getIntegerForKey(LOGIN_TYPE, 0));
+
+	switch (typeLogin)
 	{
-		FaceBookSDK::sharedInstance()->onOpenPickFriends();
-	}	
+	case LoginTypeNull:
+		break;
+	case LoginTypeTourist:
+	case LoginTypeGoogle:
+		{
+			//本地没有fbid，请求登录
+			std::string sSaveFbId = CCUserDefault::sharedUserDefault()->getStringForKey(FACEBOOK_ID, "");
+			if ( sSaveFbId==""  )
+			{
+				FaceBookSDK::sharedInstance()->openAuthor();
+			}
+			else
+			{
+				//如果本地有fbid，roleinfo没有，发送绑定
+				UserData *pData = DataCenter::sharedData()->getUser()->getUserData();
+				if ( pData )
+				{
+					if ( pData->getFbId().size() <= 1 )
+					{
+						//绑定账户
+						CPlayerControl::getInstance().sendAccountBind(sSaveFbId.c_str());
+					}
+				}
+				FaceBookSDK::sharedInstance()->onOpenPickFriends();
+			}
+		}
+		break;
+	case LoginTypeFacebook:
+		{
+			FaceBookSDK::sharedInstance()->onOpenPickFriends();
+		}
+		break;
+	
+		break;
+	default:
+		break;
+	}
 }
 
 void CFriendLayer::onFaceBookUserInfo(CCObject *object)
@@ -306,6 +345,9 @@ void CFriendLayer::onFaceBookUserInfo(CCObject *object)
 		if(Json::Reader().parse(strResult->getCString(),jsValue))
 		{
 			string m_FaceBookUserID =jsValue["id"].asCString();
+			CCUserDefault::sharedUserDefault()->setStringForKey(FACEBOOK_ID,m_FaceBookUserID);
+			CCUserDefault::sharedUserDefault()->flush();
+			//绑定账户
 			CPlayerControl::getInstance().sendAccountBind(m_FaceBookUserID.c_str());
 		}
 	}

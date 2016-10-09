@@ -17,6 +17,8 @@
 #include "common/CGameSound.h"
 #include "battle/AnimationManager.h"
 
+#include "tools/CCShake.h"
+
 using namespace BattleSpace;
 CPopItem::CPopItem()
 	:m_pMonsterInfo(nullptr)
@@ -25,6 +27,7 @@ CPopItem::CPopItem()
 	,m_iIndexForFindNewHero(0)
 	,m_pTargetCallBack(nullptr)
 	,m_pTargetFun(nullptr)
+	,m_indexprizeRes(0)
 {
 
 }
@@ -250,9 +253,13 @@ void CPopItem::signPrize(CPrize *prize)
 		CCAnimation *lightAnim = AnimationManager::sharedAction()->getAnimation("8042");
 		CCSprite *light = CCSprite::create("skill/8042.png");
 		light->setPosition(VCENTER);
-		light->runAction(CCSequence::createWithTwoActions(CCAnimate::create(lightAnim),CCRemoveSelf::create()));
 		light->setScale(1138/light->getContentSize().width);
+		light->setVisible(false);
 		m_ui->addChild(light);
+		light->runAction(CCSequence::create(
+			CCDelayTime::create(0.5f),
+			CCCallFuncN::create(this,callfuncN_selector(CPopItem::callbackforsignPrizeEffectOne)),
+			nullptr));
 
 		{
 			CCAnimation *lightAnim = AnimationManager::sharedAction()->getAnimation("8050");
@@ -260,10 +267,31 @@ void CPopItem::signPrize(CPrize *prize)
 			CCSprite *light = CCSprite::create("skill/8050.png");
 			light->setPosition(VCENTER);
 			light->setScale(2.2f);
-			light->runAction(CCRepeatForever::create(CCAnimate::create(lightAnim)->reverse()));
+			light->setVisible(false);
 			m_ui->addChild(light);
+			light->runAction(CCSequence::create(
+				CCDelayTime::create(0.5f),
+				CCCallFuncN::create(this,callfuncN_selector(CPopItem::callbackforsignPrizeEffectTwo)),
+				nullptr));
+			
+			
 		}
 	}
+}
+void CPopItem::callbackforsignPrizeEffectOne(CCNode* node)
+{
+	CCSprite* light = (CCSprite* )node;
+	CCAnimation *lightAnim = AnimationManager::sharedAction()->getAnimation("8042");
+	light->setVisible(true);
+	light->runAction(CCSequence::createWithTwoActions(CCAnimate::create(lightAnim),CCRemoveSelf::create()));
+}
+void  CPopItem::callbackforsignPrizeEffectTwo(CCNode* node)
+{
+	CCSprite* light = (CCSprite* )node;
+	CCAnimation *lightAnim = AnimationManager::sharedAction()->getAnimation("8050");
+	lightAnim->setDelayPerUnit(0.05f);
+	light->setVisible(true);
+	light->runAction(CCRepeatForever::create(CCAnimate::create(lightAnim)->reverse()));
 }
 
 void CPopItem::popItemList(const vector<CItem>& itemList)
@@ -431,6 +459,128 @@ void CPopItem::popPrizeRes(CGetPrizeRes *prizeRes)
 		m_ui->addChild(light);
 	}
 } 
+void CPopItem::popPrizeResTwoLine(CGetPrizeRes* prizeRes)
+{
+	m_prizeRes = *prizeRes;
+	
+	CButton* btn = (CButton*)m_ui->findWidgetById("ok");
+	btn->setEnabled(false);
+
+	CLayout* lay_item = (CLayout* )m_ui->findWidgetById("lay_item");
+	lay_item->setVisible(false);
+
+	CLayout* TwoLineShowPrize = (CLayout* )m_ui->findWidgetById("TwoLineShowPrize");
+	TwoLineShowPrize->setVisible(true);
+
+	for(int i = 0;i<m_prizeRes.prizeList.size(); i++)
+	{
+		CPrize& prize = m_prizeRes.prizeList.at(i);
+
+		CCString* str = CCString::createWithFormat("Cell_Item_Copy%d",i+1);
+		CLayout* item = (CLayout* )m_ui->findWidgetById(str->getCString());
+		//道具背景
+		CImageView* pBg = (CImageView* )item->getChildByTag(1);
+		pBg->removeAllChildren();
+		pBg->setTouchEnabled(true);
+		pBg->setEnabled(true);
+		pBg->setUserData(&prize);
+		pBg->setOnPressListener(this,ccw_press_selector(CPopItem::onPress));
+
+		CCSprite* spItem = nullptr;
+		if (prize.thumb >= 0)
+		{
+			//道具框
+			CImageView* frame = (CImageView* )item->getChildByTag(2);
+			frame->removeAllChildren();
+			SmartSetRectPrizeColor(frame, &prize);
+			spItem = CCSprite::create(GetImageName(prize.type,prize.color,prize.thumb).c_str());
+			if (!spItem)
+			{
+				spItem = CCSprite::create("headImg/101.png");
+				CCLOG("CLuckyWheelLayer::updateLotteryItem error load image %d",prize.thumb);
+			}
+			spItem->setPosition(ccp(frame->getContentSize().width/2,frame->getContentSize().height/2));
+			frame->addChild(spItem,-1,1);
+			spItem->setScale(0.9f);
+
+			//添加数量
+			CLabel* numLab = (CLabel* )item->getChildByTag(3);
+			numLab->setVisible(false);
+
+			CCLabelAtlas* itemNum = CCLabelAtlas::create("","label/no_02.png",9,15,46);
+			itemNum->setAnchorPoint(ccp(1.0f,0.0f));
+			itemNum->setPosition(ccp(85,5));
+			pBg->addChild(itemNum, 99,99);
+			itemNum->setString(ToString(prize.num));
+			if (prize.num <= 1)
+			{
+				itemNum->setVisible(false);
+			}
+			if (prize.quality > 0)
+			{
+				CLayout* pStar = SmartGetStarLayout(&prize);
+				frame->addChild(pStar,20,3);
+			}
+			//动画显示
+			item->setScale(1.2f);
+			item->runAction(CCSequence::create(
+				CCHide::create(),
+				CCDelayTime::create(0.5f +i*0.4),
+				CCShow::create(),
+				CCScaleTo::create(0.05f,1.0f),
+				CCCallFuncN::create(this,callfuncN_selector(CPopItem::callbackforShowTwoLinePrize)),
+				nullptr));
+		}
+	}
+}
+void CPopItem::callbackforShowTwoLinePrize(CCNode* node)
+{
+	CLayout* item = (CLayout*)node;
+	m_indexprizeRes ++;
+	//特效
+	CCAnimation *lightAnim = AnimationManager::sharedAction()->getAnimation("8001");
+	lightAnim->setDelayPerUnit(0.05f);
+	CCPoint pos = ccp(item->getChildByTag(1)->getPositionX() + item->getChildByTag(1)->getContentSize().width/2,
+									item->getChildByTag(1)->getPositionY() + item->getChildByTag(1)->getContentSize().height/2);
+	pos.x -=5;
+	pos.y -=13;
+	CCSprite *light = CCSprite::create("skill/8001.png");
+	light->setPosition(pos);
+	light->setScale(0.75f);
+	light->runAction(CCSequence::createWithTwoActions(CCAnimate::create(lightAnim),CCHide::create()));
+	item->addChild(light);
+	//震屏
+	m_ui->setScale(1.05f);
+	m_ui->runAction(CCSequence::createWithTwoActions(CCShake::create(0.2f,7.0f),CCCallFunc::create(this,callfunc_selector(CPopItem::runEffectShake))));
+
+	if (m_indexprizeRes == m_prizeRes.prizeList.size())
+	{
+		//CCAnimation *lightAnim = AnimationManager::sharedAction()->getAnimation("8042");
+		//CCSprite *light = CCSprite::create("skill/8042.png");
+		//light->setPosition(VCENTER);
+		//light->runAction(CCSequence::createWithTwoActions(CCAnimate::create(lightAnim),CCRemoveSelf::create()));
+		//light->setScale(1138/light->getContentSize().width);
+		//m_ui->addChild(light);
+
+		{
+			CCAnimation *lightAnim = AnimationManager::sharedAction()->getAnimation("8050");
+			lightAnim->setDelayPerUnit(0.05f);
+			CCSprite *light = CCSprite::create("skill/8050.png");
+			light->setPosition(VCENTER);
+			light->setScale(2.2f);
+			light->runAction(CCRepeatForever::create(CCAnimate::create(lightAnim)->reverse()));
+			m_ui->addChild(light);
+		}
+		
+		CButton* btn = (CButton*)m_ui->findWidgetById("ok");
+		btn->setEnabled(true);
+	}
+
+}
+void CPopItem::runEffectShake()
+{
+	m_ui->setScale(1.0f);
+}
 
 void CPopItem::onPress( CCObject* pSender, CTouchPressState iState )
 {

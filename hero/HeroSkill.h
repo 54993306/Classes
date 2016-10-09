@@ -34,6 +34,13 @@ public:
 	void skillLevel();
 
 	void levelUp(bool isSuccess);
+
+
+	void showSpeciaBtn( bool bVisiable );		//特殊按钮，只有五星英雄可以点击
+	void onSpecialBtnClick( CCObject *pObj );
+	void showSpeciaPage( bool bVisiable );		//特殊层，进阶展示
+	void showSpecialInfo( CCObject *pSender );
+
 protected:
 	void updateHeroInfo(const TMessage& tMsg);
 	CCObject* tableviewDataSource(CCObject* pConvertCell, unsigned int uIdx);
@@ -47,6 +54,7 @@ protected:
 	void failAction(float dt);
 private:
 	CLayout *m_ui;
+	CLayout *m_ui_special;
 	CLayout *m_skillLay;
 	CLayout *m_mainSkillLay;
 	CTableView *m_tableView;

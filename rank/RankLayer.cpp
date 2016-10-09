@@ -26,7 +26,6 @@ CRankLayer::CRankLayer():m_cell(nullptr),m_bArchive(false),m_optionType(2)
 
 }
 
-
 bool CRankLayer::init()
 {
 	if (BaseLayer::init())
@@ -76,6 +75,10 @@ void CRankLayer::onEnter()
 	m_cell2->retain();
 	m_ui->removeChild(m_cell2);
 
+	m_cell3 = (CLayout* )m_ui->findWidgetById("Cell3");
+	m_cell3->retain();
+	m_ui->removeChild(m_cell3);
+
 	m_heroLay = (CLayout*)(m_ui->findWidgetById("hero"));
 	m_heroLay->retain();
 	m_ui->removeChild(m_heroLay);
@@ -92,7 +95,7 @@ void CRankLayer::onEnter()
 	m_tableSize = m_tableView->getContentSize();
 
 	CRadioBtnGroup *radioGroup = (CRadioBtnGroup *)m_ui->getChildByTag(10);
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		CRadioButton *radioBtn= (CRadioButton*)(radioGroup->getChildByTag(i+1));
 		radioBtn->setOnCheckListener(this,ccw_check_selector(CRankLayer::onSwitchBtn));
@@ -164,6 +167,10 @@ void CRankLayer::onSwitchBtn(CCObject *pSender, bool bChecked)
 		{
 			CPlayerControl::getInstance().sendRank(3);
 		}
+		else if (m_optionType==4)
+		{
+			CPlayerControl::getInstance().sendRank(1);
+		}
 	}
 }
 
@@ -195,9 +202,13 @@ void CRankLayer::addTableCell(unsigned int uIdx, CTableViewCell* pCell)
 	{ 
 		addCombatRank(pCell, data);
 	}
-	else
+	else if(m_optionType == 3)
 	{
 		addPvpRank(pCell, data);
+	}
+	else if(m_optionType == 4)
+	{
+		addTowerRank(pCell,data);
 	}
 }
 
@@ -238,6 +249,19 @@ void CRankLayer::addMyRank(CRankData *data)
 			rankLay->setPosition(ccp(545+25,490));
 			m_ui->addChild(rankLay);
 			addPvpRank(rankLay, data);
+		}
+	}
+	else if (m_optionType == 4)
+	{
+		//自己的排名
+		m_ui->removeChildByTag(200);
+		if (data->rank>0)
+		{
+			CLayout *rankLay = CLayout::create(m_cell->getContentSize());
+			rankLay->setTag(200);
+			rankLay->setPosition(ccp(545+25,490));
+			m_ui->addChild(rankLay);
+			addTowerRank(rankLay, data);
 		}
 	}
 }
@@ -695,6 +719,126 @@ void CRankLayer::addCombatRank(CLayout* pCell, CRankData * data)
 		case 12:
 			{
 				child->setVisible(data->rank==0);
+			}
+			break;
+		default:
+			break;
+		}
+	}
+}
+
+void CRankLayer::addTowerRank(CLayout* pCell, CRankData* data)
+{
+	CLayout* clone = UICloneMgr::cloneLayout(m_cell3);
+	for (int i = 1;i<= 12;i++)
+	{
+		CCNode* _child = (CCNode* )clone->getChildByTag(i);
+		clone->removeChild(_child);
+		pCell->addChild(_child);
+
+		switch (i)
+		{
+		case 1:
+			{
+				//大框
+				CButton* select = (CButton* )_child;
+				if(data->rank == m_rankMap.find(m_optionType)->second.myRank.rank)
+				{
+					select->setNormalImage("worldBoss/box_rank.png");
+					select->setPositionY(select->getPositionY() - 16);
+				}
+				else if (data->rank > 3)
+				{
+					select->setNormalImage("worldBoss/box_rank3.png");
+				}
+				select->setOnClickListener(this,ccw_click_selector(CRankLayer::onSelect));
+			}
+			break;
+		case 2:
+			{
+				//头像框
+				if (data->roleData->getThumb() > 0)
+				{
+					CCSprite* _head = CCSprite::create(CCString::createWithFormat("headImg/%d.png",data->roleData->getThumb())->getCString());
+					if (_head)
+					{
+						_head->setPosition(ccp(_child->getContentSize().width/2, _child->getContentSize().height/2));
+						_child->addChild(_head);
+					}
+				}
+				else
+				{
+					string fbName = data->roleData->getFbId() + ".jpg";
+					string fullName = CCFileUtils::sharedFileUtils()->fullPathForFilename(fbName.c_str());
+					bool isFileExist = CCFileUtils::sharedFileUtils()->isFileExist(fbName);
+					if (isFileExist)
+					{
+						CCSprite* _sp = CCSprite::create(fullName.c_str());
+						_child->addChild(_sp);
+						NodeFillParent(_sp);
+					}
+					else
+					{
+						CCString *_imgUrl = CCString::createWithFormat(FACEBOOKIMG,data->roleData->getFbId().c_str());
+						HttpLoadImage::getInstance()->requestUrlImage(_imgUrl->getCString(),data->roleData->getFbId().c_str());
+					}
+				}
+			}
+			break;
+		case 3:
+			{
+				//名字
+				CLabel* _lab = (CLabel*)_child;
+				_lab->setString(data->roleData->getRoleName().c_str());
+			}
+			break;
+		case 4:
+			{
+				//等级
+				CLabel* _lab = (CLabel*)_child;
+				_lab->setString(ToString(data->roleData->getLevel()));
+			}
+			break;
+		case 5://头像框
+			break;
+		case 6://红色图片-上面的字
+			break;
+		case 7://红色图片
+			break;
+		case 8:
+			{
+				//排名前三图标显示
+				if (data->rank <= 3 && data->rank > 0)
+				{
+					CImageView* _view = (CImageView* )_child;
+					_view->setTexture(CCTextureCache::sharedTextureCache()
+						->addImage(CCString::createWithFormat("worldBoss/rank_%d.png",data->rank)->getCString()));
+				}
+				_child->setVisible(data->rank <= 3 && data->rank > 0);
+			}
+			break;
+		case 9:
+			{
+				//排名
+				CLabelAtlas* _lab = (CLabelAtlas* )_child;
+				_lab->setString(ToString(data->rank));
+				_lab->setVisible(data->rank > 0);
+			}
+			break;
+		case 10:
+			{
+				//层数显示
+				CLabelAtlas* _lab =  (CLabelAtlas*)_child;
+				_lab->setString(ToString(data->roleData->getCombat()));
+				_lab->setAnchorPoint(ccp(0,0.5));
+			}
+			break;
+		case 11://Lv.
+			break;
+		case 12:
+			{
+				//未上榜
+				_child->setVisible(data->rank == 0);
 			}
 			break;
 		default:

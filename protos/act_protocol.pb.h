@@ -38,6 +38,7 @@ class ActListReq;
 class ActListRes;
 class BuyGiftReq;
 class BuyGiftRes;
+class OnlinePrize;
 class Activity;
 class ExList;
 
@@ -419,6 +420,111 @@ class BuyGiftRes : public ::google::protobuf::Message {
 
   void InitAsDefaultInstance();
   static BuyGiftRes* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class OnlinePrize : public ::google::protobuf::Message {
+ public:
+  OnlinePrize();
+  virtual ~OnlinePrize();
+
+  OnlinePrize(const OnlinePrize& from);
+
+  inline OnlinePrize& operator=(const OnlinePrize& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const OnlinePrize& default_instance();
+
+  void Swap(OnlinePrize* other);
+
+  // implements Message ----------------------------------------------
+
+  OnlinePrize* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const OnlinePrize& from);
+  void MergeFrom(const OnlinePrize& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required int32 result = 1;
+  inline bool has_result() const;
+  inline void clear_result();
+  static const int kResultFieldNumber = 1;
+  inline ::google::protobuf::int32 result() const;
+  inline void set_result(::google::protobuf::int32 value);
+
+  // repeated .protos.common.Prize prizes = 2;
+  inline int prizes_size() const;
+  inline void clear_prizes();
+  static const int kPrizesFieldNumber = 2;
+  inline const ::protos::common::Prize& prizes(int index) const;
+  inline ::protos::common::Prize* mutable_prizes(int index);
+  inline ::protos::common::Prize* add_prizes();
+  inline const ::google::protobuf::RepeatedPtrField< ::protos::common::Prize >&
+      prizes() const;
+  inline ::google::protobuf::RepeatedPtrField< ::protos::common::Prize >*
+      mutable_prizes();
+
+  // optional sint32 nextTime = 3;
+  inline bool has_nexttime() const;
+  inline void clear_nexttime();
+  static const int kNextTimeFieldNumber = 3;
+  inline ::google::protobuf::int32 nexttime() const;
+  inline void set_nexttime(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:protos.OnlinePrize)
+ private:
+  inline void set_has_result();
+  inline void clear_has_result();
+  inline void set_has_nexttime();
+  inline void clear_has_nexttime();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::RepeatedPtrField< ::protos::common::Prize > prizes_;
+  ::google::protobuf::int32 result_;
+  ::google::protobuf::int32 nexttime_;
+
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
+
+  friend void  protobuf_AddDesc_act_5fprotocol_2eproto();
+  friend void protobuf_AssignDesc_act_5fprotocol_2eproto();
+  friend void protobuf_ShutdownFile_act_5fprotocol_2eproto();
+
+  void InitAsDefaultInstance();
+  static OnlinePrize* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -975,6 +1081,79 @@ BuyGiftRes::items() const {
 inline ::google::protobuf::RepeatedPtrField< ::protos::common::Prize >*
 BuyGiftRes::mutable_items() {
   return &items_;
+}
+
+// -------------------------------------------------------------------
+
+// OnlinePrize
+
+// required int32 result = 1;
+inline bool OnlinePrize::has_result() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void OnlinePrize::set_has_result() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void OnlinePrize::clear_has_result() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void OnlinePrize::clear_result() {
+  result_ = 0;
+  clear_has_result();
+}
+inline ::google::protobuf::int32 OnlinePrize::result() const {
+  return result_;
+}
+inline void OnlinePrize::set_result(::google::protobuf::int32 value) {
+  set_has_result();
+  result_ = value;
+}
+
+// repeated .protos.common.Prize prizes = 2;
+inline int OnlinePrize::prizes_size() const {
+  return prizes_.size();
+}
+inline void OnlinePrize::clear_prizes() {
+  prizes_.Clear();
+}
+inline const ::protos::common::Prize& OnlinePrize::prizes(int index) const {
+  return prizes_.Get(index);
+}
+inline ::protos::common::Prize* OnlinePrize::mutable_prizes(int index) {
+  return prizes_.Mutable(index);
+}
+inline ::protos::common::Prize* OnlinePrize::add_prizes() {
+  return prizes_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::protos::common::Prize >&
+OnlinePrize::prizes() const {
+  return prizes_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::protos::common::Prize >*
+OnlinePrize::mutable_prizes() {
+  return &prizes_;
+}
+
+// optional sint32 nextTime = 3;
+inline bool OnlinePrize::has_nexttime() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void OnlinePrize::set_has_nexttime() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void OnlinePrize::clear_has_nexttime() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void OnlinePrize::clear_nexttime() {
+  nexttime_ = 0;
+  clear_has_nexttime();
+}
+inline ::google::protobuf::int32 OnlinePrize::nexttime() const {
+  return nexttime_;
+}
+inline void OnlinePrize::set_nexttime(::google::protobuf::int32 value) {
+  set_has_nexttime();
+  nexttime_ = value;
 }
 
 // -------------------------------------------------------------------

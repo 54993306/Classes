@@ -28,7 +28,7 @@
 
 #include <spine/spine-cocos2dx.h>
 
-#include "LuckyWheel/LuckyWheelLayer.h"
+#include "LuckyActive/LuckyWheelLayer.h"
 
 using namespace spine;
 using namespace BattleSpace;
@@ -166,8 +166,8 @@ void CSignLayer::onEnter()
 	m_gridView->setSizeOfCell(m_cell->getContentSize());
 	m_gridView->setAnchorPoint(ccp(0,0));
 	m_gridView->setColumns(5);
-	m_gridView->setAutoRelocate(true);
-	m_gridView->setDeaccelerateable(false);
+	m_gridView->setAutoRelocate(false);
+	m_gridView->setDeaccelerateable(true);
 	m_gridView->setDataSourceAdapter(this,ccw_datasource_adapter_selector(CSignLayer::gridviewDataSource));
 	m_gridView->reloadData();
 

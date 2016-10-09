@@ -47,13 +47,13 @@ CMonsterInfo::~CMonsterInfo()
 
 }
 
-void CMonsterInfo::setMonster(CMonster *monster)
+void CMonsterInfo::setMonster(CMonster *pMonster)
 {
-	const HeroInfoData *data = DataCenter::sharedData()->getHeroInfo()->getCfg(monster->thumb);
+	const HeroInfoData *data = DataCenter::sharedData()->getHeroInfo()->getCfg(pMonster->thumb);
 	CLabel *name = (CLabel*)(m_ui->findWidgetById("name"));
 
 	CLabel *level = (CLabel*)(m_ui->findWidgetById("level"));
-	level->setString(CCString::createWithFormat("%d",monster->level)->getCString());
+	level->setString(CCString::createWithFormat("%d",pMonster->level)->getCString());
 
 	CLabel *desc = (CLabel*)(m_ui->findWidgetById("desc"));
 	
@@ -84,17 +84,30 @@ void CMonsterInfo::setMonster(CMonster *monster)
 	
 	
 
-	CCSprite *head = CCSprite::create(getImageName(monster).c_str());
+	CCSprite *head = CCSprite::create(getImageName(pMonster).c_str());
 	if (!head)
 	{
 		head = CCSprite::create("headImg/101.png");
-		CCLOG("[ ERROR ] CMonsterInfo::setMonster Lost Image = %d",monster->thumb);
+		CCLOG("[ ERROR ] CMonsterInfo::setMonster Lost Image = %d",pMonster->thumb);
 	}
 	headbg->removeAllChildren();
 	head->setScale(0.9f);
 	head->setPosition(ccp(headbg->getContentSize().width/2, headbg->getContentSize().height/2));
 	headbg->addChild(head);
 	//NodeFillParent(head);
+
+	//类型
+	CImageView *pType = (CImageView*)m_ui->findWidgetById("item_type");
+	pType->setVisible(false);
+	//if (data && pType)
+	//{	
+	//	CCTexture2D *pTexture = CCTextureCache::sharedTextureCache()->addImage(CCString::createWithFormat("common/type_%d_%d.png", pMonster->roletype, data->iType2)->getCString());
+	//	if (pTexture)
+	//	{
+	//		pType->setTexture(pTexture);
+	//		pType->setVisible(true);
+	//	}
+	//}
 }
 
 
@@ -145,6 +158,20 @@ void CMonsterInfo::setHero( CHero* pHero )
 	head->setPosition(ccp(headbg->getContentSize().width/2, headbg->getContentSize().height/2));
 	headbg->addChild(head);
 	//NodeFillParent(head);
+
+	//类型
+	CImageView *pType = (CImageView*)m_ui->findWidgetById("item_type");
+	pType->setVisible(false);
+	//if (data && pType)
+	//{	
+	//	CCTexture2D *pTexture = CCTextureCache::sharedTextureCache()->addImage(CCString::createWithFormat("common/type_%d_%d.png", pHero->roletype, data->iType2)->getCString());
+	//	if (pTexture)
+	//	{
+	//		pType->setTexture(pTexture);
+	//		pType->setVisible(true);
+	//	}
+	//}
+
 }
 
 void CMonsterInfo::changeForSign( CHero* pHero )

@@ -40,7 +40,7 @@ bool CPaySelect::init()
 		LayerManager::instance()->push(pMaskLayer, true);
 
 		std::string sXaml = "PaySelectGoogle.xaml";
-		if(CJniHelper::getInstance()->getPlatform() == G_PLATFORM_AIS)
+		if(G_PLATFORM_TARGET == G_PLATFORM_AIS)
 		{
 			sXaml = "PaySelectAis.xaml";
 		}

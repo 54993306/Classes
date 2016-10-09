@@ -635,10 +635,6 @@ void CPlayerControl::rechargeRes(int type, google::protobuf::Message *msg)
 			}
 		}
 
-		if(iSetp == 2)
-		{
-			pPay->onClose(nullptr);
-		}
 		if (res->rolemoney()>0)
 		{
 			UserData *data = DataCenter::sharedData()->getUser()->getUserData();	
@@ -646,7 +642,18 @@ void CPlayerControl::rechargeRes(int type, google::protobuf::Message *msg)
 			data->setRoleMoney(res->rolemoney());
 			paySuccess(money, res);
 			CSceneManager::sharedSceneManager()->PostMessageA(UPDATE_HERO,0,nullptr,nullptr);
+
+			if (pPay)
+			{
+				pPay->onPaySuccess();
+			}
 		}
+
+		if(iSetp == 2)
+		{
+			pPay->onClose(nullptr);
+		}
+
 	}
 	else if(res->result() == 2)
 	{

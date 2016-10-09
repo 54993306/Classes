@@ -72,6 +72,7 @@ public:
 	CC_SYNTHESIZE(int,m_rolePoints,RolePoints);  //PVP勋章
 	CC_SYNTHESIZE(bool, m_bGoogleBilling, GoogleBilling);  //GooglePay
 	CC_SYNTHESIZE(int, m_roleNation, RoleNation);  //GooglePay
+	CC_SYNTHESIZE(int, m_iOnlinePrizeTime, OnlinePrizeTime);  //下次在线礼包领取时间
 
 	void read(const protos::common::Role& role);
 };

@@ -20,6 +20,21 @@ namespace protos {
 
 namespace {
 
+const ::google::protobuf::Descriptor* CardListReq_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  CardListReq_reflection_ = NULL;
+const ::google::protobuf::Descriptor* CardListRes_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  CardListRes_reflection_ = NULL;
+const ::google::protobuf::Descriptor* DrawCardStart_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  DrawCardStart_reflection_ = NULL;
+const ::google::protobuf::Descriptor* GetCardReq_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  GetCardReq_reflection_ = NULL;
+const ::google::protobuf::Descriptor* GetCardRes_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  GetCardRes_reflection_ = NULL;
 const ::google::protobuf::Descriptor* LuckyWheel_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   LuckyWheel_reflection_ = NULL;
@@ -54,7 +69,89 @@ void protobuf_AssignDesc_lottery_5fprotocol_2eproto() {
     ::google::protobuf::DescriptorPool::generated_pool()->FindFileByName(
       "lottery_protocol.proto");
   GOOGLE_CHECK(file != NULL);
-  LuckyWheel_descriptor_ = file->message_type(0);
+  CardListReq_descriptor_ = file->message_type(0);
+  static const int CardListReq_offsets_[1] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CardListReq, result_),
+  };
+  CardListReq_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      CardListReq_descriptor_,
+      CardListReq::default_instance_,
+      CardListReq_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CardListReq, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CardListReq, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(CardListReq));
+  CardListRes_descriptor_ = file->message_type(1);
+  static const int CardListRes_offsets_[7] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CardListRes, card_list_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CardListRes, is_free_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CardListRes, price_1_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CardListRes, price_2_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CardListRes, draw_time_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CardListRes, ex_time_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CardListRes, notices_),
+  };
+  CardListRes_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      CardListRes_descriptor_,
+      CardListRes::default_instance_,
+      CardListRes_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CardListRes, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CardListRes, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(CardListRes));
+  DrawCardStart_descriptor_ = file->message_type(2);
+  static const int DrawCardStart_offsets_[1] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DrawCardStart, result_),
+  };
+  DrawCardStart_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      DrawCardStart_descriptor_,
+      DrawCardStart::default_instance_,
+      DrawCardStart_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DrawCardStart, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DrawCardStart, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(DrawCardStart));
+  GetCardReq_descriptor_ = file->message_type(3);
+  static const int GetCardReq_offsets_[1] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetCardReq, card_pos_),
+  };
+  GetCardReq_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      GetCardReq_descriptor_,
+      GetCardReq::default_instance_,
+      GetCardReq_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetCardReq, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetCardReq, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(GetCardReq));
+  GetCardRes_descriptor_ = file->message_type(4);
+  static const int GetCardRes_offsets_[2] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetCardRes, result_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetCardRes, card_),
+  };
+  GetCardRes_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      GetCardRes_descriptor_,
+      GetCardRes::default_instance_,
+      GetCardRes_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetCardRes, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetCardRes, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(GetCardRes));
+  LuckyWheel_descriptor_ = file->message_type(5);
   static const int LuckyWheel_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LuckyWheel, price_1_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LuckyWheel, price_10_),
@@ -72,7 +169,7 @@ void protobuf_AssignDesc_lottery_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(LuckyWheel));
-  DrawRequest_descriptor_ = file->message_type(1);
+  DrawRequest_descriptor_ = file->message_type(6);
   static const int DrawRequest_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DrawRequest, draw_type_),
   };
@@ -87,7 +184,7 @@ void protobuf_AssignDesc_lottery_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(DrawRequest));
-  DrawResponse_descriptor_ = file->message_type(2);
+  DrawResponse_descriptor_ = file->message_type(7);
   static const int DrawResponse_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DrawResponse, result_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DrawResponse, prize_index_),
@@ -103,7 +200,7 @@ void protobuf_AssignDesc_lottery_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(DrawResponse));
-  Notice_descriptor_ = file->message_type(3);
+  Notice_descriptor_ = file->message_type(8);
   static const int Notice_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Notice, player_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Notice, prize_type_),
@@ -121,7 +218,7 @@ void protobuf_AssignDesc_lottery_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Notice));
-  LotteryData_descriptor_ = file->message_type(4);
+  LotteryData_descriptor_ = file->message_type(9);
   static const int LotteryData_offsets_[5] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LotteryData, price_1_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LotteryData, price_2_),
@@ -140,7 +237,7 @@ void protobuf_AssignDesc_lottery_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(LotteryData));
-  LotteryRequest_descriptor_ = file->message_type(5);
+  LotteryRequest_descriptor_ = file->message_type(10);
   static const int LotteryRequest_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LotteryRequest, lotttype_),
   };
@@ -155,7 +252,7 @@ void protobuf_AssignDesc_lottery_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(LotteryRequest));
-  LotteryResponse_descriptor_ = file->message_type(6);
+  LotteryResponse_descriptor_ = file->message_type(11);
   static const int LotteryResponse_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LotteryResponse, result_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LotteryResponse, prizelist_),
@@ -172,7 +269,7 @@ void protobuf_AssignDesc_lottery_5fprotocol_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(LotteryResponse));
-  Lottery_descriptor_ = file->message_type(7);
+  Lottery_descriptor_ = file->message_type(12);
   static const int Lottery_offsets_[9] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Lottery, id_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Lottery, name_),
@@ -208,6 +305,16 @@ inline void protobuf_AssignDescriptorsOnce() {
 void protobuf_RegisterTypes(const ::std::string&) {
   protobuf_AssignDescriptorsOnce();
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    CardListReq_descriptor_, &CardListReq::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    CardListRes_descriptor_, &CardListRes::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    DrawCardStart_descriptor_, &DrawCardStart::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    GetCardReq_descriptor_, &GetCardReq::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    GetCardRes_descriptor_, &GetCardRes::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     LuckyWheel_descriptor_, &LuckyWheel::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     DrawRequest_descriptor_, &DrawRequest::default_instance());
@@ -228,6 +335,16 @@ void protobuf_RegisterTypes(const ::std::string&) {
 }  // namespace
 
 void protobuf_ShutdownFile_lottery_5fprotocol_2eproto() {
+  delete CardListReq::default_instance_;
+  delete CardListReq_reflection_;
+  delete CardListRes::default_instance_;
+  delete CardListRes_reflection_;
+  delete DrawCardStart::default_instance_;
+  delete DrawCardStart_reflection_;
+  delete GetCardReq::default_instance_;
+  delete GetCardReq_reflection_;
+  delete GetCardRes::default_instance_;
+  delete GetCardRes_reflection_;
   delete LuckyWheel::default_instance_;
   delete LuckyWheel_reflection_;
   delete DrawRequest::default_instance_;
@@ -255,27 +372,41 @@ void protobuf_AddDesc_lottery_5fprotocol_2eproto() {
   ::protos::common::protobuf_AddDesc_common_2fprize_5fcommon_2eproto();
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
     "\n\026lottery_protocol.proto\022\006protos\032\031common"
-    "/prize_common.proto\"z\n\nLuckyWheel\022\017\n\007pri"
-    "ce_1\030\001 \001(\005\022\020\n\010price_10\030\002 \001(\005\022(\n\nprize_li"
-    "st\030\003 \003(\0132\024.protos.common.Prize\022\037\n\007notice"
-    "s\030\004 \003(\0132\016.protos.Notice\" \n\013DrawRequest\022\021"
-    "\n\tdraw_type\030\001 \002(\005\"7\n\014DrawResponse\022\016\n\006res"
-    "ult\030\001 \002(\005\022\027\n\013prize_index\030\002 \003(\005B\002\020\001\"Q\n\006No"
-    "tice\022\016\n\006player\030\001 \001(\t\022\022\n\nprize_type\030\002 \001(\005"
-    "\022\021\n\tprize_num\030\003 \001(\005\022\020\n\010prize_id\030\004 \001(\005\"v\n"
-    "\013LotteryData\022\017\n\007price_1\030\001 \002(\005\022\017\n\007price_2"
-    "\030\002 \002(\005\022\017\n\007price_3\030\003 \002(\005\022\"\n\tprizeList\030\004 \003"
-    "(\0132\017.protos.Lottery\022\020\n\010freeTime\030\005 \001(\006\"\"\n"
-    "\016LotteryRequest\022\020\n\010lottType\030\001 \002(\005\"T\n\017Lot"
-    "teryResponse\022\016\n\006result\030\001 \002(\005\022\"\n\tprizeLis"
-    "t\030\002 \003(\0132\017.protos.Lottery\022\r\n\005price\030\003 \001(\005\""
-    "\216\001\n\007Lottery\022\n\n\002id\030\001 \002(\005\022\014\n\004name\030\007 \001(\t\022\017\n"
-    "\007quality\030\002 \001(\005\022\r\n\005thumb\030\003 \001(\005\022\014\n\004type\030\004 "
-    "\001(\005\022\r\n\005isnew\030\005 \001(\010\022\020\n\010heroType\030\006 \001(\005\022\013\n\003"
-    "num\030\010 \001(\005\022\r\n\005color\030\t \001(\005B2\n\035dass.server."
-    "gameserver.protosB\017LotteryProtocolH\001", 796);
+    "/prize_common.proto\"\035\n\013CardListReq\022\016\n\006re"
+    "sult\030\001 \001(\010\"\256\001\n\013CardListRes\022\'\n\tcard_list\030"
+    "\001 \003(\0132\024.protos.common.Prize\022\017\n\007is_free\030\002"
+    " \001(\010\022\017\n\007price_1\030\003 \001(\005\022\017\n\007price_2\030\004 \001(\005\022\021"
+    "\n\tdraw_time\030\005 \001(\005\022\017\n\007ex_time\030\006 \001(\005\022\037\n\007no"
+    "tices\030\007 \003(\0132\016.protos.Notice\"\037\n\rDrawCardS"
+    "tart\022\016\n\006result\030\001 \002(\005\"\036\n\nGetCardReq\022\020\n\010ca"
+    "rd_pos\030\001 \002(\005\"@\n\nGetCardRes\022\016\n\006result\030\001 \001"
+    "(\005\022\"\n\004card\030\002 \001(\0132\024.protos.common.Prize\"z"
+    "\n\nLuckyWheel\022\017\n\007price_1\030\001 \001(\005\022\020\n\010price_1"
+    "0\030\002 \001(\005\022(\n\nprize_list\030\003 \003(\0132\024.protos.com"
+    "mon.Prize\022\037\n\007notices\030\004 \003(\0132\016.protos.Noti"
+    "ce\" \n\013DrawRequest\022\021\n\tdraw_type\030\001 \002(\005\"7\n\014"
+    "DrawResponse\022\016\n\006result\030\001 \002(\005\022\027\n\013prize_in"
+    "dex\030\002 \003(\005B\002\020\001\"Q\n\006Notice\022\016\n\006player\030\001 \001(\t\022"
+    "\022\n\nprize_type\030\002 \001(\005\022\021\n\tprize_num\030\003 \001(\005\022\020"
+    "\n\010prize_id\030\004 \001(\005\"v\n\013LotteryData\022\017\n\007price"
+    "_1\030\001 \002(\005\022\017\n\007price_2\030\002 \002(\005\022\017\n\007price_3\030\003 \002"
+    "(\005\022\"\n\tprizeList\030\004 \003(\0132\017.protos.Lottery\022\020"
+    "\n\010freeTime\030\005 \001(\006\"\"\n\016LotteryRequest\022\020\n\010lo"
+    "ttType\030\001 \002(\005\"T\n\017LotteryResponse\022\016\n\006resul"
+    "t\030\001 \002(\005\022\"\n\tprizeList\030\002 \003(\0132\017.protos.Lott"
+    "ery\022\r\n\005price\030\003 \001(\005\"\216\001\n\007Lottery\022\n\n\002id\030\001 \002"
+    "(\005\022\014\n\004name\030\007 \001(\t\022\017\n\007quality\030\002 \001(\005\022\r\n\005thu"
+    "mb\030\003 \001(\005\022\014\n\004type\030\004 \001(\005\022\r\n\005isnew\030\005 \001(\010\022\020\n"
+    "\010heroType\030\006 \001(\005\022\013\n\003num\030\010 \001(\005\022\r\n\005color\030\t "
+    "\001(\005B2\n\035dass.server.gameserver.protosB\017Lo"
+    "tteryProtocolH\001", 1135);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "lottery_protocol.proto", &protobuf_RegisterTypes);
+  CardListReq::default_instance_ = new CardListReq();
+  CardListRes::default_instance_ = new CardListRes();
+  DrawCardStart::default_instance_ = new DrawCardStart();
+  GetCardReq::default_instance_ = new GetCardReq();
+  GetCardRes::default_instance_ = new GetCardRes();
   LuckyWheel::default_instance_ = new LuckyWheel();
   DrawRequest::default_instance_ = new DrawRequest();
   DrawResponse::default_instance_ = new DrawResponse();
@@ -284,6 +415,11 @@ void protobuf_AddDesc_lottery_5fprotocol_2eproto() {
   LotteryRequest::default_instance_ = new LotteryRequest();
   LotteryResponse::default_instance_ = new LotteryResponse();
   Lottery::default_instance_ = new Lottery();
+  CardListReq::default_instance_->InitAsDefaultInstance();
+  CardListRes::default_instance_->InitAsDefaultInstance();
+  DrawCardStart::default_instance_->InitAsDefaultInstance();
+  GetCardReq::default_instance_->InitAsDefaultInstance();
+  GetCardRes::default_instance_->InitAsDefaultInstance();
   LuckyWheel::default_instance_->InitAsDefaultInstance();
   DrawRequest::default_instance_->InitAsDefaultInstance();
   DrawResponse::default_instance_->InitAsDefaultInstance();
@@ -301,6 +437,1330 @@ struct StaticDescriptorInitializer_lottery_5fprotocol_2eproto {
     protobuf_AddDesc_lottery_5fprotocol_2eproto();
   }
 } static_descriptor_initializer_lottery_5fprotocol_2eproto_;
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int CardListReq::kResultFieldNumber;
+#endif  // !_MSC_VER
+
+CardListReq::CardListReq()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+}
+
+void CardListReq::InitAsDefaultInstance() {
+}
+
+CardListReq::CardListReq(const CardListReq& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+}
+
+void CardListReq::SharedCtor() {
+  _cached_size_ = 0;
+  result_ = false;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+CardListReq::~CardListReq() {
+  SharedDtor();
+}
+
+void CardListReq::SharedDtor() {
+  if (this != default_instance_) {
+  }
+}
+
+void CardListReq::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* CardListReq::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return CardListReq_descriptor_;
+}
+
+const CardListReq& CardListReq::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_lottery_5fprotocol_2eproto();
+  return *default_instance_;
+}
+
+CardListReq* CardListReq::default_instance_ = NULL;
+
+CardListReq* CardListReq::New() const {
+  return new CardListReq;
+}
+
+void CardListReq::Clear() {
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    result_ = false;
+  }
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool CardListReq::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+  ::google::protobuf::uint32 tag;
+  while ((tag = input->ReadTag()) != 0) {
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // optional bool result = 1;
+      case 1: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
+                 input, &result_)));
+          set_has_result();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectAtEnd()) return true;
+        break;
+      }
+
+      default: {
+      handle_uninterpreted:
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          return true;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+  return true;
+#undef DO_
+}
+
+void CardListReq::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // optional bool result = 1;
+  if (has_result()) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(1, this->result(), output);
+  }
+
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+}
+
+::google::protobuf::uint8* CardListReq::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // optional bool result = 1;
+  if (has_result()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(1, this->result(), target);
+  }
+
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  return target;
+}
+
+int CardListReq::ByteSize() const {
+  int total_size = 0;
+
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // optional bool result = 1;
+    if (has_result()) {
+      total_size += 1 + 1;
+    }
+
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void CardListReq::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const CardListReq* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const CardListReq*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void CardListReq::MergeFrom(const CardListReq& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_result()) {
+      set_result(from.result());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void CardListReq::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void CardListReq::CopyFrom(const CardListReq& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool CardListReq::IsInitialized() const {
+
+  return true;
+}
+
+void CardListReq::Swap(CardListReq* other) {
+  if (other != this) {
+    std::swap(result_, other->result_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata CardListReq::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = CardListReq_descriptor_;
+  metadata.reflection = CardListReq_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int CardListRes::kCardListFieldNumber;
+const int CardListRes::kIsFreeFieldNumber;
+const int CardListRes::kPrice1FieldNumber;
+const int CardListRes::kPrice2FieldNumber;
+const int CardListRes::kDrawTimeFieldNumber;
+const int CardListRes::kExTimeFieldNumber;
+const int CardListRes::kNoticesFieldNumber;
+#endif  // !_MSC_VER
+
+CardListRes::CardListRes()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+}
+
+void CardListRes::InitAsDefaultInstance() {
+}
+
+CardListRes::CardListRes(const CardListRes& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+}
+
+void CardListRes::SharedCtor() {
+  _cached_size_ = 0;
+  is_free_ = false;
+  price_1_ = 0;
+  price_2_ = 0;
+  draw_time_ = 0;
+  ex_time_ = 0;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+CardListRes::~CardListRes() {
+  SharedDtor();
+}
+
+void CardListRes::SharedDtor() {
+  if (this != default_instance_) {
+  }
+}
+
+void CardListRes::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* CardListRes::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return CardListRes_descriptor_;
+}
+
+const CardListRes& CardListRes::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_lottery_5fprotocol_2eproto();
+  return *default_instance_;
+}
+
+CardListRes* CardListRes::default_instance_ = NULL;
+
+CardListRes* CardListRes::New() const {
+  return new CardListRes;
+}
+
+void CardListRes::Clear() {
+  if (_has_bits_[1 / 32] & (0xffu << (1 % 32))) {
+    is_free_ = false;
+    price_1_ = 0;
+    price_2_ = 0;
+    draw_time_ = 0;
+    ex_time_ = 0;
+  }
+  card_list_.Clear();
+  notices_.Clear();
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool CardListRes::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+  ::google::protobuf::uint32 tag;
+  while ((tag = input->ReadTag()) != 0) {
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // repeated .protos.common.Prize card_list = 1;
+      case 1: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_card_list:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+                input, add_card_list()));
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(10)) goto parse_card_list;
+        if (input->ExpectTag(16)) goto parse_is_free;
+        break;
+      }
+
+      // optional bool is_free = 2;
+      case 2: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_is_free:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
+                 input, &is_free_)));
+          set_has_is_free();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(24)) goto parse_price_1;
+        break;
+      }
+
+      // optional int32 price_1 = 3;
+      case 3: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_price_1:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &price_1_)));
+          set_has_price_1();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(32)) goto parse_price_2;
+        break;
+      }
+
+      // optional int32 price_2 = 4;
+      case 4: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_price_2:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &price_2_)));
+          set_has_price_2();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(40)) goto parse_draw_time;
+        break;
+      }
+
+      // optional int32 draw_time = 5;
+      case 5: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_draw_time:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &draw_time_)));
+          set_has_draw_time();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(48)) goto parse_ex_time;
+        break;
+      }
+
+      // optional int32 ex_time = 6;
+      case 6: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_ex_time:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &ex_time_)));
+          set_has_ex_time();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(58)) goto parse_notices;
+        break;
+      }
+
+      // repeated .protos.Notice notices = 7;
+      case 7: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_notices:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+                input, add_notices()));
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(58)) goto parse_notices;
+        if (input->ExpectAtEnd()) return true;
+        break;
+      }
+
+      default: {
+      handle_uninterpreted:
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          return true;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+  return true;
+#undef DO_
+}
+
+void CardListRes::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // repeated .protos.common.Prize card_list = 1;
+  for (int i = 0; i < this->card_list_size(); i++) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      1, this->card_list(i), output);
+  }
+
+  // optional bool is_free = 2;
+  if (has_is_free()) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(2, this->is_free(), output);
+  }
+
+  // optional int32 price_1 = 3;
+  if (has_price_1()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(3, this->price_1(), output);
+  }
+
+  // optional int32 price_2 = 4;
+  if (has_price_2()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(4, this->price_2(), output);
+  }
+
+  // optional int32 draw_time = 5;
+  if (has_draw_time()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(5, this->draw_time(), output);
+  }
+
+  // optional int32 ex_time = 6;
+  if (has_ex_time()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(6, this->ex_time(), output);
+  }
+
+  // repeated .protos.Notice notices = 7;
+  for (int i = 0; i < this->notices_size(); i++) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      7, this->notices(i), output);
+  }
+
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+}
+
+::google::protobuf::uint8* CardListRes::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // repeated .protos.common.Prize card_list = 1;
+  for (int i = 0; i < this->card_list_size(); i++) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        1, this->card_list(i), target);
+  }
+
+  // optional bool is_free = 2;
+  if (has_is_free()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(2, this->is_free(), target);
+  }
+
+  // optional int32 price_1 = 3;
+  if (has_price_1()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(3, this->price_1(), target);
+  }
+
+  // optional int32 price_2 = 4;
+  if (has_price_2()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(4, this->price_2(), target);
+  }
+
+  // optional int32 draw_time = 5;
+  if (has_draw_time()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(5, this->draw_time(), target);
+  }
+
+  // optional int32 ex_time = 6;
+  if (has_ex_time()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(6, this->ex_time(), target);
+  }
+
+  // repeated .protos.Notice notices = 7;
+  for (int i = 0; i < this->notices_size(); i++) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        7, this->notices(i), target);
+  }
+
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  return target;
+}
+
+int CardListRes::ByteSize() const {
+  int total_size = 0;
+
+  if (_has_bits_[1 / 32] & (0xffu << (1 % 32))) {
+    // optional bool is_free = 2;
+    if (has_is_free()) {
+      total_size += 1 + 1;
+    }
+
+    // optional int32 price_1 = 3;
+    if (has_price_1()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->price_1());
+    }
+
+    // optional int32 price_2 = 4;
+    if (has_price_2()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->price_2());
+    }
+
+    // optional int32 draw_time = 5;
+    if (has_draw_time()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->draw_time());
+    }
+
+    // optional int32 ex_time = 6;
+    if (has_ex_time()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->ex_time());
+    }
+
+  }
+  // repeated .protos.common.Prize card_list = 1;
+  total_size += 1 * this->card_list_size();
+  for (int i = 0; i < this->card_list_size(); i++) {
+    total_size +=
+      ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+        this->card_list(i));
+  }
+
+  // repeated .protos.Notice notices = 7;
+  total_size += 1 * this->notices_size();
+  for (int i = 0; i < this->notices_size(); i++) {
+    total_size +=
+      ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+        this->notices(i));
+  }
+
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void CardListRes::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const CardListRes* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const CardListRes*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void CardListRes::MergeFrom(const CardListRes& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  card_list_.MergeFrom(from.card_list_);
+  notices_.MergeFrom(from.notices_);
+  if (from._has_bits_[1 / 32] & (0xffu << (1 % 32))) {
+    if (from.has_is_free()) {
+      set_is_free(from.is_free());
+    }
+    if (from.has_price_1()) {
+      set_price_1(from.price_1());
+    }
+    if (from.has_price_2()) {
+      set_price_2(from.price_2());
+    }
+    if (from.has_draw_time()) {
+      set_draw_time(from.draw_time());
+    }
+    if (from.has_ex_time()) {
+      set_ex_time(from.ex_time());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void CardListRes::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void CardListRes::CopyFrom(const CardListRes& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool CardListRes::IsInitialized() const {
+
+  return true;
+}
+
+void CardListRes::Swap(CardListRes* other) {
+  if (other != this) {
+    card_list_.Swap(&other->card_list_);
+    std::swap(is_free_, other->is_free_);
+    std::swap(price_1_, other->price_1_);
+    std::swap(price_2_, other->price_2_);
+    std::swap(draw_time_, other->draw_time_);
+    std::swap(ex_time_, other->ex_time_);
+    notices_.Swap(&other->notices_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata CardListRes::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = CardListRes_descriptor_;
+  metadata.reflection = CardListRes_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int DrawCardStart::kResultFieldNumber;
+#endif  // !_MSC_VER
+
+DrawCardStart::DrawCardStart()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+}
+
+void DrawCardStart::InitAsDefaultInstance() {
+}
+
+DrawCardStart::DrawCardStart(const DrawCardStart& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+}
+
+void DrawCardStart::SharedCtor() {
+  _cached_size_ = 0;
+  result_ = 0;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+DrawCardStart::~DrawCardStart() {
+  SharedDtor();
+}
+
+void DrawCardStart::SharedDtor() {
+  if (this != default_instance_) {
+  }
+}
+
+void DrawCardStart::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* DrawCardStart::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return DrawCardStart_descriptor_;
+}
+
+const DrawCardStart& DrawCardStart::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_lottery_5fprotocol_2eproto();
+  return *default_instance_;
+}
+
+DrawCardStart* DrawCardStart::default_instance_ = NULL;
+
+DrawCardStart* DrawCardStart::New() const {
+  return new DrawCardStart;
+}
+
+void DrawCardStart::Clear() {
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    result_ = 0;
+  }
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool DrawCardStart::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+  ::google::protobuf::uint32 tag;
+  while ((tag = input->ReadTag()) != 0) {
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // required int32 result = 1;
+      case 1: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &result_)));
+          set_has_result();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectAtEnd()) return true;
+        break;
+      }
+
+      default: {
+      handle_uninterpreted:
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          return true;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+  return true;
+#undef DO_
+}
+
+void DrawCardStart::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // required int32 result = 1;
+  if (has_result()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->result(), output);
+  }
+
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+}
+
+::google::protobuf::uint8* DrawCardStart::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // required int32 result = 1;
+  if (has_result()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(1, this->result(), target);
+  }
+
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  return target;
+}
+
+int DrawCardStart::ByteSize() const {
+  int total_size = 0;
+
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // required int32 result = 1;
+    if (has_result()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->result());
+    }
+
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void DrawCardStart::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const DrawCardStart* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const DrawCardStart*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void DrawCardStart::MergeFrom(const DrawCardStart& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_result()) {
+      set_result(from.result());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void DrawCardStart::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void DrawCardStart::CopyFrom(const DrawCardStart& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool DrawCardStart::IsInitialized() const {
+  if ((_has_bits_[0] & 0x00000001) != 0x00000001) return false;
+
+  return true;
+}
+
+void DrawCardStart::Swap(DrawCardStart* other) {
+  if (other != this) {
+    std::swap(result_, other->result_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata DrawCardStart::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = DrawCardStart_descriptor_;
+  metadata.reflection = DrawCardStart_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int GetCardReq::kCardPosFieldNumber;
+#endif  // !_MSC_VER
+
+GetCardReq::GetCardReq()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+}
+
+void GetCardReq::InitAsDefaultInstance() {
+}
+
+GetCardReq::GetCardReq(const GetCardReq& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+}
+
+void GetCardReq::SharedCtor() {
+  _cached_size_ = 0;
+  card_pos_ = 0;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+GetCardReq::~GetCardReq() {
+  SharedDtor();
+}
+
+void GetCardReq::SharedDtor() {
+  if (this != default_instance_) {
+  }
+}
+
+void GetCardReq::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* GetCardReq::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return GetCardReq_descriptor_;
+}
+
+const GetCardReq& GetCardReq::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_lottery_5fprotocol_2eproto();
+  return *default_instance_;
+}
+
+GetCardReq* GetCardReq::default_instance_ = NULL;
+
+GetCardReq* GetCardReq::New() const {
+  return new GetCardReq;
+}
+
+void GetCardReq::Clear() {
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    card_pos_ = 0;
+  }
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool GetCardReq::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+  ::google::protobuf::uint32 tag;
+  while ((tag = input->ReadTag()) != 0) {
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // required int32 card_pos = 1;
+      case 1: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &card_pos_)));
+          set_has_card_pos();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectAtEnd()) return true;
+        break;
+      }
+
+      default: {
+      handle_uninterpreted:
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          return true;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+  return true;
+#undef DO_
+}
+
+void GetCardReq::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // required int32 card_pos = 1;
+  if (has_card_pos()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->card_pos(), output);
+  }
+
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+}
+
+::google::protobuf::uint8* GetCardReq::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // required int32 card_pos = 1;
+  if (has_card_pos()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(1, this->card_pos(), target);
+  }
+
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  return target;
+}
+
+int GetCardReq::ByteSize() const {
+  int total_size = 0;
+
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // required int32 card_pos = 1;
+    if (has_card_pos()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->card_pos());
+    }
+
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void GetCardReq::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const GetCardReq* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const GetCardReq*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void GetCardReq::MergeFrom(const GetCardReq& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_card_pos()) {
+      set_card_pos(from.card_pos());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void GetCardReq::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void GetCardReq::CopyFrom(const GetCardReq& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool GetCardReq::IsInitialized() const {
+  if ((_has_bits_[0] & 0x00000001) != 0x00000001) return false;
+
+  return true;
+}
+
+void GetCardReq::Swap(GetCardReq* other) {
+  if (other != this) {
+    std::swap(card_pos_, other->card_pos_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata GetCardReq::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = GetCardReq_descriptor_;
+  metadata.reflection = GetCardReq_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int GetCardRes::kResultFieldNumber;
+const int GetCardRes::kCardFieldNumber;
+#endif  // !_MSC_VER
+
+GetCardRes::GetCardRes()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+}
+
+void GetCardRes::InitAsDefaultInstance() {
+  card_ = const_cast< ::protos::common::Prize*>(&::protos::common::Prize::default_instance());
+}
+
+GetCardRes::GetCardRes(const GetCardRes& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+}
+
+void GetCardRes::SharedCtor() {
+  _cached_size_ = 0;
+  result_ = 0;
+  card_ = NULL;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+GetCardRes::~GetCardRes() {
+  SharedDtor();
+}
+
+void GetCardRes::SharedDtor() {
+  if (this != default_instance_) {
+    delete card_;
+  }
+}
+
+void GetCardRes::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* GetCardRes::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return GetCardRes_descriptor_;
+}
+
+const GetCardRes& GetCardRes::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_lottery_5fprotocol_2eproto();
+  return *default_instance_;
+}
+
+GetCardRes* GetCardRes::default_instance_ = NULL;
+
+GetCardRes* GetCardRes::New() const {
+  return new GetCardRes;
+}
+
+void GetCardRes::Clear() {
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    result_ = 0;
+    if (has_card()) {
+      if (card_ != NULL) card_->::protos::common::Prize::Clear();
+    }
+  }
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool GetCardRes::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+  ::google::protobuf::uint32 tag;
+  while ((tag = input->ReadTag()) != 0) {
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // optional int32 result = 1;
+      case 1: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &result_)));
+          set_has_result();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(18)) goto parse_card;
+        break;
+      }
+
+      // optional .protos.common.Prize card = 2;
+      case 2: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_card:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+               input, mutable_card()));
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectAtEnd()) return true;
+        break;
+      }
+
+      default: {
+      handle_uninterpreted:
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          return true;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+  return true;
+#undef DO_
+}
+
+void GetCardRes::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // optional int32 result = 1;
+  if (has_result()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->result(), output);
+  }
+
+  // optional .protos.common.Prize card = 2;
+  if (has_card()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      2, this->card(), output);
+  }
+
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+}
+
+::google::protobuf::uint8* GetCardRes::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // optional int32 result = 1;
+  if (has_result()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(1, this->result(), target);
+  }
+
+  // optional .protos.common.Prize card = 2;
+  if (has_card()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        2, this->card(), target);
+  }
+
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  return target;
+}
+
+int GetCardRes::ByteSize() const {
+  int total_size = 0;
+
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // optional int32 result = 1;
+    if (has_result()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->result());
+    }
+
+    // optional .protos.common.Prize card = 2;
+    if (has_card()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+          this->card());
+    }
+
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void GetCardRes::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const GetCardRes* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const GetCardRes*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void GetCardRes::MergeFrom(const GetCardRes& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_result()) {
+      set_result(from.result());
+    }
+    if (from.has_card()) {
+      mutable_card()->::protos::common::Prize::MergeFrom(from.card());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void GetCardRes::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void GetCardRes::CopyFrom(const GetCardRes& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool GetCardRes::IsInitialized() const {
+
+  return true;
+}
+
+void GetCardRes::Swap(GetCardRes* other) {
+  if (other != this) {
+    std::swap(result_, other->result_);
+    std::swap(card_, other->card_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata GetCardRes::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = GetCardRes_descriptor_;
+  metadata.reflection = GetCardRes_reflection_;
+  return metadata;
+}
+
 
 // ===================================================================
 
