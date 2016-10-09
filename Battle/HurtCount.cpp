@@ -170,7 +170,7 @@ namespace BattleSpace
 		float hurt   = effect->getRealHurt();									//真实伤害
 		//注意百分比和正负值运算问题
 		float addhp = attributeHurt(AtcTarget);							//属性伤害的值
-		addhp += HitTarget->getRenew();
+		addhp += HitTarget->getRegain();
 		if (!erange)erange = 0.05f;
 		float hp_max = addhp*(1 + erange);			  
 		float hp_min = addhp*(1 - erange);			  
@@ -178,7 +178,7 @@ namespace BattleSpace
 		//属性影响类型*属性影响频率*浮动值+真实伤害
 		addNum = base_hp + hurt;
 		str.hitType = PlayHpType::gainType;											//加血只显示一种字体
-		str.hitNum = HitTarget->getRenew()*effect->getDamageRate();		
+		str.hitNum = HitTarget->getRegain()*effect->getDamageRate();		
 		if (HitTarget->getCallType() != sCallType::eUNAddHP)				//不可被加血类型武将
 			HitTarget->setHp(HitTarget->getHp() + str.hitNum);			//血量实际变化的位置
 		return str;

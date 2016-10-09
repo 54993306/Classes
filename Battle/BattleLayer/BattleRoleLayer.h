@@ -81,10 +81,11 @@ namespace BattleSpace
 		CC_SYNTHESIZE_READONLY(bool,mtestState,testState);
 	protected:
 		CCLayerColor*	m_LayerColor;
-		CCNode*			m_MoveNode;
-		CCNode*			m_AliveNode;
-		BaseRole*		m_TouchAlive;		//被触摸的武将id
-		RoleObject*		m_MoveActObject;		//拖拽移动对象
+		CCNode*			mMovetParent;
+		CCNode*			mRoleNode;
+		BaseRole*		mTouchRole;		//被触摸的武将id
+		RoleObject*		mMoveRole;		//拖拽移动对象
+		BaseRole*		mDefunt;
 		WarManager*		mManage;
 		CCPoint			m_TouchOffs;		//触摸偏移
 		int				m_grid;				//记录移动对象的格子位置

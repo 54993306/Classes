@@ -16,22 +16,13 @@ namespace BattleSpace
 	,m_Alive(nullptr),m_ActObject(nullptr)
 	{}
 
-	HPObject::~HPObject()
-	{
-		if(m_Skin) removeChild(m_Skin);
-		if(m_Background) removeChild(m_Background);
-		CC_SAFE_RELEASE(m_Skin);
-		CC_SAFE_RELEASE(m_Background);
-		m_Skin = nullptr;
-		m_Background = nullptr;
-	}
+	HPObject::~HPObject(){}
 
 	void HPObject::initBackground( const char* pPath )
 	{
 		m_Background = CCSprite::create(pPath);
 		if( m_Background != nullptr )
 		{
-			m_Background->retain();
 			this->addChild(m_Background);
 		}else{
 			CCLOG("[ *ERROR ] HPObject::initBackground");
@@ -75,7 +66,6 @@ namespace BattleSpace
 			m_Skin->setType(kCCProgressTimerTypeBar);
 
 			m_Skin->setPercentage(0.0f);
-			m_Skin->retain();
 			this->addChild( m_Skin );
 		}else{
 			CCLOG("[ *ERROR ] HPObject::initSkin %s",pPath);
@@ -198,12 +188,6 @@ namespace BattleSpace
 	void HPObject::offsByEnemy( CCNode* pLabel )
 	{
 		pLabel->setPosition(ccp(-30,50));
-		//if (m_Alive->getEnemy())
-		//{
-		//	
-		//}else{
-		//	pLabel->setPosition(ccp(-50,50));
-		//}
 	}
 
 	void HPObject::gainNumberPlay( int pChangeNumber )

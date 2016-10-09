@@ -36,7 +36,7 @@ namespace BattleSpace{
 
 	BattleMapLayer::BattleMapLayer()
 		:m_MapLayer(nullptr),m_GridIndex(nullptr),mGuardArea(nullptr)
-		,m_SkillRange(nullptr),mManage(nullptr),m_BackgroundManage(nullptr)
+		,m_SkillRange(nullptr),m_BackgroundManage(nullptr)
 		,m_DisPlayArea(nullptr),m_BackArea(false),m_FrontArea(false)
 	{}
 	BattleMapLayer::~BattleMapLayer()
@@ -52,7 +52,6 @@ namespace BattleSpace{
 		m_GridIndex = nullptr;
 		CC_SAFE_RELEASE(mGuardArea);
 		mGuardArea = nullptr;
-		mManage = nullptr;
 		CCSpriteFrameCache::sharedSpriteFrameCache()->removeSpriteFramesFromFile("warScene/movebg.plist");
 	}
 
@@ -64,10 +63,9 @@ namespace BattleSpace{
 	bool BattleMapLayer::init()
 	{
 		bool res = CCNode::init();
-		mManage = BattleManage;
-		m_SkillRange = SkillRange::create(mManage);
+		m_SkillRange = SkillRange::create();
 		m_SkillRange->retain();
-		mGuardArea = GuardArea::create(mManage);
+		mGuardArea = GuardArea::create();
 		mGuardArea->retain();
 
 		CCSpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile("warScene/movebg.plist");
@@ -182,7 +180,7 @@ namespace BattleSpace{
 			sp->setDisplayFrame(CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(AtksImg));
 			sp->setVisible(true);
 			m_VecGridIndex.push_back(grid+map_Bg);
-			BaseRole* tRole = mManage->getAliveByGrid(grid);
+			BaseRole* tRole = BattleManage->getAliveByGrid(grid);
 			if (tRole&&tRole->getOtherCamp() != pRole->getOtherCamp())
 			{
 				if (pRole->getOpposite())
@@ -263,7 +261,7 @@ namespace BattleSpace{
 			m_SkillRange->initSkillArea(pRole,tVector);
 			for (auto tGrid:tVector)
 			{
-				BaseRole* tRole = mManage->getAliveByGrid(tGrid);
+				BaseRole* tRole = BattleManage->getAliveByGrid(tGrid);
 				if (tRole&&tRole->getOtherCamp() != pRole->getOtherCamp())
 					ReverseArea = true;
 			}

@@ -38,7 +38,7 @@ const char MsgMonsterTips[]					=	"MsgMonsterTips";
 const char B_DrpItem[]						=	"Msg_DropItem";
 const char MsgRoleDie[]						=	"ALIVEDIE";						//一个武将死亡
 const char B_ActObjectRemove[]				=	"ACTREMOVE";					//武将死亡移除
-const char B_AddBuff[]						=	"ADDBUFF";						//武将添加buff表现
+const char MsgAddBuff[]						=	"ADDBUFF";						//武将添加buff表现
 const char B_RemoveBuff[]					=	"REMOVEBUFF";					//武将移除buff时的表现
 const char B_UpdateBuffEffect[]				=	"UPBUFFEFFECT";					//刷新武将buff效果
 const char B_PlayBeginAnimation[]			=	"PLAYERBEGINANIMATION";			//播放出场动画
@@ -74,4 +74,5 @@ const char MsgUpBatchNumber[]				=	"MsgUpBatchNumber";				//刷新关卡批次
 const char MsgPlayWinEffect[]				=	"MsgPlayWinEffect";				//播放胜利特效
 const char MsgShowStageWarning[]			=	"MsgShowStageWarning";			//显示关卡警告
 const char MsgChangeLayerLight[]			=	"MsgChangeLayerLight";			//改变角色层亮度
+
 #endif

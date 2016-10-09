@@ -17,6 +17,7 @@
 #include "Battle/Landform/BattleTrap.h"
 namespace BattleSpace
 {
+	/*******************************************************************/
 	class FireObstacle : public BattleTrap
 	{
 	public:
@@ -26,6 +27,7 @@ namespace BattleSpace
 		FireObstacle(const TrapData* pData);
 	};
 
+	/*******************************************************************/
 	class ObstacleTrap : public BattleTrap
 	{
 	public:
@@ -36,6 +38,7 @@ namespace BattleSpace
 		ObstacleTrap(const TrapData* pTrap);
 	};
 
+	/*******************************************************************/
 	class PlayerObstacle : public BattleTrap
 	{
 	public:
@@ -46,6 +49,7 @@ namespace BattleSpace
 		PlayerObstacle(const TrapData* pData);
 	};
 
+	/*******************************************************************/
 	class MonsterObstacle : public BattleTrap
 	{
 	public:

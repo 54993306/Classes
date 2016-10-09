@@ -11,11 +11,12 @@
  *
  *		Author : Lin_Xiancheng
  *
- *		Description : 怒气值显示对象(已废弃)
+ *		Description : 怒气值显示对象(武将变身使用)
  *
  *
  *************************************************************/
-namespace BattleSpace{
+namespace BattleSpace
+{
 	enum Direction_Rage
 	{
 		R_up,
@@ -25,29 +26,29 @@ namespace BattleSpace{
 	};
 	class RageObject : public CCNode
 	{
-	public:
+	protected:
 		RageObject();
+		virtual bool init();
+	public:
 		virtual ~RageObject();
 		CREATE_FUNC(RageObject);
-		void setSkin(const char* bg,const char* fore);
 		void setDirection(int Direction);
-		void setVal(float rage);
-		void setRageMax(float rageMax);
-		inline int getVal(){return m_rageval;}
-		inline int getRageMax(){return m_rageMax;}
-		inline float getPercent(){return m_percent;}
-		void setPercent(float pe,float p);
-		void junpNum(CCObject* ob);
-		void setDisplay(bool display);
+		void setRageValue(float pRageValue);
+		inline int getVal(){return mRageValue;}
+		void setRageMax(float pMaxValue);
+		inline int getRageMax(){return mRageMax;}
+		void setPercent(float pPercent);
+		inline float getPercent(){return mPercent;}
+		void setDisplay(bool pDisplay);
 		CCProgressTimer* getPro();
 	protected:
 		void updateRage();
 	private:
-		CCProgressTimer* m_rage;
-		CCSprite* m_bg;
-		float m_rageval;
-		float m_rageMax;
-		float m_percent;
+		CCProgressTimer* mProgress;
+		CCSprite* mBackdrop;
+		float mRageValue;
+		float mRageMax;
+		float mPercent;
 	};
 };
 #endif

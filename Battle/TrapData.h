@@ -36,6 +36,7 @@ namespace BattleSpace
 		eObstacle			= 4,//障碍类地形(所有武将都不可通过)
 		ePlayerObstacle		= 5,//玩家不可通过
 		eMonsterObstacle	= 6,//怪物不可通过
+		eBlood				= 7,//掉血类地形
 	};
 
 	class BuffData;

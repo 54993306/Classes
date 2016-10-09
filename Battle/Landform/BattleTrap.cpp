@@ -76,6 +76,10 @@ namespace BattleSpace
 			{
 				return MonsterObstacle::createTrap(pData);
 			}break;
+		case BattleSpace::sTrapType::eBlood:
+			{
+				return BloodTrap::createTrap(pData);
+			}break;
 		default:
 			{
 				CCLOG("[ *ERROR ] BattleTrap::CreateTrap Lost Type %d",(int)pData->getTrapType());
@@ -172,7 +176,6 @@ namespace BattleSpace
 	{
 		//只能实现加减血，但是可以根据属性值来计算，根据血量最大百分比，根据防御值等，值越大越大或其他。
 		mTriggerRole->changeBoold(- getDamage());
-		mTriggerRole->playBooldNum(PlayHpType::generalType,getDamage());
 	}
 	//将对buff的耦合都放到武将身上去处理。
 	void BattleTrap::buffImpact()

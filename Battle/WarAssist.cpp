@@ -11,7 +11,6 @@
 #include "Battle/WarControl.h"
 #include "tools/ToolDefine.h"
 #include "Battle/BaseRole.h"
-#include "Battle/RoleObject/RageObject.h"
 #include "Battle/EffectObject.h"
 #include "Battle/BattleScene/BattleScene.h"
 #include "cctk/scenemanager.h"

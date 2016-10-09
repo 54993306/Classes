@@ -24,6 +24,8 @@
 #include "Battle/RoleObjectMacro.h"
 #include "Battle/BattleLayer/BattleRoleLayer.h"
 #include "Battle/Landform/AreaManage.h"
+#include "Battle/RoleConfigData.h"
+#include "Battle/RoleVariant.h"
 
 namespace BattleSpace
 {
@@ -31,16 +33,16 @@ namespace BattleSpace
 		:m_Enemy(false),m_Hp(0),m_MaxHp(0),mGridIndex(INVALID_GRID),m_MoveGrid(0),m_AtkDelay(0),mFirstInit(true)
 		,m_AtkNum(0),m_Move(true),m_CritSkill(false),m_Hrt(0),m_HrtPe(0),m_AIState(false),mUpdateSkill(false)
 		,m_initCost(0),m_Batch(0),mCostMax(0),m_AddCost(0),m_Atk(0),m_Def(0),m_Hit(0),m_NorAtk(true)
-		,m_Doge(0),m_Crit(0),m_Zoom(0),m_Renew(0),m_GroupIndex(0),m_EffectIndex(0),m_LastAlive(false)
+		,m_Doge(0),m_Crit(0),m_Zoom(0),mRegain(0),m_GroupIndex(0),m_EffectIndex(0),m_LastAlive(false)
 		,m_Opposite(false),m_ExecuteCap(false),m_TerType(0),m_TerTypeNum(0),m_cloaking(false),mSkillTime(0)
 		,m_SortieNum(0),mRoleObject(nullptr),mBuffManage(nullptr),m_UILayout(0),m_Atktime(0),mOtherCamp(false)
 		,m_AtkInterval(0),m_SpecialAtk(false),mBattle(false),m_MoveSpeed(0),mSkillRange(nullptr),m_Model(0)
 		,m_CritTime(0),m_FatherID(0),m_Captain(false),m_CritEffect(false),mAliveState(true)
 		,m_TouchGrid(0),m_TouchState(false),mMoveObject(nullptr),mCallType(sCallType::eCommon),m_CallAliveNum(0)
 		,mDelaytime(0),mLogicState(sLogicState::eNormal),mMonsterSpecies(sMonsterSpecies::eCommon),mHurtCount(nullptr)
-		,m_AliveID(0),mBehavior(sBehavior::eNormal),mBaseData(nullptr),mLogicData(nullptr),mGuideManage(nullptr)
+		,m_AliveID(0),mBehavior(sBehavior::eNormal),mBaseData(nullptr),mLogicData(nullptr)
 		,mCommandGrid(0),mRoleLayer(nullptr),mAutoState(false),mMaxGrid(INVALID_GRID),mHasTarget(false),mEnterTime(0)
-		,mSkillEffect(nullptr),mClearState(true)
+		,mSkillEffect(nullptr),mClearState(true),mVariant(nullptr),mInTouchState(false)
 	{}
 	//AliveDefine
 	BaseRole::~BaseRole()
@@ -53,6 +55,10 @@ namespace BattleSpace
 		mGuardArea = nullptr;
 		CC_SAFE_RELEASE(mSkillEffect);
 		mSkillEffect = nullptr;
+		CC_SAFE_RELEASE(mVariant);
+		mVariant = nullptr;
+		CC_SAFE_RELEASE(mHurtCount);
+		mHurtCount = nullptr;
 		mRoleObject = nullptr;
 		mMoveObject = nullptr;
 		mStandGrids.clear();
@@ -62,17 +68,14 @@ namespace BattleSpace
 	//可以开一个适配器，将相应的外部功能封装在一个对象中
 	bool BaseRole::init()
 	{
-		mManage = BattleManage;
-		mGuideManage = ManageCenter->getCombatGuideMg();
-
 		mBuffManage = BuffManage::create();
 		mBuffManage->setAlive(this);
 		mBuffManage->retain();
 
-		mSkillRange = SkillRange::create(mManage);
+		mSkillRange = SkillRange::create();
 		mSkillRange->retain();
 
-		mGuardArea = GuardArea::create(mManage);
+		mGuardArea = GuardArea::create();
 		mGuardArea->retain();
 
 		mHurtCount = HurtCount::create();
@@ -80,6 +83,9 @@ namespace BattleSpace
 
 		mSkillEffect = skEffectData::create();			//做容错性处理
 		mSkillEffect->retain();
+
+		mVariant = RoleVariant::CreateVariant(this);
+		mVariant->retain();
 		return true;
 	}
 
@@ -100,7 +106,7 @@ namespace BattleSpace
 			setCrit(getBaseData()->getRoleCrit());
 			setDef(getBaseData()->getRoleDefense());
 			setHit(getBaseData()->getRoleHit());
-			setRenew(getBaseData()->getRoleRegain());
+			setRegain(getBaseData()->getRoleRegain());
 			setDoge(getBaseData()->getRoleDodge());				//数值型是召唤它武将的百分比
 		}else{
 			setAtkInterval((getBaseData()->getAttackSpeed()*0.01f)*pFather->getBaseData()->getAttackSpeed());
@@ -112,7 +118,7 @@ namespace BattleSpace
 			setCrit((getBaseData()->getRoleCrit()*0.01f)*pFather->getBaseData()->getRoleCrit());
 			setDef((getBaseData()->getRoleDefense()*0.01f)*pFather->getBaseData()->getRoleDefense());
 			setHit((getBaseData()->getRoleHit()*0.01f)*pFather->getBaseData()->getRoleHit());
-			setRenew((getBaseData()->getRoleRegain()*0.01f)*pFather->getBaseData()->getRoleRegain());
+			setRegain((getBaseData()->getRoleRegain()*0.01f)*pFather->getBaseData()->getRoleRegain());
 			setDoge((getBaseData()->getRoleDodge()*0.01f)*pFather->getBaseData()->getRoleDodge());				//数值型是召唤它武将的百分比
 		}
 	}
@@ -127,8 +133,7 @@ namespace BattleSpace
 		{
 			if (getEnemy())
 			{
-				setGridIndex(getBaseData()->getInitGrid());
-				BattleAreaManage->initRoleMovePath(this,(C_GRID_COL-3)*C_GRID_ROW+getGridIndex()%C_GRID_ROW);
+				setGridIndex(getBaseData()->getInitGrid());				
 			}else{
 				if (!getBaseData()->getInitGrid())
 				{
@@ -143,7 +148,7 @@ namespace BattleSpace
 						{
 							for (int tGrid = C_PVEStopGrid; tGrid < C_PVEOtherArea ; tGrid++) 
 							{
-								if (mManage->getAliveByGrid(tGrid))
+								if (BattleManage->getAliveByGrid(tGrid))
 									continue;
 								setGridIndex(tGrid);								//(数据错误容错处理)
 								CCLOG("[ *ERROR ] BaseRole::initAliveData");
@@ -191,17 +196,19 @@ namespace BattleSpace
 		setCrit(getBaseData()->getRoleCrit());
 		setDef(getBaseData()->getRoleDefense());
 		setHit(getBaseData()->getRoleHit());
-		setRenew(getBaseData()->getRoleRegain());
+		setRegain(getBaseData()->getRoleRegain());
 		setDoge(getBaseData()->getRoleDodge());
 		setZoom(getBaseData()->getRoleZoom()*0.01f);
 		BattleAreaManage->initRoleObstacle(this);
 #if BATTLE_TEST
 		if (getOtherCamp())
 		{
+			setMaxHp(1000000);
+			setHp(1000000);	
 		}else{
 			//if (getModel() == 119)
 			//{
-			//	setModel(2342);
+			//	setModel(2317);
 			//}
 			//setAtk(1000900);
 		}
@@ -240,6 +247,7 @@ namespace BattleSpace
 		setHp(getHp() + pChangeNum);
 		if (getHp()<=0)
 			roleDie();
+		playBooldNum(PlayHpType::generalType,pChangeNum);
 	}
 
 	void BaseRole::playBooldNum( PlayHpType pType,int pNumber )
@@ -592,18 +600,19 @@ namespace BattleSpace
 		int tTarget = getCurrEffect()->getTargetType();
 		if ((getOtherCamp()&&tTarget == eUsType)	|| 
 			(!getOtherCamp()&&tTarget == eEnemyType) )			/*敌方自己，我方敌人*/
-			return mManage->inBattleMonsters(true);
+			return BattleManage->inBattleMonsters(true);
 		if ((getOtherCamp()&&tTarget == eEnemyType) ||
 			(!getOtherCamp()&&tTarget == eUsType))				/*敌方敌人，我方自己*/
-			return mManage->inBattleHeros(true);
-		return mManage->inBattleRoles(true); 
+			return BattleManage->inBattleHeros(true);
+		return BattleManage->inBattleRoles(true); 
 	}
 
 	void BaseRole::excuteLogic(float pTime)
 	{
 		updateRole(pTime);
-		if (!getRoleObject())return;
+		if ( !getRoleObject() )	return;
 		this->getRoleObject()->updateFrameEvent(pTime);									//刷新武将帧事件
+		mVariant->updateVariant(pTime);
 		if (stateDispose(pTime) || !AttackJudge())
 			return;										
 		if (getEnemy())
@@ -779,7 +788,7 @@ namespace BattleSpace
 	/****************************** Move ****************************************/
 	bool BaseRole::monsterFlee()
 	{
-		if (mManage->getStageIndex())				//当前是为新手引导关卡,可以抽象出一个方法用于判断是否为新手关卡
+		if (BattleManage->getStageIndex())				//当前是为新手引导关卡,可以抽象出一个方法用于判断是否为新手关卡
 			return false;
 		if (getModel() == 1056  
 			&& ((getHp()*1.0f/getMaxHp()) < 0.60f))					//武将需要一个得到当前血量百分比的方法
@@ -803,8 +812,14 @@ namespace BattleSpace
 
 	bool BaseRole::MonstMoveExcute()
 	{
+#if BATTLE_TEST
+		if (getRoleLayer()->gettestState())
+			return false;
+#endif
 		if ( !getMove() )
 			return false;
+		if (mMoveGrids.empty())
+			BattleAreaManage->initRoleMovePath(this,(C_GRID_COL-2)*C_GRID_ROW+getGridIndex()%C_GRID_ROW);
 		if (!mMoveGrids.empty())
 		{
 			setMoveGrid(this->mMoveGrids.at(0));
@@ -1024,7 +1039,7 @@ namespace BattleSpace
 
 	BaseRole* BaseRole::getAbsentCallRole()
 	{
-		const RolesMap* tRoleMap = mManage->getRolesMap();
+		const RolesMap* tRoleMap = BattleManage->getRolesMap();
 		RolesMap::const_iterator iter = tRoleMap->begin();
 		for(; iter != tRoleMap->end();++iter)			//判断是否有已创建但未上阵的召唤武将
 		{
@@ -1052,7 +1067,7 @@ namespace BattleSpace
 		}
 		return createCallRole(tEffect->getTargetType());
 	}
-
+	//可以创建出新的数据对象，再用新的数据对象来初始化召唤的武将，这样就可以沿用之前的一套数据使用方法
 	BaseRole* BaseRole::createCallRole( int pRoleID )
 	{
 		MonsterData* tBaseData = (MonsterData*)BattleData->getChildRoleData(pRoleID);
@@ -1094,7 +1109,7 @@ namespace BattleSpace
 		}
 		tChild->initAliveByFather(this);
 		BattleAreaManage->initRoleObstacle(tChild);
-		mManage->addBattleRole(tChild);
+		BattleManage->addBattleRole(tChild);
 		tChild->setFatherID(getAliveID());
 		return tChild;
 	}
@@ -1110,6 +1125,7 @@ namespace BattleSpace
 		case eCriAtk:
 			{
 				setSortieNum(getSortieNum()+1);											//表示执行了一次攻击逻辑
+				mSkillRange->initAreaTargets(this);
 				BattleResult* tResult = mHurtCount->AttackExcute(this);					//实际进行伤害计算的地方，不应由动作来控制的，动作可以控制播放。
 				if ( getCriAtk() && !getEffIndex())										//必杀技多释一个空效果
 					bNotification->postNotification(B_AttactNull,tResult);
@@ -1150,10 +1166,10 @@ namespace BattleSpace
 			return false;
 		getRoleObject()->showThis();
 		if (!moveToGrid()								||
-			!mGuideManage->moveGuideJudge(mCommandGrid)	||
+			!BattleGuide->moveGuideJudge(mCommandGrid)	||
 			!moveJudge())		//当前位置是否可以放置英雄
 			return false;
-		mGuideManage->moveGuideJudge(mCommandGrid,true);
+		BattleGuide->moveGuideJudge(mCommandGrid,true);
 		BattleAreaManage->initRoleMovePath(this,mCommandGrid);
 		//武将对象实际控制移动的位置
 		if (mMoveGrids.empty())
@@ -1180,8 +1196,6 @@ namespace BattleSpace
 	{
 		if (getBattle())
 		{
-			if (BattleModelManage->isPvEBattle() && mCommandGrid < C_PVEStopGrid)
-				return false;
 			if (!getOtherCamp() && !BattleModelManage->moveJudge(this,mCommandGrid))
 				return false;
 			return BattleConfig->inMoveArea(mCommandGrid);
@@ -1200,10 +1214,10 @@ namespace BattleSpace
 		if (!getRoleObject())
 			return true;
 		if ( getCallType() != sCallType::eCommon		&& 
-			mGuideManage->moveGuideJudge(mCommandGrid)	&&
+			BattleGuide->moveGuideJudge(mCommandGrid)	&&
 			moveToGrid()			)
 		{
-			mGuideManage->moveGuideJudge(mCommandGrid,true);
+			BattleGuide->moveGuideJudge(mCommandGrid,true);
 			setMoveGrid(mCommandGrid);
 			getRoleObject()->setMoveState(sStateCode::eWalkState);
 			return true;
@@ -1250,7 +1264,7 @@ namespace BattleSpace
 		vector<BaseRole*> tVec = getCurrSkillTargets();
 		for (auto tGrid : tArea)
 		{
-			BaseRole* tRole = mManage->getAliveByGrid(tGrid);
+			BaseRole* tRole = BattleManage->getAliveByGrid(tGrid);
 			if (!tRole) continue;
 			for (auto t2Role : tVec)
 			{
@@ -1370,7 +1384,7 @@ namespace BattleSpace
 			BaseRole* tRole = mRoleLayer->getAliveByMoveGrid(tGrid);
 			if (!tRole || tRole->getOtherCamp() != getOtherCamp())
 				continue;
-			if (mGuideManage->isRest())		//重置状态下我方未上阵武将可以重叠
+			if (BattleGuide->isRest())		//重置状态下我方未上阵武将可以重叠
 			{
 				return true;
 			}else{
@@ -1400,7 +1414,7 @@ namespace BattleSpace
 		vector<BaseRole*> tVec = getCurrSkillTargets();
 		for (auto tGrid : tArea)
 		{
-			BaseRole* tRole = mManage->getAliveByGrid(tGrid);
+			BaseRole* tRole = BattleManage->getAliveByGrid(tGrid);
 			if (!tRole)continue;
 			for (auto t2Role : tVec)
 			{
@@ -1515,37 +1529,84 @@ namespace BattleSpace
 		return false;
 	}
 
+	void BaseRole::changeModel( int pModel,float pScale /*= 1*/)
+	{
+		if (pModel == C_DefaultModel)
+		{
+			pModel = getBaseData()->getRoleModel();
+			pScale = getBaseData()->getRoleZoom()*0.01f;
+		}
+		setModel(pModel);
+		setZoom(pScale);
+		BattleConfig->initRoleConfigData(this);				//武将变身后配置数据也跟着改变了。
+		mRoleObject->setModel(pModel);
+		mRoleObject->getBody()->setScale(pScale);
+	}
+	//武将方法调用模版
+	void BaseRole::updateRage( float pRate )
+	{
+		mRoleObject->setRangePercent(pRate);
+	}
+
+	void BaseRole::VariantBegin( bool pInVariant )
+	{
+		setMove(false);
+		setLogicState(sLogicState::eInvincible);
+		if (pInVariant)
+		{
+			mRoleObject->VariantModel(pInVariant);
+		}else{
+			updateRage(0);
+			mRoleObject->VariantModel(pInVariant);
+		}
+	}
+
+	void BaseRole::VariantEnd( bool pInVariant )
+	{
+		setMove(true);
+		setLogicState(sLogicState::eNormal);
+		//范围100点真实伤害写死
+		vector<int> tRoudArea;
+		initGridRound(tRoudArea,getGridIndex());
+		for (auto tGrid : tRoudArea)
+		{
+			BaseRole* tRole = BattleManage->getAliveByGrid(tGrid);
+			if (tRole && tRole->getOtherCamp() != getOtherCamp())
+			{
+				tRole->changeBoold(- 100);
+			}
+		}
+		bNotification->postNotification(B_ContinuousNumber);			//刷新连击处理
+		if (pInVariant)
+		{
+			mVariant->PropertyChange(pInVariant);
+		}else{
+			mVariant->PropertyChange(pInVariant);
+		}
+	}
+
+	void BaseRole::colorBlink( int pNumber,const ccColor3B& color3 )
+	{
+		mRoleObject->colorBlink(pNumber,color3);
+	}
+
 	void BaseRole::buffImpact()
 	{
-		const skEffectData* tKillEffect = this->getCurrEffect();
+		const skEffectData* tSkillEffect = this->getCurrEffect();
 		for (auto tRole : mHittingAlive)
 		{
-			if (tRole->getHp()<=0 || !tRole->getAliveState())
-				continue;
-			vector<BuffData*>::const_iterator tItre = tKillEffect->getBuffVector().begin();
-			for (;tItre != tKillEffect->getBuffVector().end();++tItre)
+			for (auto tBuff : tSkillEffect->getBuffVector())
 			{
-				BuffData* buff = *tItre;
-				int ranNum = CCRANDOM_0_1()*100;
-				if (ranNum > buff->getTriggerRate()/*true*/)//每个buf都需要进行添加判断
-				{
-					//CCLOG("[ TIPS ]Buff Add Fail [BuffID= %d, userRate= %d, ranNum=%d]",buff.buffId,buff.useRate,ranNum);
+				if (CCRANDOM_0_1()*100 > tBuff->getTriggerRate())
 					continue;		
-				}
-				if (buff->getBuffTarget() == usTargetType)					//自己
+				if (tBuff->getBuffTarget() == usTargetType)					//自己
 				{
-					//CCLOG("\nAtcTargetID = %d ,AddBuff ID: %d",AtcTarget->getAliveID(),buff.buffId);
-					if (buff->getTargetType()&&(sRoleNature)buff->getTargetType() != getBaseData()->getProperty())//判断buf的限定种族
-						continue;
-					AddBuff(buff);
-				}else if (buff->getBuffTarget() == hitTargetType && tRole)				//受击目标
+					AddBuff(tBuff);
+				}else if (tBuff->getBuffTarget() == hitTargetType && tRole)	//受击目标
 				{
-					if (buff->getTargetType()&&(sRoleNature)buff->getTargetType()!=tRole->getBaseData()->getProperty())
-						continue;
-					//CCLOG("\nHitTargetID = %d ,AddBuff ID: %d",HitTarget->getAliveID(),buff.buffId);
-					tRole->AddBuff(buff);
+					tRole->AddBuff(tBuff);
 				}else{
-					CCLOG("[ ERROR ] buff.target can find bufid:%d ,aliveid:%d",buff->getBuffID(),getAliveID());
+					CCLOG("[ ERROR ] buff.target can find bufid:%d ,aliveid:%d",tBuff->getBuffID(),getAliveID());
 				}
 			}
 		}
@@ -1553,9 +1614,11 @@ namespace BattleSpace
 
 	void BaseRole::AddBuff( const BuffData* pData )
 	{
-		if (!getBattle()||!getRoleObject()||!pData->getBuffID())
-			return;											//统一的做安全性判断处理
 		getBuffManage()->AddBuff(pData);
 	}
 
+	void BaseRole::clearDbuff()
+	{
+		getBuffManage()->clearDbuf();
+	}
 };

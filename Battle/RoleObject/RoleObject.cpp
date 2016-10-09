@@ -26,7 +26,7 @@
 #include "Battle/ActionNameDefine.h"
 #include "Battle/SpineDataManage.h"
 #include "Battle/Config/ConfigManage.h"
-//#include <spine/AnimationState.h>
+#include "Battle/RoleConfigData.h"
 namespace BattleSpace
 {
 	RoleObject::RoleObject()
@@ -57,9 +57,10 @@ namespace BattleSpace
 		}else{
 			setEnemy(false);
 		}
-
 		setModel(mRole->getModel());
 		setHp(nullptr);
+		if (mRole->getConfigData()->getVariant())							//配置数据跟显示武将有关
+			setRage(nullptr);
 		getBody()->setScale(mRole->getZoom());
 		if (mRole->getCloaking())											//潜行怪物处理
 			getArmature()->setOpacity(125);
@@ -84,6 +85,16 @@ namespace BattleSpace
 	void RoleObject::setModel(int pModel)//设置人物对应模型
 	{
 		mModel = pModel;
+		if (m_Armature)
+		{
+			m_Armature->removeFromParentAndCleanup(true);
+			m_Armature = nullptr;
+		}
+		if (m_Skeleton)
+		{
+			m_Skeleton->removeFromParentAndCleanup(true);
+			m_Skeleton = nullptr;
+		}
 		if ( SpineManage->isSpineModel(mModel) )
 		{
 			m_IsSpine = true;
@@ -92,7 +103,6 @@ namespace BattleSpace
 			m_IsSpine = false;
 			initCocosModel();
 		}
-		//m_Armature->setAnchorPoint(ccp(0.5f,0));
 		m_Armature->setPosition(ccp(0,-GRID_HEIGHT/2));					//落点在格子中心,向下偏移半个格子才是站立点,不偏移则人站格子的中心了
 		m_Body->addChild(m_Armature);
 		this->getStateManage()->initState(this);							//设置人物的初始动作为站立也可为其他						
@@ -202,8 +212,9 @@ namespace BattleSpace
 		if (EFdata)
 		{
 			m_Skeleton = SkeletonAnimation::createWithData(EFdata->first);
-			//m_Skeleton->setAnchorPoint(ccp(0.5f,0));
 			m_Skeleton->setPosition(ccp(0,-GRID_HEIGHT/2));
+			ccBlendFunc cAddModel = {GL_ONE, GL_ONE};					//图像混合效果
+			m_Skeleton->setBlendFunc(cAddModel);
 			m_Body->addChild(m_Skeleton,1);
 		}else{
 			CCLOG("[ *TIPS ]  RoleObject::setModel Spine Model=%d IS NULL",mModel); 
@@ -618,11 +629,6 @@ namespace BattleSpace
 
 	void RoleObject::setMoveByPath()
 	{
-		CCLOG(" [ %d ]------>[ %d ]",mRole->getGridIndex(),mRole->mMoveGrids.at(mRole->mMoveGrids.size()-1));
-		for (auto tGrid : mRole->mMoveGrids)
-		{
-			CCLOG("-------------------- %d",tGrid);
-		}
 		if (!getMoveObject())
 			return;
 		getMoveObject()->setgrid(mRole->mMoveGrids.at(mRole->mMoveGrids.size()-1));

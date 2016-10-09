@@ -17,7 +17,8 @@
 #define __GuardArea_H_
 #include "cocos2d.h"
 #include <vector>
-namespace BattleSpace{
+namespace BattleSpace
+{
 	//æØΩ‰«¯”Ú¿‡–Õ
 	enum GuardType
 	{
@@ -31,8 +32,8 @@ namespace BattleSpace{
 	class GuardArea : public cocos2d::CCObject
 	{
 	public:
-		GuardArea(WarManager* pManage);
-		static GuardArea* create(WarManager* pManage);
+		GuardArea();
+		static GuardArea* create();
 		int getAliveGuard(BaseRole* pAlive);	
 		void initAliveGuard(BaseRole* pAlive,std::vector<int>& pGuards);									//
 	protected:
@@ -42,8 +43,6 @@ namespace BattleSpace{
 		void guardFront(BaseRole* pAlive,std::vector<int>& pGuards);
 		void guradBack(BaseRole* pAlive,std::vector<int>& pGuards);
 		void guradFrontAndBack(BaseRole* pAlive,std::vector<int>& pGuards);
-	private:
-		WarManager* mManage;
 	};
 };
 #endif

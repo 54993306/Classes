@@ -2,13 +2,23 @@
 #ifndef _BUF_EXPRESSION_H_
 #define _BUF_EXPRESSION_H_
 #include "AppUI.h"
-/************************************************************************/
-/*                         
-				用于buf效果显示BuffExpression//  [9/9/2014 xc_lin]
-*/
-/************************************************************************/
-namespace BattleSpace{
-	class BuffInfo;
+/************************************************************* 
+ *
+ *
+ *		Data : 2016.9.21
+ *	
+ *		Name : 
+ *
+ *		Author : Lin_Xiancheng
+ *
+ *		Description : 重构方向放在显示对象上每个人单独管理
+ *
+ *
+ *************************************************************/
+
+namespace BattleSpace
+{
+	class BattleBuff;
 	class BufExp : public CCObject
 	{
 	public:
@@ -19,8 +29,8 @@ namespace BattleSpace{
 		void AddBuffExcute(CCObject* ob);
 		void updatePosition(CCObject* ob);
 		void upBuffEffect(CCObject* ob);
-		CCSprite* CreateSmallIcon(BuffInfo* info,vector<CCNode*>&Vec);
-		void CreateBigIcon(BuffInfo* info,CCSprite* body);
+		CCSprite* CreateSmallIcon(BattleBuff* info,vector<CCNode*>&Vec);
+		void CreateBigIcon(BattleBuff* info,CCSprite* body);
 		void ResetInterval(float dt);
 	private:
 		CCPoint m_hpSize;

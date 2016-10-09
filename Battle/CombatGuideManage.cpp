@@ -19,8 +19,10 @@ namespace BattleSpace{
 
 	void CombatGuideManage::clearGuideData(bool quit /*=false*/)
 	{
-		for(MapCombatGuideData::iterator iter = m_GuideData.begin(); iter != m_GuideData.end();++iter)
-			CC_SAFE_RELEASE(iter->second);
+		for(auto tPair : m_GuideData)
+		{
+			CC_SAFE_RELEASE(tPair.second);
+		}
 		m_GuideData.clear();
 		if (quit)
 		{

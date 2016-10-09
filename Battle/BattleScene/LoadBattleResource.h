@@ -24,14 +24,6 @@ namespace BattleSpace
 		total_time					= 35,		
 		public_time					= 30,		//预计加载公共资源的帧数
 	};
-	enum class ResourceType
-	{
-		Load_Role = 1,
-		Load_Spine,
-		Load_Effect,
-		Load_Terrain,
-		Load_Buff,
-	};
 	enum struct sLoadType
 	{
 		eNuLL,
@@ -86,7 +78,7 @@ namespace BattleSpace
 
 		void CocosBoneCallBack(float dt);
 		void TextureThread(const char* url, const char* model, sLoadType type = sLoadType::eEffect);		//异步加载处理
-		void SkillParse(const BaseRoleData* pRole,vector<int>&VecEffect,vector<int>&VecBuff);
+		void SkillParse(const BaseRoleData* pRole);
 		void LoadBeingAnimation();
 		void ProgressEnd();
 		void LoadCocosEffect();
@@ -94,12 +86,15 @@ namespace BattleSpace
 		void releaseResource();
 	protected:
 		CProgressBar*						m_progress;
-		CCSprite*							m_pZombieSprite;					//小僵尸
-		map<ResourceType,vector<int>>		m_WarResouse;	
+		CCSprite*							m_pZombieSprite;					//小僵尸	
 		int									m_CurrIndex;						//当前已加载的行数
 		int									m_publicNum;						//公共资源
 		int									m_totalNum;							//得到总行数
 		CCLabelTTF*							m_tip;
+	private:
+		vector<int>							mVecRole;
+		vector<int>							mVecEffect;
+		vector<int>							mVecBuff;
 	private:
 		bool								m_Release;							//当前状态
 		int									m_SceneType;						//跳转到哪一个场景

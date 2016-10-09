@@ -24,6 +24,12 @@
 #include "common/CCRollLabelAction.h"
 #include "common/CommonFunction.h"
 #include "Battle/BattleCenter.h"
+#include "tollgate/TollgatePreview.h"
+#include "Battle/BattleScene/BattleScene.h"
+#include "Battle/ComBatLogic.h"
+#include "SDK/GameEventMonitor.h"
+
+
 const char WarWinLayer::WAR_WIN_RESULT[] = "war_win_show";
 
 using namespace BattleSpace;
@@ -174,10 +180,27 @@ void WarWinLayer::processBattleFinish(int type, google::protobuf::Message *msg)
 	this->setVisible(true);
 
 	BattleFinishRep *res = (BattleFinishRep*)msg;
-	
+
 	CCSize size = CCDirector::sharedDirector()->getWinSize();	
 
 	if (!res->win())return;
+
+	//正常关卡结束事件
+	{
+		//名称
+		int stage = BattleManage->getStageIndex(); 
+		//难度
+		int iLevel = CTollgatePreview::m_iSavedStar;
+		//时间
+		int iTime = 999;
+		BattleScene* pWarScene = dynamic_cast<BattleScene* >(CSceneManager::sharedSceneManager()->getCurrScene());
+		if (pWarScene)
+		{
+			iTime = pWarScene->getCombatLogic()->getTime();
+		}
+		//状态
+		GameEventMonitor::getInstance()->onLevelComplete(CCString::createWithFormat("%d", stage)->m_sString, CCString::createWithFormat("%d", iLevel)->m_sString, iTime, 1);
+	}
 
 	//延时出现
 	float fDelayTime = 1.0;

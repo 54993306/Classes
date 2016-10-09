@@ -1,150 +1,95 @@
-﻿#include "AnimationManager.h"
-#include "Battle/RoleObject/RoleObject.h"
+﻿/************************************************************* 
+ *
+ *
+ *		Data : 2016.9.2
+ *	
+ *		Name : 
+ *
+ *		Author : Lin_Xiancheng
+ *
+ *		Description : 
+ *
+ *
+ *************************************************************/
+
+#include "AnimationManager.h"
 #include "tools/ToolDefine.h"
-#include "model/DataCenter.h"
-#include "Battle/WarManager.h"
 #include "Battle/EffectData.h"
 #include "Battle/ActionNameDefine.h"
+#include "Battle/ActionModel.h"
 #define MAX_EFFECT_FRAME 40
 #define MAX_ACTION_FRAME 20
-namespace BattleSpace{
-	ActionModel::ActionModel()
-		:m_name(""),m_Frames(0),m_type(0),m_Speed(0){}
-	ActionModel::~ActionModel()
-	{
-		m_ActionFrames.clear();
-		m_ActionSpeed.clear();
-	}
-	//得到 actionKey 帧数
-	int ActionModel::getActionFrames(const char* actionKey)
-	{
-		map<string,int>::iterator iter = m_ActionFrames.find(actionKey);
-		if(iter != m_ActionFrames.end())
-			return iter->second;
-		return 0;
-	}
-	//得到动作帧率
-	float ActionModel::getActionSpeed(const char* actionKey)
-	{
-		map<string,float>::iterator iter = m_ActionSpeed.find(actionKey);
-		if(iter != m_ActionSpeed.end())
-			return iter->second;
-		return 0;
-	}
+namespace BattleSpace
+{
+	AnimationManager* AnimationManager::mAnimationManage = nullptr;
 
-	//返回特效动画
-	CCAnimation* ActionModel::getAnimation(const char* action /*=nullptr*/)
+	AnimationManager::AnimationManager():mSpecialdata(nullptr)
 	{
-		CCArray* animFrames = CCArray::create();
-		char str[100] = {0};
-		for(int i = 0; i < MAX_EFFECT_FRAME; ++i)
-		{
-			switch (m_type)
-			{
-			case eEffectSkill:
-				{
-					int index = 10000 + i;
-					sprintf(str,"%s_%d.png",m_name.c_str(),index);
-				}break;
-			case eEffectPNG:
-				{
-					sprintf(str,"%s_%d.png",m_name.c_str(),i);
-				}break;
-			case eEffectJPG:
-				{
-					sprintf(str,"%s_%d.jpg",m_name.c_str(),i);
-				}break;
-			case eFrameRole:
-				{
-					CCArray* animFrames = CCArray::create();
-					CCSpriteFrameCache *cache = CCSpriteFrameCache::sharedSpriteFrameCache(); 
-					char str[100] = {};
-					string strFormat = m_name + "_" + string(action)+"_%d.png";
-					for(int i = 0; i < MAX_ACTION_FRAME; ++i)
-					{
-						sprintf(str,strFormat.c_str(),i);
-						CCSpriteFrame* frame = cache->spriteFrameByName(str);
-						if( frame ) animFrames->addObject(frame);
-					}
-					CCAnimation* animation = CCAnimation::createWithSpriteFrames(animFrames,getActionSpeed(action));
-					return animation;
-				}break;
-			default:
-				break;
-			}
-			CCSpriteFrame* frame = CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(str);
-			if( frame )
-				animFrames->addObject(frame);
-			else
-				break;
-		}
-		CCAnimation* animation = CCAnimation::createWithSpriteFrames(animFrames,getEffectSpeed());
-		return animation;
-	}
-	//可以配置动作或特效以第几帧作为当前特效的碰撞检测帧(或在动画运行时实时获取当前帧的范围进行判断)
-	CCRect ActionModel::getRect()
-	{
-		CCRect rect;
-		if(m_name == "") return rect;
-		string frameName = m_name + "_" + string(Stand_Action) + "_0.png";
-		CCSpriteFrame* frame = CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(frameName.c_str());
-		if(frame)
-			return frame->getRect();
-		frameName = m_name + "_0.png";
-		frame = CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(frameName.c_str());
-		if(frame)
-			return frame->getRect();
-		return rect;
-	}
-	/************************************************************************/
-	//                                                                      
-	//
-	//							动画管理器对象
-	//
-	//
-	/************************************************************************/
-	AnimationManager::~AnimationManager() 
-	{ 
-		clearAnimationManage(); 
-		CC_SAFE_RELEASE(m_spefdata);
-		m_spefdata = nullptr;
-	}
-
-	void AnimationManager::clearAnimationManage()
-	{
-		for(map<string,ActionModel*>::iterator iter = m_Actions.begin();iter != m_Actions.end();++iter)
-			iter->second->release();
-		m_Actions.clear();
-	}
-
-	AnimationManager::AnimationManager():m_spefdata(nullptr)
-	{
-		m_spefdata = SpecialEffectData::create();
-		m_spefdata->retain();
+		mSpecialdata = SpecialEffectData::create();
+		mSpecialdata->retain();
+		mDefault = ActionModel::create();
+		mDefault->retain();
 	}
 
 	AnimationManager* AnimationManager::sharedAction()
 	{
-		static AnimationManager* m_actionManager = nullptr;
-		if( m_actionManager == nullptr )
-			m_actionManager = new AnimationManager();
-		return m_actionManager;
+		if( mAnimationManage == nullptr )
+			mAnimationManage = new AnimationManager();
+		return mAnimationManage;
+	}
+
+	AnimationManager::~AnimationManager() 
+	{ 
+		clearAnimationManage(); 
+		CC_SAFE_RELEASE(mSpecialdata);
+		mSpecialdata = nullptr;
+	}
+
+	void AnimationManager::clearAnimationManage()
+	{
+		for (auto tPair : mMapAction)
+		{
+			CC_SAFE_RELEASE(tPair.second);
+		}
+		mMapAction.clear();
+	}
+
+	void AnimationManager::ReleaseAnimation(const char* name)
+	{
+		map<string,ActionModel*>::iterator iter = mMapAction.find(name);
+		if(iter != mMapAction.end())
+		{
+			CC_SAFE_RELEASE(iter->second);
+			mMapAction.erase(iter);
+		}
+	}
+	//判断容器中是否存在同名动画，如果不存在则加入容器当中
+	void AnimationManager::addAction(ActionModel* action)
+	{
+		ActionModel* tmpAction = getAction(action->getName().c_str());
+		if(strcmp(tmpAction->getName().c_str(),""))
+		{
+			CCLOG("[ *TIPS ] AnimationManager::addAction Repead ActionMode name=%s",action->getName().c_str());
+			return;
+		}
+		action->retain();
+		mMapAction[action->getName()] = action;
+	}
+	ActionModel* AnimationManager::getAction(const char* name)
+	{
+		map<string,ActionModel*>::iterator iter = mMapAction.find(name);
+		if(iter != mMapAction.end())
+			return iter->second;
+		return mDefault;
 	}
 	//根据特效名称得到特效动画
 	CCAnimation* AnimationManager::getAnimation(const char* name,const char* action/*=nullptr*/)
 	{
-		ActionModel* actionmodel = getAction(name);
-		if(actionmodel)	return actionmodel->getAnimation(action);
-		return nullptr;
-	}
-	//根据动画名称得到动画区域大小
-	CCRect AnimationManager::getAliveRect(const char* name)
-	{
-		CCRect rect;
-		ActionModel* action = getAction(name);
-		if(action)	rect = action->getRect();
-		return rect;
-	}								
+		ActionModel* tAction = getAction(name);
+		if (!strcmp(tAction->getName().c_str(),""))
+			CCLOG("[ *ERROR ] AnimationManager::getAnimation Lost %s",name);
+		return tAction->getAnimation(action);
+	}							
 	//武将动作解析 enemy1_attack_1.png
 	void AnimationManager::parseRoleAction(const char* name)
 	{
@@ -173,14 +118,12 @@ namespace BattleSpace{
 	//特效解析
 	void AnimationManager::ParseAnimation(const char* name,int type /*=EF_Skill*/)
 	{
-		if (getAction(name))
-			return;
-		ActionModel* action = ActionModel::create();
+		ActionModel* tAction = ActionModel::create();
 		char str[60] = {0};
 		float speed = 0.1f;								//默认帧率
-		if (m_spefdata->JudgeSpcialEffect(atoi(name)))
+		if (mSpecialdata->JudgeSpcialEffect(atoi(name)))
 		{
-			SpecialEffectInfo* spefdata = m_spefdata->getSpecialEffect(atoi(name));
+			SpecialEffectInfo* spefdata = mSpecialdata->getSpecialEffect(atoi(name));
 			if (spefdata)
 			{
 				speed = spefdata->getspeed();									
@@ -213,42 +156,12 @@ namespace BattleSpace{
 			if( !frame )break;
 			++totalFrame;
 		}
-		action->setEffectSpeed(speed);
-		action->setEffectFrames(totalFrame);
-		action->setType(type);
-		action->setName(name);
-		addAction(action);											//添加到管理器当中
+		tAction->setEffectSpeed(speed);
+		tAction->setEffectFrames(totalFrame);
+		tAction->setType(type);
+		tAction->setName(name);
+		addAction(tAction);											//添加到管理器当中
 	}
-	//判断容器中是否存在同名动画，如果不存在则加入容器当中
-	void AnimationManager::addAction(ActionModel* action)
-	{
-		ActionModel* tmpAction = getAction(action->getName().c_str());
-		if(!tmpAction)
-		{
-			action->retain();
-			m_Actions[action->getName()] = action;
-		}else{
-			CCLOG("[ *TIPS ] AnimationManager::addAction Repead ActionMode name=%s",action->getName().c_str());
-		}
-	}
-	ActionModel* AnimationManager::getAction(const char* name)
-	{
-		map<string,ActionModel*>::iterator iter = m_Actions.find(name);
-		if(iter != m_Actions.end())
-			return iter->second;
-		return nullptr;
-	}
-
-	void AnimationManager::ReleaseAnimation(const char* name)
-	{
-		map<string,ActionModel*>::iterator iter = m_Actions.find(name);
-		if(iter != m_Actions.end())
-		{
-			CC_SAFE_RELEASE(iter->second);
-			m_Actions.erase(iter);
-		}
-	}
-
 	//根据文件路径创建一个动画返回
 	CCAnimation* createAnimationFromSpriteFrameName(const char* Filepath)
 	{

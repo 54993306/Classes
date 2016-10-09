@@ -4,23 +4,19 @@
 #include "tools/commonDef.h"
 #include "Battle/BaseRole.h"
 #include "Battle/ConstNum.h"
-#include "Battle/WarManager.h"
-#include "Battle/CoordsManage.h"
-#include <functional>					//sort 的降序排序使用
 #include "Battle/RoleObject/RoleObject.h"
 #include "Battle/BattleTools.h"
 #include "Battle/AreaCount.h"
 #include "Battle/RoleSkill.h"
 #include "Battle/skEffectData.h"
-using namespace cocos2d;
-namespace BattleSpace{
 
-	SkillRange::SkillRange(WarManager* pManage)
-		:mManage(pManage){}
+namespace BattleSpace
+{
+	SkillRange::SkillRange(){}
 	//目标格子、范围类型、范围大小、攻击距离(默认为0)
-	SkillRange* SkillRange::create( WarManager* pManage )
+	SkillRange* SkillRange::create()
 	{
-		SkillRange* tSkillRange = new SkillRange(pManage);
+		SkillRange* tSkillRange = new SkillRange();
 		if (tSkillRange)
 		{
 			tSkillRange->autorelease();
@@ -44,6 +40,7 @@ namespace BattleSpace{
 	//返回受击范围内受击武将
 	void SkillRange::initAreaTargets(BaseRole* pRole)
 	{
+		pRole->mAreaTargets.clear();
 		vector<BaseRole*> VecAlive = pRole->getCurrSkillTargets();				//不直接使用格子去寻找是为了减少遍历的次数																
 		for (auto tGrid : pRole->mSkillArea)								//格子是排序好的,要使用格子来进行遍历(必须,不同阵营获取目标顺序不同)
 		{

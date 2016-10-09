@@ -11,6 +11,7 @@
 #include "Battle/BattleMessage.h"
 #include "Battle/BuffData.h"
 #include "Battle/Config/ConfigManage.h"
+#include "Battle/Buff/BattleBuff.h"
 namespace BattleSpace{
 
 	BufExp::BufExp():m_hpSize(CCPointZero),m_interval(0){}
@@ -23,7 +24,7 @@ namespace BattleSpace{
 	bool BufExp::init()
 	{
 		CCSpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile("warScene/bufficon.plist");
-		bNotification->addObserver(this,callfuncO_selector(BufExp::AddBuffExcute),B_AddBuff,nullptr);
+		bNotification->addObserver(this,callfuncO_selector(BufExp::AddBuffExcute),MsgAddBuff,nullptr);
 		bNotification->addObserver(this,callfuncO_selector(BufExp::updatePosition),B_RemoveBuff,nullptr);
 		bNotification->addObserver(this,callfuncO_selector(BufExp::upBuffEffect),B_UpdateBuffEffect,nullptr);
 		return true;
@@ -40,34 +41,35 @@ namespace BattleSpace{
 		BuffMap* buffMap = tRole->getBuffManage()->getBuffMap();
 		for (auto i:*buffMap)
 		{
-			if (!i.second->getAddFirst())										//找到数组中没有处理过添加效果的buff
+			if (!i.second->getBF_FirstAdd())										//找到数组中没有处理过添加效果的buff
 				continue;
-			i.second->setAddFirst(false);
-			const BuffEffect* effect = BattleConfig->getBuffData()->getBuffEffect(i.second->getBuffType(),i.second->getIsDBuff());
+			i.second->setBF_FirstAdd(false);
+			const BuffEffect* effect = BattleConfig->getBuffData()->getBuffEffect((int)i.second->getBuffType(),i.second->getDBuff());
 			vector<CCNode*> VecEffect;
 			if (effect->getEffect_up())
 			{
 				EffectObject* ef = EffectObject::create(ToString(effect->getEffect_up()));
-				ef->setSkewing(true);		
-				ef->setScale(1/tRole->getZoom());
 				if (effect->getup_Loop())						//定身类的效果需要持续显示
 				{
 					ef->setPlayerType(sPlayType::eRepeat);
 					VecEffect.push_back(ef);
 				}
+				ef->setSkewing(true);		
+				ef->setScale(1/tRole->getZoom());
 				ef->setPosition(ccp(0,30));
 				tRole->getRoleObject()->getBody()->addChild(ef);
 			}
 			if (effect->getEffect_down())
 			{
 				EffectObject* ef = EffectObject::create(ToString(effect->getEffect_down()));
-				ef->setSkewing(true);
-				ef->setScale(1/tRole->getZoom());
+
 				if (effect->getdown_Loop())						//定身类的效果需要持续显示
 				{
 					ef->setPlayerType(sPlayType::eRepeat);
 					VecEffect.push_back(ef);
 				}
+				ef->setSkewing(true);
+				ef->setScale(1/tRole->getZoom());
 				ef->setPosition(ccp(0,30));
 				tRole->getRoleObject()->getBody()->addChild(ef,-1);
 			}
@@ -83,7 +85,7 @@ namespace BattleSpace{
 		}
 	}
 
-	CCSprite* BufExp::CreateSmallIcon( BuffInfo* info,vector<CCNode*>&Vec )
+	CCSprite* BufExp::CreateSmallIcon( BattleBuff* info,vector<CCNode*>&Vec )
 	{
 		char smalstr[30] = {0};
 		sprintf(smalstr,"icon_%d.png",info->getBuffType());
@@ -92,7 +94,7 @@ namespace BattleSpace{
 		{
 			CCSprite* smallIcon = CCSprite::createWithSpriteFrame(pFrame);
 			float x = smallIcon->getContentSize().width;
-			if (!info->getIsDBuff())
+			if (!info->getDBuff())
 				smallIcon->setFlipY(true);
 			Vec.push_back(smallIcon);
 			return smallIcon;
@@ -103,13 +105,13 @@ namespace BattleSpace{
 		return NULL;
 	}
 	//创建大图标
-	void BufExp::CreateBigIcon( BuffInfo* info,CCSprite* body )
+	void BufExp::CreateBigIcon( BattleBuff* info,CCSprite* body )
 	{
 		m_interval+=0.3f;
 		CCSprite* bigIcon = nullptr;	
 		char bigstr[30]={0};
 		CCDelayTime* dely = CCDelayTime::create(1.0f);
-		if (info->getIsDBuff())		//减益大图标由上往下
+		if (info->getDBuff())		//减益大图标由上往下
 		{
 			sprintf(bigstr,"%d_down.png",info->getBuffType());
 			CCSpriteFrame *bFrame = CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(bigstr);		

@@ -75,6 +75,8 @@ namespace BattleSpace{
 		CCSpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile("skill/9049.plist");
 		AnimationManager::sharedAction()->ParseAnimation("9049");
 
+		CCSpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile("skill/104.plist");
+		AnimationManager::sharedAction()->ParseAnimation("104");										//效果模型容错性处理
 		//进度条
 		m_progress = (CProgressBar*)m_Layer->findWidgetById("progress");
 		m_progress->setMaxValue(100);
@@ -139,7 +141,7 @@ namespace BattleSpace{
 		m_tip->setVisible(false);
 	}
 	//技能解析,通过技能得到加载数据
-	void LoadBattleResource::SkillParse( const BaseRoleData* pRole,vector<int>&VecEffect,vector<int>&VecBuff )
+	void LoadBattleResource::SkillParse( const BaseRoleData* pRole)
 	{
 		vector< const RoleSkill*> VSkill;
 		VSkill.push_back(pRole->getNormalSkill());
@@ -150,13 +152,13 @@ namespace BattleSpace{
 			for (vector<skEffectData*> tVecEffect:tSkill->getEffectVector())
 				for (skEffectData* tEffectData:tVecEffect)
 				{
-					VecEffect.push_back(tEffectData->getEffectID());		//for (auto l:k.buffList){}		需要引入头文件
+					mVecEffect.push_back(tEffectData->getEffectID());		//for (auto l:k.buffList){}		需要引入头文件
 					const BuffConfig* Buffdata = BattleConfig->getBuffData();
 					for (auto p:tEffectData->getBuffVector())
 					{
 						const BuffEffect* effect = Buffdata->getBuffEffect(p->getBuffType(),p->getIsDBuff());
-						VecBuff.push_back(effect->getEffect_up());
-						VecBuff.push_back(effect->getEffect_down());
+						mVecBuff.push_back(effect->getEffect_up());
+						mVecBuff.push_back(effect->getEffect_down());
 					}
 				}
 	}
@@ -164,32 +166,23 @@ namespace BattleSpace{
 	void LoadBattleResource::DataParse()
 	{
 		const vector<BaseRoleData*> tRoleDatas = BattleData->getRoleDatas();
-		vector<int> VecRole;
-		vector<int> VecEffect;
-		vector<int> VecBuff;
 		for (auto tRoleData: tRoleDatas)
 		{
 			if (SpineManage->isSpineModel(tRoleData->getRoleModel()))
 			{
 				SpineManage->AddRoleSpineID(tRoleData->getRoleModel());
 			}else{
-				VecRole.push_back(tRoleData->getRoleModel());
+				mVecRole.push_back(tRoleData->getRoleModel());
 			}
-			SkillParse(tRoleData,VecEffect,VecBuff);	
+			SkillParse(tRoleData);	
 		}
-		VecRole.push_back(516);
+		mVecRole.push_back(516);
 		SpineManage->AddRoleSpineID(146);
 		SpineManage->AddRoleSpineID(9999);
-		
+		SpineManage->AddRoleSpineID(20001);
 #if BATTLE_TEST
 		//m_LoadSpine->AddRoleSpineID(2317);
 #endif
-		VectorUnique(VecRole);
-		VectorUnique(VecEffect);
-		VectorUnique(VecBuff);
-		m_WarResouse[ResourceType::Load_Role]		= VecRole;
-		m_WarResouse[ResourceType::Load_Effect]		= VecEffect;
-		m_WarResouse[ResourceType::Load_Buff]		= VecBuff;
 	}
 
 	void LoadBattleResource::TrapParse()
@@ -203,6 +196,10 @@ namespace BattleSpace{
 		{
 			if (SpineManage->isSpineModel(tTrap->getTrapModel()))
 				SpineManage->AddTrapID(tTrap->getTrapModel());
+			const BuffConfig* Buffdata = BattleConfig->getBuffData();
+			const BuffEffect* effect = Buffdata->getBuffEffect(tTrap->getTrapBuff()->getBuffType(),tTrap->getTrapBuff()->getIsDBuff());
+			mVecBuff.push_back(effect->getEffect_up());
+			mVecBuff.push_back(effect->getEffect_down());
 		}
 	}
 	//公共资源、地图特效技能特效一起加载、骨骼动画和骨骼动画效果一起加载
@@ -218,7 +215,7 @@ namespace BattleSpace{
 		case LOAD_ROLE:		
 			{
 				LoadCocosEffect();
-				for (auto id: m_WarResouse.find(ResourceType::Load_Role)->second)
+				for (auto id: mVecRole)
 					CocosBoneThread(id);
 				if (!m_Release)
 					SpineManage->LoadSpineAnimation();
@@ -380,8 +377,9 @@ namespace BattleSpace{
 		char plist_str[60] = {0};
 		const EffectData* EfData = BattleConfig->getEffData();
 		vector<int> VecEffectID;
-		for (auto id:m_WarResouse.find(ResourceType::Load_Effect)->second)
-			EfData->getEffectInfo(id)->initEffectList(VecEffectID);
+		VectorUnique(mVecEffect);
+		for(auto tID : mVecEffect)
+			EfData->getEffectInfo(tID)->initEffectList(VecEffectID);
 		VectorUnique(VecEffectID);
 		for(auto tFileID:VecEffectID)
 		{
@@ -396,7 +394,8 @@ namespace BattleSpace{
 				TextureThread(plist_str,ToString(tFileID));
 			}
 		}
-		for (auto ptr:m_WarResouse.find(ResourceType::Load_Buff)->second)
+		VectorUnique(mVecBuff);
+		for (auto ptr:mVecBuff)
 		{
 			if ( !ptr )continue;
 			sprintf(plist_str,"skill/%d.plist",ptr);

@@ -17,6 +17,29 @@
 #include "Battle/RoleMacro.h"
 namespace BattleSpace
 {
+	/*******************************************************************/
+	BloodTrap::BloodTrap( const TrapData* pData ):BattleTrap(pData){}
+
+	BloodTrap* BloodTrap::createTrap( const TrapData* pData )
+	{
+		BloodTrap* tTrap = new BloodTrap(pData);
+		if (tTrap)
+		{
+			tTrap->autorelease();
+			return tTrap;
+		}else{
+			delete tTrap;
+			tTrap = nullptr;
+			return nullptr;
+		}
+	}
+
+	bool BloodTrap::RoleJudge()
+	{
+		return true;
+	}
+
+	/*******************************************************************/
 	FireTrap::FireTrap( const TrapData* pData ):BattleTrap(pData){}
 
 	FireTrap* FireTrap::createTrap( const TrapData* pData )
@@ -40,6 +63,7 @@ namespace BattleSpace
 		return true;
 	}
 
+	/*******************************************************************/
 	WaterTrap::WaterTrap( const TrapData* pData ):BattleTrap(pData){}
 
 	WaterTrap* WaterTrap::createTrap( const TrapData* pData )
@@ -63,6 +87,7 @@ namespace BattleSpace
 		return true;
 	}
 
+	/*******************************************************************/
 	WoodTrap::WoodTrap( const TrapData* pData ):BattleTrap(pData){}
 
 	WoodTrap* WoodTrap::createTrap( const TrapData* pData )

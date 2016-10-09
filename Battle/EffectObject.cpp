@@ -11,7 +11,7 @@ namespace BattleSpace{
 		,m_DurationTime(0),m_Shake(false),m_LoopInterval(0)
 	{}
 	EffectObject::~EffectObject(){}
-
+	//写多个创建的方法,可使用数字也可以使用字符串来创建
 	EffectObject* EffectObject::create(const char* model,sPlayType type /*=EffectType::once*/)
 	{
 		EffectObject* pRet = new EffectObject();
@@ -58,43 +58,37 @@ namespace BattleSpace{
 				m_effect->setScale(spefdata->getscale());
 			}
 		}
-		play();
+		playEffect();
 	}
 	//特效帧数控制音效播放，控制音效播放次数，播放位置
-	void EffectObject::play()
+	void EffectObject::playEffect()
 	{
-		CCAnimation* Animation = AnimationManager::sharedAction()->getAnimation(m_model.c_str());//获取特效动画的区域赋值给特效对象
-		if( Animation == nullptr )
-		{
-			this->scheduleUpdate();
-			m_bIsNullEffect = true;
-			return;
-		}
-		CCAnimate* animate = CCAnimate::create(Animation);
+		CCAnimation* tAnimation = AnimationManager::sharedAction()->getAnimation(m_model.c_str());//获取特效动画的区域赋值给特效对象
+		CCAnimate* tAnimate = CCAnimate::create(tAnimation);
 		switch (m_Type)
 		{
 		case sPlayType::eOnce:
 			{
 				this->scheduleUpdate();
-				animate->setTag((int)sPlayType::eRepeat);
-				m_effect->runAction(animate);
+				tAnimate->setTag((int)sPlayType::eRepeat);
+				m_effect->runAction(tAnimate);
 				if (m_Music)
 					playeEffectMusic(m_Music);
-				m_TotalTime = Animation->getDuration();
+				m_TotalTime = tAnimation->getDuration();
 			}break;
 		case sPlayType::eRepeat:
 			{
-				CCAction* Action = CCRepeatForever::create(animate);
+				CCAction* Action = CCRepeatForever::create(tAnimate);
 				Action->setTag((int)sPlayType::eRepeat);
 				m_effect->runAction(Action);
 			}break;
 		case sPlayType::eRepeatNum:
 			{
 				this->scheduleUpdate();
-				CCAction* Action = CCRepeat::create(animate,m_LoopNum);
+				CCAction* Action = CCRepeat::create(tAnimate,m_LoopNum);
 				Action->setTag((int)sPlayType::eRepeat);
 				m_effect->runAction(Action);
-				m_TotalTime = Animation->getDuration()*m_LoopNum;
+				m_TotalTime = tAnimation->getDuration()*m_LoopNum;
 			}break;
 		case sPlayType::eDelay:
 			{
@@ -105,19 +99,19 @@ namespace BattleSpace{
 				{
 					CCCallFunc* func = CCCallFunc::create(this,callfunc_selector(EffectObject::ShakeMessage));
 					CCCallFunc* func1 = CCCallFunc::create(this,callfunc_selector(EffectObject::PlayerMusic));
-					CCSequence* pSeq = CCSequence::create(animate/*,func*/,Interval,nullptr);									//每次重复都震动
+					CCSequence* pSeq = CCSequence::create(tAnimate/*,func*/,Interval,nullptr);									//每次重复都震动
 					seq = CCSequence::create(delay,func,CCRepeat::create(pSeq,m_LoopNum),CCRemoveSelf::create(),nullptr);		//只震动一次然后播重复动作
 				}else{
-					CCSequence* pSeq = CCSequence::create(animate,Interval,nullptr);
+					CCSequence* pSeq = CCSequence::create(tAnimate,Interval,nullptr);
 					seq = CCSequence::create(delay,CCRepeat::create(pSeq,m_LoopNum),CCRemoveSelf::create(),nullptr);
 				}
 				seq->setTag((int)sPlayType::eRepeat);
 				m_effect->runAction(seq);
-				m_TotalTime = Animation->getDuration()*m_LoopNum+m_Delaytime;
+				m_TotalTime = tAnimation->getDuration()*m_LoopNum+m_Delaytime;
 			}break;
 		case sPlayType::eDuration:
 			{
-				CCAction* Action = CCRepeatForever::create(animate);
+				CCAction* Action = CCRepeatForever::create(tAnimate);
 				Action->setTag((int)sPlayType::eRepeat);
 				m_effect->runAction(Action);
 				m_TotalTime = m_DurationTime;

@@ -14,16 +14,16 @@
  *
  *
  *************************************************************/
-namespace BattleSpace{
-
+using namespace cocos2d;
+namespace BattleSpace
+{
 	class BaseRole;
 	class AreaCountInfo;
-	class WarManager;
 	class SkillRange : public CCObject
 	{
 	public:
-		SkillRange(WarManager* pManage);
-		static SkillRange* create(WarManager* pManage);
+		SkillRange();
+		static SkillRange* create();
 		void initValidGrids(BaseRole* pAlive,vector<int>& pValids);								//得到武将有效攻击格子
 		void FixGrid(AreaCountInfo& pInfo);														//固定格子
 		void FixAlive(AreaCountInfo& pInfo);													//固定武将
@@ -32,8 +32,6 @@ namespace BattleSpace{
 		void initAreaTargets(BaseRole* pAlive);													//受击武将
 		void initAttackInfo(BaseRole* pAlive);													//受击信息(战斗处提升效率核心方法)
 		int CaptainGuard(BaseRole* pAlive);
-	private:
-		WarManager* mManage;
 	};
 
 };

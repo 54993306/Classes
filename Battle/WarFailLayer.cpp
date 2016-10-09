@@ -14,7 +14,10 @@
 #include "mainCity/MainCityControl.h"
 #include "tools/ShowTexttip.h"
 #include "model/DataCenter.h"
-
+#include "tollgate/TollgatePreview.h"
+#include "Battle/BattleScene/BattleScene.h"
+#include "Battle/ComBatLogic.h"
+#include "SDK/GameEventMonitor.h"
 
 WarFailLayer::WarFailLayer(void)
 {
@@ -31,6 +34,24 @@ bool WarFailLayer::init(){
 	setVisible(true);
 
 	CCSize size = CCDirector::sharedDirector()->getWinSize();
+
+	//正常关卡结束事件
+	{
+		//名称
+		int stage = BattleManage->getStageIndex(); 
+		//难度
+		int iLevel = CTollgatePreview::m_iSavedStar;
+		//时间
+		int iTime = 999;
+		BattleScene* pWarScene = dynamic_cast<BattleScene* >(CSceneManager::sharedSceneManager()->getCurrScene());
+		if (pWarScene)
+		{
+			iTime = pWarScene->getCombatLogic()->getTime();
+		}
+		//状态
+		GameEventMonitor::getInstance()->onLevelComplete(CCString::createWithFormat("%d", stage)->m_sString, CCString::createWithFormat("%d", iLevel)->m_sString, iTime, 0);
+	}
+
 
 	//黑底
 	MaskLayer* pMaskLayer = MaskLayer::create("WarFailLayerMaskLayer");

@@ -15,7 +15,6 @@
 #include "Battle/WarManager.h"
 #include "Battle/CoordsManage.h"
 #include "Battle/Landform/TrapManage.h"
-#include "Battle/RoleConfig.h"
 #include "Battle/CombatGuideManage.h"
 #include "Battle/SpineDataManage.h"
 #include "Battle/Config/ConfigManage.h"
@@ -29,7 +28,7 @@ namespace BattleSpace
 	BattleCenter::ManageSingletonDestory BattleCenter::mDestory;
 
 	BattleCenter::BattleCenter():mMapManage(nullptr),mWarManage(nullptr),mTrapManage(nullptr),
-	mGuideManage(nullptr),mRoleConfigData(nullptr),mSpineDataManage(nullptr),mConfigManage(nullptr),
+	mGuideManage(nullptr),mSpineDataManage(nullptr),mConfigManage(nullptr),
 	mAreaManage(nullptr),mBattleModel(nullptr)
 	{}
 
@@ -51,8 +50,6 @@ namespace BattleSpace
 		mWarManage = nullptr;
 		CC_SAFE_RELEASE(mMapManage);
 		mMapManage = nullptr;
-		CC_SAFE_RELEASE(mRoleConfigData);
-		mRoleConfigData = nullptr;
 		CC_SAFE_RELEASE(mTrapManage);
 		mTrapManage = nullptr;
 		CC_SAFE_RELEASE(mGuideManage);
@@ -121,16 +118,6 @@ namespace BattleSpace
 			mGuideManage->retain();
 		}
 		return mGuideManage;
-	}
-	//每个武将的解析数据应该是跟武将模型绑定在一起的
-	RoleConfig* BattleCenter::getRoleConfig()
-	{
-		if (mRoleConfigData == nullptr)
-		{
-			mRoleConfigData = RoleConfig::create();
-			mRoleConfigData->retain();
-		}
-		return mRoleConfigData;
 	}
 
 	SpineDataManage* BattleCenter::getSpineManage()

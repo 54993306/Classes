@@ -62,8 +62,7 @@ namespace BattleSpace
 		{
 			if (pRole->getCallType() != sCallType::eCommon)
 				return true;
-			if (pGrid / C_GRID_ROW > pRole->getMoveObject()->getgrid() / C_GRID_ROW ||
-				pGrid < C_PVEStopGrid)		//不能往回移动
+			if (pGrid < C_PVEStopGrid)		//不能往回移动
 				return false;
 			return true;
 		}
@@ -99,8 +98,6 @@ namespace BattleSpace
 
 	bool BattleModel::layerMove()
 	{
-		if ( isPvEBattle() )
-			return true;
 		return true;
 	}
 

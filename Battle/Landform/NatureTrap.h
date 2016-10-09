@@ -18,6 +18,17 @@
 
 namespace BattleSpace
 {
+	/*******************************************************************/
+	class BloodTrap : public BattleTrap
+	{
+	public:
+		static BloodTrap* createTrap(const TrapData* pData);
+	protected:
+		BloodTrap(const TrapData* pData);
+		virtual bool RoleJudge();
+	};
+
+	/*******************************************************************/
 	class FireTrap : public BattleTrap
 	{
 	public:
@@ -27,6 +38,7 @@ namespace BattleSpace
 		virtual bool RoleJudge();
 	};
 
+	/*******************************************************************/
 	class WaterTrap : public BattleTrap
 	{
 	public:
@@ -36,6 +48,7 @@ namespace BattleSpace
 		virtual bool RoleJudge();
 	};
 
+	/*******************************************************************/
 	class WoodTrap : public BattleTrap
 	{
 	public:

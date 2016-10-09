@@ -98,6 +98,7 @@ namespace BattleSpace
 		m_UILayer = WarControl::create();
 		this->addChild(m_UILayer);
 
+		//物品掉落功能取消了
 		_dropItem = DropItem::create();
 		_dropItem->retain();
 		_dropItem->setWarUi(m_UILayer,m_AliveLayer);

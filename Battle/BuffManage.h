@@ -21,8 +21,8 @@ namespace BattleSpace
 {
 	class BaseRole;
 	class BuffData;
-	class BuffInfo;
-	typedef map<unsigned int,BuffInfo*> BuffMap;	
+	class BattleBuff;
+	typedef map<int,BattleBuff*> BuffMap;	
 	typedef map<int,vector<CCNode*>>	BuffEffectMapList;	
 
 	class BuffManage : public CCObject
@@ -34,34 +34,21 @@ namespace BattleSpace
 		CC_SYNTHESIZE(BaseRole*,mRole,Alive);
 		void Buffclear();
 		void clearDbuf();											//清除减益buf
-		BuffInfo* getbuff(int bufID);
-		BuffInfo* getbuffbyType(int buftype);
+		BattleBuff* getbuff(int bufID);
+		BattleBuff* getbuffbyType(int buftype);
 		void removeBuf(int id);
 		void AddBuff(const BuffData* pData);							//将buff对象添加到武将身上
 		bool AddBuffLogic(const BuffData* pData);						//buf替换添加逻辑
+		void maxBuffJudge();
 		void upDateBuff(float dt);
-		BuffMap* getBuffMap(){return &m_BuffMap;}
+		BuffMap* getBuffMap(){return &mBuffMap;}
 		vector<CCNode*>* getVecEffect(int buffid);					//判断是否已经存在效果数组
 		void AddEffectVec(int buffid,vector<CCNode*>& Vec);
 		BuffEffectMapList* getEffectMap(){return &m_EffectMap;}
-		void ExcuteBuff(BuffInfo*bfinfo,bool handel = true);		//为false时清除buf对武将的影响/*buf处理类型分发函数*/
-
-		int  bufCurrHpHandle(BuffInfo* bfinfo,bool handel);			//当前血量	/*可以存在当前的原因是buf移除不用恢复*/
-		void bufAtkHandle(BuffInfo* bfinfo,bool handel);			//攻击		/*区分持续和非持续影响的属性*/
-		void bufDefHandle(BuffInfo* bfinfo,bool handel);			//防御
-		void bufCritHandle(BuffInfo* bfinfo,bool handel);			//暴击
-		void bufDogeHandle(BuffInfo* bfinfo,bool handel);			//闪避
-		void bufHitHandle(BuffInfo* bfinfo,bool handel);			//命中
-		void bufMSpeedHandle(BuffInfo* bfinfo,bool handel);			//移动速度
-		void bufAtkSpeedHandle(BuffInfo* bfinfo,bool handel);		//攻击速度
-
-		int  bufMaxHpHandle(BuffInfo* bfinfo,bool handel);			//最大血量
-		void bufHrtHandle(BuffInfo* bfinfo,bool handel);			//伤害
 	protected:
-		BuffMap m_BuffMap; 
+		BuffMap mBuffMap; 
 		BuffEffectMapList m_EffectMap;										//存储武将身上的表现效果。
-		bool init(){return true;}			
+		virtual bool init();			
 	};
 };
-
 #endif // _BUFFMANAGE_

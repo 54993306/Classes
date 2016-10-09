@@ -55,7 +55,7 @@ namespace BattleSpace
 		CC_SYNTHESIZE(sRoleCamp,mRoleNature,RoleNature);				//角色阵营
 		CC_SYNTHESIZE(sMoveType,mMoveType,MoveType);					//移动类型
 		CC_SYNTHESIZE(bool,mOtherCamp,OtherCamp);						//其他阵营武将(非玩家阵营)
-		bool isAttribute(sRoleNature pType);
+		bool isProperty(sRoleNature pType);
 		float judgeAttribute( sRoleNature pType );
 	public:
 		//hero

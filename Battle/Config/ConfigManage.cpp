@@ -17,11 +17,14 @@
 #include "Battle/ParseFileData.h"
 #include "Battle/ConstNum.h"
 #include "Battle/EffectData.h"
-#include "Battle/ArmatureEventDataMgr.h"
 #include "Battle/BaseRole.h"
+#include "Battle/RoleConfig.h"
+#include "Battle/ArmatureEventDataMgr.h"
+
 namespace BattleSpace
 {
 	ConfigManage::ConfigManage():mEffectData(nullptr),mBuffData(nullptr),mStoryData(nullptr),mModelEventData(nullptr)
+		,mRoleConfig(nullptr)
 	{}
 
 	ConfigManage::~ConfigManage()
@@ -34,6 +37,8 @@ namespace BattleSpace
 		mBuffData = nullptr;
 		CC_SAFE_RELEASE(mModelEventData);
 		mModelEventData = nullptr;
+		CC_SAFE_RELEASE(mRoleConfig);
+		mRoleConfig = nullptr;
 	}
 
 	bool ConfigManage::init()
@@ -47,6 +52,8 @@ namespace BattleSpace
 		mBuffData->retain();
 		mModelEventData = ArmatureEventDataMgr::create();
 		mModelEventData->retain();
+		mRoleConfig = RoleConfig::create();
+		mRoleConfig->retain();
 		return true;
 	}
 
@@ -202,6 +209,14 @@ namespace BattleSpace
 		pVector.assign(mObstacleArea.begin(),mObstacleArea.end());
 	}
 
+	void ConfigManage::initRoleConfigData( BaseRole* pRole )
+	{
+		pRole->setConfigData(mRoleConfig->getConfigData(pRole->getModel()));
+	}
 
+	const RoleConfigData* ConfigManage::getConfigData( int pModel ) const
+	{
+		return mRoleConfig->getConfigData(pModel);
+	}
 
 }

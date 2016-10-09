@@ -22,6 +22,11 @@
 #include "sdk/FaceBookSDK.h"
 #include "Global.h"
 #include "Battle/BattleCenter.h"
+#include "tollgate/TollgatePreview.h"
+#include "Battle/BattleScene/BattleScene.h"
+#include "Battle/ComBatLogic.h"
+#include "SDK/GameEventMonitor.h"
+
 
 PvpEndLayer::PvpEndLayer():m_rank(0),m_bIsWin(true)
 {
@@ -103,6 +108,23 @@ void PvpEndLayer::processBattleFinish(int type, google::protobuf::Message *msg)
 	if(res->result() == 2)
 	{
 		m_bIsWin = false;
+	}
+
+	//正常关卡结束事件
+	{
+		//名称
+		int stage = BattleManage->getStageIndex(); 
+		//难度
+		int iLevel = CTollgatePreview::m_iSavedStar;
+		//时间
+		int iTime = 999;
+		BattleScene* pWarScene = dynamic_cast<BattleScene* >(CSceneManager::sharedSceneManager()->getCurrScene());
+		if (pWarScene)
+		{
+			iTime = pWarScene->getCombatLogic()->getTime();
+		}
+		//状态
+		GameEventMonitor::getInstance()->onLevelComplete("pvp", "0", iTime, m_bIsWin?1:0);
 	}
 
 	//旋转光

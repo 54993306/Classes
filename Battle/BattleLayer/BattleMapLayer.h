@@ -44,7 +44,6 @@ namespace BattleSpace{
 	class BattleRoleLayer;
 	class SkillRange;
 	class MapBackgroundManage;
-	class WarManager;
 	class BaseRole;
 	class GuardArea;
 	class BattleMapLayer:public CCNode
@@ -86,7 +85,6 @@ namespace BattleSpace{
 		GuardArea* mGuardArea;					//武将警戒区域
 		MoveRule* m_move;						//移动区域计算
 		vector<int> m_VecGridIndex;				//存储敌方武将按钮显示的格子
-		WarManager* mManage;
 		bool m_BackArea;						//反向攻击范围内是否存在敌方目标
 		bool m_FrontArea;						//正向攻击区域
 	};

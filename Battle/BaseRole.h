@@ -28,24 +28,23 @@ namespace BattleSpace
 	class BaseRoleData;
 	class RoleSkill;
 	class skEffectData;
-	class WarManager;
 	class SkillRange;
 	class GuardArea;
 	class HurtCount;
 	class BattleRoleLayer;
-	class CombatGuideManage;
 	class BattleModel;
+	class RoleConfigData;
+	class RoleVariant;
 	enum struct PlayHpType;
 	class BaseRole:public CCObject			//定义数据的顺序结构是为了方便查看数据
 	{
 	protected:
 		BaseRole();
-		WarManager* mManage;
 		GuardArea* mGuardArea;
 		SkillRange* mSkillRange;
 		HurtCount* mHurtCount;
-		CombatGuideManage* mGuideManage;
 		skEffectData* mSkillEffect;			//空对象代替空指针防止程序崩溃
+		RoleVariant* mVariant;
 	public:
 		virtual void excuteLogic(float pTime);
 		bool stateDispose(float pTime);
@@ -126,6 +125,12 @@ namespace BattleSpace
 		void playBooldNum(PlayHpType pType,int pNumber);
 		void buffImpact();
 		void AddBuff(const BuffData* pData);
+		void clearDbuff();
+		void changeModel(int pModel,float pScale = 1);
+		void updateRage(float pRate);
+		void VariantBegin(bool pInVariant);
+		void VariantEnd(bool pInVariant);
+		void colorBlink(int pNumber,const ccColor3B& color3);
 		//封装一些得到服务器基础属性的方法,避免直接暴露服务器数据对象,导致耦合的层次不断的增加
 	public:
 		//public
@@ -140,6 +145,7 @@ namespace BattleSpace
 		CC_SYNTHESIZE_READONLY(BuffManage*,mBuffManage,BuffManage);		//(是不是应该暴露出去呢)
 		CC_SYNTHESIZE(RoleObject*,mRoleObject,RoleObject);
 		CC_SYNTHESIZE(MoveObject*,mMoveObject,MoveObject);				//设置移动对象
+		CC_SYNTHESIZE(RoleConfigData*,mConfigData,ConfigData);			//角色配置数据(模型改变时会改变)
 		CC_SYNTHESIZE(BattleRoleLayer*,mRoleLayer,RoleLayer);			//显示对象层
 		CC_SYNTHESIZE(unsigned int,m_AliveID,AliveID);					//武将ID
 		PROPERTY_CONSTREAD(bool,m_NorAtk,NorAtk);						//普通攻击状态
@@ -172,13 +178,13 @@ namespace BattleSpace
 		//data
 		CC_SYNTHESIZE(int,m_Model,Model);								//武将模型
 		PROPERTY_CONSTREAD(int,m_Hp,Hp);								//血量
-		CC_SYNTHESIZE(unsigned int,m_MaxHp,MaxHp);						//血量Max
+		CC_SYNTHESIZE(int,m_MaxHp,MaxHp);								//血量Max
 		CC_SYNTHESIZE(int,m_Atk,Atk);									//攻击
 		PROPERTY_CONSTREAD(int,m_Def,Def);								//防御
 		CC_SYNTHESIZE(int,m_Hit,Hit);									//命中
 		CC_SYNTHESIZE(int,m_Doge,Doge);									//闪避
 		CC_SYNTHESIZE(int,m_Crit,Crit);									//暴击
-		CC_SYNTHESIZE(unsigned int,m_Renew,Renew);						//回复
+		CC_SYNTHESIZE(int,mRegain,Regain);								//回复
 		CC_SYNTHESIZE(bool,mOtherCamp,OtherCamp);
 	public:
 		//unused
@@ -190,7 +196,8 @@ namespace BattleSpace
 		//hero
 		vector<int> mTouchGrids;										//移动状态下武将多格子处理
 		CC_SYNTHESIZE(bool,m_AIState,AIState);							//武将是否在AI状态
-		CC_SYNTHESIZE(bool,m_TouchState,TouchState);					//武将当前为移动状态下
+		CC_SYNTHESIZE(bool,m_TouchState,TouchState);					//武将当前为移动状态下   这个是一个临时型用于绘制的状态
+		CC_SYNTHESIZE(bool,mInTouchState,InTouchState);					//武将是否处于被触摸的状态下
 		PROPERTY_CONSTREAD(int,m_TouchGrid,TouchGrid);					//移动状态下当前位置
 		CC_SYNTHESIZE(int,m_UILayout,UiLayout);							//对应的UI控制面板ID
 		CC_SYNTHESIZE(float,m_AtkDelay,AtkDelay);						//武将攻击延迟时间(我方武将释放必杀技时使用)

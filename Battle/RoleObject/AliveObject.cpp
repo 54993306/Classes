@@ -13,38 +13,24 @@
 #include "Battle/BaseRoleData.h"
 #include "common/CGameSound.h"
 #include "common/ShaderDataHelper.h"
-#include "Battle/RoleConfig.h"
 #include "Battle/BuffManage.h"
 #include "Battle/BattleMessage.h"
 #include "Battle/MoveObject.h"
 #include "Battle/ActionNameDefine.h"
 #include "model/DataCenter.h"
 #include "Battle/RoleObjectMacro.h"
-
+#include "Battle/RoleConfigData.h"
+#include "Battle/SpineDataManage.h"
+#include "Battle/BattleTools.h"
 namespace BattleSpace{
 	AliveObject::AliveObject()
 		:m_Body(nullptr),m_HpObject(nullptr),m_Name(""),m_ActionKey(""),m_MoveState(sStateCode::eNullState)
 		,m_NameLabel(nullptr),m_Armature(nullptr),m_DropItem(0),m_offs(CCPointZero)
 		,mEnemy(false),m_EffectMusic(0),m_IsSpine(false),m_Speed(CCPointZero)
-		,m_Direction(-1),mModel(0),mRole(nullptr),mMoveObj(nullptr)
+		,m_Direction(-1),mModel(0),mRole(nullptr),mMoveObj(nullptr),mRageObject(nullptr)
 		,m_AtkEffect(0),m_PlayerEffect(0),m_UpdateState(true),m_Skeleton(nullptr)
 	{}
-	AliveObject::~AliveObject()
-	{
-		if(m_HpObject) removeChild(m_HpObject);
-		if(m_NameLabel) removeChild(m_NameLabel);
-		if(m_Body) removeChild(m_Body);
-		CC_SAFE_RELEASE(m_HpObject);
-		CC_SAFE_RELEASE(m_NameLabel);
-		CC_SAFE_RELEASE(m_Body);
-		m_HpObject = nullptr;
-		m_NameLabel = nullptr;
-		m_Body = nullptr;
-		//CC_SAFE_RELEASE(m_Armature);
-		//m_Armature = nullptr;
-		//CC_SAFE_RELEASE(m_Skeleton);
-		//m_Skeleton = nullptr;
-	}
+	AliveObject::~AliveObject(){}
 
 	bool AliveObject::init()
 	{
@@ -55,7 +41,6 @@ namespace BattleSpace{
 	void AliveObject::setBody(CCSprite* body)
 	{
 		m_Body = CCSprite::create();
-		m_Body->retain();
 		this->addChild(m_Body);
 	}
 	CCSprite* AliveObject::getBody() { return m_Body; }
@@ -75,25 +60,37 @@ namespace BattleSpace{
 		this->addChild(AliveID);
 #endif
 	}
-
+	//像血量这样的成员对象是不应该暴露出去的,显示一些调用对象的方法就可以了
 	void AliveObject::setHp(HPObject* hp)
 	{
 		testLabel();
 		m_HpObject = HPObject::create();
 		m_HpObject->initHp(this);
-		m_HpObject->retain();
 		m_HpObject->setPosition(ccp(0,10-GRID_HEIGHT/2));
 		this->addChild(m_HpObject, 1);					//设置血量对象添加的父节点
 		initAliveTypeIcon();
 	}
 	HPObject* AliveObject::getHp() { return m_HpObject; }
 
+	void AliveObject::setRangePercent( float pPercent )
+	{
+		mRageObject->setPercent(pPercent);
+	}
+	//根据属性判断是否创建怒气值条
+	void AliveObject::setRage(RageObject* rage)
+	{
+		mRageObject = RageObject::create();
+		mRageObject->setPosition(ccp(0,-GRID_HEIGHT/2));
+		this->addChild(mRageObject);
+	}
+	RageObject* AliveObject::getRage(){return mRageObject;}
+
 	void AliveObject::initTypeIconPath(char* pPath)
 	{
-		const HeroInfoData *c_data = DataCenter::sharedData()->getHeroInfo()->getCfg(mRole->getBaseData()->getRoleModel());
-		if(c_data)
+		const HeroInfoData *tData = DataCenter::sharedData()->getHeroInfo()->getCfg(mRole->getBaseData()->getRoleModel());
+		if(tData)
 		{
-			sprintf(pPath,"common/type_%d_%d.png", mRole->getBaseData()->getProperty(), c_data->iType2);
+			sprintf(pPath,"common/type_%d_%d.png", mRole->getBaseData()->getProperty(), tData->iType2);
 		}else{
 			sprintf(pPath,"common/type_1_1.png");
 			CCLOG("[ *ERROR ] AliveObject::initAliveTypeIcon %d",mRole->getBaseData()->getRoleModel());
@@ -128,7 +125,6 @@ namespace BattleSpace{
 		{
 			m_NameLabel = CCLabelTTF::create();
 			if(m_NameLabel == nullptr) return;
-			m_NameLabel->retain();
 			m_NameLabel->setFontSize(20);
 			m_NameLabel->setFontName("arial");
 			m_Body->addChild( m_NameLabel );
@@ -145,7 +141,7 @@ namespace BattleSpace{
 	void AliveObject::setRoleDirection(int direction)//设置人物方向
 	{
 		m_Direction = direction;
-		if (m_IsSpine && ManageCenter->getRoleConfig()->isTurn(mModel))
+		if (m_IsSpine && mRole->getConfigData()->getTurn())
 		{
 			if(m_Direction == Ditection_Left)
 			{
@@ -253,12 +249,9 @@ namespace BattleSpace{
 	}
 
 	void AliveObject::lostHpDispose()
-	{		//这个函数应该是多余的,在武将创建的时候，应该就经过一次武将的特殊信息初始化，根据配置文件来初始化武将的一些配置的信息，而不是每次武将受击的时候才去找
-		CCNode* Effect = ManageCenter->getRoleConfig()->getActionEffect(mRole->getModel());			
-		if (Effect)
-			this->addChild(Effect);
-		m_Armature->runAction(CCSequence::create(
-			CCTintTo::create(0.25f,255,0,0),CCTintTo::create(0,255,255,255),NULL));								//变红处理
+	{		//这个函数应该是多余的,在武将创建的时候，应该就经过一次武将的特殊信息初始化，根据配置文件来初始化武将的一些配置的信息，而不是每次武将受击的时候才去找		
+		this->addChild(mRole->getConfigData()->getActionEffect());
+		colorBlink(1,ccc3(255,0,0));
 		if (mRole->getCaptain() && !mRole->getOtherCamp())
 		{
 			NOTIFICATION->postNotification(B_CaptainHurt,mRole);
@@ -304,6 +297,68 @@ namespace BattleSpace{
 				ef->setPosition(ccp(-getoffs().x+(j*(GRID_WIDTH+C_GRIDOFFSET_X)),-getoffs().y-(i*(GRID_HEIGHT+C_GRIDOFFSET_Y))));
 				//aliveOb->addChild(ef,-1);
 			}
+	}
+
+	void AliveObject::colorBlink( int pNumber,const ccColor3B& color3 )
+	{
+		if (pNumber == C_ForEver)
+		{
+			CCRepeatForever* tAction = CCRepeatForever::create(CCRepeat::create(CCSequence::create(
+				CCTintTo::create(0.25f,color3.r,color3.g,color3.b),CCTintTo::create(0,255,255,255),NULL),3));
+			tAction->setTag(C_ForEver);
+			m_Armature->runAction(tAction);//变红处理
+		}else if (pNumber == C_StopForEver)
+		{
+			CCAction* tAction = m_Armature->getActionByTag(C_ForEver);
+			if (tAction)
+				tAction->stop();
+		}else{
+			m_Armature->runAction(CCRepeat::create(CCSequence::create(
+				CCTintTo::create(0.25f,color3.r,color3.g,color3.b),CCTintTo::create(0,255,255,255),NULL),3));//变红处理
+		}
+	}
+
+	void AliveObject::VariantModel( bool pInVariant )
+	{
+		//武将身上放一个特效挂在对象，这个对象只存在于武将身上，只跟武将耦合，负责武将特效的播放
+		SpineData* tData = SpineManage->getSpineData("20001");
+		if (!tData)
+		{
+			CCLOG("[ *ERROR ]  AliveObject::VariantModel Spine Model=%d IS NULL",mModel); 
+			return;
+		}
+		SkeletonAnimation*  tAnimation = SkeletonAnimation::createWithData(tData->first);
+		CCAssert(tAnimation,"AliveObject::VariantModel Spine NULL");
+		if (pInVariant)
+		{
+			tAnimation->setAnimation(0,Stand_Action,true);				//爆特效	
+			tAnimation->eventListener = [this]( int trackIndex,spEvent* Event )
+			{
+				if (Event->intValue >= 200)			//音效从200号文件开始播放
+					PlaySound(Event->intValue);
+				else
+					mRole->VariantEnd(true);
+			};
+			tAnimation->completeListener = [tAnimation](int trackIndex, int loopCount)
+			{
+				tAnimation->removeFromParentAndCleanup(true);
+			};
+			this->addChild(tAnimation);
+		}else{
+			tAnimation->setAnimation(0,Stand_Action,true);				//爆特效	(变身回来的特效动作名称可能不同)
+			tAnimation->eventListener = [this]( int trackIndex,spEvent* Event )
+			{
+				if (Event->intValue >= 200)			//音效从200号文件开始播放
+					PlaySound(Event->intValue);
+				else
+					mRole->VariantEnd(false);
+			};
+			tAnimation->completeListener = [tAnimation](int trackIndex, int loopCount)
+			{
+				tAnimation->removeFromParentAndCleanup(true);
+			};
+			this->addChild(tAnimation);
+		}
 	}
 
 }

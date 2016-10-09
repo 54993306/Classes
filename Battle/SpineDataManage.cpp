@@ -7,9 +7,8 @@
 #include "Battle/BattleTools.h"
 #include "Battle/ParseFileData.h"
 #include "Battle/Config/ConfigManage.h"
-using namespace spine;
-using namespace cocos2d;
-using namespace std;
+#include "Battle/RoleConfigData.h"
+
 namespace BattleSpace
 {
 	SpineDataManage::SpineDataManage()
@@ -85,6 +84,9 @@ namespace BattleSpace
 	void SpineDataManage::AddRoleSpineID( int pRoleID )
 	{
 		mVecRole.push_back(pRoleID);
+		const RoleConfigData* tData = BattleConfig->getConfigData(pRoleID);				//加载变身模型
+		if (tData->getVariant())
+			mVecRole.push_back(tData->getVariantModel());
 	}
 
 	void SpineDataManage::AddTrapID( int pTrapID )

@@ -9,7 +9,7 @@
  *
  *		Author : Lin_Xiancheng
  *
- *		Description : 
+ *		Description : 负责管理游戏主循环
  *
  *
  *************************************************************/
@@ -24,11 +24,9 @@ namespace BattleSpace
 	class WarAssist;
 	class WarControl;
 	class StoryLayer;
-	class WarManager;
 	class BattleMapLayer;
 	class CombatEffect;
 	class BattleRoleLayer;
-	class CombatGuideManage;
 	class TotalStrategy;
 	class CombatLogic : public CCNode
 	{
@@ -58,6 +56,7 @@ namespace BattleSpace
 		void critComboEffect();
 		void beginStageFloorEffect();
 		void beginStoryEnd();
+		void layerMove(CCObject* ob);
 		void moveStoryEnd(CCObject* ob);
 		void rolePlyaSkill(CCObject* ob);
 	private:	
@@ -71,11 +70,9 @@ namespace BattleSpace
 		BufExp* mbufExp;
 		WarAssist* mAssist;
 		BattleScene* mBattleScene;
-		WarManager* mManage;
 		WarControl* mControlLayer;
 		BattleMapLayer* mMapLayer;
 		CombatEffect* mCombatEffect;
-		CombatGuideManage* mGuideManage;
 		TotalStrategy* mTotalStrategy;
 	};
 };

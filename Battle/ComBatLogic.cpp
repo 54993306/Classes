@@ -41,9 +41,9 @@ namespace BattleSpace
 	CombatLogic::CombatLogic()
 		:mTime(0),mAssist(nullptr),mTask(nullptr),mCombatEffect(nullptr),mFirstBatch(true)
 		,mMapLayer(nullptr),mControlLayer(nullptr),mBattleScene(nullptr),mInterval(0)
-		,mManage(nullptr),mTotalStrategy(nullptr),mGuideManage(nullptr)
+		,mTotalStrategy(nullptr),m_Record(true),m_RecordNum(0)
 		,mCritRole(nullptr),mRecvFinish(false),m_PlayerNum(0),mbufExp(nullptr)
-		,m_Record(true),m_RecordNum(0)
+		
 	{}
 
 	CombatLogic::~CombatLogic()
@@ -92,8 +92,6 @@ namespace BattleSpace
 		mCombatEffect->retain();
 		mTotalStrategy  = TotalStrategy::create();
 		mTotalStrategy->retain();
-		mManage = BattleManage;
-		mGuideManage = ManageCenter->getCombatGuideMg();
 		return true;
 	}
 
@@ -103,6 +101,7 @@ namespace BattleSpace
 		bNotification->addObserver(this,callfuncO_selector(CombatLogic::CritAtkEnd),B_CritEnd,nullptr);
 		bNotification->addObserver(this,callfuncO_selector(CombatLogic::BatterRecord),B_RecordContinuousSkill,nullptr);
 		bNotification->addObserver(this,callfuncO_selector(CombatLogic::rolePlyaSkill),B_RoleSkill,nullptr);
+		bNotification->addObserver(this,callfuncO_selector(CombatLogic::layerMove),B_EntranceBattle,nullptr);
 	}
 
 	void CombatLogic::initMapBackground()						//可以搬到maplayer
@@ -110,16 +109,16 @@ namespace BattleSpace
 		if (mMapLayer->getBackgroundManage())
 		{
 			mMapLayer->getBackgroundManage()->setMap(mMapLayer);
-			mMapLayer->getBackgroundManage()->initWithStage(mManage->getStageIndex());
+			mMapLayer->getBackgroundManage()->initWithStage(BattleManage->getStageIndex());
 		}
 		bNotification->postNotification(MsgUpBatchNumber);
 	}
 
 	void CombatLogic::showRound()
 	{
-		if (mTime >= 0.8f && mFirstBatch && !mGuideManage->IsGuide())
+		if (mTime >= 0.8f && mFirstBatch && !BattleGuide->IsGuide())
 		{
-			mManage->setLogicState(true);
+			BattleManage->setLogicState(true);
 			mFirstBatch = false;
 			bNotification->postNotification(MsgMonsterTips);
 		}
@@ -153,7 +152,7 @@ namespace BattleSpace
 		showRound();
 		updateTask();
 		mbufExp->ResetInterval(delta);
-		mManage->setCostSpeed(0);
+		BattleManage->setCostSpeed(0);
 		runLogic(delta);
 		mControlLayer->updateCostNumber();
 		
@@ -161,10 +160,10 @@ namespace BattleSpace
 
 	void CombatLogic::runLogic(float delta)
 	{
-		if ( !mManage->getLogicState() || 
-			mGuideManage->IsGuide())
+		if ( !BattleManage->getLogicState() || 
+			BattleGuide->IsGuide())
 			return;
-		mManage->updateAlive();							//更新武将信息
+		BattleManage->updateAlive();							//更新武将信息
 		ExcuteAI(delta);
 		mInterval += delta;
 		if ( !mCritRole )
@@ -176,7 +175,7 @@ namespace BattleSpace
 				BattleTrapManage->updateActivateTrap();
 				mControlLayer->updateCostSpeed(delta);
 			}
-			mManage->costUpdate(delta);
+			BattleManage->costUpdate(delta);
 			mTotalStrategy->excuteStrategy(delta);
 			BattleTrapManage->updateTrap(delta);
 		}
@@ -189,14 +188,14 @@ namespace BattleSpace
 			return;
 		if (BattleConfig->inAddCostArea(tRole->getGridIndex()) || tRole->getCaptain())
 		{
-			float tSpeed = mManage->getCostSpeed() + (tRole->getAddCost()* dt);
-			mManage->setCostSpeed(tSpeed);
+			float tSpeed = BattleManage->getCostSpeed() + (tRole->getAddCost()* dt);
+			BattleManage->setCostSpeed(tSpeed);
 		}
 	}
 	//每一帧都判断每个武将的信息                   
 	void CombatLogic::ExcuteAI(float pTime)
 	{
-		const RolesMap* tMapRole = mManage->getRolesMap();
+		const RolesMap* tMapRole = BattleManage->getRolesMap();
 		RolesMap::const_iterator iter = tMapRole->begin();
 		for (;iter != tMapRole->end(); iter++)
 		{
@@ -223,7 +222,7 @@ namespace BattleSpace
 		{
 			if (!BattleModelManage->isPvEBattle())
 			{
-				mManage->setLogicState(false);
+				BattleManage->setLogicState(false);
 				mCombatEffect->BatterSpine(m_RecordNum);
 			}
 			m_PlayerNum = 0; 
@@ -254,7 +253,7 @@ namespace BattleSpace
 			mCombatEffect->PlayerSkill(tRole);
 			if (!tRole->getEnemy())
 			{
-				mManage->setLogicState(false);
+				BattleManage->setLogicState(false);
 				mCritRole = tRole;
 			}
 			mMapLayer->DrawWarningEffect(tRole->mSkillArea);						//格子预警
@@ -264,7 +263,7 @@ namespace BattleSpace
 	}
 	void CombatLogic::beginStageFloorEffect()								//可以搬到maplayer
 	{
-		if (!mManage->getStageIndex())
+		if (!BattleManage->getStageIndex())
 		{
 			CCSize size  = CCDirector::sharedDirector()->getWinSize();
 			int grids[4] = {78,89,102,117};
@@ -280,6 +279,15 @@ namespace BattleSpace
 				ef->setZOrder(10);
 				mMapLayer->addChild(ef);
 			}
+		}
+	}
+
+	void CombatLogic::layerMove( CCObject* ob )
+	{
+		if (BattleModelManage->isPvEBattle())
+		{
+			CCMoveTo* mt = CCMoveTo::create(0.25f,ccp( BattleCoords->CoordsMin() , mBattleScene->getMoveLayer()->getPositionY()));
+			mBattleScene->getMoveLayer()->runAction(mt);
 		}
 	}
 
@@ -310,9 +318,9 @@ namespace BattleSpace
 		mBattleScene->AddEvent();																//场景移动动画结束，添加事件响应
 		scheduleUpdate();																		//开启游戏主循环
 		PlayBackgroundMusic(BGM_Battle,true);
-		mGuideManage->setCurrBatchGuide(nullptr);
-		if (mManage->getStageIndex() == 301)
-			mGuideManage->setCurrBatchGuide("CostGuide");
+		BattleGuide->setCurrBatchGuide(nullptr);
+		if (BattleManage->getStageIndex() == 301)
+			BattleGuide->setCurrBatchGuide("CostGuide");
 	}
 
 	void CombatLogic::StoryEndEvent(CCObject* ob)

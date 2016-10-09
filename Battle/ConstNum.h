@@ -28,7 +28,7 @@ const int		GRID_WIDTH			= 118;				//格子大小108*92
 const int		GRID_HEIGHT			= 105;
 const char		INVALID_GRID		= 0;
 
-
+const int		C_DefaultModel		= -1;				//转化为原模型(武将变身)
 //武将相关
 const int		C_BatchMonst		= 2000;				//伏兵ID
 const int		C_CallHero			= 4000;				//我方英雄召唤武将
@@ -42,4 +42,7 @@ const int		C_PVPMINGRID		= 64;
 const int		C_PVEOtherArea		= 83;
 
 const int		C_TrapSpace			= 1;				//地形1S触发一次效果
+
+const int		C_ForEver			= 10000;
+const int		C_StopForEver		= 10001;
 #endif

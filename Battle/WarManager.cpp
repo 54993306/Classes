@@ -28,6 +28,7 @@
 #include "Battle/MonsterData.h"
 #include "Battle/HeroData.h"
 #include "Battle/skEffectData.h"
+#include "Battle/Config/ConfigManage.h"
 
 namespace BattleSpace
 {
@@ -94,6 +95,7 @@ namespace BattleSpace
 			}
 		}
 		pRole->retain();
+		BattleConfig->initRoleConfigData(pRole);
 		mBattleRole[pRole->getAliveID()] = pRole;
 	}
 

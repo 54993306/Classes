@@ -4,14 +4,13 @@
 #include "Battle/ConstNum.h"
 #include "Battle/BattleTools.h"
 #include "Battle/WarManager.h"
-namespace BattleSpace{
-	GuardArea::GuardArea(WarManager* pManage)
-		:mManage(pManage)
-	{}
+namespace BattleSpace
+{
+	GuardArea::GuardArea(){}
 
-	GuardArea* GuardArea::create( WarManager* pManage )
+	GuardArea* GuardArea::create()
 	{
-		GuardArea* tGuardArea = new GuardArea(pManage);
+		GuardArea* tGuardArea = new GuardArea();
 		if (tGuardArea)
 		{
 			tGuardArea->autorelease();

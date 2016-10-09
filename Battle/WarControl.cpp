@@ -578,7 +578,7 @@ namespace BattleSpace
 		if (index < 5)																				//guide chapter call number is infinite
 			button->setPosition(ccpAdd(button->getPosition(),ccp(-3.7f,0)));
 	}
-	//初始化武将头像和进度条
+	//初始化武将头像和进度条	
 	void WarControl::initAliveButtonBar( CCNode* Layout , int model )
 	{
 		char ptr[60] = {0};
@@ -1089,6 +1089,8 @@ namespace BattleSpace
 	{
 		m_ControLayer->findWidgetById("layer_up_boss")->setVisible(false);
 		m_ControLayer->findWidgetById("layer_up_normal")->setVisible(false);
+		m_ControLayer->findWidgetById("layer_time")->setVisible(false);
+		m_ControLayer->findWidgetById("layer_up_pvp")->setVisible(false);
 		m_ControLayer->getChildByTag(CL_Menu)->setVisible(false);
 		m_ControLayer->getChildByTag(CL_AddSpeedBtn)->setVisible(false);
 		m_ControLayer->getChildByTag(CL_AutoPlay)->setVisible(false);

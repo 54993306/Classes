@@ -26,12 +26,12 @@ using namespace std;
 #define BattleAreaManage BattleSpace::BattleCenter::shareManageCenter()->getAreaManage()
 #define BattleConfig BattleSpace::BattleCenter::shareManageCenter()->getConfigManage()
 #define BattleModelManage BattleSpace::BattleCenter::shareManageCenter()->getBattleModel()
+#define BattleGuide BattleSpace::BattleCenter::shareManageCenter()->getCombatGuideMg()
 
 namespace BattleSpace
 {
 	class WarManager;
 	class CoordsManage;
-	class RoleConfig;
 	class TrapManage;
 	class CombatGuideManage;
 	class SpineDataManage;
@@ -42,17 +42,15 @@ namespace BattleSpace
 	{
 	public:
 		void clearBattleData();
-		CoordsManage* getCoordsManage();					//1 没有定义宏
+		CoordsManage* getCoordsManage();
 		WarManager* getWarManage();
 		TrapManage* getTrapManage();
-		RoleConfig* getRoleConfig();					//2属于配置的部分
 		CombatGuideManage* getCombatGuideMg();				//3
 		SpineDataManage* getSpineManage();
 		ConfigManage* getConfigManage();
 		AreaManage* getAreaManage();
 		BattleModel* getBattleModel();
 	protected:
-		RoleConfig *mRoleConfigData;
 		WarManager *mWarManage;
 		CoordsManage *mMapManage;
 		TrapManage *mTrapManage;

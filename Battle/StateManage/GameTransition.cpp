@@ -50,11 +50,13 @@ namespace BattleSpace{
 		//5、攻击
 		StateVector Attck;
 		Attck.push_back(sStateCode::eStandState);
+		Attck.push_back(sStateCode::eWalkState);
 		Attck.push_back(sStateCode::eDizzyState);
 		Attck.push_back(sStateCode::eDeathState);
 		//6、特殊攻击
 		StateVector specialAttack;
 		specialAttack.push_back(sStateCode::eStandState);
+		specialAttack.push_back(sStateCode::eWalkState);
 		specialAttack.push_back(sStateCode::eDizzyState);
 		specialAttack.push_back(sStateCode::eDeathState);
 		//7、主动技能

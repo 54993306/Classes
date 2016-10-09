@@ -29,6 +29,7 @@ namespace BattleSpace
 	class EffectObject;
 	class BaseRole;
 	class MoveObject;
+	class RageObject;
 	enum AliveDirection
 	{
 		Ditection_Left,		//左
@@ -54,6 +55,9 @@ namespace BattleSpace
 		void showThis();
 		void countOffs(CCPoint pMapPoint);
 		void monsterSoleSprite();
+		void setRangePercent(float pPercent);
+		void colorBlink(int pNumber,const ccColor3B& color3);
+		void VariantModel(bool pInVariant);
 	public:
 		CC_SYNTHESIZE(BaseRole*,mRole,BaseRole);							//设置逻辑对象
 		CC_SYNTHESIZE(MoveObject*,mMoveObj,MoveObject);						//设置移动对象
@@ -71,6 +75,7 @@ namespace BattleSpace
 		CC_PROPERTY(CCSprite*,m_Body,Body);									//显示搭载
 		CC_PROPERTY(int,m_Direction,RoleDirection);							//武将方向
 		CC_PROPERTY(HPObject*,m_HpObject,Hp);								//血量对象
+		CC_PROPERTY(RageObject*,mRageObject,Rage);							//怒气值对象(武将创建出来时就确定)
 		CC_SYNTHESIZE(CCPoint,m_offs,offs);									//实际位置相对于
 		CC_SYNTHESIZE(sStateCode,m_MoveState,MoveState);					//刷新位置执行的动作
 		CC_SYNTHESIZE(CCPoint,m_Speed,Speed);								//移动速度

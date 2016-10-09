@@ -4,7 +4,7 @@
 #include "Battle/BattleCenter.h"
 #include "Battle/BaseRole.h"
 #include "Battle/BaseRoleData.h"
-#include "Battle/TrapData.h"				//耦合了数据结构的对象,寻找是否有其他方法可以解耦
+#include "Battle/TrapData.h"				//这样的耦合是最合适的
 #include "Battle/Landform/BattleTrap.h"
 
 namespace BattleSpace

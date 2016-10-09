@@ -20,7 +20,6 @@ namespace BattleSpace
 			CC_SAFE_RELEASE(tPair.second);
 		}
 		mCoordsMap.clear();
-		CC_SAFE_RELEASE(mCurrCoords);
 		mCurrCoords = nullptr;
 	}
 
@@ -80,13 +79,13 @@ namespace BattleSpace
 	float CoordsManage::CoordsMax() const
 	{
 		CCSize size = CCDirector::sharedDirector()->getWinSize();
-		return size.width / 2 + abs(size.width / 2 - mCurrCoords->getCoordsWidth() / 2);
+		return size.width / 2 + fabs(size.width / 2 - mCurrCoords->getCoordsWidth() / 2);
 	}
 
 	float CoordsManage::CoordsMin() const
 	{
 		CCSize size = CCDirector::sharedDirector()->getWinSize();
-		return size.width / 2 - abs(( size.width - mCurrCoords->getCoordsWidth() ) / 2);
+		return size.width / 2 - fabs(( size.width - mCurrCoords->getCoordsWidth() ) / 2);
 	}
 
 	int CoordsManage::getCoordsRow() const

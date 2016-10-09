@@ -82,7 +82,7 @@ namespace BattleSpace{
 		return mCaptainSkill;
 	}
 
-	bool BaseRoleData::isAttribute( sRoleNature pType )
+	bool BaseRoleData::isProperty( sRoleNature pType )
 	{
 		if (pType == getProperty())
 			return true;

@@ -24,6 +24,8 @@ namespace BattleSpace
 	class BuffConfig;
 	class EffectInfo;
 	class StoryData;
+	class RoleConfig;
+	class RoleConfigData;
 	class ArmatureEventDataMgr;
 	
 	class ConfigManage : public CCObject
@@ -52,12 +54,14 @@ namespace BattleSpace
 		const EffectData* getEffData() const;
 		const BuffConfig* getBuffData() const;
 		const StoryData* getStoryData() const;
-		const ArmatureEventDataMgr* getArmatureDataMgr() const;
 		const EffectInfo* getEffectInfo(int pInfoID) const;
+		const RoleConfigData* getConfigData(int pModel) const;
+		const ArmatureEventDataMgr* getArmatureDataMgr() const;
 	public:
 		void initObstacle(vector<int>& pVector);
 	public:
 		void initRoleSkillInfo(int pEffectID,BaseRole* pRole);
+		void initRoleConfigData(BaseRole* pRole);
 	private:
 		vector<int> mEnterArea;									//武将创建时的召唤区域
 		vector<int>	mOtherEnter;								//对方阵营武将进入战场区域
@@ -69,6 +73,7 @@ namespace BattleSpace
 		EffectData* mEffectData;
 		BuffConfig* mBuffData;
 		StoryData* mStoryData;
+		RoleConfig* mRoleConfig;
 		ArmatureEventDataMgr* mModelEventData;
 	};
 };

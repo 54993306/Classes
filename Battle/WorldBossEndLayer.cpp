@@ -21,6 +21,11 @@
 #include "mainCity/CNewHero.h"
 #include "common/CCMixLabelAction.h"
 #include "sdk/FaceBookSDK.h"
+#include "tollgate/TollgatePreview.h"
+#include "Battle/BattleScene/BattleScene.h"
+#include "Battle/ComBatLogic.h"
+#include "SDK/GameEventMonitor.h"
+
 
 WorldBossEndLayer::WorldBossEndLayer():m_rank(0)
 {
@@ -98,6 +103,23 @@ void WorldBossEndLayer::processBattleFinish(int type, google::protobuf::Message 
 	this->setVisible(true);
 
 	BossFinishRes *res = (BossFinishRes*)msg;
+
+	//正常关卡结束事件
+	{
+		//名称
+		int stage = BattleManage->getStageIndex(); 
+		//难度
+		int iLevel = CTollgatePreview::m_iSavedStar;
+		//时间
+		int iTime = 999;
+		BattleScene* pWarScene = dynamic_cast<BattleScene* >(CSceneManager::sharedSceneManager()->getCurrScene());
+		if (pWarScene)
+		{
+			iTime = pWarScene->getCombatLogic()->getTime();
+		}
+		//状态
+		GameEventMonitor::getInstance()->onLevelComplete("worldBoss", "0", iTime, 1);
+	}
 
 	float fDelayTime = 1.0;
 	

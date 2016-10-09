@@ -215,7 +215,7 @@ namespace BattleSpace
 			}break;
 		case sAttribute::RenewRate:		
 			{ 
-				alive->setRenew(alive->getBaseData()->getRoleRegain()*rate*0.01f);
+				alive->setRegain(alive->getBaseData()->getRoleRegain()*rate*0.01f);
 				return true;	
 			}break;
 		case sAttribute::DogeRate:		
@@ -395,7 +395,7 @@ namespace BattleSpace
 			}break;
 		case sAttribute::RenewRate:
 			{
-				pAlive->setRenew(pAlive->getRenew()+(pAlive->getBaseData()->getRoleRegain() * (pEffect->getImpactRate()*0.01f-1)));
+				pAlive->setRegain(pAlive->getRegain()+(pAlive->getBaseData()->getRoleRegain() * (pEffect->getImpactRate()*0.01f-1)));
 			}break;
 		case sAttribute::DogeRate:
 			{

@@ -9,7 +9,6 @@
 #include "Battle/BaseRole.h"
 #include "Battle/RoleObject/RoleObject.h"
 #include "Battle/CombatTask.h"
-#include "Battle/RoleObject/RageObject.h"
 #include "Battle/BattleLayer/BattleMapLayer.h"
 #include "Battle/EffectObject.h"
 #include "Battle/BattleResult.h"
@@ -34,6 +33,7 @@
 #include "Battle/Config/ConfigManage.h"
 #include "model/DataCenter.h"
 #include "Battle/RoleObjectMacro.h"
+#include "Battle/Landform/AreaManage.h"
 
 namespace BattleSpace
 {
@@ -229,46 +229,54 @@ namespace BattleSpace
 	void CombatEffect::BattleEffect(CCObject* ob)
 	{
 		BattleResult* Result = (BattleResult*)ob;
-		BaseRole*alive = Result->getAlive();
-		RoleObject* aliveOb = alive->getRoleObject();
-		const skEffectData* efInfo = alive->getCurrEffect();									//状态性的数据	
+		BaseRole*tAtkRole = Result->getAlive();
+		RoleObject* tAtkRoleOb = tAtkRole->getRoleObject();
+		const skEffectData* efInfo = tAtkRole->getCurrEffect();									//状态性的数据	
 		const EffectInfo* effectinfo = BattleConfig->getEffectInfo(efInfo->getEffectID());	
 		if (Result->getusNum()&&Result->getusType()!=PlayHpType::nullType)
-			aliveOb->playerNum(Result->getusType(),Result->getusNum());						//攻击武将播放血量变化(吸血类效果有时应该差时而非同步播放)
-		for(vector<unsigned int>::iterator iter = Result->m_HitTargets.begin();iter!=Result->m_HitTargets.end();++iter)
+			tAtkRoleOb->playerNum(Result->getusType(),Result->getusNum());						//攻击武将播放血量变化(吸血类效果有时应该差时而非同步播放)
+		vector<unsigned int>::iterator iter = Result->m_HitTargets.begin();
+		for(;iter!=Result->m_HitTargets.end();++iter)
 		{
-			BaseRole* pAlive = Result->m_Alive_s[*iter];
-			RoleObject* pAliveOb = pAlive->getRoleObject();
-			if ( !pAlive|| !pAliveOb)continue;													
-			EffectObject* SkillEffect = EffectObject::create(ToString(effectinfo->getfoeEft()));									//受击目标播放受击特效
-			SkillEffect->setSkewing(true);
-			SkillEffect->setScale(1/pAliveOb->getScale());
-			pAliveOb->addChild(SkillEffect);
-			SkillEffect->setShaderEffect(aliveOb->getArmature()->getShaderProgram());
-			//       
-			EffectObject* FloorEffect = EffectObject::create(ToString(effectinfo->getFloorEf()));	//受击目标播放受击特效
-			CCPoint p = pAlive->getRoleObject()->getPosition();
-			CCPoint wp = m_Scene->getBattleRoleLayer()->convertToWorldSpace(p);
-			CCPoint mp = m_Scene->getBattleMapLayer()->convertToNodeSpace(wp);
-			FloorEffect->setSkewing(true);
-			FloorEffect->setPosition(mp);															//特效加在地板上,但是位置应和人物实际站位重合
-			m_Scene->getBattleMapLayer()->addChild(FloorEffect);	
-			FloorEffect->setShaderEffect(aliveOb->getArmature()->getShaderProgram());
-
+			BaseRole* tRole = Result->m_Alive_s[*iter];
+			RoleObject* tRoleOb = tRole->getRoleObject();
+			if ( !tRole|| !tRoleOb)continue;	
+			if (effectinfo->getfoeEft())
+			{
+				EffectObject* SkillEffect = EffectObject::create(ToString(effectinfo->getfoeEft()));									//受击目标播放受击特效
+				SkillEffect->setSkewing(true);
+				SkillEffect->setScale(1/tRoleOb->getScale());
+				tRoleOb->addChild(SkillEffect);
+				SkillEffect->setShaderEffect(tAtkRoleOb->getArmature()->getShaderProgram());
+			}
+			//   
+			if (effectinfo->getFloorEf())
+			{
+				EffectObject* FloorEffect = EffectObject::create(ToString(effectinfo->getFloorEf()));	//受击目标播放受击特效
+				CCPoint p = tRole->getRoleObject()->getPosition();
+				CCPoint wp = m_Scene->getBattleRoleLayer()->convertToWorldSpace(p);
+				CCPoint mp = m_Scene->getBattleMapLayer()->convertToNodeSpace(wp);
+				FloorEffect->setSkewing(true);
+				FloorEffect->setPosition(mp);															//特效加在地板上,但是位置应和人物实际站位重合
+				m_Scene->getBattleMapLayer()->addChild(FloorEffect);	
+				FloorEffect->setShaderEffect(tAtkRoleOb->getArmature()->getShaderProgram());
+			}
 			if (effectinfo->getisShake())															//震屏处理
 				NOTIFICATION->postNotification(B_Shark,nullptr);
 			if (Result->m_LostHp[*iter].hitNum < 0)													//播放受击动作
 			{
-				pAliveOb->TurnStateTo(sStateCode::eHitState); 
-				if (!alive->getOtherCamp())
+				tRoleOb->TurnStateTo(sStateCode::eHitState); 
+				if (!tAtkRole->getOtherCamp())
 					NOTIFICATION->postNotification(B_ContinuousNumber);			//刷新连击处理
 			}
-			pAliveOb->playerNum((PlayHpType)Result->m_LostHp[*iter].hitType,Result->m_LostHp[*iter].hitNum);	
+			tRoleOb->playerNum((PlayHpType)Result->m_LostHp[*iter].hitType,Result->m_LostHp[*iter].hitNum);	
 
-			if (Result->m_Repel[*iter] != pAlive->getGridIndex())
+			if (Result->m_Repel[*iter] != tRole->getGridIndex())
 			{
-				pAlive->setMoveGrid(Result->m_Repel[*iter]);
-				pAliveOb->setMoveState(sStateCode::eHitState);
+				tRole->setMoveGrid(Result->m_Repel[*iter]);
+				tRoleOb->setMoveState(sStateCode::eHitState);
+				if (tRole->getEnemy())
+					BattleAreaManage->initRoleMovePath(tRole,(C_GRID_COL-2)*C_GRID_ROW+tRole->getGridIndex()%C_GRID_ROW);
 			}
 		}
 	}
