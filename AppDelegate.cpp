@@ -30,7 +30,7 @@
 #include "scene/layer/GameTip.h"
 #include "Battle/BattleScene/LoadBattleResource.h"
 #include "GMessage.h"
-#include "CFileScaner.h"
+//#include "CFileScaner.h"
 #include "SDK/GooglePaySDK.h"
 #include "SDK/GamePlatformManager.h"
 #include "SDK/GameEventMonitor.h"

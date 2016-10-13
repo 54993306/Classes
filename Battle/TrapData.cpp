@@ -38,11 +38,11 @@ namespace BattleSpace
 		mTrapBuff->readData(&pTrap->buff());
 #if BATTLE_TEST
 		//地形还存在大块地形，一个地形占据还几个格子的情况
-		this->setDmage(10);
-		this->setTrapType(sTrapType::eBlood);
+		//this->setDmage(10);
+		//this->setTrapType(sTrapType::eBlood);
 		//if (this->getPosition() == 106)
 			//this->setPosition(107);
-		this->setTrapModel(10003);
+		//this->setTrapModel(10003);
 		//this->setRotatione(90);
 #endif
 	}

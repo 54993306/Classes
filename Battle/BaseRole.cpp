@@ -203,8 +203,8 @@ namespace BattleSpace
 #if BATTLE_TEST
 		if (getOtherCamp())
 		{
-			setMaxHp(1000000);
-			setHp(1000000);	
+			//setMaxHp(1000000);
+			//setHp(1000000);	
 		}else{
 			//if (getModel() == 119)
 			//{
@@ -810,6 +810,21 @@ namespace BattleSpace
 		return false;
 	}
 
+	int BaseRole::getEndGrid()
+	{
+		BattleAreaManage->initRoleObstacle(this);
+		//怪物是一格一格往前走的模式
+		int tLineGrid = (C_GRID_COL-2)*C_GRID_ROW+getGridIndex()%C_GRID_ROW;
+		for (auto tGrid : mObstacle)
+		{
+			if (tGrid == tLineGrid)
+			{
+
+			}
+		}
+		return tLineGrid;
+	}
+
 	bool BaseRole::MonstMoveExcute()
 	{
 #if BATTLE_TEST
@@ -819,7 +834,7 @@ namespace BattleSpace
 		if ( !getMove() )
 			return false;
 		if (mMoveGrids.empty())
-			BattleAreaManage->initRoleMovePath(this,(C_GRID_COL-2)*C_GRID_ROW+getGridIndex()%C_GRID_ROW);
+			BattleAreaManage->initRoleMovePath(this,this->getEndGrid());
 		if (!mMoveGrids.empty())
 		{
 			setMoveGrid(this->mMoveGrids.at(0));
@@ -1546,6 +1561,7 @@ namespace BattleSpace
 	void BaseRole::updateRage( float pRate )
 	{
 		mRoleObject->setRangePercent(pRate);
+		//增加一个对控制面板造成影响界面
 	}
 
 	void BaseRole::VariantBegin( bool pInVariant )

@@ -131,6 +131,7 @@ namespace BattleSpace
 		void VariantBegin(bool pInVariant);
 		void VariantEnd(bool pInVariant);
 		void colorBlink(int pNumber,const ccColor3B& color3);
+		int getEndGrid();
 		//封装一些得到服务器基础属性的方法,避免直接暴露服务器数据对象,导致耦合的层次不断的增加
 	public:
 		//public
