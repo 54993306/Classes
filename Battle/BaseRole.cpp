@@ -40,7 +40,7 @@ namespace BattleSpace
 		,m_CritTime(0),m_FatherID(0),m_Captain(false),m_CritEffect(false),mAliveState(true)
 		,m_TouchGrid(0),m_TouchState(false),mMoveObject(nullptr),mCallType(sCallType::eCommon),m_CallAliveNum(0)
 		,mDelaytime(0),mLogicState(sLogicState::eNormal),mMonsterSpecies(sMonsterSpecies::eCommon),mHurtCount(nullptr)
-		,m_AliveID(0),mBehavior(sBehavior::eNormal),mBaseData(nullptr),mLogicData(nullptr)
+		,m_AliveID(0),mBehavior(sBehavior::eNormal),mBaseData(nullptr),mLogicData(nullptr),mAngerVariant(nullptr)
 		,mCommandGrid(0),mRoleLayer(nullptr),mAutoState(false),mMaxGrid(INVALID_GRID),mHasTarget(false),mEnterTime(0)
 		,mSkillEffect(nullptr),mClearState(true),mVariant(nullptr),mInTouchState(false)
 	{}
@@ -819,7 +819,17 @@ namespace BattleSpace
 		{
 			if (tGrid == tLineGrid)
 			{
-
+				do{
+					int tLine = CCRANDOM_0_1()*4;	
+					bool tEndLine = true;
+					for (auto t2Grid : mObstacle)
+					{
+						if ((C_GRID_COL-2)*C_GRID_ROW+tLine == t2Grid)
+							tEndLine = false;
+					}
+					if (tEndLine)
+						return (C_GRID_COL-2)*C_GRID_ROW+tLine;
+				} while (true);
 			}
 		}
 		return tLineGrid;
@@ -1476,6 +1486,10 @@ namespace BattleSpace
 	{
 		if (this->getAliveState())
 		{
+			if (isVariant())
+			{
+				VariantEnd(false);
+			}
 			setAliveState(false);
 			setFirstInit(false);
 			mRoleObject->AliveDie();
@@ -1561,6 +1575,8 @@ namespace BattleSpace
 	void BaseRole::updateRage( float pRate )
 	{
 		mRoleObject->setRangePercent(pRate);
+		if (mAngerVariant)
+			mAngerVariant->setPercentage(pRate);
 		//增加一个对控制面板造成影响界面
 	}
 
@@ -1593,12 +1609,7 @@ namespace BattleSpace
 			}
 		}
 		bNotification->postNotification(B_ContinuousNumber);			//刷新连击处理
-		if (pInVariant)
-		{
-			mVariant->PropertyChange(pInVariant);
-		}else{
-			mVariant->PropertyChange(pInVariant);
-		}
+		mVariant->PropertyChange(pInVariant);
 	}
 
 	void BaseRole::colorBlink( int pNumber,const ccColor3B& color3 )
@@ -1636,5 +1647,10 @@ namespace BattleSpace
 	void BaseRole::clearDbuff()
 	{
 		getBuffManage()->clearDbuf();
+	}
+
+	bool BaseRole::isVariant()
+	{
+		return mVariant->isVariant();
 	}
 };

@@ -93,6 +93,8 @@ namespace BattleSpace{
 
 		void initAliveButtonBar(CCNode* Layout,int model);			//init role bar
 
+		void initRoleImage(CCObject* ob);
+
 		void initCaptinButtonBar(CCNode* Layout,BaseRole* pRole);
 
 		void initButtonBackImage(CButton* button,int index );		//reason call number init button back image
@@ -182,6 +184,7 @@ namespace BattleSpace{
 		CL_NeedCost,			//Cost值
 		CL_BtnCallEff,			//召唤状态
 		CL_BtnSkillEff,			//技能状态
+		CL_BtnVariantEff,		//变身状态技能效果
 		CL_TipsEffect1 = 200,	//进击特效
 		CL_TipsEffect2,
 		CL_TipsEffect3,

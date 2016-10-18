@@ -132,6 +132,7 @@ namespace BattleSpace
 		void VariantEnd(bool pInVariant);
 		void colorBlink(int pNumber,const ccColor3B& color3);
 		int getEndGrid();
+		bool isVariant();
 		//封装一些得到服务器基础属性的方法,避免直接暴露服务器数据对象,导致耦合的层次不断的增加
 	public:
 		//public
@@ -148,6 +149,7 @@ namespace BattleSpace
 		CC_SYNTHESIZE(MoveObject*,mMoveObject,MoveObject);				//设置移动对象
 		CC_SYNTHESIZE(RoleConfigData*,mConfigData,ConfigData);			//角色配置数据(模型改变时会改变)
 		CC_SYNTHESIZE(BattleRoleLayer*,mRoleLayer,RoleLayer);			//显示对象层
+		CC_SYNTHESIZE(CCProgressTimer*,mAngerVariant,AngerVariant);		//武将变身怒气值
 		CC_SYNTHESIZE(unsigned int,m_AliveID,AliveID);					//武将ID
 		PROPERTY_CONSTREAD(bool,m_NorAtk,NorAtk);						//普通攻击状态
 		CC_SYNTHESIZE(bool,m_SpecialAtk,SpeAtk);						//特殊攻击

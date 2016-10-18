@@ -81,6 +81,10 @@ namespace BattleSpace{
 	{
 		mRageObject = RageObject::create();
 		mRageObject->setPosition(ccp(0,-GRID_HEIGHT/2));
+		mRageObject->setVisible(false);
+#if BATTLE_TEST
+		mRageObject->setVisible(true);
+#endif
 		this->addChild(mRageObject);
 	}
 	RageObject* AliveObject::getRage(){return mRageObject;}

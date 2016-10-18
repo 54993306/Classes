@@ -39,6 +39,7 @@ namespace BattleSpace
 		void updateVariant(float dt);
 	public:
 		virtual void PropertyChange(bool pAddProperty);
+		virtual bool isVariant();
 	protected:
 		virtual bool variantJudge();
 		virtual void variantExcute();

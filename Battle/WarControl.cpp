@@ -39,6 +39,7 @@
 #include "Battle/BaseRoleData.h"
 #include "Battle/BattleDataCenter.h"
 #include "Battle/BattleLayer/BattleTips.h"
+#include "Battle/RoleConfigData.h"
 #include "model/DataCenter.h"
 
 namespace BattleSpace
@@ -67,6 +68,7 @@ namespace BattleSpace
 		bNotification->addObserver(this,callfuncO_selector(WarControl::showFlyCostToBar),MsgMonsterDie,nullptr);
 		bNotification->addObserver(this,callfuncO_selector(WarControl::hideUiUpPart),MsgHideControlUp,nullptr);
 		bNotification->addObserver(this,callfuncO_selector(WarControl::updateBatchNumber),MsgUpBatchNumber,nullptr);
+		bNotification->addObserver(this,callfuncO_selector(WarControl::initRoleImage),MsgRoleVariant,nullptr);
 	}
 
 	void WarControl::onExit()
@@ -545,6 +547,19 @@ namespace BattleSpace
 			btn->setVisible(false);
 		}
 
+		if (pRole->getConfigData()->getVariant())							//配置数据跟显示武将有关
+		{
+			CCSprite* tFrontImage = CCSprite::create("warScene/tiao.png");
+			CCProgressTimer* tProgress = CCProgressTimer::create(tFrontImage);
+			tProgress->setType(kCCProgressTimerTypeBar);		//条形进度条
+			tProgress->setBarChangeRate(ccp(0,1));				//变化方向为Y轴
+			tProgress->setMidpoint(ccp(0,0));					//中心点,越靠近中心点值越小
+			tProgress->setZOrder(1);
+			tProgress->setPosition(ccpAdd(btn->getPosition(),ccp(-40,-15)));
+			Layout->addChild(tProgress);
+			pRole->setAngerVariant(tProgress);
+		}
+
 		EffectObject* CallAliveEffect = EffectObject::create("10028",sPlayType::eRepeat);			//call role effect
 		CallAliveEffect->setTag(CL_BtnCallEff);
 		CallAliveEffect->setPosition(ccpAdd(btn->getPosition(),ccp(0,50)));
@@ -555,6 +570,12 @@ namespace BattleSpace
 		AliveSkillEffect->setEffAnchorPoint(0.5f,0.2f);
 		AliveSkillEffect->setPosition(btn->getPosition());
 		Layout->addChild(AliveSkillEffect, -1);
+
+		EffectObject* tVariantSkillEffect = EffectObject::create("10035",sPlayType::eRepeat);			//can use role skill effect
+		tVariantSkillEffect->setTag(CL_BtnVariantEff);
+		tVariantSkillEffect->setEffAnchorPoint(0.5f,0.2f);
+		tVariantSkillEffect->setPosition(ccpAdd(btn->getPosition(),ccp(0,20)));
+		Layout->addChild(tVariantSkillEffect, -1);
 
 		const skEffectData* effect = pRole->getBaseData()->getActiveSkill()->getSummonEffect();		//这个方法是应该放在武将身上的
 		if (!effect)
@@ -599,6 +620,23 @@ namespace BattleSpace
 		CdBar->setValue(100);
 		CdBar->setDirection(eProgressBarDirectionBottomToTop);
 		CdBar->setOnProgressEndedListener(this,ccw_progressended_selector(WarControl::AliveBarFullCallBack));
+	}
+	//武将变身时武将按钮背景发生变化
+	void WarControl::initRoleImage( CCObject* ob )
+	{
+		BaseRole* tRole = (BaseRole*)ob;
+		CCNode* MoveLaout = getMoveLayout(tRole->getUiLayout()-CL_BtnLayout1);
+		char ptr[60] = {0};
+		sprintf(ptr,"headIcon/NewIcon/%d.png",tRole->getModel());
+		CCSprite* sp = (CCSprite*)MoveLaout->getChildByTag(CL_HeroIcon);								//role head image
+		if (!sp->initWithFile(ptr))
+		{
+			CCLOG("[ *ERROR ] WarControl::initRoleImage Lost Img %s",ptr);
+			sprintf(ptr,"headIcon/NewIcon/146.png"); 
+			sp->initWithFile(ptr);
+		}
+		CProgressBar* CdBar = (CProgressBar*)MoveLaout->getChildByTag(CL_HeroPro);	//Bar都是增量变化的CD时间也做成增量的变化方式,满的情况bar消失。点击按钮后重现
+		CdBar->setProgressImage(ptr);
 	}
 
 	void WarControl::initCaptinButtonBar( CCNode* Layout,BaseRole* pRole )
@@ -718,6 +756,7 @@ namespace BattleSpace
 			BaseRole* tRole = (BaseRole*)btn->getUserObject();
 			if (!tRole)continue;
 			MoveLaout->getChildByTag(CL_BtnSkillEff)->setVisible(false);
+			MoveLaout->getChildByTag(CL_BtnVariantEff)->setVisible(false);
 			MoveLaout->getChildByTag(CL_BtnCallEff)->setVisible(false);	
 			if (guideStateButtonEffect(MoveLaout,false))									//in guide state effect dispose 
 				continue;
@@ -730,7 +769,12 @@ namespace BattleSpace
 					{
 						MoveLaout->getChildByTag(CL_BtnCallEff)->setVisible(true);				
 					}else if(skill->getSkillID() && skill->getSkillType() != eCallAtk){
-						MoveLaout->getChildByTag(CL_BtnSkillEff)->setVisible(true);
+						if (tRole->isVariant())		//变身状态
+						{
+							MoveLaout->getChildByTag(CL_BtnVariantEff)->setVisible(true);
+						}else{
+							MoveLaout->getChildByTag(CL_BtnSkillEff)->setVisible(true);
+						}
 					}	
 				}		
 			}else{			

@@ -17,6 +17,7 @@
 #include "Battle/RoleConfigData.h"
 #include "Battle/ConstNum.h"
 #include "Battle/BaseRoleData.h"
+#include "Battle/BattleMessage.h"
 
 namespace BattleSpace
 {
@@ -129,7 +130,7 @@ namespace BattleSpace
 			mBlinkState = false;
 		}
 			
-		if (mVariantState == eVariantState::eInVariant)
+		if (isVariant())
 		{
 			mRole->updateRage(100 - pRate);
 			return;
@@ -168,5 +169,13 @@ namespace BattleSpace
 			mRole->setCrit(mRole->getCrit() - mRole->getBaseData()->getRoleCrit()*mConfigData->getVariantRate());
 			mRole->setRegain(mRole->getRegain() - mRole->getBaseData()->getRoleRegain()*mConfigData->getVariantRate());
 		}
+		bNotification->postNotification(MsgRoleVariant,mRole);
+	}
+
+	bool RoleVariant::isVariant()
+	{
+		if (mVariantState == eVariantState::eInVariant)
+			return true;
+		return false;
 	}
 }

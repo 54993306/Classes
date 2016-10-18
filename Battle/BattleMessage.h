@@ -74,5 +74,6 @@ const char MsgUpBatchNumber[]				=	"MsgUpBatchNumber";				//刷新关卡批次
 const char MsgPlayWinEffect[]				=	"MsgPlayWinEffect";				//播放胜利特效
 const char MsgShowStageWarning[]			=	"MsgShowStageWarning";			//显示关卡警告
 const char MsgChangeLayerLight[]			=	"MsgChangeLayerLight";			//改变角色层亮度
+const char MsgRoleVariant[]					=	"MsgRoleVariant";				//角色变身
 
 #endif
