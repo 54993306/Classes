@@ -42,7 +42,6 @@ namespace BattleSpace
 		BaseRole();
 		GuardArea* mGuardArea;
 		SkillRange* mSkillRange;
-		HurtCount* mHurtCount;
 		skEffectData* mSkillEffect;			//空对象代替空指针防止程序崩溃
 		RoleVariant* mVariant;
 	public:
@@ -106,7 +105,6 @@ namespace BattleSpace
 		skEffectData* getCurrEffect();									//得到武将当前效果
 		RoleSkill* getCurrSkill();										//得到武将当前效果
 		bool NextEffect();												//判断第二个效果是否释放
-		int getSkillType();
 		bool captainCallNumberJudge();
 		bool hasAliveByTargets(BaseRole* pAlive);
 		void cloakingTarget();											//判断受击目标内是否全为隐身对象
@@ -117,7 +115,7 @@ namespace BattleSpace
 		void initAliveData();
 		void initAliveByFather(BaseRole*pFather);
 		void updateRole(float dt);
-		vector<BaseRole*>& getCurrSkillTargets();
+		vector<BaseRole*>& getCurrSkillTargets(int pCamp = 0);
 		void roleDie();
 		bool hasOtherRole(int pGrid);
 		void byOtherKill(BaseRole* pRole);
@@ -128,8 +126,8 @@ namespace BattleSpace
 		void clearDbuff();
 		void changeModel(int pModel,float pScale = 1);
 		void updateRage(float pRate);
-		void VariantBegin(bool pInVariant);
-		void VariantEnd(bool pInVariant);
+		void VariantBegin();
+		void VariantEnd();
 		void colorBlink(int pNumber,const ccColor3B& color3);
 		int getEndGrid();
 		bool isVariant();

@@ -69,6 +69,8 @@ namespace BattleSpace
 		bNotification->addObserver(this,callfuncO_selector(WarControl::hideUiUpPart),MsgHideControlUp,nullptr);
 		bNotification->addObserver(this,callfuncO_selector(WarControl::updateBatchNumber),MsgUpBatchNumber,nullptr);
 		bNotification->addObserver(this,callfuncO_selector(WarControl::initRoleImage),MsgRoleVariant,nullptr);
+		bNotification->addObserver(this,callfuncO_selector(WarControl::UpdateBossHp),MsgUpdateBossHp,nullptr);
+		bNotification->addObserver(this,callfuncO_selector(WarControl::initBossBar),MsgInitBossBar,nullptr);
 	}
 
 	void WarControl::onExit()
@@ -316,7 +318,6 @@ namespace BattleSpace
 		BaseRole* boss = mManage->getAliveByType(sMonsterSpecies::eWorldBoss);
 		if (boss)
 		{
-			
 			m_ControLayer->findWidgetById("layer_up_boss")->setVisible(true);
 			m_ControLayer->findWidgetById("layer_up_normal")->setVisible(false);
 			m_ControLayer->findWidgetById("layer_up_pvp")->setVisible(false);
@@ -427,8 +428,6 @@ namespace BattleSpace
 		if(CCFileUtils::sharedFileUtils()->isFileExist(strFullPath))
 			pHead->setTexture(CCTextureCache::sharedTextureCache()->addImage(pStr->getCString()));
 
-		m_pBossBar1 = (CProgressBar*)m_ControLayer->findWidgetById("bar1");
-		m_pBossBar2 = (CProgressBar*)m_ControLayer->findWidgetById("bar2");
 		updateWorldBossBloodBar(CCInteger::create(boss->getHp()));
 
 		CLabel* pBuffRank = (CLabel*)m_ControLayer->findWidgetById("boss_fire_level");					//BUFF层次
@@ -446,7 +445,8 @@ namespace BattleSpace
 	void WarControl::updateWorldBossBloodBar( CCObject* ob )
 	{
 		updateWorldBossDamage();
-
+		m_pBossBar1 = (CProgressBar*)m_ControLayer->findWidgetById("bar1");
+		m_pBossBar2 = (CProgressBar*)m_ControLayer->findWidgetById("bar2");
 		int iValue = ((CCInteger*)ob)->getValue();					
 		iValue = iValue<0?0:iValue;									//保证大于等于0
 		int iOneBarMax = 10000;										//一管血10000	
@@ -768,7 +768,7 @@ namespace BattleSpace
 					if (tRole->canSummonAlive())
 					{
 						MoveLaout->getChildByTag(CL_BtnCallEff)->setVisible(true);				
-					}else if(skill->getSkillID() && skill->getSkillType() != eCallAtk){
+					}else if(skill->getSkillID() && skill->getSkillType() != sSkillType::eCallAtk){
 						if (tRole->isVariant())		//变身状态
 						{
 							MoveLaout->getChildByTag(CL_BtnVariantEff)->setVisible(true);
@@ -882,7 +882,7 @@ namespace BattleSpace
 		if (tRole->getBattle())
 		{
 			RoleSkill* skill = tRole->getBaseData()->getActiveSkill();		//我方目前只有主动技为召唤技
-			if (skill->getSkillType() == eCallAtk&&cost >= skill->getExpendCost())
+			if (skill->getSkillType() == sSkillType::eCallAtk&&cost >= skill->getExpendCost())
 			{
 				BaseRole* atRole = tRole->getCallRole(skill);
 				if (!atRole)
@@ -911,7 +911,7 @@ namespace BattleSpace
 		CButton* btn = (CButton*)ob;	
 		BaseRole* tRole = dynamic_cast<BaseRole*>(btn->getUserObject());			//根据点击的按钮来判断点了哪个人
 		const RoleSkill* skill = tRole->getBaseData()->getActiveSkill();
-		if (  skill->getSkillType() == eCallAtk
+		if (  skill->getSkillType() == sSkillType::eCallAtk
 			||mManage->getCurrCost()<skill->getExpendCost() 
 			||!tRole->getBattle() 
 			||!tRole->getRoleObject()
@@ -1250,4 +1250,31 @@ namespace BattleSpace
 		}
 	}
 
+	void WarControl::UpdateBossHp( CCObject* ob )
+	{
+		BaseRole* tRole = (BaseRole*)ob;
+		m_pBossBar1->setValue(tRole->getHp());
+	}
+
+	void WarControl::initBossBar( CCObject* ob )
+	{
+		BaseRole* tRole = (BaseRole*)ob;
+		CCNode* tBar = m_ControLayer->findWidgetById("layer_up_boss");
+		tBar->setVisible(true);
+		tBar->setPosition(ccpAdd(tBar->getPosition(),ccp(-70,10)));
+		m_ControLayer->findWidgetById("layer_up_normal")->setVisible(false);
+		m_ControLayer->findWidgetById("layer_up_pvp")->setVisible(false);
+		m_ControLayer->findWidgetById("layer_time")->setVisible(false);
+
+		CImageView* pHead = (CImageView*)m_ControLayer->findWidgetById("boss_head");					//BOSS头像
+		CCString* pStr = CCString::createWithFormat("headImg/%d.png", tRole->getModel());
+		std::string strFullPath = CCFileUtils::sharedFileUtils()->fullPathForFilename(pStr->getCString());
+		if(CCFileUtils::sharedFileUtils()->isFileExist(strFullPath))
+			pHead->setTexture(CCTextureCache::sharedTextureCache()->addImage(pStr->getCString()));
+
+		m_pBossBar1 = (CProgressBar*)m_ControLayer->findWidgetById("bar1");
+		m_pBossBar1->setProgressImage("warScene/boss_bar_1.png");
+		m_pBossBar1->setMaxValue(tRole->getMaxHp());
+		m_pBossBar1->setValue(tRole->getHp());
+	}
 };

@@ -2,10 +2,11 @@
 #include "Battle/RoleSkill.h"
 #include "Battle/skEffectData.h"
 #include <protos/common/skill_common.pb.h>
-namespace BattleSpace{
-	RoleSkill::RoleSkill()
-		:mSkillID(0),mSkillType(0),mUserRatio(0),mExpendCost(0),mCooldown(0)
-		,mSkillLevel(0),mMoveRole(false),mTargetType(0),mAffectRatio(0),mAffectType(0)
+namespace BattleSpace
+{
+	RoleSkill::RoleSkill():mSkillID(0),mSkillType(sSkillType::eNullType),
+	mUserRatio(0),mExpendCost(0),mCooldown(0),mSkillLevel(0),mMoveRole(false),
+	mTargetType(0),mAffectRatio(0),mAffectType(0)
 	{}
 
 	RoleSkill::~RoleSkill()
@@ -43,7 +44,7 @@ namespace BattleSpace{
 	void RoleSkill::readData(const protos::common::Skill* pSkillData)
 	{
 		this->setSkillID(pSkillData->skillid());
-		this->setSkillType(pSkillData->type());
+		this->setSkillType((sSkillType)pSkillData->type());
 		this->setUserRatio(pSkillData->userate());
 		this->setExpendCost(abs(pSkillData->cost()));
 		this->setCooldown(pSkillData->colddown());
@@ -59,6 +60,11 @@ namespace BattleSpace{
 	{
 		std::vector<skEffectData*>	tFirstList;		//技能的效果列表1
 		std::vector<skEffectData*>	tSecondList;	//技能的效果列表2
+		enum E_EffectGroup
+		{
+			eFristGroup		=1,
+			eSecondGroup	=2,
+		};
 		for (int i=0;i<pSkillData->effect_size();i++)
 		{
 			skEffectData* tEffectData = skEffectData::create();
@@ -123,7 +129,7 @@ namespace BattleSpace{
 
 	skEffectData* RoleSkill::getSummonEffect() const
 	{
-		if (getSkillType() == eCallAtk)
+		if (getSkillType() == sSkillType::eCallAtk)
 			if (mEffectList.size())
 				if (mEffectList.at(0).size())
 					return mEffectList.at(0).at(0);

@@ -113,6 +113,10 @@ namespace BattleSpace{
 
 		void postButtonState(CCObject* ob);
 
+		void initBossBar(CCObject* ob);
+
+		void UpdateBossHp(CCObject* ob);
+
 		void changeSpeed();
 
 		void upAutoSkillState(float dt);

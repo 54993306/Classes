@@ -75,5 +75,8 @@ const char MsgPlayWinEffect[]				=	"MsgPlayWinEffect";				//播放胜利特效
 const char MsgShowStageWarning[]			=	"MsgShowStageWarning";			//显示关卡警告
 const char MsgChangeLayerLight[]			=	"MsgChangeLayerLight";			//改变角色层亮度
 const char MsgRoleVariant[]					=	"MsgRoleVariant";				//角色变身
-
+const char MsgCreateSpineFloor[]			=	"MsgCreateSpineFloor";			//创建spine地板特效
+const char MsgDelayAttack[]					=	"MsgDelayAttack";				//延迟攻击效果
+const char MsgInitBossBar[]					=	"MsgInitBossBar";				//初始化boss的显示条
+const char MsgUpdateBossHp[]				=	"MsgUpdateBossHp";				//刷新boss血量值
 #endif

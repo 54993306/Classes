@@ -45,11 +45,12 @@
 #include "Battle/BattleModel.h"
 #include "Battle/PvpEndLayer.h"
 #include "model/DataCenter.h"
+#include "Battle/SpineFloor/SpineFloorLayer.h"
 
 namespace BattleSpace
 {
 	BattleScene::BattleScene()
-	:m_MapLayer(nullptr),m_AliveLayer(nullptr),m_StoryLayer(nullptr)
+	:m_MapLayer(nullptr),m_AliveLayer(nullptr),m_StoryLayer(nullptr),mSpineEffectLayer(nullptr)
 	,m_MoveLayer(nullptr),m_UILayer(nullptr),_dropItem(nullptr),mMoveState(true)
 	,m_Loginc(nullptr),m_Touch(nullptr),mBackLayer(nullptr),mBattleClose(nullptr)
 	{}
@@ -91,6 +92,9 @@ namespace BattleSpace
 
 		mTrapLayer = TrapLayer::create();
 		m_MoveLayer->addChild(mTrapLayer);
+
+		mSpineEffectLayer = SpineFloorLayer::create();
+		m_MoveLayer->addChild(mSpineEffectLayer);
 
 		m_AliveLayer = BattleRoleLayer::create();
 		m_MoveLayer->addChild(m_AliveLayer);

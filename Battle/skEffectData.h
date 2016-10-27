@@ -22,7 +22,8 @@ namespace protos{
 	}
 }
 #include "cocos2d.h"
-namespace BattleSpace{
+namespace BattleSpace
+{
 	enum struct sAttribute
 	{
 		eNull						= 0,
@@ -41,7 +42,7 @@ namespace BattleSpace{
 		CritRate					= 13,//暴擊=13
 		HpMaxRate					= 14,//血量上限=14*
 	};
-	enum eEffectCountType
+	enum struct eEffectCountType
 	{
 		eNull						= 0,
 		eSuckblood					= 1,//吸血类效果
@@ -49,6 +50,12 @@ namespace BattleSpace{
 		eRateBlood					= 3,//扣血百分比型吸血效果
 		eNumberBoold				= 4,//扣数值型吸血效果
 		eCurrBooldRate				= 5,//扣当前血量百分比
+	};
+	enum E_TargetType
+	{
+		eUsType	= 1,			//我方目标
+		eEnemyType,				//敌方目标
+		eAllType,				//双方目标
 	};
 	class BaseRole;
 	class BuffData;
@@ -90,13 +97,6 @@ namespace BattleSpace{
 		void addBuffData(const protos::common::Buff* pBuffData);
 		std::vector<BuffData*> mBuffVector;
 		AffectArea* mAffectArea;
-	};
-
-	enum E_TargetType
-	{
-		eUsType	= 1,			//我方目标
-		eEnemyType,				//敌方目标
-		eAllType,				//双方目标
 	};
 	bool EffectSort(const skEffectData* Effect1,const skEffectData* Effect2);//{return Effect1.pos>Effect2.pos;}
 };

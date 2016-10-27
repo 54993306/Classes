@@ -82,7 +82,7 @@ namespace BattleSpace
 		initSkinByEnemy();
 		this->setHpNumberMax(m_Alive->getMaxHp());
 		this->setHpNumber(m_Alive->getHp());
-		this->setVisible(false);
+		showHp(nullptr);
 	}
 
 	void HPObject::setHpNumber(float hp)
@@ -250,7 +250,8 @@ namespace BattleSpace
 
 	void HPObject::hideHp( float dt )
 	{
-		this->setVisible(false);
+		if (!m_Alive->getCaptain())
+			this->setVisible(false);
 	}
 
 	int HPObject::maxMoveDistance( CCNode* pLabel )

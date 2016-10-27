@@ -23,20 +23,18 @@ namespace protos{
 		class Effect;
 	}
 }
-namespace BattleSpace{
-	enum E_EFFECTGROUP
+//技能类型(1 普通攻击，2 特殊攻击，3 必杀技，4 召唤技，5 队长技)
+namespace BattleSpace
+{
+	enum struct sSkillType
 	{
-		eFristGroup		=1,
-		eSecondGroup	=2,
-	};
-	//技能类型(1 普通攻击，2 特殊攻击，3 必杀技，4 召唤技，5 队长技)
-	enum E_SKILLTYPE
-	{
-		eNorAtk		=1,
-		eSpeAtk		=2,
-		eCriAtk		=3,
-		eCallAtk	=4,
-		eCapAtk		=5, 
+		eNullType			=0,
+		eNorAtk				=1,//普通攻击
+		eSpeAtk				=2,//特殊攻击
+		eCriAtk				=3,//必杀技
+		eCallAtk			=4,//召唤技
+		eCapAtk				=5,//队长技
+		eSpineEffect		=6,//spine召唤伤害效果技
 	};
 
 	class RoleSkill : public cocos2d::CCObject
@@ -45,7 +43,7 @@ namespace BattleSpace{
 		virtual ~RoleSkill();
 		static RoleSkill* create();
 		CC_SYNTHESIZE(int,mSkillID,SkillID);				//技能ID
-		CC_SYNTHESIZE(int,mSkillType,SkillType);			//技能类型( E_SKILLTYPE )
+		CC_SYNTHESIZE(sSkillType,mSkillType,SkillType);		//技能类型
 		CC_SYNTHESIZE(int,mUserRatio,UserRatio);			//成功施放概率(种族限制)
 		CC_SYNTHESIZE(int,mExpendCost,ExpendCost);			//释放技能所需的cost
 		CC_SYNTHESIZE(float,mCooldown,Cooldown);			//技能冷却时间

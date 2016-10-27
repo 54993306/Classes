@@ -4,7 +4,8 @@
 #include "Battle/WarManager.h"
 #include "common/CGameSound.h"
 #include "Battle/BattleMessage.h"
-namespace BattleSpace{
+namespace BattleSpace
+{
 	EffectObject::EffectObject()
 		:m_effect(nullptr),m_TotalTime(0),m_Playtime(0),m_Type(sPlayType::eOnce),m_Music(0)
 		,m_model(""),m_skewing(false),m_bIsNullEffect(false),m_Delaytime(0),m_LoopNum(1)

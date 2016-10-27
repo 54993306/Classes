@@ -20,7 +20,7 @@ namespace BattleSpace
 	RoleConfigData::RoleConfigData():m_ModeID(0),m_MoveSound(542),m_Turn(false),m_HitEffect(0)
 		,m_HitEffectX(0),m_HitEffectY(0),m_HitEffectScale(1),mVariant(false),mVariantCooldown(0)
 		,mVariantDuration(0),mVariantCooling(0),mVariantRate(0),mVariantEffect(0),mVariantModel(0)
-		,mVariantScale(1)
+		,mVariantScale(1),mHPPosition(0)
 	{}
 
 	CCNode* RoleConfigData::getActionEffect()

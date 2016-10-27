@@ -17,7 +17,8 @@
 
 #include <vector>
 #include "cocos2d.h"
-namespace BattleSpace{
+namespace BattleSpace
+{
 	class BaseRole;
 	class AreaCountInfo
 	{

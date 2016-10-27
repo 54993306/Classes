@@ -42,7 +42,7 @@ namespace BattleSpace
 		//this->setTrapType(sTrapType::eBlood);
 		//if (this->getPosition() == 106)
 			//this->setPosition(107);
-		//this->setTrapModel(10003);
+		//this->setTrapModel(10000);
 		//this->setRotatione(90);
 #endif
 	}

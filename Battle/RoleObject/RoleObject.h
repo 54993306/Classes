@@ -24,16 +24,6 @@ namespace BattleSpace
 	class SpecialEffectInfo;
 	class ArmatureEventData;
 
-	enum struct eActionEvent
-	{
-		eBeginEvevt					=0,//攻击开始
-		eHitEvent					=1,//攻击帧
-		eShark						=2,//震动
-		eMask						=3,//marsk
-		eAttackEventEnd				=4,//攻击动作结束
-		eScaleScene					=5,//场景缩放
-	};
-
 	class RoleObject : public AliveObject,public StateMachine
 	{
 	public:

@@ -28,12 +28,18 @@
 #include "Battle/RoleObjectMacro.h"
 namespace BattleSpace
 {
-	HurtCount::HurtCount():m_Manage(nullptr){}
-	HurtCount::~HurtCount(){}
-	bool HurtCount::init()
+	HurtCount::HurtCount():mSkillEffect(nullptr)
+	{}
+
+	BattleResult* HurtCount::SpineEffectAttack( BaseRole*pAtkRole,BaseRole*pHitRole,skEffectData* pSkillEffect )
 	{
-		m_Manage = BattleManage;
-		return true;
+		BattleResult* Result = BattleResult::create();
+		Result->setAlive(pAtkRole);
+		mSkillEffect = pSkillEffect;
+		HurtExcute(Result,pAtkRole,pHitRole);
+		EffectTypeExcute(Result);						//用于计算我方受伤信息
+		mSkillEffect = nullptr;
+		return Result;
 	}
 
 	// << 血量变化 >> 、 << 怒气值变化 >> 、<< 打击位移效果 >> 处理,目标为受击数组
@@ -42,12 +48,13 @@ namespace BattleSpace
 		BattleResult* Result = BattleResult::create();
 		Result->setAlive(pRole);
 		vector<BaseRole*>::iterator iter = pRole->mAreaTargets.begin();
+		mSkillEffect = pRole->getCurrEffect();
 		for (;iter != pRole->mAreaTargets.end();iter ++)
 		{
-			BaseRole* HitAlive = *iter;
-			HurtExcute(Result,pRole,HitAlive);
+			HurtExcute(Result,pRole,*iter);
 		}
-		EffectTypeExcute(Result);												//用于计算我方受伤信息
+		EffectTypeExcute(Result);						//用于计算我方受伤信息
+		mSkillEffect = nullptr;
 		return Result;
 	}
 	//多人打击的情况有返回值才能确定具体移动
@@ -57,16 +64,15 @@ namespace BattleSpace
 			|| HitAlive->getCallType() == sCallType::eNotAttack||HitAlive->getCaptain()
 			|| HitAlive->getMonsterSpecies() == sMonsterSpecies::eWorldBoss)//不可被击飞类型武将
 			return HitAlive->getGridIndex();
-		const skEffectData* effect = AtcAlive->getCurrEffect();
-		if (effect->getBatter() != AtcAlive->getSortieNum() || !effect->getRepel())
+		if (mSkillEffect->getBatter() != AtcAlive->getSortieNum() || !mSkillEffect->getRepel())
 			return HitAlive->getGridIndex();									//连击的最后一次才做击退
 		bool tEnemy = AtcAlive->getOtherCamp();
 		if (AtcAlive->getOpposite())
 			tEnemy = !tEnemy;
-		int grid = MoveRule::create()->FrontBack(HitAlive,effect->getRepel(),tEnemy);
+		int grid = MoveRule::create()->FrontBack(HitAlive,mSkillEffect->getRepel(),tEnemy);
 		if (grid != INVALID_GRID)
 		{
-			if (!m_Manage->getNormal())
+			if (!BattleManage->getNormal())
 			{
 				if (grid >= C_PVEStopGrid)
 					return grid;
@@ -83,9 +89,9 @@ namespace BattleSpace
 		unsigned int hitID = HitAlive->getAliveID();
 		Result->m_HitTargets.push_back(hitID);
 		Result->m_Alive_s[hitID] = HitAlive;
-		Result->m_LostHp[hitID] = hitNum(AtkAlive , HitAlive);			//伤害计算(血量、怒气值)
+		Result->m_LostHp[hitID] = hitNum(AtkAlive,HitAlive);	//伤害计算(血量、怒气值)
 		Result->m_CurrHp[hitID] = HitAlive->getHp();					//相对于传入伤害的血量
-		if (Result->m_LostHp[hitID].hitType != PlayHpType::typeface)				//不是显示字体类型就可以判断击退
+		if (Result->m_LostHp[hitID].hitType != PlayHpType::typeface)	//不是显示字体类型就可以判断击退
 			Result->m_Repel[hitID] = ChangeLocation(AtkAlive,HitAlive);	//击退效果(直接改变武将逻辑值)
 		else
 			Result->m_Repel[hitID] = HitAlive->getGridIndex();
@@ -94,8 +100,7 @@ namespace BattleSpace
 	STR_LostHp HurtCount::hitNum(BaseRole* AtcTarget , BaseRole* HitTarget)
 	{
 		STR_LostHp vec;
-		const skEffectData* effect = AtcTarget->getCurrEffect();
-		if (effect->getTargetType() == usTargetType)						//判断是攻击还是加血
+		if (mSkillEffect->getTargetType() == usTargetType)						//判断是攻击还是加血
 		{
 			vec = gainCount(AtcTarget,HitTarget);
 			addHittingAlive(AtcTarget,HitTarget);
@@ -131,9 +136,9 @@ namespace BattleSpace
 	{
 		if (pAlive->getMonsterSpecies() == sMonsterSpecies::eWorldBoss)							//世界boss受击
 		{
-			pHurt *= (1+m_Manage->getBossHurtPe()*0.01f);								//鼓舞效果
-			m_Manage->setBossHurtCount(pHurt);
-			m_Manage->setVerifyNum(pHurt);
+			pHurt *= (1+BattleManage->getBossHurtPe()*0.01f);								//鼓舞效果
+			BattleManage->setBossHurtCount(pHurt);
+			BattleManage->setVerifyNum(pHurt);
 		}
 	}
 	//对一个武将造成伤害计算
@@ -145,14 +150,13 @@ namespace BattleSpace
 		int crit_pe = critJudge(AtcTarget,HitTarget);										//暴伤修正百分比
 		hp.hitType = lostType(race_hurt,crit_pe);											//得到掉血类型
 		//普通伤害 =(攻击力*(1+百分比))^2/(攻击力*(1+百分比)+目标防御))*暴击伤害*属性伤害
-		const skEffectData* effect = AtcTarget->getCurrEffect();
-		float tAttackNum = pow(AtcTarget->getAtk()*(1+effect->getDamageRate()),2);
-		float tDefenseNum = AtcTarget->getAtk()*(1+effect->getDamageRate())+HitTarget->getDef();
+		float tAttackNum = pow(AtcTarget->getAtk()*(1+mSkillEffect->getDamageRate()),2);
+		float tDefenseNum = AtcTarget->getAtk()*(1+mSkillEffect->getDamageRate())+HitTarget->getDef();
 		float BaseHurt = tAttackNum / tDefenseNum;
-		float base_hurt_max = BaseHurt * (1 + effect->getHurtRatio());						//基础伤害max
-		float base_hurt_min = BaseHurt * (1 - effect->getHurtRatio());						//基础伤害min
+		float base_hurt_max = BaseHurt * (1 + mSkillEffect->getHurtRatio());						//基础伤害max
+		float base_hurt_min = BaseHurt * (1 - mSkillEffect->getHurtRatio());						//基础伤害min
 		BaseHurt = CCRANDOM_0_1()*(base_hurt_max-base_hurt_min) + base_hurt_min;			//浮动后的基础伤害
-		float TotlaHurt = BaseHurt * crit_pe * race_hurt + effect->getRealHurt();
+		float TotlaHurt = BaseHurt * crit_pe * race_hurt + mSkillEffect->getRealHurt();
 		woldBossHurt(HitTarget,TotlaHurt);
 		if (TotlaHurt <= 1)
 			TotlaHurt = 1;
@@ -165,9 +169,8 @@ namespace BattleSpace
 	{
 		STR_LostHp str;
 		float addNum = 0;	//加血只与加血方有关
-		const skEffectData* effect = AtcTarget->getCurrEffect();	
-		float erange = effect->getHurtRatio() * 0.01f;							//伤害浮动值
-		float hurt   = effect->getRealHurt();									//真实伤害
+		float erange = mSkillEffect->getHurtRatio() * 0.01f;							//伤害浮动值
+		float hurt   = mSkillEffect->getRealHurt();									//真实伤害
 		//注意百分比和正负值运算问题
 		float addhp = attributeHurt(AtcTarget);							//属性伤害的值
 		addhp += HitTarget->getRegain();
@@ -178,7 +181,7 @@ namespace BattleSpace
 		//属性影响类型*属性影响频率*浮动值+真实伤害
 		addNum = base_hp + hurt;
 		str.hitType = PlayHpType::gainType;											//加血只显示一种字体
-		str.hitNum = HitTarget->getRegain()*effect->getDamageRate();		
+		str.hitNum = HitTarget->getRegain()*mSkillEffect->getDamageRate();		
 		if (HitTarget->getCallType() != sCallType::eUNAddHP)				//不可被加血类型武将
 			HitTarget->setHp(HitTarget->getHp() + str.hitNum);			//血量实际变化的位置
 		return str;
@@ -231,38 +234,37 @@ namespace BattleSpace
 	void HurtCount::EffectTypeExcute( BattleResult*Result )
 	{
 		BaseRole *tRole = Result->getAlive();
-		const skEffectData* effect = tRole->getCurrEffect();
 		int tLostHp = abs(getAllTargetLostHp(Result));				//掉血的具体数字
-		switch (effect->getCountType())
+		switch (mSkillEffect->getCountType())
 		{
 		case eEffectCountType::eSuckblood:	//吸血型效果
 			{		
-				tRole->setHp(tRole->getHp() + effect->getImpactRate()*tLostHp*0.01f);
-				Result->setusNum(effect->getImpactRate()*tLostHp*0.01f);																
+				tRole->setHp(tRole->getHp() + mSkillEffect->getImpactRate()*tLostHp*0.01f);
+				Result->setusNum(mSkillEffect->getImpactRate()*tLostHp*0.01f);																
 				Result->setusType(PlayHpType::gainType);
 			}break;
 		case eEffectCountType::eBoom:			//自爆型效果
 			{
-				Result->setusNum(- effect->getImpactRate());											//爆炸中用于计算自身伤害的血量
+				Result->setusNum(- mSkillEffect->getImpactRate());											//爆炸中用于计算自身伤害的血量
 				Result->setusType(PlayHpType::generalType);
-				tRole->setHp(tRole->getHp() - effect->getImpactRate());
+				tRole->setHp(tRole->getHp() - mSkillEffect->getImpactRate());
 			}break;
 		case eEffectCountType::eRateBlood:	//扣自己最大血量百分比型吸血技能,可加减血互换
 			{
-				tRole->setHp(tRole->getHp() - effect->getImpactNumber()*0.01f*tRole->getMaxHp()+effect->getImpactRate()*tLostHp*0.01f);		
-				Result->setusNum(effect->getImpactRate()*tLostHp*0.01f- effect->getImpactNumber()*0.01f*tRole->getMaxHp());																
+				tRole->setHp(tRole->getHp() - mSkillEffect->getImpactNumber()*0.01f*tRole->getMaxHp()+mSkillEffect->getImpactRate()*tLostHp*0.01f);		
+				Result->setusNum(mSkillEffect->getImpactRate()*tLostHp*0.01f- mSkillEffect->getImpactNumber()*0.01f*tRole->getMaxHp());																
 				Result->setusType(PlayHpType::generalType);
 			}break;
 		case eEffectCountType::eNumberBoold:
 			{
-				tRole->setHp(tRole->getHp() - effect->getImpactNumber()+effect->getImpactRate()*tLostHp*0.01f);	//扣自己数值血量型吸血技能,可加减血互换
-				Result->setusNum(effect->getImpactRate()*tLostHp*0.01f-effect->getImpactNumber());																
+				tRole->setHp(tRole->getHp() - mSkillEffect->getImpactNumber()+mSkillEffect->getImpactRate()*tLostHp*0.01f);	//扣自己数值血量型吸血技能,可加减血互换
+				Result->setusNum(mSkillEffect->getImpactRate()*tLostHp*0.01f-mSkillEffect->getImpactNumber());																
 				Result->setusType(PlayHpType::generalType);
 			}break;
 		case eEffectCountType::eCurrBooldRate:
 			{
-				tRole->setHp(tRole->getHp() - effect->getImpactNumber()*0.01f*tRole->getHp());		
-				Result->setusNum(effect->getImpactRate()*tLostHp*0.01f-effect->getImpactNumber()*0.01f*tRole->getMaxHp());																
+				tRole->setHp(tRole->getHp() - mSkillEffect->getImpactNumber()*0.01f*tRole->getHp());		
+				Result->setusNum(mSkillEffect->getImpactRate()*tLostHp*0.01f-mSkillEffect->getImpactNumber()*0.01f*tRole->getMaxHp());																
 				Result->setusType(PlayHpType::generalType);
 			}break;
 		}
@@ -276,36 +278,34 @@ namespace BattleSpace
 			lostHp += pResult->m_LostHp[*iter].hitNum;
 		return lostHp;
 	}
-
+	//属性影响类型*属性影响频率
 	float HurtCount::attributeHurt(BaseRole* AtcTarget)
 	{
-		const skEffectData* effect = AtcTarget->getCurrEffect();
-		//属性影响类型*属性影响频率
-		switch (effect->getImpactType())
+		switch (mSkillEffect->getImpactType())
 		{
 		case sAttribute::eAttack:
 			{
-				return AtcTarget->getAtk() * effect->getImpactRate() *0.01f;
+				return AtcTarget->getAtk() * mSkillEffect->getImpactRate() *0.01f;
 			}break;
 		case sAttribute::eDefense:
 			{
-				return AtcTarget->getDef() * effect->getImpactRate()*0.01f;
+				return AtcTarget->getDef() * mSkillEffect->getImpactRate()*0.01f;
 			}break;
 		case sAttribute::eBlood:
 			{
-				return AtcTarget->getHp() * effect->getImpactRate()*0.01f;
+				return AtcTarget->getHp() * mSkillEffect->getImpactRate()*0.01f;
 			}break;
 		case sAttribute::eHit:
 			{
-				return AtcTarget->getHit() * effect->getImpactRate()*0.01f;
+				return AtcTarget->getHit() * mSkillEffect->getImpactRate()*0.01f;
 			}break;
 		case sAttribute::eCrit:
 			{
-				return AtcTarget->getCrit() * effect->getImpactRate()*0.01f;
+				return AtcTarget->getCrit() * mSkillEffect->getImpactRate()*0.01f;
 			}break;
 		default:
 			{
-				if (effect->getImpactType() != sAttribute::eNull)
+				if (mSkillEffect->getImpactType() != sAttribute::eNull)
 					CCLOG("ERROR: in [ HurtCount::attribute_hurt ]");
 				return 0;
 			}break;
@@ -318,4 +318,5 @@ namespace BattleSpace
 		sRoleNature hitType = (sRoleNature)HitTarget->getBaseData()->getProperty();
 		return AtcTarget->getBaseData()->judgeAttribute(hitType);
 	}
+
 };

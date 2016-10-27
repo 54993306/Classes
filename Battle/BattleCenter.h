@@ -27,6 +27,7 @@ using namespace std;
 #define BattleConfig BattleSpace::BattleCenter::shareManageCenter()->getConfigManage()
 #define BattleModelManage BattleSpace::BattleCenter::shareManageCenter()->getBattleModel()
 #define BattleGuide BattleSpace::BattleCenter::shareManageCenter()->getCombatGuideMg()
+#define BattleHurtCount BattleSpace::BattleCenter::shareManageCenter()->getHurtCount()
 
 namespace BattleSpace
 {
@@ -38,6 +39,7 @@ namespace BattleSpace
 	class ConfigManage;
 	class AreaManage;
 	class BattleModel;
+	class HurtCount;
 	class BattleCenter
 	{
 	public:
@@ -50,6 +52,7 @@ namespace BattleSpace
 		ConfigManage* getConfigManage();
 		AreaManage* getAreaManage();
 		BattleModel* getBattleModel();
+		HurtCount* getHurtCount();
 	protected:
 		WarManager *mWarManage;
 		CoordsManage *mMapManage;
@@ -59,6 +62,7 @@ namespace BattleSpace
 		ConfigManage* mConfigManage;
 		AreaManage* mAreaManage;
 		BattleModel* mBattleModel;
+		HurtCount* mHurtcount;
 	public:
 		virtual ~BattleCenter();
 		static BattleCenter* shareManageCenter();

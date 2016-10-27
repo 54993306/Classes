@@ -22,7 +22,8 @@
 #include "Battle/RoleConfigData.h"
 #include "Battle/SpineDataManage.h"
 #include "Battle/BattleTools.h"
-namespace BattleSpace{
+namespace BattleSpace
+{
 	AliveObject::AliveObject()
 		:m_Body(nullptr),m_HpObject(nullptr),m_Name(""),m_ActionKey(""),m_MoveState(sStateCode::eNullState)
 		,m_NameLabel(nullptr),m_Armature(nullptr),m_DropItem(0),m_offs(CCPointZero)
@@ -36,6 +37,13 @@ namespace BattleSpace{
 	{
 		setBody(nullptr);
 		return true;
+	}
+
+	void AliveObject::draw()
+	{
+		CCNode::draw();
+		if (m_HpObject)
+			updateHpPosition();
 	}
 
 	void AliveObject::setBody(CCSprite* body)
@@ -66,6 +74,7 @@ namespace BattleSpace{
 		testLabel();
 		m_HpObject = HPObject::create();
 		m_HpObject->initHp(this);
+		//CCSize size = m_Armature->getContentSize();
 		m_HpObject->setPosition(ccp(0,10-GRID_HEIGHT/2));
 		this->addChild(m_HpObject, 1);					//设置血量对象添加的父节点
 		initAliveTypeIcon();
@@ -181,7 +190,7 @@ namespace BattleSpace{
 	//做受击判断和一个冲锋0号格子特殊处理,攻击音效攻击特效播放,使用了受击数组但是未操作
 	void AliveObject::AtkBegin_Event()
 	{
-		if(m_AtkEffect)
+		if(m_AtkEffect)//当前并没有使用攻击特效
 		{
 			EffectObject* _Effect = EffectObject::create(ToString(m_AtkEffect));
 			this->addChild(_Effect);						//播在人物身上，不会发生偏移，跟着人物走动的
@@ -194,7 +203,7 @@ namespace BattleSpace{
 	{
 		mRole->attackEventLogic();
 		//if (getPlayerEffect())
-			//NOTIFICATION->postNotification(B_SkilEffectInMap,this);
+		//NOTIFICATION->postNotification(B_SkilEffectInMap,this);
 	}
 	//攻击区域必杀技状态才绘制,攻击完毕可以将武将传出去,进行下一个效果的判断或是重置武将信息等
 	void AliveObject::AtkEnd_Event()
@@ -248,6 +257,8 @@ namespace BattleSpace{
 		m_HpObject->playChangeNumber(pNumber,pType);
 		if (mRole->getMonsterSpecies() == sMonsterSpecies::eWorldBoss)														//boss的情况处理应该在血量条的内部,自己进行。
 			NOTIFICATION->postNotification(B_WorldBoss_HurtUpdate,CCInteger::create(m_HpObject->getHpNumber()));	
+		if (mRole->getMonsterSpecies() == sMonsterSpecies::eBoss)
+			bNotification->postNotification(MsgUpdateBossHp,mRole);
 		if (pType > PlayHpType::gainType)
 			lostHpDispose();
 	}
@@ -322,7 +333,7 @@ namespace BattleSpace{
 		}
 	}
 
-	void AliveObject::VariantModel( bool pInVariant )
+	void AliveObject::VariantModel()
 	{
 		//武将身上放一个特效挂在对象，这个对象只存在于武将身上，只跟武将耦合，负责武将特效的播放
 		SpineData* tData = SpineManage->getSpineData("20001");
@@ -333,36 +344,27 @@ namespace BattleSpace{
 		}
 		SkeletonAnimation*  tAnimation = SkeletonAnimation::createWithData(tData->first);
 		CCAssert(tAnimation,"AliveObject::VariantModel Spine NULL");
-		if (pInVariant)
+		tAnimation->setAnimation(0,Stand_Action,true);				//爆特效	
+		tAnimation->eventListener = [this]( int trackIndex,spEvent* Event )
 		{
-			tAnimation->setAnimation(0,Stand_Action,true);				//爆特效	
-			tAnimation->eventListener = [this]( int trackIndex,spEvent* Event )
-			{
-				if (Event->intValue >= 200)			//音效从200号文件开始播放
-					PlaySound(Event->intValue);
-				else
-					mRole->VariantEnd(true);
-			};
-			tAnimation->completeListener = [tAnimation](int trackIndex, int loopCount)
-			{
-				tAnimation->removeFromParentAndCleanup(true);
-			};
-			this->addChild(tAnimation);
-		}else{
-			tAnimation->setAnimation(0,Stand_Action,true);				//爆特效	(变身回来的特效动作名称可能不同)
-			tAnimation->eventListener = [this]( int trackIndex,spEvent* Event )
-			{
-				if (Event->intValue >= 200)			//音效从200号文件开始播放
-					PlaySound(Event->intValue);
-				else
-					mRole->VariantEnd(false);
-			};
-			tAnimation->completeListener = [tAnimation](int trackIndex, int loopCount)
-			{
-				tAnimation->removeFromParentAndCleanup(true);
-			};
-			this->addChild(tAnimation);
-		}
+			if (Event->intValue >= 200)			//音效从200号文件开始播放
+				PlaySound(Event->intValue);
+			else
+				mRole->VariantEnd();
+		};
+		tAnimation->completeListener = [tAnimation](int trackIndex, int loopCount)
+		{
+			tAnimation->removeFromParentAndCleanup(true);
+		};
+		this->addChild(tAnimation);
 	}
 
+	void AliveObject::updateHpPosition()
+	{
+		CCSize size = CCDirector::sharedDirector()->getWinSize();
+		m_HpObject->setPosition(0,mRole->getConfigData()->getHPPosition());
+		CCPoint p = this->convertToWorldSpace(m_HpObject->getPosition());
+		if (p.y > size.height - 50)
+			m_HpObject->setPosition(ccpAdd(m_HpObject->getPosition(),ccp(0,-(p.y+50-size.height))));
+	}
 }

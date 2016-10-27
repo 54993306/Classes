@@ -38,7 +38,7 @@ namespace BattleSpace
 		static RoleVariant* CreateVariant(BaseRole* pRole);
 		void updateVariant(float dt);
 	public:
-		virtual void PropertyChange(bool pAddProperty);
+		virtual void PropertyChange();
 		virtual bool isVariant();
 	protected:
 		virtual bool variantJudge();

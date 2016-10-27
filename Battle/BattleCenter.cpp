@@ -20,6 +20,7 @@
 #include "Battle/Config/ConfigManage.h"
 #include "Battle/Landform/AreaManage.h"
 #include "Battle/BattleModel.h"
+#include "Battle/HurtCount.h"
 
 namespace BattleSpace
 {
@@ -29,7 +30,7 @@ namespace BattleSpace
 
 	BattleCenter::BattleCenter():mMapManage(nullptr),mWarManage(nullptr),mTrapManage(nullptr),
 	mGuideManage(nullptr),mSpineDataManage(nullptr),mConfigManage(nullptr),
-	mAreaManage(nullptr),mBattleModel(nullptr)
+	mAreaManage(nullptr),mBattleModel(nullptr),mHurtcount(nullptr)
 	{}
 
 	BattleCenter::~BattleCenter()
@@ -60,6 +61,8 @@ namespace BattleSpace
 		mConfigManage = nullptr;
 		CC_SAFE_RELEASE(mBattleModel);
 		mBattleModel = nullptr;
+		CC_SAFE_RELEASE(mHurtcount);
+		mHurtcount = nullptr;
 	}
 
 	void BattleCenter::clearBattleData()
@@ -158,6 +161,16 @@ namespace BattleSpace
 			mBattleModel->retain();
 		}
 		return mBattleModel;
+	}
+
+	HurtCount* BattleCenter::getHurtCount()
+	{
+		if (mHurtcount == nullptr)
+		{
+			mHurtcount = HurtCount::create();
+			mHurtcount->retain();
+		}
+		return mHurtcount;
 	}
 
 }

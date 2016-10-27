@@ -30,7 +30,7 @@ namespace BattleSpace
 
 	void SpineDataManage::ReleaseSpineData()
 	{
-		CCLOG("/******************* Release SpineData ***************************/ \n");
+		CCLOG(" /******************* Release SpineData ***************************/ \n");
 		for (auto tPair:mMapData)
 		{
 			spSkeletonData_dispose(tPair.second.first);
@@ -94,11 +94,17 @@ namespace BattleSpace
 		mTrapVec.push_back(pTrapID);
 	}
 
+	void SpineDataManage::AddSpineEffectID( int pEffectID )
+	{
+		mSpineEffect.push_back(pEffectID);
+	}
+
 	void SpineDataManage::LoadSpineAnimation()
 	{
 		LoadVecRoleData();
 		LoadVecStoryData();
 		LoadVecTrap();
+		LoadVecEffect();
 	}
 	//  id + 类型  得到加载文件名   当前有3种，角色，角色特效，剧情spine
 	void SpineDataManage::LoadVecRoleData()
@@ -123,7 +129,6 @@ namespace BattleSpace
 			for (auto tStoryRole:i.second)
 				if (tStoryRole->getSpine()&&tStoryRole->getRoleID())
 					mVecStory.push_back(tStoryRole->getRoleID());
-
 		VectorUnique(mVecStory);
 		for (auto tStoryRole : mVecStory)
 			LoadStoryData(tStoryRole);
@@ -136,11 +141,25 @@ namespace BattleSpace
 		LoadTexture(path);					//加载模型图片
 	}
 
+	void SpineDataManage::LoadVecEffect(int pEffectID)
+	{
+		char path[60] = {0};
+		sprintf(path,"SpineEffect/%d",pEffectID);
+		LoadTexture(path);					//加载模型图片
+	}
+
 	void SpineDataManage::LoadVecTrap()
 	{
 		VectorUnique(mTrapVec);
 		for (auto tTrap : mTrapVec)
 			LoadTrapData(tTrap);
+	}
+
+	void SpineDataManage::LoadVecEffect()
+	{
+		VectorUnique(mSpineEffect);
+		for (auto tEffectID : mSpineEffect)
+			LoadVecEffect(tEffectID);
 	}
 
 	void SpineDataManage::LoadTrapData( int pTrap )
@@ -189,6 +208,7 @@ namespace BattleSpace
 		LoadStoryAction();
 		LoadRoleAction();
 		LoadTrapAction();
+		LoadEffectAction();
 		mLoadSucceed = true;
 		//std::function<void()> Fun = std::bind(&LoadSpineData::LoadSpineAction,this,m_VecSpine);
 		//std::thread LoadThread(Fun);
@@ -239,6 +259,18 @@ namespace BattleSpace
 			sprintf(tJson,"Trap/%d.json",tTrap);
 			sprintf(tAltlas,"Trap/%d.atlas",tTrap);
 			LoadActionData(tJson,tAltlas,ToString(tTrap));
+		}
+	}
+
+	void SpineDataManage::LoadEffectAction()
+	{
+		for (auto tEffect : mSpineEffect)
+		{
+			char tJson[60]   = {0};
+			char tAltlas[60] = {0};
+			sprintf(tJson,"SpineEffect/%d.json",tEffect);
+			sprintf(tAltlas,"SpineEffect/%d.atlas",tEffect);
+			LoadActionData(tJson,tAltlas,ToString(tEffect));
 		}
 	}
 

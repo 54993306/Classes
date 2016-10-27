@@ -178,8 +178,9 @@ namespace BattleSpace{
 		}
 		mVecRole.push_back(516);
 		SpineManage->AddRoleSpineID(146);
-		SpineManage->AddRoleSpineID(9999);
-		SpineManage->AddRoleSpineID(20001);
+		SpineManage->AddSpineEffectID(9999);
+		SpineManage->AddSpineEffectID(20001);
+		SpineManage->AddSpineEffectID(20002);
 #if BATTLE_TEST
 		//m_LoadSpine->AddRoleSpineID(2317);
 #endif
@@ -384,14 +385,19 @@ namespace BattleSpace{
 		for(auto tFileID:VecEffectID)
 		{
 			if (!tFileID) continue;
-			sprintf(plist_str,"skill/%d.plist",tFileID);
-			if (m_Release)
+			if (!m_Release && SpineManage->isSpineModel(tFileID))
 			{
-				CCLOG("Release WarResourse EFFectID = %d",tFileID);
-				AnimationManager::sharedAction()->ReleaseAnimation(ToString(tFileID));
-				CCSpriteFrameCache::sharedSpriteFrameCache()->removeSpriteFramesFromFile(plist_str);
+				SpineManage->AddSpineEffectID(tFileID);
 			}else{
-				TextureThread(plist_str,ToString(tFileID));
+				sprintf(plist_str,"skill/%d.plist",tFileID);
+				if (m_Release)
+				{
+					CCLOG("Release WarResourse EFFectID = %d",tFileID);
+					AnimationManager::sharedAction()->ReleaseAnimation(ToString(tFileID));
+					CCSpriteFrameCache::sharedSpriteFrameCache()->removeSpriteFramesFromFile(plist_str);
+				}else{
+					TextureThread(plist_str,ToString(tFileID));
+				}
 			}
 		}
 		VectorUnique(mVecBuff);
@@ -480,6 +486,7 @@ namespace BattleSpace{
 			CCArmatureDataManager::sharedArmatureDataManager()->removeArmatureFileInfo("warpublic/open.ExportJson");
 		this->unscheduleAllSelectors();
 		ManageCenter->clearBattleData();
+		//ManageCenter->rleaseData();
 		CCTextureCache::sharedTextureCache()->removeUnusedTextures();				//清理掉所有的不使用的图片
 		FileUtils::sharedFileUtils()->releaseFile("csv/loadWar.csv");
 		LayerManager::instance()->closeAll();

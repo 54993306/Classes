@@ -59,6 +59,7 @@ namespace BattleSpace
 	{
 		NOTIFICATION->addObserver(this,callfuncO_selector(CombatEffect::AttackNull),B_AttactNull,nullptr);
 		NOTIFICATION->addObserver(this,callfuncO_selector(CombatEffect::BattleEffect),B_AttackResult,nullptr);
+		bNotification->addObserver(this,callfuncO_selector(CombatEffect::DelayEffect),MsgDelayAttack,nullptr);
 	}
 
 
@@ -225,6 +226,37 @@ namespace BattleSpace
 			mManage->setLogicState(true);
 		}
 	}
+	//spineEffect   在很多地方都可能使用上spine的特效
+	void CombatEffect::DelayEffect( CCObject* ob )
+	{
+		BattleResult* Result = (BattleResult*)ob;
+		BaseRole*tAtkRole = Result->getAlive();
+		RoleObject* tAtkRoleOb = tAtkRole->getRoleObject();
+		if (Result->getusNum()&&Result->getusType()!=PlayHpType::nullType)
+			tAtkRoleOb->playerNum(Result->getusType(),Result->getusNum());						//攻击武将播放血量变化(吸血类效果有时应该差时而非同步播放)
+		vector<unsigned int>::iterator iter = Result->m_HitTargets.begin();
+		for(;iter!=Result->m_HitTargets.end();++iter)
+		{
+			BaseRole* tRole = Result->m_Alive_s[*iter];
+			RoleObject* tRoleOb = tRole->getRoleObject();
+			if (!tRoleOb)continue;
+			if (Result->m_LostHp[*iter].hitNum < 0)														//播放受击动作
+			{
+				tRoleOb->TurnStateTo(sStateCode::eHitState); 
+				if (!tAtkRole->getOtherCamp())
+					NOTIFICATION->postNotification(B_ContinuousNumber);									//刷新连击处理
+			}
+			tRoleOb->playerNum((PlayHpType)Result->m_LostHp[*iter].hitType,Result->m_LostHp[*iter].hitNum);	
+
+			if (Result->m_Repel[*iter] != tRole->getGridIndex())
+			{
+				tRole->setMoveGrid(Result->m_Repel[*iter]);
+				tRoleOb->setMoveState(sStateCode::eHitState);
+				if (tRole->getEnemy())
+					BattleAreaManage->initRoleMovePath(tRole,(C_GRID_COL-2)*C_GRID_ROW+tRole->getGridIndex()%C_GRID_ROW);
+			}
+		}
+	}
 
 	void CombatEffect::BattleEffect(CCObject* ob)
 	{
@@ -243,7 +275,7 @@ namespace BattleSpace
 			if ( !tRole|| !tRoleOb)continue;	
 			if (effectinfo->getfoeEft())
 			{
-				EffectObject* SkillEffect = EffectObject::create(ToString(effectinfo->getfoeEft()));									//受击目标播放受击特效
+				EffectObject* SkillEffect = EffectObject::create(ToString(effectinfo->getfoeEft()));	//受击目标播放受击特效
 				SkillEffect->setSkewing(true);
 				SkillEffect->setScale(1/tRoleOb->getScale());
 				tRoleOb->addChild(SkillEffect);
@@ -261,13 +293,13 @@ namespace BattleSpace
 				m_Scene->getBattleMapLayer()->addChild(FloorEffect);	
 				FloorEffect->setShaderEffect(tAtkRoleOb->getArmature()->getShaderProgram());
 			}
-			if (effectinfo->getisShake())															//震屏处理
+			if (effectinfo->getisShake())																//震屏处理
 				NOTIFICATION->postNotification(B_Shark,nullptr);
-			if (Result->m_LostHp[*iter].hitNum < 0)													//播放受击动作
+			if (Result->m_LostHp[*iter].hitNum < 0)														//播放受击动作
 			{
 				tRoleOb->TurnStateTo(sStateCode::eHitState); 
 				if (!tAtkRole->getOtherCamp())
-					NOTIFICATION->postNotification(B_ContinuousNumber);			//刷新连击处理
+					NOTIFICATION->postNotification(B_ContinuousNumber);									//刷新连击处理
 			}
 			tRoleOb->playerNum((PlayHpType)Result->m_LostHp[*iter].hitType,Result->m_LostHp[*iter].hitNum);	
 

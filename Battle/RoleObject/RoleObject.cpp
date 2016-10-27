@@ -349,6 +349,10 @@ namespace BattleSpace
 			{
 				bNotification->postNotification(B_SKILL_MASK,mRole);
 			}break;
+		case eActionEvent::eAttackEventEnd:
+			{
+				attackActionEnd();
+			}break;
 		default:
 			break;
 		}									//动画确定播放点,策划确定播放内容

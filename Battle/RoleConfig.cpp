@@ -103,6 +103,8 @@ namespace BattleSpace
 				tConfigData->setVariantEffect(tData["VariantEffect"].GetInt());
 			if (tData.HasMember("VariantModel"))
 				tConfigData->setVariantModel(tData["VariantModel"].GetInt());
+			if (tData.HasMember("HPPosition"))
+				tConfigData->setHPPosition(tData["HPPosition"].GetInt());
 			AddConfigData(tConfigData);
 		}
 		mDefultData = RoleConfigData::create();

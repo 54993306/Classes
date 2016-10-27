@@ -48,11 +48,11 @@ namespace BattleSpace{
 		return false;
 	}
 
-	int BaseRoleData::getActiveSkillType() const
+	sSkillType BaseRoleData::getActiveSkillType() const
 	{
 		if (mActiveSkill->getSkillID())
 			return mActiveSkill->getSkillType();
-		return 0;
+		return sSkillType::eNullType;
 	}
 
 	bool BaseRoleData::hasCaptainSkill() const

@@ -74,6 +74,7 @@ namespace BattleSpace
 		ParseBattleGrid(tStageIndex,mMoveArea,mUndefinedArea,mEnterArea,mOtherEnter);
 		ParseAddCostGrid(tStageIndex,mCostArea);
 		mStoryData->initStoryData(tStageIndex);
+		mUndefinedArea.clear();
 		if (!mUndefinedArea.empty())
 			mObstacleArea.assign(mUndefinedArea.begin(),mUndefinedArea.end());
 		for (int tGrid = C_BEGINGRID;tGrid<C_CAPTAINGRID;tGrid++)

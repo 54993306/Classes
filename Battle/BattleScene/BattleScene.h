@@ -32,6 +32,7 @@ namespace BattleSpace
 	class WarControl;
 	class WarBackLayer;
 	class BattleClose;
+	class SpineFloorLayer;
 	enum WarSceneTouchPriority
 	{
 		guideLayerPriority = -11,		//引导层
@@ -78,6 +79,7 @@ namespace BattleSpace
 		CCTouch * m_Touch;
 		WarBackLayer* mBackLayer;
 		BattleClose* mBattleClose;
+		SpineFloorLayer* mSpineEffectLayer;
 	};
 };
 #endif // !_WAR_SCENE_H_

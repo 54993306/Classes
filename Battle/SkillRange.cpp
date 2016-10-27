@@ -47,8 +47,7 @@ namespace BattleSpace
 			for (BaseRole* tRole: VecAlive)
 			{
 				if ( pRole->hasAliveByTargets(tRole) || 
-					!tRole->inStandGrid(tGrid)		||
-					!tRole->getAliveState() )
+					!tRole->inStandGrid(tGrid)		)
 					continue;												//受击数组已存在该武将
 				if (tRole->getLogicState() == sLogicState::eInvincible ||
 					tRole->getLogicState() == sLogicState::eFree		||

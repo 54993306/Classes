@@ -57,7 +57,9 @@ namespace BattleSpace
 		void monsterSoleSprite();
 		void setRangePercent(float pPercent);
 		void colorBlink(int pNumber,const ccColor3B& color3);
-		void VariantModel(bool pInVariant);
+		void VariantModel();
+		void draw();
+		void updateHpPosition();
 	public:
 		CC_SYNTHESIZE(BaseRole*,mRole,BaseRole);							//设置逻辑对象
 		CC_SYNTHESIZE(MoveObject*,mMoveObj,MoveObject);						//设置移动对象
@@ -65,8 +67,8 @@ namespace BattleSpace
 		CC_SYNTHESIZE(int,mModel,Model);									//角色模型ID( 子类重写 )
 		CC_SYNTHESIZE(string,m_ActionKey,ActionKey);						//武将当前动作
 		CC_SYNTHESIZE(int,m_DropItem,DropItem);								//掉落物品类型
-		CC_SYNTHESIZE(CCNodeRGBA*,m_Armature,Armature);						//动画对象	( 子类实现 )
-		CC_SYNTHESIZE(SkeletonAnimation*,m_Skeleton,Skeleton);				//动画对象	( 子类实现 )
+		CC_SYNTHESIZE(CCNodeRGBA*,m_Armature,Armature);						//动画对象
+		CC_SYNTHESIZE(SkeletonAnimation*,m_Skeleton,Skeleton);				//spine特效对象
 		CC_SYNTHESIZE(int,m_AtkEffect,AtkEffect);							//攻击特效id
 		CC_SYNTHESIZE(int,m_PlayerEffect,PlayerEffect);						//播放空效果
 		CC_SYNTHESIZE(int,m_EffectMusic,EffectMusic);						//空效果音效

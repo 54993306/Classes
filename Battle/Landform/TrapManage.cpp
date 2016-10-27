@@ -61,7 +61,6 @@ namespace BattleSpace
 		map<int,BattleTrap*>::const_iterator iter = mTrapMap.find(pTrapID);
 		if (iter != mTrapMap.end())
 			return iter->second;
-		CCLOG("[ *ERROR ] TrapManage::getTerrain %d",pTrapID);
 		return mDefault;
 	}
 	//得到当前位置的地形

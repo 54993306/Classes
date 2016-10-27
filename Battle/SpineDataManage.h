@@ -25,6 +25,16 @@ using namespace spine;
 using namespace cocos2d;
 namespace BattleSpace
 {
+	enum struct eActionEvent
+	{
+		eBeginEvevt					=0,//攻击开始
+		eHitEvent					=1,//攻击帧
+		eShark						=2,//震动
+		eMask						=3,//marsk
+		eAttackEventEnd				=4,//攻击动作结束
+		eScaleScene					=5,//场景缩放
+	};
+
 	typedef std::pair<spSkeletonData*,spAtlas*> SpineData;
 	class WarManager;
 	class SpineDataManage : public CCObject 
@@ -43,16 +53,20 @@ namespace BattleSpace
 		void LoadSpineAnimation();
 		void AddRoleSpineID(int pRoleID);
 		void AddTrapID(int pTrapID);
+		void AddSpineEffectID(int pEffectID);
 	protected:
 		void LoadStoryData(int pStoryRole);
 		void LoadRoleData(int pRoleID);
 		void LoadTrapData(int pTrap);
 		void LoadVecRoleData();
 		void LoadVecStoryData();
+		void LoadVecEffect(int pEffectID);
 		void LoadVecTrap();
+		void LoadVecEffect();
 		void LoadRoleAction();
 		void LoadStoryAction();
 		void LoadTrapAction();
+		void LoadEffectAction();
 		void LoadTexture(const char* pPath);
 		bool AsyncLoadTexture(const char* pPath);
 		void LoadActionData(const char* pJson,const char* pAtlas,const char* pKey);
@@ -63,6 +77,7 @@ namespace BattleSpace
 		vector<int> mVecRole;
 		vector<int> mVecStory;
 		vector<int> mTrapVec;
+		vector<int> mSpineEffect;
 		vector<int> mSpineModels;									//记录spine的ID
 		map<string,SpineData> mMapData;
 	};

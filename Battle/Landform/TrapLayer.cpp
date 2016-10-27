@@ -23,14 +23,10 @@
 namespace BattleSpace
 {
 	TrapLayer::TrapLayer()
-	{
-
-	}
+	{}
 
 	TrapLayer::~TrapLayer()
-	{
-		
-	}
+	{}
 
 	bool TrapLayer::init()
 	{

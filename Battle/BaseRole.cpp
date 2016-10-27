@@ -39,7 +39,7 @@ namespace BattleSpace
 		,m_AtkInterval(0),m_SpecialAtk(false),mBattle(false),m_MoveSpeed(0),mSkillRange(nullptr),m_Model(0)
 		,m_CritTime(0),m_FatherID(0),m_Captain(false),m_CritEffect(false),mAliveState(true)
 		,m_TouchGrid(0),m_TouchState(false),mMoveObject(nullptr),mCallType(sCallType::eCommon),m_CallAliveNum(0)
-		,mDelaytime(0),mLogicState(sLogicState::eNormal),mMonsterSpecies(sMonsterSpecies::eCommon),mHurtCount(nullptr)
+		,mDelaytime(0),mLogicState(sLogicState::eNormal),mMonsterSpecies(sMonsterSpecies::eCommon)
 		,m_AliveID(0),mBehavior(sBehavior::eNormal),mBaseData(nullptr),mLogicData(nullptr),mAngerVariant(nullptr)
 		,mCommandGrid(0),mRoleLayer(nullptr),mAutoState(false),mMaxGrid(INVALID_GRID),mHasTarget(false),mEnterTime(0)
 		,mSkillEffect(nullptr),mClearState(true),mVariant(nullptr),mInTouchState(false)
@@ -57,8 +57,6 @@ namespace BattleSpace
 		mSkillEffect = nullptr;
 		CC_SAFE_RELEASE(mVariant);
 		mVariant = nullptr;
-		CC_SAFE_RELEASE(mHurtCount);
-		mHurtCount = nullptr;
 		mRoleObject = nullptr;
 		mMoveObject = nullptr;
 		mStandGrids.clear();
@@ -77,9 +75,6 @@ namespace BattleSpace
 
 		mGuardArea = GuardArea::create();
 		mGuardArea->retain();
-
-		mHurtCount = HurtCount::create();
-		mHurtCount->retain();
 
 		mSkillEffect = skEffectData::create();			//做容错性处理
 		mSkillEffect->retain();
@@ -418,7 +413,7 @@ namespace BattleSpace
 
 	bool BaseRole::canSummonAlive()
 	{
-		if (getBaseData()->getActiveSkillType() == eCallAtk)
+		if (getBaseData()->getActiveSkillType() == sSkillType::eCallAtk)
 		{
 			if (getCaptain() && getCallAliveNum() < 1)
 				return false;
@@ -499,11 +494,6 @@ namespace BattleSpace
 			}
 		}
 		return false;
-	}
-
-	int BaseRole::getSkillType()
-	{
-		return getCurrSkill()->getSkillType();
 	}
 
 	bool BaseRole::captainCallNumberJudge()
@@ -595,14 +585,15 @@ namespace BattleSpace
 		return false;
 	}
 
-	vector<BaseRole*>& BaseRole::getCurrSkillTargets()
+	vector<BaseRole*>& BaseRole::getCurrSkillTargets(int pCamp)
 	{
-		int tTarget = getCurrEffect()->getTargetType();
-		if ((getOtherCamp()&&tTarget == eUsType)	|| 
-			(!getOtherCamp()&&tTarget == eEnemyType) )			/*敌方自己，我方敌人*/
+		if (pCamp == 0)
+			pCamp = getCurrEffect()->getTargetType();
+		if ((getOtherCamp()&&pCamp == eUsType)	|| 
+			(!getOtherCamp()&&pCamp == eEnemyType) )			/*敌方自己，我方敌人*/
 			return BattleManage->inBattleMonsters(true);
-		if ((getOtherCamp()&&tTarget == eEnemyType) ||
-			(!getOtherCamp()&&tTarget == eUsType))				/*敌方敌人，我方自己*/
+		if ((getOtherCamp()&&pCamp == eEnemyType) ||
+			(!getOtherCamp()&&pCamp == eUsType))				/*敌方敌人，我方自己*/
 			return BattleManage->inBattleHeros(true);
 		return BattleManage->inBattleRoles(true); 
 	}
@@ -772,7 +763,7 @@ namespace BattleSpace
 			}
 			AliveExcuteAI();
 		}else{
-			if (getSkillType() == eCallAtk)
+			if (getCurrSkill()->getSkillType() == sSkillType::eCallAtk)
 			{
 				getRoleObject()->setMoveState(sStateCode::eNullState);
 				getRoleObject()->TurnStateTo(sStateCode::eStandState);
@@ -1143,25 +1134,29 @@ namespace BattleSpace
 	{
 		if( soriteNumberEnd() )										//当掉血帧多于实际逻辑值，少于实际逻辑值情况处理
 			return;	
-		switch ( getSkillType() )
+		setSortieNum(getSortieNum()+1);											//表示执行了一次攻击逻辑
+		switch ( getCurrSkill()->getSkillType())
 		{
-		case eNorAtk:
-		case eSpeAtk:
-		case eCriAtk:
+		case sSkillType::eNorAtk:
+		case sSkillType::eSpeAtk:
+		case sSkillType::eCriAtk:
 			{
-				setSortieNum(getSortieNum()+1);											//表示执行了一次攻击逻辑
 				mSkillRange->initAreaTargets(this);
-				BattleResult* tResult = mHurtCount->AttackExcute(this);					//实际进行伤害计算的地方，不应由动作来控制的，动作可以控制播放。
+				BattleResult* tResult = BattleHurtCount->AttackExcute(this);					//实际进行伤害计算的地方，不应由动作来控制的，动作可以控制播放。
 				if ( getCriAtk() && !getEffIndex())										//必杀技多释一个空效果
 					bNotification->postNotification(B_AttactNull,tResult);
 				if (!tResult->m_HitTargets.empty())
 					bNotification->postNotification(B_AttackResult,tResult);
 			}break;
-		case eCallAtk:
+		case sSkillType::eCallAtk:
 			{
-				setSortieNum(getSortieNum()+1);											//一次性可召唤多个武将
 				BaseRole* tRole = getCallRole(getCurrSkill());							//得到被召唤的武将	
 				bNotification->postNotification(MsgCreateRoleObject,tRole);
+			}break;
+		case sSkillType::eSpineEffect:
+			{
+				mSkillRange->initAreaTargets(this);
+				bNotification->postNotification(MsgCreateSpineFloor,this);				
 			}break;
 		}
 		if( soriteNumberEnd() )
@@ -1488,7 +1483,7 @@ namespace BattleSpace
 		{
 			if (isVariant())
 			{
-				VariantEnd(false);
+				VariantEnd();
 			}
 			setAliveState(false);
 			setFirstInit(false);
@@ -1575,29 +1570,21 @@ namespace BattleSpace
 	void BaseRole::updateRage( float pRate )
 	{
 		mRoleObject->setRangePercent(pRate);
-		if (mAngerVariant)
+		if (mAngerVariant)//对控制面板造成影响
 			mAngerVariant->setPercentage(pRate);
-		//增加一个对控制面板造成影响界面
 	}
 
-	void BaseRole::VariantBegin( bool pInVariant )
+	void BaseRole::VariantBegin()
 	{
 		setMove(false);
 		setLogicState(sLogicState::eInvincible);
-		if (pInVariant)
-		{
-			mRoleObject->VariantModel(pInVariant);
-		}else{
-			updateRage(0);
-			mRoleObject->VariantModel(pInVariant);
-		}
+		mRoleObject->VariantModel();
 	}
 
-	void BaseRole::VariantEnd( bool pInVariant )
+	void BaseRole::VariantEnd()
 	{
 		setMove(true);
 		setLogicState(sLogicState::eNormal);
-		//范围100点真实伤害写死
 		vector<int> tRoudArea;
 		initGridRound(tRoudArea,getGridIndex());
 		for (auto tGrid : tRoudArea)
@@ -1605,11 +1592,11 @@ namespace BattleSpace
 			BaseRole* tRole = BattleManage->getAliveByGrid(tGrid);
 			if (tRole && tRole->getOtherCamp() != getOtherCamp())
 			{
-				tRole->changeBoold(- 100);
+				tRole->changeBoold(- 100);		//范围100点真实伤害写死
 			}
 		}
 		bNotification->postNotification(B_ContinuousNumber);			//刷新连击处理
-		mVariant->PropertyChange(pInVariant);
+		mVariant->PropertyChange();
 	}
 
 	void BaseRole::colorBlink( int pNumber,const ccColor3B& color3 )

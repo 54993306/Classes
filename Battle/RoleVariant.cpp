@@ -94,12 +94,12 @@ namespace BattleSpace
 		case BattleSpace::eVariantState::eInVariant:			//变回原来的模型,播放特效
 			{
 				mVariantProcess = true;
-				mRole->VariantBegin(false);
+				mRole->VariantBegin();
 			}break;
 		case BattleSpace::eVariantState::eCooldown:				//周围武将造成100点真是伤害,固定值，写死。
 			{
 				mVariantProcess = true;
-				mRole->VariantBegin(true);
+				mRole->VariantBegin();
 			}break;
 		case BattleSpace::eVariantState::eCooling:
 			{
@@ -138,11 +138,14 @@ namespace BattleSpace
 		mRole->updateRage(pRate);
 	}
 	//武将是否应该由一个常用属性变化的方法,应该有一个基础属性变化的方法,增加基础属性,和减少基础属性,一般都是以百分比来计算的
-	void RoleVariant::PropertyChange( bool pAddProperty /*= false*/ )
+	void RoleVariant::PropertyChange()
 	{
+		if (mVariantState != eVariantState::eCooldown && 
+			mVariantState != eVariantState::eInVariant )
+			return;
 		mBlinkState = true;
 		mVariantProcess = false;
-		if (pAddProperty)
+		if (mVariantState == eVariantState::eCooldown /*pAddProperty*/)
 		{
 			mVariantState = eVariantState::eInVariant;
 			mUserTime = mConfigData->getVariantDuration();

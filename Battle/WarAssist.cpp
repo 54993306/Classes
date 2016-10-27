@@ -944,6 +944,8 @@ namespace BattleSpace
 			converCol(tRole->getGridIndex())	 < C_GRID_COL_MIN	)
 			return;
 		displayBossWarningBegin(tRole);
+		bNotification->postNotification(MsgInitBossBar,tRole);
+		//大boss显示血量条
 	}
 
 	void WarAssist::starActionEnd( CCObject* ob )

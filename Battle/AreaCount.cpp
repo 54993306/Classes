@@ -5,7 +5,8 @@
 #include "Battle/BattleTools.h"
 
 using namespace cocos2d;
-namespace BattleSpace{
+namespace BattleSpace
+{
 	AreaCountInfo::AreaCountInfo(vector<int>& pVector,BaseRole* pAlive)
 		:mGrid(0),mVector(pVector),mAlive(pAlive),mEnemy(false),mBackAttack(false)
 		,mAreaType(0),mAreaRange(0),mDistance(0),mTargetType(0)

@@ -42,6 +42,7 @@ namespace BattleSpace{
 		void SkillEfHandleForEnemy(CCObject* ob);
 		void skillShowCallBack(CCObject* ob);
 		void BattleEffect(CCObject* ob);
+		void DelayEffect(CCObject* ob);
 		void setScene(BattleScene* scene);
 		void armatureMovementEventCallFunc(CCArmature * pArmature, MovementEventType type, const char *data);
 		void SpineActionEnd(int trackIndex);

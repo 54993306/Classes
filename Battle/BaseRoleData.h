@@ -29,6 +29,7 @@ namespace protos{
 namespace BattleSpace
 {
 	class RoleSkill;
+	enum struct  sSkillType;
 	class BaseRoleData : public cocos2d::CCObject
 	{
 	public:
@@ -82,7 +83,7 @@ namespace BattleSpace
 		bool hasSpecialSkill()const;
 		bool hasActiveSkill()const; 
 		bool hasCaptainSkill()const;
-		int getActiveSkillType()const;
+		sSkillType getActiveSkillType()const;
 	protected:
 		RoleSkill* mNormalSkill;										//ÆÕÍ¨¹¥»÷
 		RoleSkill* mSpecialSkill;										//ÌØÊâ¹¥»÷

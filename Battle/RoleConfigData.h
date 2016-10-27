@@ -43,6 +43,7 @@ namespace BattleSpace
 		CC_SYNTHESIZE(float,	mVariantRate,				VariantRate);			//变身属性变化比率
 		CC_SYNTHESIZE(int,		mVariantEffect,				VariantEffect);			//变身特效(虚影跟模型都是绑定在一起的。还有变身模型,命名好可以不需要配置)
 		CC_SYNTHESIZE(int,		mVariantModel,				VariantModel);			//变身模型(变身特效和返回特效都是固定的)
+		CC_SYNTHESIZE(int,		mHPPosition,				HPPosition);			//角色血量条位置
 	public:
 		CCNode* getActionEffect();
 	};
