@@ -23,6 +23,7 @@
 #include "Battle/MonsterData.h"
 #include "Battle/HeroData.h"
 #include "Battle/Config/ConfigManage.h"
+#include "Battle/RoleConfigData.h"
 using namespace CocosDenshion;
 //using namespace Battle;
 namespace BattleSpace{
@@ -173,6 +174,9 @@ namespace BattleSpace{
 				SpineManage->AddRoleSpineID(tRoleData->getRoleModel());
 			}else{
 				mVecRole.push_back(tRoleData->getRoleModel());
+				const RoleConfigData* tData = BattleConfig->getConfigData(tRoleData->getRoleModel());				//加载变身模型
+				if (tData->getVariant())
+					SpineManage->AddRoleSpineID(tData->getVariantModel());
 			}
 			SkillParse(tRoleData);	
 		}

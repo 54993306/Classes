@@ -150,7 +150,7 @@ namespace BattleSpace
 			mVariantState = eVariantState::eInVariant;
 			mUserTime = mConfigData->getVariantDuration();
 			mRole->colorBlink(C_StopForEver,ccc3(255,0,255));		//Í£µôÉÁË¸×´Ì¬
-			mRole->changeModel(mConfigData->getVariantModel());
+			mRole->changeModel(mConfigData->getVariantModel(),mConfigData->getVariantScale());
 			mRole->setMaxHp(mRole->getMaxHp() + mRole->getBaseData()->getRoleHp()*mConfigData->getVariantRate());
 			mRole->setHp(mRole->getHp() + mRole->getBaseData()->getRoleHp()*mConfigData->getVariantRate());
 			mRole->setAtk(mRole->getAtk() + mRole->getBaseData()->getRoleAttack()*mConfigData->getVariantRate());

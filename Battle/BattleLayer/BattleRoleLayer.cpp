@@ -153,12 +153,8 @@ namespace BattleSpace
 		pRole->setRoleLayer(this);
 		if (pRole->getEnemy() || pRole->getFatherID())
 		{
-			//EffectObject* eff = EffectObject::create("304");
-			//eff->setEffAnchorPoint(0.5f,0.5f);
-			//eff->setPosition(ccp(0,GRID_HEIGHT*1.0f));
-			//tRoleObject->addChild(eff);
-			//tRoleObject->setDropItem(tRoleObject->getAlive()->getBaseData()->getRoleDrop());
-			//PlayEffectSound(SFX_517);
+			tRoleObject->setDropItem(tRoleObject->getBaseRole()->getBaseData()->getRoleDrop());
+			PlayEffectSound(SFX_517);
 		}
 		AddActToGrid(tRoleObject,pRole->getGridIndex());
 	}
